@@ -1,0 +1,8 @@
+databaseChangeLog:
+
+  - preConditions:
+    - runningAs:
+        username: partysvc
+
+  - include:
+      file: database/changes/release-9.32.0/changelog.yml

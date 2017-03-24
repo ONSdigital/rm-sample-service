@@ -1,12 +1,59 @@
-*.class
+# Created by https://www.gitignore.io
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+*~
 
-# Package Files #
-*.jar
-*.war
-*.ear
+### Eclipse ###
+*.pydevproject
+.factorypath
+.metadata
+.gradle
+bin/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+# Eclipse Core
+.project
+
+# IntelliJ
+*.iml
+.idea/
+out/
+tools/addend/target/classes/
+
+# External tool builders
+.externalToolBuilders/
+
+# Locally stored "Eclipse launch configurations"
+*.launch
+
+# CDT-specific
+.cproject
+
+# JDT-specific (Eclipse Java Development Tools)
+.classpath
+
+# PDT-specific
+.buildpath
+
+# sbteclipse plugin
+.target
+
+# TeXlipse plugin
+.texlipse
+
+# IntelliJ
+*.iml
+.idea/
+out/
+tools/addend/target/classes/
+
+target
+*.log
+*.data
+*.redo
+*.backup

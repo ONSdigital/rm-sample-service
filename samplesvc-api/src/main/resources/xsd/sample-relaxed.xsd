@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://ons.gov.uk/ctp/response/respondent/definition"
+  targetNamespace="http://ons.gov.uk/ctp/response/respondent/definition">
+
+  <xsd:simpleType name="string_1_2">
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1" />
+      <xsd:maxLength value="2" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="string_1_6">
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1" />
+      <xsd:maxLength value="6" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="string_1_8">
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1" />
+      <xsd:maxLength value="8" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="string_1_9">
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1" />
+      <xsd:maxLength value="20" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="string_1_30">
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1" />
+      <xsd:maxLength value="30" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="string_1_35">
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1" />
+      <xsd:maxLength value="35" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="string_1_60">
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1" />
+      <xsd:maxLength value="60" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+
+  <xsd:element name="respondentCollection" type="RespondentCollection" />
+
+  <xsd:complexType name="RespondentCollection">
+    <xsd:annotation>
+      <xsd:documentation>This document contains the definitions of all
+        respondents for a given collection exercise
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="surveyRef" minOccurs="1" maxOccurs="1" />
+      <xsd:element name="collectionExerciseRef" minOccurs="1" maxOccurs="1" />
+      <xsd:element name="effectiveStartDate" type="xsd:dateTime" minOccurs="1" maxOccurs="1" />
+      <xsd:element name="effectiveEndDate" type="xsd:dateTime" minOccurs="1" maxOccurs="1" />
+      <xsd:element name="respondents" type="Respondents" minOccurs="1" maxOccurs="1" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+
+  <xsd:complexType name="Respondents">
+    <xsd:sequence>
+      <xsd:element name="Respondent" minOccurs="0" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:all>
+            <xsd:element name="respondentRef" type="xsd:string" minOccurs="1" maxOccurs="1" />
+            <xsd:element name="respondentType" minOccurs="1" maxOccurs="1">
+              <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                  <xsd:enumeration value="H" />
+                  <xsd:enumeration value="HI" />
+                  <xsd:enumeration value="C" />
+                  <xsd:enumeration value="CI" />
+                  <xsd:enumeration value="B" />
+                  <xsd:enumeration value="BI" />
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="treatmentRef" minOccurs="1" maxOccurs="1" type="xsd:string" />
+
+            <xsd:element name="addressType" minOccurs="0" maxOccurs="1" type="string_1_2" />
+            <xsd:element name="estabType" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="organisationName" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="category" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="line1" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="line2" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="line3" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="townName" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="county" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="postcode" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="ladCode" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="latitude" type="xsd:decimal" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="longitude" type="xsd:decimal" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="htc" type="xsd:int" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="locality" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="oa" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="msoa" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="lsoa" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="region" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="phoneNumber" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="emailAddress" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="title" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="forename" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="surname" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="checkletter" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="frosic2003" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="rusic2003" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="frosic2007" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="rusic2007" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="froempees" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="employees" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="froempment" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="employment" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="froFTEempt" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="FTEempt" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="frotover" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="turnover" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="entref" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="wowentref" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="vatref" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="payeref" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="crn" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="live_lu" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="live_vat" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="live_paye" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="legalstatus" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="entrepmkr" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="birthdate" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="entname1" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="entname2" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="entname3" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="runame1" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="runame2" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="runame3" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="tradstyle1" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="tradstyle2" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="tradstyle3" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="fax" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="seltype" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="inclexcl" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="cell_no" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="formtype" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="cso_tel" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="currency" type="xsd:string" minOccurs="0" maxOccurs="1" />
+
+
+          </xsd:all>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>

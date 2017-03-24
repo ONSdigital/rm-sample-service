@@ -1,0 +1,11 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 9.32.0-1
+      author: Phil Whiles
+      changes:
+        - sqlFile:
+            comment: First Schema
+            path: initial-schema.sql
+            relativeToChangelogFile: true
+            splitStatements: false
