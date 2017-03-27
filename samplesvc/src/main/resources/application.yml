@@ -88,3 +88,12 @@ spring:
       max-active: 10
       max-idle: 5
       min-idle: 3
+      
+sftp:
+  host: localhost
+  port: 22
+  username: centos
+  password: "JLibV2&XD,"
+  directory: Documents
+  cron: "* * * * * ?"
+  filepattern: "*.xml"

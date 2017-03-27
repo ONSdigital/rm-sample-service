@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<p:respondentCollection xmlns:p="http://ons.gov.uk/ctp/response/respondent/definition" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ons.gov.uk/ctp/response/respondent/definition sample-relaxed.xsd ">
+  <surveyRef/>
+  <collectionExerciseRef/>
+  <effectiveStartDate>2001-12-31T12:00:00</effectiveStartDate>
+  <effectiveEndDate>2001-12-31T12:00:00</effectiveEndDate>
+  <respondents/>
+</p:respondentCollection>

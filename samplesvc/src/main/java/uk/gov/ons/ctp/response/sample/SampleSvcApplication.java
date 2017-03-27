@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import uk.gov.ons.ctp.common.jaxrs.JAXRSRegister;
+import uk.gov.ons.ctp.response.respondent.definition.Respondents;
 
 /**
  * The main entry point into the IAC Service SpringBoot Application.
@@ -17,11 +19,11 @@ import uk.gov.ons.ctp.common.jaxrs.JAXRSRegister;
 @SpringBootApplication
 @EnableTransactionManagement
 @EnableCaching
+@ImportResource("springintegration/main.xml")
 public class SampleSvcApplication {
 
 //  @Autowired
 //  private AppConfig appConfig;
-
 
   /**
    * To register classes in the JAX-RS world.

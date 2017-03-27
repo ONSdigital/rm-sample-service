@@ -30,12 +30,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@Table(name = "party", schema = "party")
+@Table(name = "sample", schema = "sample")
 public class Sample {
 
   @Id
   @Column(name = "id")
-  private String partyId;
+  private String sampleId;
   
   @Version
   @Column(name = "optlockversion")

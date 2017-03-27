@@ -50,7 +50,7 @@
         <executions>
           <execution>
             <phase>generate-sources</phase>
-            <id>inbound</id>
+            <id>inbfound</id>
             <goals>
               <goal>generate</goal>
             </goals>

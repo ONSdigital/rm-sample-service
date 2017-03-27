@@ -2,7 +2,7 @@ databaseChangeLog:
 
   - preConditions:
     - runningAs:
-        username: partysvc
+        username: samplesvc
 
   - include:
       file: database/changes/release-9.32.0/changelog.yml
