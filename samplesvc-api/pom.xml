@@ -50,7 +50,7 @@
         <executions>
           <execution>
             <phase>generate-sources</phase>
-            <id>inbfound</id>
+            <id>inbound</id>
             <goals>
               <goal>generate</goal>
             </goals>
@@ -59,9 +59,9 @@
               <bindingIncludes>
                 <include>sample-relaxed.xjb</include>
               </bindingIncludes>
-              <bindingExcludes>
+<!--               <bindingExcludes>
                 <include>sample-relaxed.xjb</include>
-              </bindingExcludes>
+              </bindingExcludes> -->
               <schemaDirectory>src/main/resources/xsd</schemaDirectory>
               <schemaIncludes>
                 <include>sample-relaxed.xsd</include>

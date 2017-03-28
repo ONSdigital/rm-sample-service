@@ -8,7 +8,8 @@
 
     <int:annotation-config/>
 
-    <import resource="sftp-inbound-flow.xml"/>
+<!--     <import resource="sftp-inbound-flow.xml"/> -->
+    <import resource="sample-flow.xml"/>
 
 </beans>
 

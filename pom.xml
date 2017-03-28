@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>uk.gov.ons.ctp.product</groupId>
     <artifactId>sampleservice</artifactId>
-    <version>9.33.0-SNAPSHOT</version>
+    <version>9.35.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>CTP : SampleService</name>
@@ -13,7 +13,7 @@
     <properties>
         <skip.integration.tests>true</skip.integration.tests>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <common.version>9.33.0-SNAPSHOT</common.version>
+        <common.version>9.35.0-SNAPSHOT</common.version>
         <maven.compiler.plugin.version>3.5.1</maven.compiler.plugin.version>
         <java.version>1.8</java.version>
         <springboot.version>1.4.4.RELEASE</springboot.version>

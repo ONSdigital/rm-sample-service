@@ -49,26 +49,26 @@
         <int:poller cron="${sftp.cron}"/>
     </int-sftp:inbound-channel-adapter>
 
-    <int-file:file-to-string-transformer id="sftpTransformer" input-channel="sftpInbound" output-channel="caseReceiptValidator"
-        delete-files="false" charset="UTF-8"/>
+<!--     <int-file:file-to-string-transformer id="sftpTransformer" input-channel="sftpInbound" output-channel="caseReceiptValidator"
+        delete-files="false" charset="UTF-8"/> -->
 
      
 
     <!-- <int:logging-channel-adapter id="myLog" channel="caseReceiptValidator" level="INFO"/> -->
 
-   <int-xml:validating-filter id="sampleReceiptValidator" input-channel="caseReceiptValidator" 
-                               output-channel="sampleXmlValid" schema-location="classpath:xsd/sample-relaxed.xsd" discard-channel="invalidSample"/>
+<!--    <int-xml:validating-filter id="sampleReceiptValidator" input-channel="sftpInbound" 
+                               output-channel="sampleXmlValid" schema-location="classpath:xsd/sample-relaxed.xsd" discard-channel="invalidSample"/> -->
                                
        <!-- Secondly the now validated xml is transformed into the jaxb generated object model -->
        
-    <int:channel id="sampleXmlTransformed" datatype="uk.gov.ons.ctp.response.respondent.definition.RespondentCollection">
-    </int:channel>
-    <int-xml:unmarshalling-transformer
-            input-channel="sampleXmlValid" output-channel="sampleXmlTransformed"
-            unmarshaller="sampleUnmarshaller" />
     <bean id="sampleUnmarshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
         <property name="contextPath" value="uk.gov.ons.ctp.response.respondent.definition" />
     </bean>
+    <int:channel id="sampleXmlTransformed" datatype="uk.gov.ons.ctp.response.respondent.definition.RespondentCollection">
+    </int:channel>
+    <int-xml:unmarshalling-transformer
+            input-channel="sftpInbound" output-channel="sampleXmlTransformed"
+            unmarshaller="sampleUnmarshaller" />
                                
 <!-- discard-channel="caseReceiptXmlInvalid" -->
 <!--      <int:stream-transformer input-channel="sftpStreamTransformer" output-channel="sftpOutbound"/> -->

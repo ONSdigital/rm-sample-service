@@ -8,6 +8,7 @@ import org.springframework.messaging.Message;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.ctp.common.error.CTPException;
+import uk.gov.ons.ctp.response.respondent.definition.RespondentCollection;
 
 @Slf4j
 @MessageEndpoint
@@ -84,11 +85,13 @@ public class SFTPFileReceiverImpl {
    * @param caseReceipt to process
    */
   @ServiceActivator(inputChannel = "sampleXmlTransformed")
-  public void process(JAXBElement caseReceipt) {
+  public void process(RespondentCollection caseReceipt) {
     log.debug("entering process with caseReceipt {}", caseReceipt);
     /*System.out.println("Respondent: " + caseReceipt.getName());
     System.out.println("Respondent Content Model: " + caseReceipt.getValue());*/
     System.out.println("Respondent All: " + caseReceipt.toString());
+    System.out.println("Respondent All: " + caseReceipt.getEffectiveEndDate().getDay());
+    
   }
   
   /**
