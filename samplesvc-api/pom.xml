@@ -50,21 +50,24 @@
         <executions>
           <execution>
             <phase>generate-sources</phase>
-            <id>inbound</id>
+            <id>census-xjc</id>
             <goals>
               <goal>generate</goal>
             </goals>
             <configuration>
               <bindingDirectory>src/main/resources/xsd</bindingDirectory>
               <bindingIncludes>
-                <include>sample-relaxed.xjb</include>
+                <include>census-survey-sample.xjb</include>
+                <include>business-survey-sample.xjb</include>
+                <include>social-survey-sample.xjb</include>
               </bindingIncludes>
-<!--               <bindingExcludes>
-                <include>sample-relaxed.xjb</include>
-              </bindingExcludes> -->
+              <bindingExcludes>
+              </bindingExcludes>
               <schemaDirectory>src/main/resources/xsd</schemaDirectory>
               <schemaIncludes>
-                <include>sample-relaxed.xsd</include>
+                <include>census-survey-sample.xsd</include>
+                <include>business-survey-sample.xsd</include>
+                <include>social-survey-sample.xsd</include>
               </schemaIncludes>
               <generateDirectory>${project.build.directory}/generated-sources/xjc/inbound</generateDirectory>
               <args>
