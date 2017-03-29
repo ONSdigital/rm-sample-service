@@ -18,7 +18,6 @@
       </xsd:complexContent>
   </xsd:complexType>
 
-  <!-- the outer element containing requests -->
   <xsd:complexType name="SocialSampleUnits">
     <xsd:sequence>
       <xsd:element name="socialSampleUnit" type="SocialSampleUnit" minOccurs="0" maxOccurs="unbounded" />

@@ -5,8 +5,8 @@
 
   <xsd:complexType name="SampleUnitBase">
     <xsd:sequence>
-      <xsd:element name="respondentRef" type="xsd:string" minOccurs="1" maxOccurs="1" />
-      <xsd:element name="respondentType" minOccurs="1" maxOccurs="1">
+      <xsd:element name="sampleUnitRef" type="xsd:string" minOccurs="1" maxOccurs="1" />
+      <xsd:element name="sampleUnitType" minOccurs="1" maxOccurs="1">
         <xsd:simpleType>
           <xsd:restriction base="xsd:string">
             <xsd:enumeration value="H" />
