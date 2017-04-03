@@ -57,17 +57,17 @@
             <configuration>
               <bindingDirectory>src/main/resources/xsd</bindingDirectory>
               <bindingIncludes>
-                <include>census-survey-sample.xjb</include>
+               <!--  <include>census-survey-sample.xjb</include> -->
                 <include>business-survey-sample.xjb</include>
-                <include>social-survey-sample.xjb</include>
+                <!-- <include>social-survey-sample.xjb</include> -->
               </bindingIncludes>
               <bindingExcludes>
               </bindingExcludes>
               <schemaDirectory>src/main/resources/xsd</schemaDirectory>
               <schemaIncludes>
-                <include>census-survey-sample.xsd</include>
+                <!-- <include>census-survey-sample.xsd</include> -->
                 <include>business-survey-sample.xsd</include>
-                <include>social-survey-sample.xsd</include>
+                <!-- <include>social-survey-sample.xsd</include> -->
               </schemaIncludes>
               <generateDirectory>${project.build.directory}/generated-sources/xjc/inbound</generateDirectory>
               <args>

@@ -45,44 +45,39 @@
         <int:poller cron="${sftp.cron}"/>
     </int-sftp:inbound-channel-adapter>
 
-    <int-file:file-to-string-transformer id="sftpTransformer" input-channel="sftpInbound" output-channel="sampleXML" delete-files="false" charset="UTF-8"/>
+    <int-file:file-to-string-transformer id="sftpTransformer" input-channel="sftpInbound" output-channel="sampleXML" delete-files="false" charset="UTF-8"/> 
 
     <int-xml:validating-filter id="sampleValidator" input-channel="sampleXML" 
-                               output-channel="sampleXmlValid" schema-location="classpath:xsd/sample-relaxed.xsd" discard-channel="sampleXmlInvalid"/>
+                                output-channel="sampleXmlValid" schema-location="classpath:xsd/business-survey-sample.xsd" discard-channel="sampleXmlInvalid"/> 
        
     <int-xml:unmarshalling-transformer input-channel="sampleXmlValid" output-channel="sampleXmlTransformed" unmarshaller="sampleUnmarshaller" />
     
     <bean id="sampleUnmarshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
-        <property name="contextPath" value="uk.gov.ons.ctp.response.respondent.definition" />
+        <property name="contextPath" value="uk.gov.ons.ctp.response.sample.definition" />
     </bean>
                                
-    <int:channel id="sampleXmlTransformed"  datatype="uk.gov.ons.ctp.response.respondent.definition.RespondentCollection"></int:channel>
-<!--     <int:channel id="sampleXmlTransformed"  ></int:channel> -->
+    <int:channel id="sampleXmlTransformed"  datatype="uk.gov.ons.ctp.response.sample.definition.BusinessSurveySample"></int:channel>
 
-
-
-<!-- discard-channel="caseReceiptXmlInvalid" -->
-<!--      <int:stream-transformer input-channel="sftpStreamTransformer" output-channel="sftpOutbound"/> -->
-                                       
-<!-- <int-sftp:outbound-gateway id="renameFile" -->
-<!--                               session-factory="sftpSessionFactory" -->
-<!--                               request-channel="sftpOutbound" -->
-<!--                               reply-channel="nullChannel" -->
-<!--                               auto-startup="true" -->
-<!--                               remote-file-separator="/" -->
-<!--                               command="mv" -->
-<!--                               expression="headers['file_remoteDirectory'] + '/' + headers['file_remoteFile']" -->
-<!--                               rename-expression="headers['file_remoteDirectory'] + '/' + headers['file_remoteFile'] + '.processed'" -->
-<!--                               order="1"> -->
-<!--         <int-sftp:request-handler-advice-chain> -->
-<!--             <bean class="org.springframework.integration.handler.advice.ExpressionEvaluatingRequestHandlerAdvice"> -->
-<!--                 <property name="onSuccessExpression" value="#root" /> -->
-<!--                 <property name="successChannel" ref="sftpSuccessProcess" /> -->
-<!--                 <property name="onFailureExpression" value="#root" /> -->
-<!--                 <property name="failureChannel" ref="sftpFailedProcess" /> -->
-<!--             </bean> -->
-<!--         </int-sftp:request-handler-advice-chain> -->
-<!--     </int-sftp:outbound-gateway> -->
-<!--     <int:channel id="sftpSuccessProcess"/> -->
-<!--     <int:channel id="sftpFailedProcess"/> -->
+    <int-sftp:outbound-gateway id="renameFile"
+                          session-factory="sftpSessionFactory"
+                          request-channel="sampleXmlValid"
+                          reply-channel="nullChannel"
+                          auto-startup="true"
+                          remote-file-separator="/"
+                          command="mv"
+                          expression="'${sftp.directory}/' + headers['file_name']"
+                          rename-expression="'${sftp.directory}/' + headers['file_name'] + '.processed'"
+                          order="1">
+        <int-sftp:request-handler-advice-chain>
+            <bean class="org.springframework.integration.handler.advice.ExpressionEvaluatingRequestHandlerAdvice">
+                <property name="onSuccessExpression" value="#root" />
+                <property name="successChannel" ref="sftpSuccessProcess" />
+                <property name="onFailureExpression" value="#root" />
+                <property name="failureChannel" ref="sftpFailedProcess" />
+            </bean>
+        </int-sftp:request-handler-advice-chain>
+  </int-sftp:outbound-gateway>
+  <int:channel id="sftpSuccessProcess"/>
+  <int:channel id="sftpFailedProcess"/>
+  
 </beans>
