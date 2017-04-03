@@ -9,6 +9,8 @@
     <int:annotation-config/>
 
     <import resource="sample-ingest-business.xml"/>
+    <import resource="sample-ingest-census.xml"/>
+    <import resource="sample-ingest-social.xml"/>
 
 </beans>
 
