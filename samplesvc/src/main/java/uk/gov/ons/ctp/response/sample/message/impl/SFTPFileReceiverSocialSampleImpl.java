@@ -8,33 +8,33 @@ import org.springframework.messaging.support.GenericMessage;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.ctp.common.error.CTPException;
-import uk.gov.ons.ctp.response.sample.definition.BusinessSurveySample;
+import uk.gov.ons.ctp.response.sample.definition.SocialSurveySample;
 
 @Slf4j
 @MessageEndpoint
-public class SFTPFileReceiverBusinessSampleImpl implements SFTPFileReceiverSample<BusinessSurveySample> {
+public class SFTPFileReceiverSocialSampleImpl implements SFTPFileReceiverSample<SocialSurveySample> {
 
-  @ServiceActivator(inputChannel = "xmlInvalidBusiness")
+  @ServiceActivator(inputChannel = "xmlInvalidSocial")
   public void invalidXMLProcess(Message<String> message) throws CTPException {
-    log.info("xmlInvalidBusiness: " + message.getHeaders().get("file_name"));
+    log.info("xmlInvalidSocial: " + message.getHeaders().get("file_name"));
   }
   
   /**
-   * To process BusinessSurveySample transformed from XML
-   * @param BusinessSurveySample to process
+   * To process SocialSurveySample transformed from XML
+   * @param SocialSurveySample to process
    */
-  @ServiceActivator(inputChannel = "xmlTransformedBusiness")
-  public void transformedXMLProcess(BusinessSurveySample BusinessSurveySample) {
-    log.info(String.format("BusinessSurveySample (Collection Exercise Ref: %s) transformed successfully.", BusinessSurveySample.getCollectionExerciseRef()));
+  @ServiceActivator(inputChannel = "xmlTransformedSocial")
+  public void transformedXMLProcess(SocialSurveySample SocialSurveySample) {
+    log.info(String.format("SocialSurveySample (Collection Exercise Ref: %s) transformed successfully.", SocialSurveySample.getCollectionExerciseRef()));
   }
 
-  @ServiceActivator(inputChannel = "renameSuccessProcessBusiness")
+  @ServiceActivator(inputChannel = "renameSuccessProcessSocial")
   public void sftpSuccessProcess(GenericMessage<GenericMessage<byte[]>> message) {
     String filename = (String) message.getPayload().getHeaders().get("file_name");
     log.info("Renaming successful for " + filename);
   }
 
-  @ServiceActivator(inputChannel = "renameFailedProcessBusiness")
+  @ServiceActivator(inputChannel = "renameFailedProcessSocial")
   public void sftpFailedProcess(GenericMessage<MessagingException> message) {
     String filename = (String) message.getPayload().getFailedMessage().getHeaders().get("file_name");
     log.info("Renaming failed for" + filename);    

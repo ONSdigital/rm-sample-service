@@ -18,66 +18,55 @@
   http://www.springframework.org/schema/integration/stream 
   http://www.springframework.org/schema/integration/stream/spring-integration-stream-2.2.xsd">
   
-    <bean id="sftpSessionFactory" class="org.springframework.integration.file.remote.session.CachingSessionFactory">
-        <constructor-arg ref="defaultSftpSessionFactory" />
-        <constructor-arg value="1"/>
-        <property name="sessionWaitTimeout" value="5000"/>
-    </bean>
+    <import resource="session-factory.xml"/>
 
-    <bean id="defaultSftpSessionFactory" class="org.springframework.integration.sftp.session.DefaultSftpSessionFactory">
-        <property name="host" value="${sftp.host}"/>
-        <property name="port" value="${sftp.port}"/>
-        <property name="user" value="${sftp.username}"/>
-        <property name="password" value="${sftp.password}"/>
-        <property name="allowUnknownKeys" value="true"/>
-    </bean>
-
-    <int:channel id="sftpInbound"/>
-    <int:channel id="sampleXmlInvalid" />
+    <int:channel id="sftpInboundCensus"/>
+    <int:channel id="xmlInvalidCensus" />
+    <int:publish-subscribe-channel id="xmlValidCensus" />
     
-    <int-sftp:inbound-channel-adapter id="sftpInboundAdapter"
-            channel="sftpInbound"
+    <int-sftp:inbound-channel-adapter id="sftpInboundAdapterCensus"
+            channel="sftpInboundCensus"
             session-factory="sftpSessionFactory"
-            local-directory="/home/centos/Documents/sftp_test"
+            local-directory="/home/centos/Documents/sftp_test/census-local"
             filename-pattern="*.xml"
             remote-file-separator="/"
-            remote-directory="${sftp.directory}">
+            remote-directory="${sftp.directory}/census-sftp">
         <int:poller cron="${sftp.cron}"/>
     </int-sftp:inbound-channel-adapter>
 
-    <int-file:file-to-string-transformer id="sftpTransformer" input-channel="sftpInbound" output-channel="sampleXML" delete-files="false" charset="UTF-8"/> 
+    <int-file:file-to-string-transformer id="fileToStringTransformerCensus" input-channel="sftpInboundCensus" output-channel="xmlCensus" delete-files="false" charset="UTF-8"/> 
 
-    <int-xml:validating-filter id="sampleValidator" input-channel="sampleXML" 
-                                output-channel="sampleXmlValid" schema-location="classpath:xsd/census-survey-sample.xsd" discard-channel="sampleXmlInvalid"/> 
+    <int-xml:validating-filter id="xmlValidatorCensus" input-channel="xmlCensus" 
+                                output-channel="xmlValidCensus" schema-location="classpath:xsd/census-survey-sample.xsd" discard-channel="xmlInvalidCensus"/> 
        
-    <int-xml:unmarshalling-transformer input-channel="sampleXmlValid" output-channel="sampleXmlTransformed" unmarshaller="sampleUnmarshaller" />
+    <int-xml:unmarshalling-transformer input-channel="xmlValidCensus" output-channel="xmlTransformedCensus" unmarshaller="unmarshallerCensus" />
     
-    <bean id="sampleUnmarshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+    <bean id="unmarshallerCensus" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
         <property name="contextPath" value="uk.gov.ons.ctp.response.sample.definition" />
     </bean>
                                
-    <int:channel id="sampleXmlTransformed"  datatype="uk.gov.ons.ctp.response.sample.definition.CensusSurveySample"></int:channel>
+    <int:channel id="xmlTransformedCensus"  datatype="uk.gov.ons.ctp.response.sample.definition.CensusSurveySample"></int:channel>
 
-    <int-sftp:outbound-gateway id="renameFile"
+     <int-sftp:outbound-gateway id="renameFileCensus"
                           session-factory="sftpSessionFactory"
-                          request-channel="sampleXmlValid"
+                          request-channel="xmlValidCensus"
                           reply-channel="nullChannel"
                           auto-startup="true"
                           remote-file-separator="/"
                           command="mv"
-                          expression="'${sftp.directory}/' + headers['file_name']"
-                          rename-expression="'${sftp.directory}/' + headers['file_name'] + '.processed'"
+                          expression="'${sftp.directory}/census-sftp/' + headers['file_name']"
+                          rename-expression="'${sftp.directory}/census-sftp/' + headers['file_name'] + '.processed'"
                           order="1">
         <int-sftp:request-handler-advice-chain>
             <bean class="org.springframework.integration.handler.advice.ExpressionEvaluatingRequestHandlerAdvice">
                 <property name="onSuccessExpression" value="#root" />
-                <property name="successChannel" ref="sftpSuccessProcess" />
+                <property name="successChannel" ref="renameSuccessProcessCensus" />
                 <property name="onFailureExpression" value="#root" />
-                <property name="failureChannel" ref="sftpFailedProcess" />
+                <property name="failureChannel" ref="renameFailedProcessCensus" />
             </bean>
         </int-sftp:request-handler-advice-chain>
   </int-sftp:outbound-gateway>
-  <int:channel id="sftpSuccessProcess"/>
-  <int:channel id="sftpFailedProcess"/>
+  <int:channel id="renameSuccessProcessCensus"/>
+  <int:channel id="renameFailedProcessCensus"/>
   
 </beans>
