@@ -44,6 +44,7 @@ CREATE TABLE sample.samplingunit
   samplingunitid integer DEFAULT nextval('sampleunitidseq'::regclass) NOT NULL,
   sampleid bigint,
   sampleunitref character varying,
+  sampleunittype character varying(10),
   CONSTRAINT samplingunitid_pkey PRIMARY KEY (samplingunitid),
   CONSTRAINT summaryid_fkey FOREIGN KEY (sampleid)
       REFERENCES sample.samplesummary (sampleid) MATCH SIMPLE
