@@ -20,10 +20,10 @@ CREATE SEQUENCE sampleidseq
 CREATE TABLE sample.samplesummary
 (
   sampleid integer DEFAULT nextval('sampleidseq'::regclass) NOT NULL,
-  effectivestartdatetime date[],
-  effectiveenddatetime date[],
+  effectivestartdatetime timestamp with time zone,
+  effectiveenddatetime timestamp with time zone,
   surveyref character varying,
-  ingestdatetime date[],
+  ingestdatetime timestamp with time zone,
   state character varying,
   CONSTRAINT sampleid_pkey PRIMARY KEY (sampleid),
   CONSTRAINT state_fkey FOREIGN KEY (state)
