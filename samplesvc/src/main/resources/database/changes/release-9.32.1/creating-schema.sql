@@ -6,8 +6,8 @@ CREATE TABLE sample.samplestate
   CONSTRAINT state_pkey PRIMARY KEY (state)
 );
 
-INSERT INTO sample.samplestate(state)
-VALUES(INIT, ACTIVE)
+INSERT INTO sample.samplestate(state) VALUES('INIT');
+INSERT INTO sample.samplestate(state) VALUES('ACTIVE');
 
 -- for primary keys
 CREATE SEQUENCE sampleidseq
