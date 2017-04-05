@@ -22,7 +22,7 @@ CREATE TABLE sample.samplesummary
   sampleid integer DEFAULT nextval('sampleidseq'::regclass) NOT NULL,
   effectivestartdatetime date[],
   effectiveenddatetime date[],
-  surveyref character varying[],
+  surveyref character varying,
   ingestdatetime date[],
   state character varying,
   CONSTRAINT sampleid_pkey PRIMARY KEY (sampleid),
@@ -43,7 +43,7 @@ CREATE TABLE sample.samplingunit
 (
   samplingunitid integer DEFAULT nextval('sampleunitidseq'::regclass) NOT NULL,
   sampleid bigint,
-  sampleunitref character varying[],
+  sampleunitref character varying,
   CONSTRAINT samplingunitid_pkey PRIMARY KEY (samplingunitid),
   CONSTRAINT summaryid_fkey FOREIGN KEY (sampleid)
       REFERENCES sample.samplesummary (sampleid) MATCH SIMPLE
