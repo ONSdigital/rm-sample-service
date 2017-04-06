@@ -64,7 +64,7 @@ public class SFTPFileReceiverBusinessSampleImpl implements SFTPFileReceiverSampl
       sampleService.createSampleUnit(sampleUnit);
       
     }
-    
+
   }
 
   @ServiceActivator(inputChannel = "renameSuccessProcessBusiness")
