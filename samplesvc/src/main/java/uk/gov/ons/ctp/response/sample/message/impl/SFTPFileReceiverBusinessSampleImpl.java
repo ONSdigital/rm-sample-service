@@ -18,6 +18,7 @@ import uk.gov.ons.ctp.response.sample.definition.BusinessSampleUnit;
 import uk.gov.ons.ctp.response.sample.definition.BusinessSurveySample;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.service.BusinessSampleService;
 
 @Slf4j
@@ -48,7 +49,7 @@ public class SFTPFileReceiverBusinessSampleImpl implements SFTPFileReceiverSampl
     sampleSummary.setEffectiveEndDateTime(effectiveEndDateTime);
     sampleSummary.setSurveyRef(businessSurveySample.getSurveyRef());
     sampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
-    sampleSummary.setState("INIT");
+    sampleSummary.setState(SampleSummaryDTO.SampleState.INIT);
     
     SampleSummary savedSampleSummary = businessSampleService.createSampleSummary(sampleSummary);
     

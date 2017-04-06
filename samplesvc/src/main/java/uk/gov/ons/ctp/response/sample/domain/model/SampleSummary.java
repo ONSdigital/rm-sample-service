@@ -5,6 +5,8 @@ import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -18,6 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 
 /**
  * TODO
@@ -53,7 +56,7 @@ public class SampleSummary implements Serializable {
   @Column(name = "ingestdatetime")
   private Timestamp ingestDateTime;
   
-  @Column(name = "state")
-  private String state;
+  @Enumerated(EnumType.STRING)
+  private SampleSummaryDTO.SampleState state;
  
 }
