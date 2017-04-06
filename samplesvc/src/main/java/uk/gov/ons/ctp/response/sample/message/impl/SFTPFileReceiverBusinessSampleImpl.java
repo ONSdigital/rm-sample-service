@@ -19,14 +19,14 @@ import uk.gov.ons.ctp.response.sample.definition.BusinessSurveySample;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
-import uk.gov.ons.ctp.response.sample.service.BusinessSampleService;
+import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 @Slf4j
 @MessageEndpoint
 public class SFTPFileReceiverBusinessSampleImpl implements SFTPFileReceiverSample<BusinessSurveySample> {
 
   @Inject
-  private BusinessSampleService businessSampleService;
+  private SampleService sampleService;
   
   @ServiceActivator(inputChannel = "xmlInvalidBusiness")
   public void invalidXMLProcess(Message<String> message) throws CTPException {
@@ -51,7 +51,7 @@ public class SFTPFileReceiverBusinessSampleImpl implements SFTPFileReceiverSampl
     sampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
     sampleSummary.setState(SampleSummaryDTO.SampleState.INIT);
     
-    SampleSummary savedSampleSummary = businessSampleService.createSampleSummary(sampleSummary);
+    SampleSummary savedSampleSummary = sampleService.createSampleSummary(sampleSummary);
     
     List<BusinessSampleUnit> samplingUnitList = businessSurveySample.getSampleUnits().getBusinessSampleUnits();
     
@@ -61,7 +61,7 @@ public class SFTPFileReceiverBusinessSampleImpl implements SFTPFileReceiverSampl
       sampleUnit.setSampleUnitRef(businessSampleUnit.getSampleUnitRef());
       sampleUnit.setSampleUnitType(businessSampleUnit.getSampleUnitType());
       
-      businessSampleService.createSampleUnit(sampleUnit);
+      sampleService.createSampleUnit(sampleUnit);
       
     }
     

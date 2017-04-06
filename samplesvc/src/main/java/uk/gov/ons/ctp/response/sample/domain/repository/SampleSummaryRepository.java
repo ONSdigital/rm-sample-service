@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 
 /**
- * JPA Data Repository needed to persist IAC records
+ * JPA Data Repository needed to persist Survey SampleSummarys
  */
 @Repository
 public interface SampleSummaryRepository extends JpaRepository<SampleSummary, Integer> {
