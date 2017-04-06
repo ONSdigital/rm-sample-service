@@ -42,10 +42,10 @@ CREATE SEQUENCE sampleunitidseq
 CREATE TABLE sample.sampleunit
 (
   sampleunitid integer DEFAULT nextval('sampleunitidseq'::regclass) NOT NULL,
-  sampleid bigint,
+  sampleid bigint NOT NULL,
   sampleunitref character varying,
   sampleunittype character varying(10),
-  CONSTRAINT sampleunitid_pkey PRIMARY KEY (sampleunitid),
+  CONSTRAINT sampleunitid_pkey PRIMARY KEY (sampleunitid) ,
   CONSTRAINT summaryid_fkey FOREIGN KEY (sampleid)
       REFERENCES sample.samplesummary (sampleid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
