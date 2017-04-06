@@ -39,13 +39,13 @@ CREATE SEQUENCE sampleunitidseq
     MAXVALUE 999999999999
     CACHE 1;
 
-CREATE TABLE sample.samplingunit
+CREATE TABLE sample.sampleunit
 (
-  samplingunitid integer DEFAULT nextval('sampleunitidseq'::regclass) NOT NULL,
+  sampleunitid integer DEFAULT nextval('sampleunitidseq'::regclass) NOT NULL,
   sampleid bigint,
   sampleunitref character varying,
   sampleunittype character varying(10),
-  CONSTRAINT samplingunitid_pkey PRIMARY KEY (samplingunitid),
+  CONSTRAINT sampleunitid_pkey PRIMARY KEY (sampleunitid),
   CONSTRAINT summaryid_fkey FOREIGN KEY (sampleid)
       REFERENCES sample.samplesummary (sampleid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
