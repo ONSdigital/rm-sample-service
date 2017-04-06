@@ -27,7 +27,7 @@
     <int-sftp:inbound-channel-adapter id="sftpInboundAdapterSocial"
             channel="sftpInboundSocial"
             session-factory="sftpSessionFactory"
-            local-directory="/home/centos/Documents/sftp_test/social-local"
+            local-directory="${sftp.localdirectory}/social-local"
             filename-pattern="*.xml"
             remote-file-separator="/"
             remote-directory="${sftp.directory}/social-sftp">

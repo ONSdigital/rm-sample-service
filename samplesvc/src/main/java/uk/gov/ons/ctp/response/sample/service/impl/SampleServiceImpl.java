@@ -3,7 +3,7 @@ package uk.gov.ons.ctp.response.sample.service.impl;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import uk.gov.ons.ctp.response.sample.domain.repository.SampleRepository;
+import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 /**
@@ -14,7 +14,7 @@ public class SampleServiceImpl implements SampleService {
 
 
   @Inject
-  private SampleRepository sampleRepository;
+  private SampleSummaryRepository sampleRepository;
 
  
 }
