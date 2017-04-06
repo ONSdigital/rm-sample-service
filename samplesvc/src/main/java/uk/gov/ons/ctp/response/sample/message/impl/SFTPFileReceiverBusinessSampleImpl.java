@@ -54,11 +54,11 @@ public class SFTPFileReceiverBusinessSampleImpl implements SFTPFileReceiverSampl
     
     List<BusinessSampleUnit> samplingUnitList = businessSurveySample.getSampleUnits().getBusinessSampleUnits();
     
-    for (BusinessSampleUnit bsu : samplingUnitList) {
+    for (BusinessSampleUnit businessSampleUnit : samplingUnitList) {
       SampleUnit sampleUnit = new SampleUnit();
       sampleUnit.setSampleId(savedSampleSummary.getSampleId());
-      sampleUnit.setSampleUnitRef(bsu.getSampleUnitRef());
-      sampleUnit.setSampleUnitType(bsu.getSampleUnitType());
+      sampleUnit.setSampleUnitRef(businessSampleUnit.getSampleUnitRef());
+      sampleUnit.setSampleUnitType(businessSampleUnit.getSampleUnitType());
       
       businessSampleService.createSampleUnit(sampleUnit);
       
