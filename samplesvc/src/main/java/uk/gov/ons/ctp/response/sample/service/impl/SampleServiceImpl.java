@@ -1,14 +1,20 @@
 package uk.gov.ons.ctp.response.sample.service.impl;
 
 import java.sql.Timestamp;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+
+import ma.glasnost.orika.MapperFacade;
+import uk.gov.ons.ctp.common.rest.RestClient;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.common.time.DateTimeUtil;
+import uk.gov.ons.ctp.response.party.representation.PartyDTO;
+import uk.gov.ons.ctp.response.sample.definition.BusinessSampleUnit;
+import uk.gov.ons.ctp.response.sample.definition.BusinessSurveySample;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
@@ -33,6 +39,13 @@ public class SampleServiceImpl implements SampleService {
   
   @Inject
   private StateTransitionManager<SampleSummaryDTO.SampleState, SampleSummaryDTO.SampleEvent> sampleSvcStateTransitionManager;
+  
+  @Inject
+  private MapperFacade mapperFacade;
+  
+  @Inject
+  @Qualifier("sampleServiceClient")
+  private RestClient sampleServiceClient;
   
   @Override
   public <T extends SurveyBase> SampleSummary createandSaveSampleSummary(T surveySampleObject) {
@@ -93,5 +106,15 @@ public class SampleServiceImpl implements SampleService {
      sampleSummaryRepository.saveAndFlush(targetSampleSummary);
      //notificationPublisher.sendNotifications(Arrays.asList(prepareCaseNotification(targetCase, transitionEvent)));
    }
+  }
+  
+  @Override
+  public void sendToParty(BusinessSurveySample businessSurveySample) {
+    List<BusinessSampleUnit> samplingUnitList = businessSurveySample.getSampleUnits().getBusinessSampleUnits();
+    for (BusinessSampleUnit bsu : samplingUnitList) {
+//      PartyDTO party = new PartyDTO(bsu.getSampleUnitRef(),bsu.getSampleUnitType(), bsu.getForename());
+      PartyDTO party = mapperFacade.map(bsu, PartyDTO.class);
+      sampleServiceClient.postResource("/party/events", party, PartyDTO.class);
+    }
   }
 }

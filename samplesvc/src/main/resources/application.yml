@@ -88,6 +88,17 @@ spring:
       max-active: 10
       max-idle: 5
       min-idle: 3
+
+sample-svc:
+  sample-path: /events
+  connection-config:
+    scheme: http
+    host: localhost
+    port: 8125
+    retry-attempts: 10
+    retry-pause-milli-seconds: 5000
+    connect-timeout-milli-seconds: 5000
+    read-timeout-milli-seconds: 5000
       
 sftp:
   host: localhost
@@ -98,3 +109,4 @@ sftp:
   localdirectory: /tmp/samplesvc
   cron: "* * * * * ?"
   filepattern: "*.xml"
+  

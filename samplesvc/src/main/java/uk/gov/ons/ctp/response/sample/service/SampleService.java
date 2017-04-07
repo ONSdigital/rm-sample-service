@@ -2,6 +2,7 @@ package uk.gov.ons.ctp.response.sample.service;
 
 import java.util.List;
 
+import uk.gov.ons.ctp.response.sample.definition.BusinessSurveySample;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
@@ -39,4 +40,6 @@ public interface SampleService {
    * @return SampleSummary object or null
    */
   public void activateSampleSummaryState(Integer sampleId);
+
+  void sendToParty(BusinessSurveySample businessSurveySample);
 }

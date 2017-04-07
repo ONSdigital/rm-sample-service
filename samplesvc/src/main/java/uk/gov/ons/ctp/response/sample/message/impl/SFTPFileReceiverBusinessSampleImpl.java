@@ -41,7 +41,7 @@ public class SFTPFileReceiverBusinessSampleImpl implements SFTPFileReceiverSampl
     
     List<BusinessSampleUnit> samplingUnitList = businessSurveySample.getSampleUnits().getBusinessSampleUnits();
     sampleService.createandSaveSampleUnits(samplingUnitList, savedSampleSummary);
-
+    sampleService.sendToParty(businessSurveySample);
   }
 
   @ServiceActivator(inputChannel = "renameSuccessProcessBusiness")

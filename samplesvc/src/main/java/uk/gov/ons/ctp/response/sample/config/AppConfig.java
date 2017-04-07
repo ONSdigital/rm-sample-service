@@ -14,4 +14,5 @@ import lombok.Data;
 @ConfigurationProperties
 @Data
 public class AppConfig {
+  private SampleSvc sampleSvc;
 }
