@@ -1,6 +1,5 @@
 package uk.gov.ons.ctp.response.sample.message.impl;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -13,12 +12,9 @@ import org.springframework.messaging.support.GenericMessage;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.ctp.common.error.CTPException;
-import uk.gov.ons.ctp.common.time.DateTimeUtil;
 import uk.gov.ons.ctp.response.sample.definition.CensusSampleUnit;
 import uk.gov.ons.ctp.response.sample.definition.CensusSurveySample;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
-import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
-import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 @Slf4j
@@ -41,29 +37,10 @@ public class SFTPFileReceiverCensusSampleImpl implements SFTPFileReceiverSample<
   public void transformedXMLProcess(CensusSurveySample censusSurveySample) {
     log.info(String.format("CensusSurveySample (Collection Exercise Ref: %s) transformed successfully.", censusSurveySample.getCollectionExerciseRef()));
 
-    Timestamp effectiveStartDateTime = new Timestamp(censusSurveySample.getEffectiveStartDateTime().toGregorianCalendar().getTimeInMillis());
-    Timestamp effectiveEndDateTime = new Timestamp(censusSurveySample.getEffectiveEndDateTime().toGregorianCalendar().getTimeInMillis());
-    
-    SampleSummary sampleSummary = new SampleSummary();
-    sampleSummary.setEffectiveStartDateTime(effectiveStartDateTime);
-    sampleSummary.setEffectiveEndDateTime(effectiveEndDateTime);
-    sampleSummary.setSurveyRef(censusSurveySample.getSurveyRef());
-    sampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
-    sampleSummary.setState(SampleSummaryDTO.SampleState.INIT);
-    
-    SampleSummary savedSampleSummary = sampleService.createSampleSummary(sampleSummary);
+    SampleSummary savedSampleSummary = sampleService.createandSaveSampleSummary(censusSurveySample);
     
     List<CensusSampleUnit> samplingUnitList = censusSurveySample.getSampleUnits().getCensusSampleUnits();
-    
-    for (CensusSampleUnit censusSampleUnit : samplingUnitList) {
-      SampleUnit sampleUnit = new SampleUnit();
-      sampleUnit.setSampleId(savedSampleSummary.getSampleId());
-      sampleUnit.setSampleUnitRef(censusSampleUnit.getSampleUnitRef());
-      sampleUnit.setSampleUnitType(censusSampleUnit.getSampleUnitType());
-      
-      sampleService.createSampleUnit(sampleUnit);
-      
-    }
+    sampleService.createandSaveSampleUnits(samplingUnitList, savedSampleSummary);
 
   }
 

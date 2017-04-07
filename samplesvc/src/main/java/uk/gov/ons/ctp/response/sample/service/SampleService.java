@@ -1,26 +1,29 @@
 package uk.gov.ons.ctp.response.sample.service;
 
+import java.util.List;
+
+import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
+import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
-import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 
 public interface SampleService {
-  
+   
   /**
-   * Create a SampleSummary from the incoming SurveySample
+   * Create and save a SampleSummary from the incoming SurveySample
    *
-   * @param sampleSummary SampleSummary to be created
+   * @param surveySampleObject SurveySample to be used
    * @return the created SampleSummary
    */
-  SampleSummary createSampleSummary(SampleSummary sampleSummary);
-  
+  public <T extends SurveyBase> SampleSummary createandSaveSampleSummary(T surveySampleObject);
+
   /**
-   * Create a SampleUnit from the incoming SurveySample
-   *
-   * @param sampleUnit SampleUnit to be created
-   * @return the created SampleUnit
+   * Create and save SampleUnits from the incoming SurveySample
+   * 
+   * @param samplingUnitList List of SampleUnits to save
+   * @param sampleSummary SampleSummary to be used
    */
-  SampleUnit createSampleUnit(SampleUnit sampleUnit);
-  
+  public <T extends SampleUnitBase> void createandSaveSampleUnits(List<T> samplingUnitList, SampleSummary sampleSummary);
+    
   /**
    * Find SampleSummary entity by sampleid
    *

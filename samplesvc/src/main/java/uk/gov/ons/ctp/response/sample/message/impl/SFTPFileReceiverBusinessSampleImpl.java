@@ -1,6 +1,5 @@
 package uk.gov.ons.ctp.response.sample.message.impl;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -13,12 +12,9 @@ import org.springframework.messaging.support.GenericMessage;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.ctp.common.error.CTPException;
-import uk.gov.ons.ctp.common.time.DateTimeUtil;
 import uk.gov.ons.ctp.response.sample.definition.BusinessSampleUnit;
 import uk.gov.ons.ctp.response.sample.definition.BusinessSurveySample;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
-import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
-import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 @Slf4j
@@ -41,29 +37,10 @@ public class SFTPFileReceiverBusinessSampleImpl implements SFTPFileReceiverSampl
   public void transformedXMLProcess(BusinessSurveySample businessSurveySample) {
     log.info(String.format("BusinessSurveySample (Collection Exercise Ref: %s) transformed successfully.", businessSurveySample.getCollectionExerciseRef()));
 
-    Timestamp effectiveStartDateTime = new Timestamp(businessSurveySample.getEffectiveStartDateTime().toGregorianCalendar().getTimeInMillis());
-    Timestamp effectiveEndDateTime = new Timestamp(businessSurveySample.getEffectiveEndDateTime().toGregorianCalendar().getTimeInMillis());
-    
-    SampleSummary sampleSummary = new SampleSummary();
-    sampleSummary.setEffectiveStartDateTime(effectiveStartDateTime);
-    sampleSummary.setEffectiveEndDateTime(effectiveEndDateTime);
-    sampleSummary.setSurveyRef(businessSurveySample.getSurveyRef());
-    sampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
-    sampleSummary.setState(SampleSummaryDTO.SampleState.INIT);
-    
-    SampleSummary savedSampleSummary = sampleService.createSampleSummary(sampleSummary);
+    SampleSummary savedSampleSummary = sampleService.createandSaveSampleSummary(businessSurveySample);
     
     List<BusinessSampleUnit> samplingUnitList = businessSurveySample.getSampleUnits().getBusinessSampleUnits();
-    
-    for (BusinessSampleUnit businessSampleUnit : samplingUnitList) {
-      SampleUnit sampleUnit = new SampleUnit();
-      sampleUnit.setSampleId(savedSampleSummary.getSampleId());
-      sampleUnit.setSampleUnitRef(businessSampleUnit.getSampleUnitRef());
-      sampleUnit.setSampleUnitType(businessSampleUnit.getSampleUnitType());
-      
-      sampleService.createSampleUnit(sampleUnit);
-      
-    }
+    sampleService.createandSaveSampleUnits(samplingUnitList, savedSampleSummary);
 
   }
 

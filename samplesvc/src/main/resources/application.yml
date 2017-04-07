@@ -95,6 +95,6 @@ sftp:
   username: centos
   password: "JLibV2&XD,"
   directory: Documents
-  localdirectory: ~/Documents/sftp_test
+  localdirectory: /tmp/samplesvc
   cron: "* * * * * ?"
   filepattern: "*.xml"
