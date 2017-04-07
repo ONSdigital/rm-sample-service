@@ -31,5 +31,12 @@ public interface SampleService {
    * @return SampleSummary object or null
    */
   SampleSummary findSampleSummaryBySampleId(Integer sampleId);
-  
+ 
+  /**
+   * update sample summary status
+   *
+   * @param sampleId The sampleId 
+   * @return SampleSummary object or null
+   */
+  public void activateSampleSummaryState(Integer sampleId);
 }

@@ -1,11 +1,13 @@
 package uk.gov.ons.ctp.response.sample.service.impl;
 
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.common.time.DateTimeUtil;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
@@ -28,6 +30,9 @@ public class SampleServiceImpl implements SampleService {
 
   @Inject
   private SampleUnitRepository sampleUnitRepository;
+  
+  @Inject
+  private StateTransitionManager<SampleSummaryDTO.SampleState, SampleSummaryDTO.SampleEvent> sampleSvcStateTransitionManager;
   
   @Override
   public <T extends SurveyBase> SampleSummary createandSaveSampleSummary(T surveySampleObject) {
@@ -54,14 +59,39 @@ public class SampleServiceImpl implements SampleService {
       sampleUnit.setSampleUnitType(businessSampleUnit.getSampleUnitType());
       
       sampleUnitRepository.save(sampleUnit);
-      
+      activateSampleSummaryState(sampleSummary.getSampleId());
     }
-
   }
   
   @Override
   public SampleSummary findSampleSummaryBySampleId(Integer sampleId) {
     return sampleSummaryRepository.findBySampleId(sampleId);
   }
-
+  
+  /**
+   * Effect a state transition for the target case if the category indicates one
+   * is required If a transition was made and the state changes as a result,
+   * notify the action service of the state change AND if the event was type
+   * DISABLED then also call the IAC service to disable/deactivate the IAC code
+   * related to the target case.
+   * 
+   * @param category the category details of the event
+   * @param targetCase the 'source' case the event is being created for
+   */
+  @Override
+  public void activateSampleSummaryState(Integer sampleId) {
+    
+   SampleSummary targetSampleSummary = sampleSummaryRepository.findOne(sampleId );
+  
+   SampleSummaryDTO.SampleState oldState = targetSampleSummary.getState();
+   SampleSummaryDTO.SampleState newState = null;
+   // make the transition
+   newState = sampleSvcStateTransitionManager.transition(targetSampleSummary.getState(), SampleSummaryDTO.SampleEvent.ACTIVATED);
+   // was a state change effected?
+   if (oldState != newState) {
+     targetSampleSummary.setState(newState);
+     sampleSummaryRepository.saveAndFlush(targetSampleSummary);
+     //notificationPublisher.sendNotifications(Arrays.asList(prepareCaseNotification(targetCase, transitionEvent)));
+   }
+  }
 }
