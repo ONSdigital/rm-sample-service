@@ -89,6 +89,9 @@ spring:
       max-idle: 5
       min-idle: 3
 
+  zipkin:
+    enabled: false
+
 sample-svc:
   sample-path: /events
   connection-config:
