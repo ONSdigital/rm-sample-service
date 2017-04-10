@@ -28,9 +28,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Table(name = "sampleunit", schema = "sample")
 public class SampleUnit implements Serializable {
-  
+
   private static final long serialVersionUID = 7778360895016862172L;
-  
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "sampleunitidseq_gen")
   @GenericGenerator(name = "sampleunitidseq_gen", strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator", parameters = {
@@ -39,14 +39,14 @@ public class SampleUnit implements Serializable {
   })
   @Column(name = "sampleunitid")
   private Integer sampleUnitId;
-  
+
   @Column(name = "sampleid")
   private Integer sampleId;
-  
+
   @Column(name = "sampleunitref")
   private String sampleUnitRef;
 
   @Column(name = "sampleunittype")
   private String sampleUnitType;
-  
+
 }

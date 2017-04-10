@@ -13,22 +13,22 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
  */
 @Repository
 public interface SampleSummaryRepository extends JpaRepository<SampleSummary, Integer> {
-  
+
   /**
    * Find SampleSummary entity by sampleid
    *
-   * @param sampleId The sampleId 
+   * @param sampleId The sampleId
    * @return SampleSummary object or null
    */
   SampleSummary findBySampleId(Integer sampleId);
-  
+
   /**
    * Find Lists of SampleSummary entity by surveyRef and exerciseDateTime
    *
-   * @param surveyRef The surveyRef 
-   * @param exerciseDateTime The effectiveStateDateTime 
+   * @param surveyRef The surveyRef
+   * @param exerciseDateTime The effectiveStateDateTime
    * @return <List>SampleSummary object or null
    */
   List<SampleSummary> findBySurveyRefAndEffectiveStartDateTime(String surveyRef, Timestamp exerciseDateTime);
-  
+
 }

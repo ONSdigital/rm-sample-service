@@ -16,40 +16,51 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.rest.RestClient;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 
+/**
+ * The Mock REST endpoint controller for Party Service.
+ */
 @Path("/party")
 @Produces({"application/json"})
-
 @Slf4j
 public class PartyEndpoint implements CTPEndpoint {
 
   @Inject
   @Qualifier("sampleServiceClient")
   private RestClient sampleServiceClient;
-  
-  
+
+  /**
+   * POST to update state for a specified PartyDTO.
+   *
+   * @param partyDTO partyDTO to be updated
+   * @throws CTPException if update operation fails
+   * @return Response PartyDTO that has been updated
+   */
   @POST
   @Path("/events")
   public Response createCaseEvent(final PartyDTO partyDTO) throws CTPException {
-    
+
     log.info(partyDTO.getForename());
     log.info(partyDTO.getPostion() + " / " + partyDTO.getSize());
     log.info(Integer.toString(partyDTO.getSampleId()));
-    log.info(Boolean.toString(sampleServiceClient==null));
-    if(partyDTO.getPostion() == partyDTO.getSize())
-    {
-      sampleServiceClient.putResource("/samples/"+partyDTO.getSampleId(),partyDTO.getSampleId(), Integer.class);
+    log.info(Boolean.toString(sampleServiceClient == null));
+    if (partyDTO.getPostion() == partyDTO.getSize()) {
+      sampleServiceClient.putResource("/samples/" + partyDTO.getSampleId(), partyDTO.getSampleId(), Integer.class);
       return Response.ok(partyDTO).status(Status.OK).build();
     }
     return Response.ok(partyDTO).status(Status.CREATED).build();
 
   }
 
+  /**
+   * GET to retrieve party info
+   * @return Response confirmation
+   */
   @GET
   @Path("/events")
   public Response up() {
     log.info("party up");
     return Response.ok().status(Status.CREATED).build();
 
-  } 
-  
+  }
+
 }

@@ -23,7 +23,7 @@ public class SampleSvcStateTransitionManagerFactory implements StateTransitionMa
   public static final String SAMPLE_ENTITY = "Sample";
 
   private Map<String, StateTransitionManager<?, ?>> managers;
-  
+
   /**
    * Create and init the factory with concrete StateTransitionManagers for each
    * required entity
@@ -33,11 +33,10 @@ public class SampleSvcStateTransitionManagerFactory implements StateTransitionMa
 
     Map<SampleState, Map<SampleEvent, SampleState>> transitions = new HashMap<>();
 
-    //TODO: look at writing unit test for this
     Map<SampleEvent, SampleState> transitionMapForSampledInit = new HashMap<>();
     transitionMapForSampledInit.put(SampleEvent.ACTIVATED, SampleState.ACTIVE);
     transitions.put(SampleState.INIT, transitionMapForSampledInit);
-    
+
     StateTransitionManager<SampleState, SampleEvent> caseStateTransitionManager =
         new BasicStateTransitionManager<>(transitions);
 
@@ -50,5 +49,5 @@ public class SampleSvcStateTransitionManagerFactory implements StateTransitionMa
   public StateTransitionManager<?, ?> getStateTransitionManager(String entity) {
     return managers.get(entity);
   }
-  
+
 }

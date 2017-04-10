@@ -7,7 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** * Domain model object
+/**
+ * Domain model object
  */
 @Data
 @AllArgsConstructor
@@ -15,14 +16,20 @@ import lombok.NoArgsConstructor;
 
 public class SampleSummaryDTO {
 
+  /**
+   * enum for Sample state
+   */
   public enum SampleState {
     ACTIVE, INIT,
   }
 
+  /**
+   * enum for Sample event
+   */
   public enum SampleEvent {
     ACTIVATED
   }
-  
+
   private Integer sampleId;
 
   private Timestamp effectiveStartDateTime;

@@ -37,65 +37,61 @@ public class SampleServiceImpl implements SampleService {
 
   @Inject
   private SampleUnitRepository sampleUnitRepository;
-  
+
   @Inject
   private StateTransitionManager<SampleSummaryDTO.SampleState, SampleSummaryDTO.SampleEvent> sampleSvcStateTransitionManager;
-  
+
   @Inject
   private MapperFacade mapperFacade;
-  
+
   @Inject
   @Qualifier("sampleServiceClient")
   private RestClient sampleServiceClient;
-  
+
   @Override
   public <T extends SurveyBase> SampleSummary createandSaveSampleSummary(T surveySampleObject) {
     Timestamp effectiveStartDateTime = new Timestamp(surveySampleObject.getEffectiveStartDateTime().toGregorianCalendar().getTimeInMillis());
     Timestamp effectiveEndDateTime = new Timestamp(surveySampleObject.getEffectiveEndDateTime().toGregorianCalendar().getTimeInMillis());
-    
+
     SampleSummary sampleSummary = new SampleSummary();
     sampleSummary.setEffectiveStartDateTime(effectiveStartDateTime);
     sampleSummary.setEffectiveEndDateTime(effectiveEndDateTime);
     sampleSummary.setSurveyRef(surveySampleObject.getSurveyRef());
     sampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
     sampleSummary.setState(SampleSummaryDTO.SampleState.INIT);
-    
+
     return sampleSummaryRepository.save(sampleSummary);
   }
 
   @Override
   public <T extends SampleUnitBase> void createandSaveSampleUnits(List<T> samplingUnitList, SampleSummary sampleSummary) {
-    
+
     for (T businessSampleUnit : samplingUnitList) {
       SampleUnit sampleUnit = new SampleUnit();
       sampleUnit.setSampleId(sampleSummary.getSampleId());
       sampleUnit.setSampleUnitRef(businessSampleUnit.getSampleUnitRef());
       sampleUnit.setSampleUnitType(businessSampleUnit.getSampleUnitType());
-      
+
       sampleUnitRepository.save(sampleUnit);
     }
   }
-  
+
   @Override
   public SampleSummary findSampleSummaryBySampleId(Integer sampleId) {
     return sampleSummaryRepository.findBySampleId(sampleId);
   }
-  
+
   /**
-   * Effect a state transition for the target case if the category indicates one
-   * is required If a transition was made and the state changes as a result,
-   * notify the action service of the state change AND if the event was type
-   * DISABLED then also call the IAC service to disable/deactivate the IAC code
-   * related to the target case.
-   * 
-   * @param category the category details of the event
-   * @param targetCase the 'source' case the event is being created for
+   * Effect a state transition for the target SampleSummary if the one is required
+   *
+   * @param sampleId the sampleId to be updated
+   * @return SampleSummary the updated SampleSummary
    */
   @Override
-  public void activateSampleSummaryState(Integer sampleId) {
-    
+  public SampleSummary activateSampleSummaryState(Integer sampleId) {
+
    SampleSummary targetSampleSummary = sampleSummaryRepository.findOne(sampleId);
-  
+
    SampleSummaryDTO.SampleState oldState = targetSampleSummary.getState();
    SampleSummaryDTO.SampleState newState = null;
    // make the transition
@@ -105,8 +101,11 @@ public class SampleServiceImpl implements SampleService {
      targetSampleSummary.setState(newState);
      sampleSummaryRepository.saveAndFlush(targetSampleSummary);
    }
+
+   return targetSampleSummary;
+
   }
-  
+
   @Override
   public void sendToParty(Integer sampleId, BusinessSurveySample businessSurveySample) {
     List<BusinessSampleUnit> samplingUnitList = businessSurveySample.getSampleUnits().getBusinessSampleUnits();
@@ -120,22 +119,22 @@ public class SampleServiceImpl implements SampleService {
       sampleServiceClient.postResource("/party/events", party, PartyDTO.class);
       position++;
     }
-    
+
   }
-  
+
   @Override
   public List<SampleUnit> findSampleUnitsBySurveyRefandExerciseDateTime(String surveyRef, Timestamp exerciseDateTime) {
-    
+
     List<SampleSummary> listOfSampleSummaries = sampleSummaryRepository.findBySurveyRefAndEffectiveStartDateTime(surveyRef, exerciseDateTime);
-        
+
     List<SampleUnit> listOfSampleUnits = new ArrayList<SampleUnit>();
-    
+
     for (SampleSummary ss : listOfSampleSummaries) {
       SampleUnit su = sampleUnitRepository.findBySampleId(ss.getSampleId());
       listOfSampleUnits.add(su);
     }
- 
+
     return listOfSampleUnits;
   }
-  
+
 }

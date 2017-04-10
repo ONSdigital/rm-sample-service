@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 
 /**
- * TODO
+ * Domain model object.
  */
 @Entity
 @Data
@@ -32,9 +32,9 @@ import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Table(name = "samplesummary", schema = "sample")
 public class SampleSummary implements Serializable {
-  
+
   private static final long serialVersionUID = 7778360895016862176L;
-  
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "sampleidseq_gen")
   @GenericGenerator(name = "sampleidseq_gen", strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator", parameters = {
@@ -49,14 +49,14 @@ public class SampleSummary implements Serializable {
 
   @Column(name = "effectiveenddatetime")
   private Timestamp effectiveEndDateTime;
-  
+
   @Column(name = "surveyref")
   private String surveyRef;
-  
+
   @Column(name = "ingestdatetime")
   private Timestamp ingestDateTime;
-  
+
   @Enumerated(EnumType.STRING)
   private SampleSummaryDTO.SampleState state;
- 
+
 }

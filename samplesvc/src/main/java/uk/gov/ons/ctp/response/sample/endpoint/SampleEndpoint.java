@@ -1,7 +1,6 @@
 package uk.gov.ons.ctp.response.sample.endpoint;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -19,9 +18,12 @@ import javax.ws.rs.core.Response.Status;
 import org.springframework.util.CollectionUtils;
 
 import lombok.extern.slf4j.Slf4j;
+import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.endpoint.CTPEndpoint;
 import uk.gov.ons.ctp.common.error.CTPException;
+import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 /**
@@ -35,25 +37,45 @@ public final class SampleEndpoint implements CTPEndpoint {
 
   @Inject
   private SampleService sampleService;
-  
+
+  @Inject
+  private MapperFacade mapperFacade;
+
+  /**
+   * PUT to update state for a specified SampleSummary.
+   *
+   * @param sampleId SampleId of the SampleSummary to update.
+   * @return SampleSummary Returns the updated SampleSummary
+   * @throws CTPException if update operation fails
+   */
   @PUT
   @Path("/{sampleId}")
-  public final void activateSampleSummary(@PathParam("sampleId") final Integer sampleId) throws CTPException {
-    
-    sampleService.activateSampleSummaryState(sampleId);
-    
+  public Response activateSampleSummary(@PathParam("sampleId") final Integer sampleId) throws CTPException {
+
+    SampleSummary sampleSummary = sampleService.activateSampleSummaryState(sampleId);
+
+    return Response.ok(mapperFacade.map(sampleSummary, SampleSummaryDTO.class)).build();
+
   }
-  
+
+  /**
+   * GET List of Sample Units by parent SampleSummary surveyRef and exerciseDateTime
+   *
+   * @param surveyRef surveyRef to which SampleUnits are related
+   * @param exerciseDateTime exerciseDateTime to which SampleUnits are related
+   * @return List<SampleUnit> Returns the associated SampleUnits for the specified surveyRef and exerciseDateTime.
+   * @throws CTPException if update operation fails
+   */
   @GET
   @Path("/{surveyRef}/{exerciseDateTime}")
   public Response getSampleSummary(@PathParam("surveyRef") final String surveyRef, @PathParam("exerciseDateTime") final Timestamp exerciseDateTime) throws CTPException {
-    
+
     List<SampleUnit> listSampleUnits = sampleService.findSampleUnitsBySurveyRefandExerciseDateTime(surveyRef, exerciseDateTime);
 
     ResponseBuilder responseBuilder = Response.ok(CollectionUtils.isEmpty(listSampleUnits) ? null : listSampleUnits);
     responseBuilder.status(CollectionUtils.isEmpty(listSampleUnits) ? Status.NO_CONTENT : Status.OK);
     return responseBuilder.build();
-    
+
   }
-  
+
 }
