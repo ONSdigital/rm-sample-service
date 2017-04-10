@@ -52,6 +52,7 @@ public class SampleSvcApplication {
     return sampleSummarySvcStateTransitionManagerFactory.getStateTransitionManager(
         SampleSvcStateTransitionManagerFactory.SAMPLE_ENTITY);
   }
+  
   /**
    * To register classes in the JAX-RS world.
    */

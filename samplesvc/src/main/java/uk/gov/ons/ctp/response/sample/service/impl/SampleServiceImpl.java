@@ -72,7 +72,6 @@ public class SampleServiceImpl implements SampleService {
       sampleUnit.setSampleUnitType(businessSampleUnit.getSampleUnitType());
       
       sampleUnitRepository.save(sampleUnit);
-      activateSampleSummaryState(sampleSummary.getSampleId());
     }
   }
   
