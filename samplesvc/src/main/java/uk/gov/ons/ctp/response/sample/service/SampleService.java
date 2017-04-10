@@ -1,11 +1,13 @@
 package uk.gov.ons.ctp.response.sample.service;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import uk.gov.ons.ctp.response.sample.definition.BusinessSurveySample;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
+import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 
 public interface SampleService {
    
@@ -42,4 +44,6 @@ public interface SampleService {
   public void activateSampleSummaryState(Integer sampleId);
 
   void sendToParty(Integer sampleId, BusinessSurveySample businessSurveySample);
+  
+  public List<SampleUnit> findSampleUnitsBySurveyRefandExerciseDateTime(String surveyRef, Timestamp exerciseDateTime);
 }

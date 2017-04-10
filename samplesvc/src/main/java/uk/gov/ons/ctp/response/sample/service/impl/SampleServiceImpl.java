@@ -1,6 +1,7 @@
 package uk.gov.ons.ctp.response.sample.service.impl;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -121,4 +122,20 @@ public class SampleServiceImpl implements SampleService {
     }
     
   }
+  
+  @Override
+  public List<SampleUnit> findSampleUnitsBySurveyRefandExerciseDateTime(String surveyRef, Timestamp exerciseDateTime) {
+    
+    List<SampleSummary> listOfSampleSummaries = sampleSummaryRepository.findBySurveyRefAndEffectiveStartDateTime(surveyRef, exerciseDateTime);
+        
+    List<SampleUnit> listOfSampleUnits = new ArrayList<SampleUnit>();
+    
+    for (SampleSummary ss : listOfSampleSummaries) {
+      SampleUnit su = sampleUnitRepository.findBySampleId(ss.getSampleId());
+      listOfSampleUnits.add(su);
+    }
+ 
+    return listOfSampleUnits;
+  }
+  
 }
