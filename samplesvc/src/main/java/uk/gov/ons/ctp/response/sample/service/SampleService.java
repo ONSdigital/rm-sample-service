@@ -4,7 +4,9 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import uk.gov.ons.ctp.response.sample.definition.BusinessSurveySample;
+import uk.gov.ons.ctp.response.sample.definition.CensusSurveySample;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
+import uk.gov.ons.ctp.response.sample.definition.SocialSurveySample;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
@@ -49,14 +51,29 @@ public interface SampleService {
    */
   SampleSummary activateSampleSummaryState(Integer sampleId);
 
+  /**
+   * Sends relevant Census information to the Party service
+   *
+   * @param sampleId The sampleId
+   * @param censusSurveySample object or null
+   */
+  void sendCensusToParty(Integer sampleId, CensusSurveySample censusSurveySample);
 
   /**
-   * Sends relevant information to the Party service
+   * Sends relevant Social information to the Party service
+   *
+   * @param sampleId The sampleId
+   * @param socialSurveySample object or null
+   */
+  void sendSocialToParty(Integer sampleId, SocialSurveySample socialSurveySample);
+
+  /**
+   * Sends relevant Business information to the Party service
    *
    * @param sampleId The sampleId
    * @param businessSurveySample object or null
    */
-  void sendToParty(Integer sampleId, BusinessSurveySample businessSurveySample);
+  void sendBuisnessToParty(Integer sampleId, BusinessSurveySample businessSurveySample);
 
   /**
    * Update the SampleSummary state

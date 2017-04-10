@@ -18,7 +18,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 /**
- * A SampleService implementation which encapsulates all business logic operating
+ * A SampleService implementation which encapsulates all social logic operating
  * on the Sample entity model for Social samples.
  */
 @Slf4j
@@ -48,9 +48,9 @@ public class SFTPFileReceiverSocialSampleImpl implements SFTPFileReceiverSample<
         socialSurveySample.getCollectionExerciseRef()));
 
     SampleSummary savedSampleSummary = sampleService.createandSaveSampleSummary(socialSurveySample);
-
     List<SocialSampleUnit> samplingUnitList = socialSurveySample.getSampleUnits().getSocialSampleUnits();
     sampleService.createandSaveSampleUnits(samplingUnitList, savedSampleSummary);
+    sampleService.sendSocialToParty(savedSampleSummary.getSampleId(), socialSurveySample);
 
   }
 

@@ -16,7 +16,11 @@ import uk.gov.ons.ctp.common.time.DateTimeUtil;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 import uk.gov.ons.ctp.response.sample.definition.BusinessSampleUnit;
 import uk.gov.ons.ctp.response.sample.definition.BusinessSurveySample;
+import uk.gov.ons.ctp.response.sample.definition.CensusSampleUnit;
+import uk.gov.ons.ctp.response.sample.definition.CensusSurveySample;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
+import uk.gov.ons.ctp.response.sample.definition.SocialSampleUnit;
+import uk.gov.ons.ctp.response.sample.definition.SocialSurveySample;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
@@ -45,8 +49,8 @@ public class SampleServiceImpl implements SampleService {
   private MapperFacade mapperFacade;
 
   @Inject
-  @Qualifier("partyServiceClient")
-  private RestClient partyServiceClient;
+  @Qualifier("sampleServiceClient")
+  private RestClient sampleServiceClient;
 
   @Override
   public <T extends SurveyBase> SampleSummary createandSaveSampleSummary(T surveySampleObject) {
@@ -112,7 +116,7 @@ public class SampleServiceImpl implements SampleService {
   }
 
   @Override
-  public void sendToParty(Integer sampleId, BusinessSurveySample businessSurveySample) {
+  public void sendBuisnessToParty(Integer sampleId, BusinessSurveySample businessSurveySample) {
     List<BusinessSampleUnit> samplingUnitList = businessSurveySample
         .getSampleUnits().getBusinessSampleUnits();
     int size = samplingUnitList.size();
@@ -122,10 +126,41 @@ public class SampleServiceImpl implements SampleService {
       party.setSize(size);
       party.setPostion(position);
       party.setSampleId(sampleId);
-      partyServiceClient.postResource("/party/events", party, PartyDTO.class);
+      sampleServiceClient.postResource("/party/events", party, PartyDTO.class);
       position++;
     }
+  }
 
+  @Override
+  public void sendCensusToParty(Integer sampleId, CensusSurveySample censusSurveySample) {
+    List<CensusSampleUnit> samplingUnitList = censusSurveySample
+        .getSampleUnits().getCensusSampleUnits();
+    int size = samplingUnitList.size();
+    int position = 1;
+    for (CensusSampleUnit bsu : samplingUnitList) {
+      PartyDTO party = mapperFacade.map(bsu, PartyDTO.class);
+      party.setSize(size);
+      party.setPostion(position);
+      party.setSampleId(sampleId);
+      sampleServiceClient.postResource("/party/events", party, PartyDTO.class);
+      position++;
+    }
+  }
+
+  @Override
+  public void sendSocialToParty(Integer sampleId, SocialSurveySample socialSurveySample) {
+    List<SocialSampleUnit> samplingUnitList = socialSurveySample
+        .getSampleUnits().getSocialSampleUnits();
+    int size = samplingUnitList.size();
+    int position = 1;
+    for (SocialSampleUnit bsu : samplingUnitList) {
+      PartyDTO party = mapperFacade.map(bsu, PartyDTO.class);
+      party.setSize(size);
+      party.setPostion(position);
+      party.setSampleId(sampleId);
+      sampleServiceClient.postResource("/party/events", party, PartyDTO.class);
+      position++;
+    }
   }
 
   @Override

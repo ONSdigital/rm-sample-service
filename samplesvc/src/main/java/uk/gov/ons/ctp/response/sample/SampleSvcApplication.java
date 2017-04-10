@@ -47,6 +47,16 @@ public class SampleSvcApplication {
     RestClient restHelper = new RestClient(appConfig.getSampleSvc().getConnectionConfig());
     return restHelper;
   }
+//  /**
+//   * The SampleService client bean
+//   * @return the RestClient for the SampleService
+//   */
+//  @Bean
+//  @Qualifier("partyServiceClient")
+//  public RestClient partyServiceClient() {
+//    RestClient restHelper = new RestClient(appConfig.getSampleSvc().getConnectionConfig());
+//    return restHelper;
+//  }
 
   /**
    * Bean to allow application to make controlled state transitions of Samples

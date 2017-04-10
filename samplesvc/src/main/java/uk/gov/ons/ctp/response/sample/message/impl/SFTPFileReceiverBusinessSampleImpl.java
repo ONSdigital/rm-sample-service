@@ -50,7 +50,7 @@ public class SFTPFileReceiverBusinessSampleImpl implements SFTPFileReceiverSampl
     SampleSummary savedSampleSummary = sampleService.createandSaveSampleSummary(businessSurveySample);
     List<BusinessSampleUnit> samplingUnitList = businessSurveySample.getSampleUnits().getBusinessSampleUnits();
     sampleService.createandSaveSampleUnits(samplingUnitList, savedSampleSummary);
-    sampleService.sendToParty(savedSampleSummary.getSampleId(), businessSurveySample);
+    sampleService.sendBuisnessToParty(savedSampleSummary.getSampleId(), businessSurveySample);
   }
 
   /**

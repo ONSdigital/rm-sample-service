@@ -18,7 +18,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 /**
- * A SampleService implementation which encapsulates all business logic operating
+ * A SampleService implementation which encapsulates all census logic operating
  * on the Sample entity model for Census samples.
  */
 @Slf4j
@@ -44,12 +44,13 @@ public class SFTPFileReceiverCensusSampleImpl implements SFTPFileReceiverSample<
    */
   @ServiceActivator(inputChannel = "xmlTransformedCensus")
   public void transformedXMLProcess(CensusSurveySample censusSurveySample) {
-    log.info(String.format("CE Ref: %s transform successful.", censusSurveySample.getCollectionExerciseRef()));
+    log.info(String.format("CensusSurveySample (Collection Exercise Ref: %s) transformed successfully.",
+        censusSurveySample.getCollectionExerciseRef()));
 
     SampleSummary savedSampleSummary = sampleService.createandSaveSampleSummary(censusSurveySample);
-
     List<CensusSampleUnit> samplingUnitList = censusSurveySample.getSampleUnits().getCensusSampleUnits();
     sampleService.createandSaveSampleUnits(samplingUnitList, savedSampleSummary);
+    sampleService.sendCensusToParty(savedSampleSummary.getSampleId(), censusSurveySample);
 
   }
 
