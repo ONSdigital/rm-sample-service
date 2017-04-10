@@ -44,7 +44,8 @@ public class SFTPFileReceiverSocialSampleImpl implements SFTPFileReceiverSample<
    */
   @ServiceActivator(inputChannel = "xmlTransformedSocial")
   public void transformedXMLProcess(SocialSurveySample socialSurveySample) {
-    log.info(String.format("SocialSurveySample (Collection Exercise Ref: %s) transformed successfully.", socialSurveySample.getCollectionExerciseRef()));
+    log.info(String.format("SocialSurveySample (Collection Exercise Ref: %s) transformed successfully.",
+        socialSurveySample.getCollectionExerciseRef()));
 
     SampleSummary savedSampleSummary = sampleService.createandSaveSampleSummary(socialSurveySample);
 

@@ -31,7 +31,6 @@ import uk.gov.ons.ctp.response.sample.service.SampleService;
 @Named
 public class SampleServiceImpl implements SampleService {
 
-
   @Inject
   private SampleSummaryRepository sampleSummaryRepository;
 
@@ -39,19 +38,23 @@ public class SampleServiceImpl implements SampleService {
   private SampleUnitRepository sampleUnitRepository;
 
   @Inject
-  private StateTransitionManager<SampleSummaryDTO.SampleState, SampleSummaryDTO.SampleEvent> sampleSvcStateTransitionManager;
+  private StateTransitionManager<SampleSummaryDTO.SampleState,
+      SampleSummaryDTO.SampleEvent> sampleSvcStateTransitionManager;
 
   @Inject
   private MapperFacade mapperFacade;
 
   @Inject
-  @Qualifier("sampleServiceClient")
-  private RestClient sampleServiceClient;
+  @Qualifier("partyServiceClient")
+  private RestClient partyServiceClient;
 
   @Override
   public <T extends SurveyBase> SampleSummary createandSaveSampleSummary(T surveySampleObject) {
-    Timestamp effectiveStartDateTime = new Timestamp(surveySampleObject.getEffectiveStartDateTime().toGregorianCalendar().getTimeInMillis());
-    Timestamp effectiveEndDateTime = new Timestamp(surveySampleObject.getEffectiveEndDateTime().toGregorianCalendar().getTimeInMillis());
+
+    Timestamp effectiveStartDateTime = new Timestamp(surveySampleObject.getEffectiveStartDateTime()
+        .toGregorianCalendar().getTimeInMillis());
+    Timestamp effectiveEndDateTime = new Timestamp(surveySampleObject.getEffectiveEndDateTime()
+        .toGregorianCalendar().getTimeInMillis());
 
     SampleSummary sampleSummary = new SampleSummary();
     sampleSummary.setEffectiveStartDateTime(effectiveStartDateTime);
@@ -64,7 +67,8 @@ public class SampleServiceImpl implements SampleService {
   }
 
   @Override
-  public <T extends SampleUnitBase> void createandSaveSampleUnits(List<T> samplingUnitList, SampleSummary sampleSummary) {
+  public <T extends SampleUnitBase> void createandSaveSampleUnits(List<T> samplingUnitList,
+      SampleSummary sampleSummary) {
 
     for (T businessSampleUnit : samplingUnitList) {
       SampleUnit sampleUnit = new SampleUnit();
@@ -82,7 +86,8 @@ public class SampleServiceImpl implements SampleService {
   }
 
   /**
-   * Effect a state transition for the target SampleSummary if the one is required
+   * Effect a state transition for the target SampleSummary if the one is
+   * required
    *
    * @param sampleId the sampleId to be updated
    * @return SampleSummary the updated SampleSummary
@@ -90,25 +95,26 @@ public class SampleServiceImpl implements SampleService {
   @Override
   public SampleSummary activateSampleSummaryState(Integer sampleId) {
 
-   SampleSummary targetSampleSummary = sampleSummaryRepository.findOne(sampleId);
+    SampleSummary targetSampleSummary = sampleSummaryRepository.findOne(sampleId);
+    SampleSummaryDTO.SampleState oldState = targetSampleSummary.getState();
+    SampleSummaryDTO.SampleState newState = null;
+    // make the transition
+    newState = sampleSvcStateTransitionManager.transition(targetSampleSummary.getState(),
+        SampleSummaryDTO.SampleEvent.ACTIVATED);
+    // was a state change effected?
+    if (oldState != newState) {
+      targetSampleSummary.setState(newState);
+      sampleSummaryRepository.saveAndFlush(targetSampleSummary);
+    }
 
-   SampleSummaryDTO.SampleState oldState = targetSampleSummary.getState();
-   SampleSummaryDTO.SampleState newState = null;
-   // make the transition
-   newState = sampleSvcStateTransitionManager.transition(targetSampleSummary.getState(), SampleSummaryDTO.SampleEvent.ACTIVATED);
-   // was a state change effected?
-   if (oldState != newState) {
-     targetSampleSummary.setState(newState);
-     sampleSummaryRepository.saveAndFlush(targetSampleSummary);
-   }
-
-   return targetSampleSummary;
+    return targetSampleSummary;
 
   }
 
   @Override
   public void sendToParty(Integer sampleId, BusinessSurveySample businessSurveySample) {
-    List<BusinessSampleUnit> samplingUnitList = businessSurveySample.getSampleUnits().getBusinessSampleUnits();
+    List<BusinessSampleUnit> samplingUnitList = businessSurveySample
+        .getSampleUnits().getBusinessSampleUnits();
     int size = samplingUnitList.size();
     int position = 1;
     for (BusinessSampleUnit bsu : samplingUnitList) {
@@ -116,7 +122,7 @@ public class SampleServiceImpl implements SampleService {
       party.setSize(size);
       party.setPostion(position);
       party.setSampleId(sampleId);
-      sampleServiceClient.postResource("/party/events", party, PartyDTO.class);
+      partyServiceClient.postResource("/party/events", party, PartyDTO.class);
       position++;
     }
 
@@ -125,7 +131,8 @@ public class SampleServiceImpl implements SampleService {
   @Override
   public List<SampleUnit> findSampleUnitsBySurveyRefandExerciseDateTime(String surveyRef, Timestamp exerciseDateTime) {
 
-    List<SampleSummary> listOfSampleSummaries = sampleSummaryRepository.findBySurveyRefAndEffectiveStartDateTime(surveyRef, exerciseDateTime);
+    List<SampleSummary> listOfSampleSummaries = sampleSummaryRepository
+        .findBySurveyRefAndEffectiveStartDateTime(surveyRef, exerciseDateTime);
 
     List<SampleUnit> listOfSampleUnits = new ArrayList<SampleUnit>();
 

@@ -53,7 +53,6 @@ public final class SampleEndpoint implements CTPEndpoint {
   public Response activateSampleSummary(@PathParam("sampleid") final Integer sampleId) throws CTPException {
 
     log.info("Activating SampleId: " + sampleId);
-    
     SampleSummary sampleSummary = sampleService.activateSampleSummaryState(sampleId);
 
     return Response.ok(mapperFacade.map(sampleSummary, SampleSummaryDTO.class)).build();
@@ -61,18 +60,22 @@ public final class SampleEndpoint implements CTPEndpoint {
   }
 
   /**
-   * GET List of Sample Units by parent SampleSummary surveyRef and exerciseDateTime
+   * GET List of Sample Units by parent SampleSummary surveyRef and
+   * exerciseDateTime
    *
    * @param surveyRef surveyRef to which SampleUnits are related
    * @param exerciseDateTime exerciseDateTime to which SampleUnits are related
-   * @return List<SampleUnit> Returns the associated SampleUnits for the specified surveyRef and exerciseDateTime.
+   * @return List<SampleUnit> Returns the associated SampleUnits for the
+   *         specified surveyRef and exerciseDateTime.
    * @throws CTPException if update operation fails
    */
   @GET
   @Path("/{surveyref}/{exercisedatetime}")
-  public Response getSampleSummary(@PathParam("surveyref") final String surveyRef, @PathParam("exercisedatetime") final Timestamp exerciseDateTime) throws CTPException {
+  public Response getSampleSummary(@PathParam("surveyref") final String surveyRef,
+      @PathParam("exercisedatetime") final Timestamp exerciseDateTime) throws CTPException {
 
-    List<SampleUnit> listSampleUnits = sampleService.findSampleUnitsBySurveyRefandExerciseDateTime(surveyRef, exerciseDateTime);
+    List<SampleUnit> listSampleUnits = sampleService.findSampleUnitsBySurveyRefandExerciseDateTime(
+        surveyRef, exerciseDateTime);
 
     ResponseBuilder responseBuilder = Response.ok(CollectionUtils.isEmpty(listSampleUnits) ? null : listSampleUnits);
     responseBuilder.status(CollectionUtils.isEmpty(listSampleUnits) ? Status.NO_CONTENT : Status.OK);

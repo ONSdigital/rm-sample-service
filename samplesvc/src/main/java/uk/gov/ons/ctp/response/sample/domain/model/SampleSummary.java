@@ -37,7 +37,8 @@ public class SampleSummary implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "sampleidseq_gen")
-  @GenericGenerator(name = "sampleidseq_gen", strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator", parameters = {
+  @GenericGenerator(name = "sampleidseq_gen", strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+  parameters = {
       @Parameter(name = "sequence_name", value = "sample.sampleidseq"),
       @Parameter(name = "increment_size", value = "1")
   })

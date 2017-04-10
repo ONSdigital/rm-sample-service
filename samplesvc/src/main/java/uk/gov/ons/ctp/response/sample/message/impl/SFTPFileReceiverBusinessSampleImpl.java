@@ -44,7 +44,8 @@ public class SFTPFileReceiverBusinessSampleImpl implements SFTPFileReceiverSampl
    */
   @ServiceActivator(inputChannel = "xmlTransformedBusiness")
   public void transformedXMLProcess(BusinessSurveySample businessSurveySample) {
-    log.info(String.format("BusinessSurveySample (Collection Exercise Ref: %s) transformed successfully.", businessSurveySample.getCollectionExerciseRef()));
+    log.info(String.format("BusinessSurveySample (Collection Exercise Ref: %s) transformed successfully.",
+        businessSurveySample.getCollectionExerciseRef()));
 
     SampleSummary savedSampleSummary = sampleService.createandSaveSampleSummary(businessSurveySample);
     List<BusinessSampleUnit> samplingUnitList = businessSurveySample.getSampleUnits().getBusinessSampleUnits();

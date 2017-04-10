@@ -53,7 +53,8 @@ public class SampleSvcApplication {
    * @return the state transition manager specifically for Samples
    */
   @Bean
-  public StateTransitionManager<SampleSummaryDTO.SampleState, SampleSummaryDTO.SampleEvent> sampleSvcStateTransitionManager() {
+  public StateTransitionManager<SampleSummaryDTO.SampleState,
+      SampleSummaryDTO.SampleEvent> sampleSvcStateTransitionManager() {
     return sampleSummarySvcStateTransitionManagerFactory.getStateTransitionManager(
         SampleSvcStateTransitionManagerFactory.SAMPLE_ENTITY);
   }
