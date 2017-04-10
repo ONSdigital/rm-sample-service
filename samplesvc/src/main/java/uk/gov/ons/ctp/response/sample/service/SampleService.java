@@ -73,7 +73,7 @@ public interface SampleService {
    * @param sampleId The sampleId
    * @param businessSurveySample object or null
    */
-  void sendBuisnessToParty(Integer sampleId, BusinessSurveySample businessSurveySample);
+  void sendBusinessToParty(Integer sampleId, BusinessSurveySample businessSurveySample);
 
   /**
    * Update the SampleSummary state

@@ -116,7 +116,7 @@ public class SampleServiceImpl implements SampleService {
   }
 
   @Override
-  public void sendBuisnessToParty(Integer sampleId, BusinessSurveySample businessSurveySample) {
+  public void sendBusinessToParty(Integer sampleId, BusinessSurveySample businessSurveySample) {
     List<BusinessSampleUnit> samplingUnitList = businessSurveySample
         .getSampleUnits().getBusinessSampleUnits();
     int size = samplingUnitList.size();
