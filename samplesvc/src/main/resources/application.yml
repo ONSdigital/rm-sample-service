@@ -88,6 +88,9 @@ spring:
       max-active: 10
       max-idle: 5
       min-idle: 3
+      
+  zipkin:
+    enabled: false
 
 
 party-svc:
