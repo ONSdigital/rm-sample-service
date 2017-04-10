@@ -49,9 +49,11 @@ public final class SampleEndpoint implements CTPEndpoint {
    * @throws CTPException if update operation fails
    */
   @PUT
-  @Path("/{sampleId}")
-  public Response activateSampleSummary(@PathParam("sampleId") final Integer sampleId) throws CTPException {
+  @Path("/{sampleid}")
+  public Response activateSampleSummary(@PathParam("sampleid") final Integer sampleId) throws CTPException {
 
+    log.info("Activating SampleId: " + sampleId);
+    
     SampleSummary sampleSummary = sampleService.activateSampleSummaryState(sampleId);
 
     return Response.ok(mapperFacade.map(sampleSummary, SampleSummaryDTO.class)).build();
@@ -67,8 +69,8 @@ public final class SampleEndpoint implements CTPEndpoint {
    * @throws CTPException if update operation fails
    */
   @GET
-  @Path("/{surveyRef}/{exerciseDateTime}")
-  public Response getSampleSummary(@PathParam("surveyRef") final String surveyRef, @PathParam("exerciseDateTime") final Timestamp exerciseDateTime) throws CTPException {
+  @Path("/{surveyref}/{exercisedatetime}")
+  public Response getSampleSummary(@PathParam("surveyref") final String surveyRef, @PathParam("exercisedatetime") final Timestamp exerciseDateTime) throws CTPException {
 
     List<SampleUnit> listSampleUnits = sampleService.findSampleUnitsBySurveyRefandExerciseDateTime(surveyRef, exerciseDateTime);
 
