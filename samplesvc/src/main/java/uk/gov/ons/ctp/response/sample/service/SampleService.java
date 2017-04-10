@@ -41,5 +41,5 @@ public interface SampleService {
    */
   public void activateSampleSummaryState(Integer sampleId);
 
-  void sendToParty(BusinessSurveySample businessSurveySample);
+  void sendToParty(Integer sampleId, BusinessSurveySample businessSurveySample);
 }

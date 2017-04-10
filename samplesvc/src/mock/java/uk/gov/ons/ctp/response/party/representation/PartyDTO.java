@@ -9,8 +9,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class PartyDTO {
+  private int sampleId;
   private String sampleUnitRef;
   private String sampleUnitType;
   private String forename;
+  private int size;
+  private int postion;
 
 }

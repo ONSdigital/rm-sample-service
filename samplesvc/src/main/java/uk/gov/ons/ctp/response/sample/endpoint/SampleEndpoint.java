@@ -1,10 +1,7 @@
 package uk.gov.ons.ctp.response.sample.endpoint;
 
-import java.sql.Timestamp;
-
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;

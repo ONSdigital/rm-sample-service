@@ -18,6 +18,7 @@ import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.common.state.StateTransitionManagerFactory;
 import uk.gov.ons.ctp.response.party.endpoint.PartyEndpoint;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
+import uk.gov.ons.ctp.response.sample.endpoint.SampleEndpoint;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.service.state.SampleSvcStateTransitionManagerFactory;
 
@@ -65,6 +66,7 @@ public class SampleSvcApplication {
 
       JAXRSRegister.listCommonTypes().forEach(t->register(t));
       register(PartyEndpoint.class);
+      register(SampleEndpoint.class);
       System.setProperty("ma.glasnost.orika.writeSourceFiles", "false");
       System.setProperty("ma.glasnost.orika.writeClassFiles", "false");
     }

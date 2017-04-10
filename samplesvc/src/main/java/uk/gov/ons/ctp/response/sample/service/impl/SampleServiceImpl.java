@@ -93,7 +93,7 @@ public class SampleServiceImpl implements SampleService {
   @Override
   public void activateSampleSummaryState(Integer sampleId) {
     
-   SampleSummary targetSampleSummary = sampleSummaryRepository.findOne(sampleId );
+   SampleSummary targetSampleSummary = sampleSummaryRepository.findOne(sampleId);
   
    SampleSummaryDTO.SampleState oldState = targetSampleSummary.getState();
    SampleSummaryDTO.SampleState newState = null;
@@ -103,17 +103,22 @@ public class SampleServiceImpl implements SampleService {
    if (oldState != newState) {
      targetSampleSummary.setState(newState);
      sampleSummaryRepository.saveAndFlush(targetSampleSummary);
-     //notificationPublisher.sendNotifications(Arrays.asList(prepareCaseNotification(targetCase, transitionEvent)));
    }
   }
   
   @Override
-  public void sendToParty(BusinessSurveySample businessSurveySample) {
+  public void sendToParty(Integer sampleId, BusinessSurveySample businessSurveySample) {
     List<BusinessSampleUnit> samplingUnitList = businessSurveySample.getSampleUnits().getBusinessSampleUnits();
+    int size = samplingUnitList.size();
+    int position = 1;
     for (BusinessSampleUnit bsu : samplingUnitList) {
-//      PartyDTO party = new PartyDTO(bsu.getSampleUnitRef(),bsu.getSampleUnitType(), bsu.getForename());
       PartyDTO party = mapperFacade.map(bsu, PartyDTO.class);
+      party.setSize(size);
+      party.setPostion(position);
+      party.setSampleId(sampleId);
       sampleServiceClient.postResource("/party/events", party, PartyDTO.class);
+      position++;
     }
+    
   }
 }

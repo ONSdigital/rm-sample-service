@@ -38,10 +38,9 @@ public class SFTPFileReceiverBusinessSampleImpl implements SFTPFileReceiverSampl
     log.info(String.format("BusinessSurveySample (Collection Exercise Ref: %s) transformed successfully.", businessSurveySample.getCollectionExerciseRef()));
 
     SampleSummary savedSampleSummary = sampleService.createandSaveSampleSummary(businessSurveySample);
-    
     List<BusinessSampleUnit> samplingUnitList = businessSurveySample.getSampleUnits().getBusinessSampleUnits();
     sampleService.createandSaveSampleUnits(samplingUnitList, savedSampleSummary);
-    sampleService.sendToParty(businessSurveySample);
+    sampleService.sendToParty(savedSampleSummary.getSampleId(), businessSurveySample);
   }
 
   @ServiceActivator(inputChannel = "renameSuccessProcessBusiness")
