@@ -33,27 +33,31 @@ public class SampleSvcApplication {
 
   @Autowired
   private StateTransitionManagerFactory sampleSummarySvcStateTransitionManagerFactory;
-  
+
   @Autowired
   private AppConfig appConfig;
-  
+
+  /**
+   * The SampleService client bean
+   * @return the RestClient for the SampleService
+   */
   @Bean
   @Qualifier("sampleServiceClient")
   public RestClient sampleServiceClient() {
     RestClient restHelper = new RestClient(appConfig.getSampleSvc().getConnectionConfig());
     return restHelper;
   }
-  
+
   /**
-   * Bean to allow application to make controlled state transitions of Actions
-   * @return the state transition manager specifically for Actions
+   * Bean to allow application to make controlled state transitions of Samples
+   * @return the state transition manager specifically for Samples
    */
   @Bean
   public StateTransitionManager<SampleSummaryDTO.SampleState, SampleSummaryDTO.SampleEvent> sampleSvcStateTransitionManager() {
     return sampleSummarySvcStateTransitionManagerFactory.getStateTransitionManager(
         SampleSvcStateTransitionManagerFactory.SAMPLE_ENTITY);
   }
-  
+
   /**
    * To register classes in the JAX-RS world.
    */
@@ -71,7 +75,7 @@ public class SampleSvcApplication {
       System.setProperty("ma.glasnost.orika.writeClassFiles", "false");
     }
   }
-  
+
   /**
    * This method is the entry point to the Spring Boot application.
    *
