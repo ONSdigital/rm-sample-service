@@ -22,7 +22,9 @@
 
     <int:channel id="sftpInboundBusiness"/>
     <int:channel id="xmlInvalidBusiness" />
+
     <int:publish-subscribe-channel id="xmlValidBusiness" />
+    <int:publish-subscribe-channel id="errorUploadChannel" />
     
     <int-sftp:inbound-channel-adapter id="sftpInboundAdapterBusiness"
             channel="sftpInboundBusiness"
@@ -32,7 +34,7 @@
             local-filter="acceptAllFileListFilter"
             remote-file-separator="/"
             remote-directory="${sftp.directory}/business-sftp">
-        <int:poller cron="${sftp.cron}"/>
+        <int:poller cron="${sftp.cron}"  error-channel="pollerErrorChannel"/>
     </int-sftp:inbound-channel-adapter>
 
     <bean id="acceptAllFileListFilter" class="org.springframework.integration.file.filters.AcceptAllFileListFilter"/>
@@ -40,7 +42,7 @@
     <int-file:file-to-string-transformer id="fileToStringTransformerBusiness" input-channel="sftpInboundBusiness" output-channel="xmlBusiness" delete-files="true" charset="UTF-8"/> 
 
     <int-xml:validating-filter id="xmlValidatorBusiness" input-channel="xmlBusiness" 
-                                output-channel="xmlValidBusiness" schema-location="classpath:xsd/business-survey-sample.xsd" discard-channel="xmlInvalidBusiness"/> 
+                                output-channel="xmlValidBusiness" schema-location="classpath:xsd/business-survey-sample.xsd" discard-channel="xmlInvalidBusiness" throw-exception-on-rejection="true"/>
        
     <int-xml:unmarshalling-transformer input-channel="xmlValidBusiness" output-channel="xmlTransformedBusiness" unmarshaller="unmarshallerBusiness" />
     
@@ -71,5 +73,28 @@
   </int-sftp:outbound-gateway>
   <int:channel id="renameSuccessProcessBusiness"/>
   <int:channel id="renameFailedProcessBusiness"/>
+
+    <int-sftp:outbound-channel-adapter id="createErrorFile"
+                                       channel="errorUploadChannel"
+                                       session-factory="sftpSessionFactory"
+                                       auto-startup="true"
+                                       charset="UTF-8"
+                                       remote-file-separator="/"
+                                       remote-directory="${sftp.directory}/errors"
+                                       remote-filename-generator-expression="headers['error_file_name']"
+                                       order="1"
+    />
+
+    <int-sftp:outbound-gateway id="renameInvalidFile"
+                               session-factory="sftpSessionFactory"
+                               request-channel="errorUploadChannel"
+                               reply-channel="nullChannel"
+                               auto-startup="true"
+                               remote-file-separator="/"
+                               command="mv"
+                               expression="'${sftp.directory}/business-sftp/' + headers['file_name']"
+                               rename-expression="'${sftp.directory}/business-sftp/' + headers['short_file_name'] + '.error'"
+                               order="2"
+    />
   
 </beans>
