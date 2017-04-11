@@ -74,6 +74,11 @@ public final class SampleEndpoint implements CTPEndpoint {
   public Response getSampleSummary(@PathParam("surveyref") final String surveyRef,
       @PathParam("exercisedatetime") final Timestamp exerciseDateTime) throws CTPException {
 
+    /*
+     * TODO: GET currently only works with exerciseDateTime in this format: http://localhost:8125/samples/str1234/2012-12-13%2012:12:12
+     * exerciseDateTime format has not yet been specified so work with this for now.
+     */
+    
     List<SampleUnit> listSampleUnits = sampleService.findSampleUnitsBySurveyRefandExerciseDateTime(
         surveyRef, exerciseDateTime);
 
