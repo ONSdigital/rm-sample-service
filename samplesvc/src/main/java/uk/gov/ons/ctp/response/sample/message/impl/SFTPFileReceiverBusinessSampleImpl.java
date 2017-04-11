@@ -32,16 +32,6 @@ public class SFTPFileReceiverBusinessSampleImpl implements SFTPFileReceiverSampl
   private SampleService sampleService;
 
   /**
-   * Receives invalid XML for BusinessSurveySample
-   * @param message invalid XML message
-   * @throws CTPException if update operation fails
-   */
-  @ServiceActivator(inputChannel = "xmlInvalidBusiness")
-  public void invalidXMLProcess(Message<String> message) throws CTPException {
-    log.info("xmlInvalidBusiness: " + message.getHeaders().get("file_name"));
-  }
-
-  /**
    * To process BusinessSurveySample transformed from XML
    * @param businessSurveySample to process
    */
@@ -76,7 +66,12 @@ public class SFTPFileReceiverBusinessSampleImpl implements SFTPFileReceiverSampl
     log.info("Renaming failed for" + filename);
   }
 
-  @ServiceActivator(inputChannel = "pollerErrorChannel", outputChannel ="errorUploadChannel")
+  /**
+   * Creates error file containing the reason for XML validation failure
+   * @param errorMessage failure message containing reason for failure
+   * @return Message<String> message containing cut down error message and new file names
+   */
+  @ServiceActivator(inputChannel = "pollerErrorChannelBusiness", outputChannel ="errorUploadChannelBusiness")
   public Message<String> invalidXMLProcessPoll(GenericMessage errorMessage) throws CTPException, IOException {
 
     String fileName = ((MessageRejectedException) errorMessage.getPayload()).getFailedMessage().getHeaders().get("file_name").toString();

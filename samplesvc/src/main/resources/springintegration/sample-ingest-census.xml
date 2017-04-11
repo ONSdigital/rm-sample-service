@@ -22,7 +22,9 @@
 
     <int:channel id="sftpInboundCensus"/>
     <int:channel id="xmlInvalidCensus" />
+
     <int:publish-subscribe-channel id="xmlValidCensus" />
+    <int:publish-subscribe-channel id="errorUploadChannelCensus" />
     
     <int-sftp:inbound-channel-adapter id="sftpInboundAdapterCensus"
             channel="sftpInboundCensus"
@@ -31,7 +33,7 @@
             filename-pattern="*.xml"
             remote-file-separator="/"
             remote-directory="${sftp.directory}/census-sftp">
-        <int:poller cron="${sftp.cron}"/>
+        <int:poller cron="${sftp.cron}" error-channel="pollerErrorChannelCensus"/>
     </int-sftp:inbound-channel-adapter>
 
     <bean id="acceptAllFileListFilter" class="org.springframework.integration.file.filters.AcceptAllFileListFilter"/>
@@ -39,7 +41,7 @@
     <int-file:file-to-string-transformer id="fileToStringTransformerCensus" input-channel="sftpInboundCensus" output-channel="xmlCensus" delete-files="true" charset="UTF-8"/> 
 
     <int-xml:validating-filter id="xmlValidatorCensus" input-channel="xmlCensus" 
-                                output-channel="xmlValidCensus" schema-location="classpath:xsd/census-survey-sample.xsd" discard-channel="xmlInvalidCensus"/> 
+                                output-channel="xmlValidCensus" schema-location="classpath:xsd/census-survey-sample.xsd" throw-exception-on-rejection="true"/>
        
     <int-xml:unmarshalling-transformer input-channel="xmlValidCensus" output-channel="xmlTransformedCensus" unmarshaller="unmarshallerCensus" />
     
@@ -70,5 +72,26 @@
   </int-sftp:outbound-gateway>
   <int:channel id="renameSuccessProcessCensus"/>
   <int:channel id="renameFailedProcessCensus"/>
-  
+    <int-sftp:outbound-channel-adapter id="createErrorFileCensus"
+                                       channel="errorUploadChannelCensus"
+                                       session-factory="sftpSessionFactory"
+                                       auto-startup="true"
+                                       charset="UTF-8"
+                                       remote-file-separator="/"
+                                       remote-directory="${sftp.directory}/errors"
+                                       remote-filename-generator-expression="headers['error_file_name']"
+                                       order="1"
+    />
+
+    <int-sftp:outbound-gateway id="renameInvalidFileCensus"
+                               session-factory="sftpSessionFactory"
+                               request-channel="errorUploadChannelCensus"
+                               reply-channel="nullChannel"
+                               auto-startup="true"
+                               remote-file-separator="/"
+                               command="mv"
+                               expression="'${sftp.directory}/census-sftp/' + headers['file_name']"
+                               rename-expression="'${sftp.directory}/census-sftp/' + headers['short_file_name'] + '.error'"
+                               order="2"
+    />
 </beans>

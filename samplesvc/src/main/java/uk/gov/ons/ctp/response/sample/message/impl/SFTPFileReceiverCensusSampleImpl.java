@@ -1,9 +1,11 @@
 package uk.gov.ons.ctp.response.sample.message.impl;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import org.springframework.integration.MessageRejectedException;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
@@ -11,6 +13,7 @@ import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.support.GenericMessage;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.support.MessageBuilder;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.definition.CensusSampleUnit;
 import uk.gov.ons.ctp.response.sample.definition.CensusSurveySample;
@@ -27,17 +30,7 @@ public class SFTPFileReceiverCensusSampleImpl implements SFTPFileReceiverSample<
 
   @Inject
   private SampleService sampleService;
-
-  /**
-   * Receives invalid XML for CensusSurveySample
-   * @param message invalid XML message
-   * @throws CTPException if update operation fails
-   */
-  @ServiceActivator(inputChannel = "xmlInvalidCensus")
-  public void invalidXMLProcess(Message<String> message) throws CTPException {
-    log.info("xmlInvalidCensus: " + message.getHeaders().get("file_name"));
-  }
-
+  
   /**
    * Processes CensusSurveySample transformed from XML
    * @param censusSurveySample to process
@@ -74,4 +67,24 @@ public class SFTPFileReceiverCensusSampleImpl implements SFTPFileReceiverSample<
     log.info("Renaming failed for" + filename);
   }
 
+  /**
+   * Creates error file containing the reason for XML validation failure
+   * @param errorMessage failure message containing reason for failure
+   * @return Message<String> message containing cut down error message and new file names
+   */
+  @ServiceActivator(inputChannel = "pollerErrorChannelCensus", outputChannel ="errorUploadChannelCensus")
+  public Message<String> invalidXMLProcessPoll(GenericMessage errorMessage) throws CTPException, IOException {
+
+    String fileName = ((MessageRejectedException) errorMessage.getPayload()).getFailedMessage().getHeaders().get("file_name").toString();
+    String error = ((Exception)errorMessage.getPayload()).getCause().toString();
+    String shortFileName = fileName.replace(".xml", "");
+    String errorFile = shortFileName + "_error.txt";
+
+    log.info(fileName + " Was invalid and rejected.");
+
+    final Message<String> message = MessageBuilder.withPayload(error).setHeader( "error_file_name",errorFile)
+            .setHeader("file_name",fileName).setHeader("short_file_name", shortFileName).build();
+
+    return message;
+  }
 }

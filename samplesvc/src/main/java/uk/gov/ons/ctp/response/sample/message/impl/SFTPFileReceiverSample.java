@@ -8,6 +8,8 @@ import org.springframework.messaging.support.GenericMessage;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 
+import java.io.IOException;
+
 /**
 * The SampleService interface defines all business behaviours for operations on
 * the Sample entity model.
@@ -15,14 +17,6 @@ import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 */
 @MessageEndpoint
 public interface SFTPFileReceiverSample<T extends SurveyBase> {
-
-  /**
-   * Receives invalid XML for CensusSurveySample
-   * @param message invalid XML message
-   * @throws CTPException if update operation fails
-   *
-   */
-  void invalidXMLProcess(Message<String> message) throws CTPException;
 
   /**
    * Processes CensusSurveySample transformed from XML
@@ -41,5 +35,12 @@ public interface SFTPFileReceiverSample<T extends SurveyBase> {
    * @param message failure message
    */
   void sftpFailedProcess(GenericMessage<MessagingException> message);
+
+  /**
+   * Creates error file containing the reason for XML validation failure
+   * @param errorMessage failure message containing reason for failure
+   * @return Message<String> message containing cut down error message and new file names
+   */
+  Message<String> invalidXMLProcessPoll(GenericMessage errorMessage) throws CTPException, IOException;
 
 }

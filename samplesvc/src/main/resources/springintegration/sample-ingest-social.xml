@@ -22,7 +22,9 @@
 
     <int:channel id="sftpInboundSocial"/>
     <int:channel id="xmlInvalidSocial" />
+
     <int:publish-subscribe-channel id="xmlValidSocial" />
+    <int:publish-subscribe-channel id="errorUploadChannelSocial" />
     
     <int-sftp:inbound-channel-adapter id="sftpInboundAdapterSocial"
             channel="sftpInboundSocial"
@@ -31,7 +33,7 @@
             filename-pattern="*.xml"
             remote-file-separator="/"
             remote-directory="${sftp.directory}/social-sftp">
-        <int:poller cron="${sftp.cron}"/>
+        <int:poller cron="${sftp.cron}" error-channel="pollerErrorChannelSocial"/>
     </int-sftp:inbound-channel-adapter>
     
     <bean id="acceptAllFileListFilter" class="org.springframework.integration.file.filters.AcceptAllFileListFilter"/>
@@ -39,7 +41,7 @@
     <int-file:file-to-string-transformer id="fileToStringTransformerSocial" input-channel="sftpInboundSocial" output-channel="xmlSocial" delete-files="true" charset="UTF-8"/> 
 
     <int-xml:validating-filter id="xmlValidatorSocial" input-channel="xmlSocial" 
-                                output-channel="xmlValidSocial" schema-location="classpath:xsd/social-survey-sample.xsd" discard-channel="xmlInvalidSocial"/> 
+                                output-channel="xmlValidSocial" schema-location="classpath:xsd/social-survey-sample.xsd" throw-exception-on-rejection="true"/>
        
     <int-xml:unmarshalling-transformer input-channel="xmlValidSocial" output-channel="xmlTransformedSocial" unmarshaller="unmarshallerSocial" />
     
@@ -70,5 +72,26 @@
   </int-sftp:outbound-gateway>
   <int:channel id="renameSuccessProcessSocial"/>
   <int:channel id="renameFailedProcessSocial"/>
-  
+    <int-sftp:outbound-channel-adapter id="createErrorFileSocial"
+                                       channel="errorUploadChannelSocial"
+                                       session-factory="sftpSessionFactory"
+                                       auto-startup="true"
+                                       charset="UTF-8"
+                                       remote-file-separator="/"
+                                       remote-directory="${sftp.directory}/errors"
+                                       remote-filename-generator-expression="headers['error_file_name']"
+                                       order="1"
+    />
+
+    <int-sftp:outbound-gateway id="renameInvalidFileSocial"
+                               session-factory="sftpSessionFactory"
+                               request-channel="errorUploadChannelSocial"
+                               reply-channel="nullChannel"
+                               auto-startup="true"
+                               remote-file-separator="/"
+                               command="mv"
+                               expression="'${sftp.directory}/social-sftp/' + headers['file_name']"
+                               rename-expression="'${sftp.directory}/social-sftp/' + headers['short_file_name'] + '.error'"
+                               order="2"
+    />
 </beans>
