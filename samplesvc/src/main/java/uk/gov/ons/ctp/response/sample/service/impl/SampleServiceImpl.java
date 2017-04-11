@@ -116,9 +116,7 @@ public class SampleServiceImpl implements SampleService {
   }
 
   @Override
-  public void sendBusinessToParty(Integer sampleId, BusinessSurveySample businessSurveySample) {
-    List<BusinessSampleUnit> samplingUnitList = businessSurveySample
-        .getSampleUnits().getBusinessSampleUnits();
+  public void sendBusinessToParty(Integer sampleId, List<BusinessSampleUnit> samplingUnitList) {
     int size = samplingUnitList.size();
     int position = 1;
     for (BusinessSampleUnit bsu : samplingUnitList) {
@@ -132,13 +130,11 @@ public class SampleServiceImpl implements SampleService {
   }
 
   @Override
-  public void sendCensusToParty(Integer sampleId, CensusSurveySample censusSurveySample) {
-    List<CensusSampleUnit> samplingUnitList = censusSurveySample
-        .getSampleUnits().getCensusSampleUnits();
+  public void sendCensusToParty(Integer sampleId, List<CensusSampleUnit> samplingUnitList) {
     int size = samplingUnitList.size();
     int position = 1;
-    for (CensusSampleUnit bsu : samplingUnitList) {
-      PartyDTO party = mapperFacade.map(bsu, PartyDTO.class);
+    for (CensusSampleUnit csu : samplingUnitList) {
+      PartyDTO party = mapperFacade.map(csu, PartyDTO.class);
       party.setSize(size);
       party.setPostion(position);
       party.setSampleId(sampleId);
@@ -148,13 +144,11 @@ public class SampleServiceImpl implements SampleService {
   }
 
   @Override
-  public void sendSocialToParty(Integer sampleId, SocialSurveySample socialSurveySample) {
-    List<SocialSampleUnit> samplingUnitList = socialSurveySample
-        .getSampleUnits().getSocialSampleUnits();
+  public void sendSocialToParty(Integer sampleId, List<SocialSampleUnit> samplingUnitList) {
     int size = samplingUnitList.size();
     int position = 1;
-    for (SocialSampleUnit bsu : samplingUnitList) {
-      PartyDTO party = mapperFacade.map(bsu, PartyDTO.class);
+    for (SocialSampleUnit ssu : samplingUnitList) {
+      PartyDTO party = mapperFacade.map(ssu, PartyDTO.class);
       party.setSize(size);
       party.setPostion(position);
       party.setSampleId(sampleId);

@@ -9,6 +9,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -28,6 +29,7 @@ import uk.gov.ons.ctp.response.sample.service.state.SampleSvcStateTransitionMana
 @SpringBootApplication
 @EnableTransactionManagement
 @EnableCaching
+@ComponentScan(basePackages = {"uk.gov.ons.ctp.response"})
 @ImportResource("springintegration/main.xml")
 public class SampleSvcApplication {
 

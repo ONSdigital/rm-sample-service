@@ -3,10 +3,10 @@ package uk.gov.ons.ctp.response.sample.service;
 import java.sql.Timestamp;
 import java.util.List;
 
-import uk.gov.ons.ctp.response.sample.definition.BusinessSurveySample;
-import uk.gov.ons.ctp.response.sample.definition.CensusSurveySample;
+import uk.gov.ons.ctp.response.sample.definition.BusinessSampleUnit;
+import uk.gov.ons.ctp.response.sample.definition.CensusSampleUnit;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
-import uk.gov.ons.ctp.response.sample.definition.SocialSurveySample;
+import uk.gov.ons.ctp.response.sample.definition.SocialSampleUnit;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
@@ -57,7 +57,7 @@ public interface SampleService {
    * @param sampleId The sampleId
    * @param censusSurveySample object or null
    */
-  void sendCensusToParty(Integer sampleId, CensusSurveySample censusSurveySample);
+  void sendCensusToParty(Integer sampleId, List<CensusSampleUnit> samplingUnitList);
 
   /**
    * Sends relevant Social information to the Party service
@@ -65,15 +65,15 @@ public interface SampleService {
    * @param sampleId The sampleId
    * @param socialSurveySample object or null
    */
-  void sendSocialToParty(Integer sampleId, SocialSurveySample socialSurveySample);
+  void sendSocialToParty(Integer sampleId, List<SocialSampleUnit> samplingUnitList);
 
   /**
    * Sends relevant Business information to the Party service
    *
    * @param sampleId The sampleId
-   * @param businessSurveySample object or null
+   * @param samplingUnitList object or null
    */
-  void sendBusinessToParty(Integer sampleId, BusinessSurveySample businessSurveySample);
+  void sendBusinessToParty(Integer sampleId, List<BusinessSampleUnit> samplingUnitList);
 
   /**
    * Update the SampleSummary state
