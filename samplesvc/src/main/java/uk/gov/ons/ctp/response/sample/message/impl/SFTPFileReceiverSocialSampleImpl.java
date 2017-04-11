@@ -50,7 +50,7 @@ public class SFTPFileReceiverSocialSampleImpl implements SFTPFileReceiverSample<
     SampleSummary savedSampleSummary = sampleService.createandSaveSampleSummary(socialSurveySample);
     List<SocialSampleUnit> samplingUnitList = socialSurveySample.getSampleUnits().getSocialSampleUnits();
     sampleService.createandSaveSampleUnits(samplingUnitList, savedSampleSummary);
-    sampleService.sendSocialToParty(savedSampleSummary.getSampleId(), socialSurveySample);
+    sampleService.sendSocialToParty(savedSampleSummary.getSampleId(), samplingUnitList);
 
   }
 

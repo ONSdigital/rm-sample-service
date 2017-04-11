@@ -50,7 +50,7 @@ public class SFTPFileReceiverCensusSampleImpl implements SFTPFileReceiverSample<
     SampleSummary savedSampleSummary = sampleService.createandSaveSampleSummary(censusSurveySample);
     List<CensusSampleUnit> samplingUnitList = censusSurveySample.getSampleUnits().getCensusSampleUnits();
     sampleService.createandSaveSampleUnits(samplingUnitList, savedSampleSummary);
-    sampleService.sendCensusToParty(savedSampleSummary.getSampleId(), censusSurveySample);
+    sampleService.sendCensusToParty(savedSampleSummary.getSampleId(), samplingUnitList);
 
   }
 
