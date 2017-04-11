@@ -29,12 +29,15 @@
             session-factory="sftpSessionFactory"
             local-directory="${sftp.localdirectory}/business-local"
             filename-pattern="*.xml"
+            local-filter="acceptAllFileListFilter"
             remote-file-separator="/"
             remote-directory="${sftp.directory}/business-sftp">
         <int:poller cron="${sftp.cron}"/>
     </int-sftp:inbound-channel-adapter>
 
-    <int-file:file-to-string-transformer id="fileToStringTransformerBusiness" input-channel="sftpInboundBusiness" output-channel="xmlBusiness" delete-files="false" charset="UTF-8"/> 
+    <bean id="acceptAllFileListFilter" class="org.springframework.integration.file.filters.AcceptAllFileListFilter"/>
+
+    <int-file:file-to-string-transformer id="fileToStringTransformerBusiness" input-channel="sftpInboundBusiness" output-channel="xmlBusiness" delete-files="true" charset="UTF-8"/> 
 
     <int-xml:validating-filter id="xmlValidatorBusiness" input-channel="xmlBusiness" 
                                 output-channel="xmlValidBusiness" schema-location="classpath:xsd/business-survey-sample.xsd" discard-channel="xmlInvalidBusiness"/> 

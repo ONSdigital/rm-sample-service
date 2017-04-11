@@ -34,7 +34,9 @@
         <int:poller cron="${sftp.cron}"/>
     </int-sftp:inbound-channel-adapter>
 
-    <int-file:file-to-string-transformer id="fileToStringTransformerCensus" input-channel="sftpInboundCensus" output-channel="xmlCensus" delete-files="false" charset="UTF-8"/> 
+    <bean id="acceptAllFileListFilter" class="org.springframework.integration.file.filters.AcceptAllFileListFilter"/>
+
+    <int-file:file-to-string-transformer id="fileToStringTransformerCensus" input-channel="sftpInboundCensus" output-channel="xmlCensus" delete-files="true" charset="UTF-8"/> 
 
     <int-xml:validating-filter id="xmlValidatorCensus" input-channel="xmlCensus" 
                                 output-channel="xmlValidCensus" schema-location="classpath:xsd/census-survey-sample.xsd" discard-channel="xmlInvalidCensus"/> 
