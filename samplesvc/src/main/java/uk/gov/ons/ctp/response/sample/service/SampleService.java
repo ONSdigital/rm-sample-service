@@ -55,7 +55,7 @@ public interface SampleService {
    * Sends relevant Census information to the Party service
    *
    * @param sampleId The sampleId
-   * @param censusSurveySample object or null
+   * @param samplingUnitList object or null
    */
   void sendCensusToParty(Integer sampleId, List<CensusSampleUnit> samplingUnitList);
 
@@ -63,7 +63,7 @@ public interface SampleService {
    * Sends relevant Social information to the Party service
    *
    * @param sampleId The sampleId
-   * @param socialSurveySample object or null
+   * @param samplingUnitList object or null
    */
   void sendSocialToParty(Integer sampleId, List<SocialSampleUnit> samplingUnitList);
 
