@@ -43,7 +43,7 @@ public class PartyEndpoint implements CTPEndpoint {
     log.info(Integer.toString(partyDTO.getSampleId()));
     log.info(Boolean.toString(sampleServiceClient == null));
     if (partyDTO.getPostion() == partyDTO.getSize()) {
-      sampleServiceClient.putResource("/samples/" + partyDTO.getSampleId(), partyDTO.getSampleId(), Integer.class);
+      sampleServiceClient.putResource("/samples/" + partyDTO.getSampleId(), null, null, partyDTO.getSampleId());
       return Response.ok(partyDTO).status(Status.OK).build();
     }
     return Response.ok(partyDTO).status(Status.CREATED).build();
