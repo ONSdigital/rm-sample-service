@@ -74,7 +74,7 @@ public class SFTPFileReceiverBusinessSampleImpl implements SFTPFileReceiverSampl
   @ServiceActivator(inputChannel = "pollerErrorChannelBusiness", outputChannel ="errorUploadChannelBusiness")
   public Message<String> invalidXMLProcessPoll(GenericMessage errorMessage) throws CTPException, IOException {
 
-    String fileName = ((MessageRejectedException) errorMessage.getPayload()).getFailedMessage().getHeaders().get("file_name").toString();
+    String fileName = ((MessagingException) errorMessage.getPayload()).getFailedMessage().getHeaders().get("file_name").toString();
     String error = ((Exception)errorMessage.getPayload()).getCause().toString();
     String shortFileName = fileName.replace(".xml", "");
     String errorFile = shortFileName + "_error.txt";

@@ -30,7 +30,7 @@ public class SFTPFileReceiverCensusSampleImpl implements SFTPFileReceiverSample<
 
   @Inject
   private SampleService sampleService;
-  
+
   /**
    * Processes CensusSurveySample transformed from XML
    * @param censusSurveySample to process
@@ -75,7 +75,7 @@ public class SFTPFileReceiverCensusSampleImpl implements SFTPFileReceiverSample<
   @ServiceActivator(inputChannel = "pollerErrorChannelCensus", outputChannel ="errorUploadChannelCensus")
   public Message<String> invalidXMLProcessPoll(GenericMessage errorMessage) throws CTPException, IOException {
 
-    String fileName = ((MessageRejectedException) errorMessage.getPayload()).getFailedMessage().getHeaders().get("file_name").toString();
+    String fileName = ((MessagingException) errorMessage.getPayload()).getFailedMessage().getHeaders().get("file_name").toString();
     String error = ((Exception)errorMessage.getPayload()).getCause().toString();
     String shortFileName = fileName.replace(".xml", "");
     String errorFile = shortFileName + "_error.txt";
