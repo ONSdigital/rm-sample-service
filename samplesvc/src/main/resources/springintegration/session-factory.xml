@@ -9,7 +9,6 @@
     <bean id="sftpSessionFactory" class="org.springframework.integration.file.remote.session.CachingSessionFactory">
         <constructor-arg ref="defaultSftpSessionFactory" />
         <constructor-arg value="1"/>
-        <property name="sessionWaitTimeout" value="5000"/>
     </bean>
 
     <bean id="defaultSftpSessionFactory" class="org.springframework.integration.sftp.session.DefaultSftpSessionFactory">
