@@ -38,10 +38,10 @@ public class PartyEndpoint implements CTPEndpoint {
   @Path("/events")
   public Response createCaseEvent(final PartyDTO partyDTO) throws CTPException {
 
-    log.info(partyDTO.getForename());
-    log.info(partyDTO.getPostion() + " / " + partyDTO.getSize());
-    log.info(Integer.toString(partyDTO.getSampleId()));
-    log.info(Boolean.toString(sampleServiceClient == null));
+    log.debug(partyDTO.getForename());
+    log.debug(partyDTO.getPostion() + " / " + partyDTO.getSize());
+    log.debug(Integer.toString(partyDTO.getSampleId()));
+    log.debug(Boolean.toString(sampleServiceClient == null));
     if (partyDTO.getPostion() == partyDTO.getSize()) {
       sampleServiceClient.putResource("/samples/" + partyDTO.getSampleId(), null, null, partyDTO.getSampleId());
       return Response.ok(partyDTO).status(Status.OK).build();
@@ -57,7 +57,7 @@ public class PartyEndpoint implements CTPEndpoint {
   @GET
   @Path("/events")
   public Response up() {
-    log.info("party up");
+    log.debug("party up");
     return Response.ok().status(Status.CREATED).build();
 
   }

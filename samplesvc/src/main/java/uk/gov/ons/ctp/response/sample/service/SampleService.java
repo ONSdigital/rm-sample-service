@@ -24,7 +24,7 @@ public interface SampleService {
    * @param surveySampleObject SurveySample to be used
    * @return the created SampleSummary
    */
-  <T extends SurveyBase> SampleSummary createandSaveSampleSummary(T surveySampleObject);
+  SampleSummary processSampleSummary(SurveyBase surveySampleObject);
 
   /**
    * Create and save SampleUnits from the incoming SurveySample
@@ -33,7 +33,7 @@ public interface SampleService {
    * @param samplingUnitList List of SampleUnits to save
    * @param sampleSummary SampleSummary to be used
    */
-  <T extends SampleUnitBase> void createandSaveSampleUnits(List<T> samplingUnitList, SampleSummary sampleSummary);
+   void createandSaveSampleUnits(List<? extends SampleUnitBase> samplingUnitList, SampleSummary sampleSummary);
 
   /**
    * Find SampleSummary entity by sampleid
@@ -82,5 +82,5 @@ public interface SampleService {
    * @param exerciseDateTime The effectiveStartDateTime
    * @return List<SampleUnit> object list or null
    */
-  List<SampleUnit> findSampleUnitsBySurveyRefandExerciseDateTime(String surveyRef, Timestamp exerciseDateTime);
+  List<SampleUnit> findSampleUnits(String surveyRef, Timestamp exerciseDateTime);
 }

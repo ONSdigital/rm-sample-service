@@ -4,12 +4,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -52,7 +47,7 @@ public final class SampleEndpoint implements CTPEndpoint {
   @Path("/{sampleid}")
   public Response activateSampleSummary(@PathParam("sampleid") final Integer sampleId) throws CTPException {
 
-    log.info("Activating SampleId: " + sampleId);
+    log.debug("Activating SampleId: " + sampleId);
     SampleSummary sampleSummary = sampleService.activateSampleSummaryState(sampleId);
 
     return Response.ok(mapperFacade.map(sampleSummary, SampleSummaryDTO.class)).build();
@@ -70,16 +65,16 @@ public final class SampleEndpoint implements CTPEndpoint {
    * @throws CTPException if update operation fails
    */
   @GET
-  @Path("/{surveyref}/{exercisedatetime}")
-  public Response getSampleSummary(@PathParam("surveyref") final String surveyRef,
-      @PathParam("exercisedatetime") final Timestamp exerciseDateTime) throws CTPException {
+  @Path("/")
+  public Response getSampleSummary(@QueryParam("surveyref") final String surveyRef,
+      @QueryParam("exercisedatetime") final Timestamp exerciseDateTime) throws CTPException {
 
     /*
      * TODO: GET currently only works with exerciseDateTime in this format: http://localhost:8125/samples/str1234/2012-12-13%2012:12:12
      * exerciseDateTime format has not yet been specified so work with this for now.
      */
     
-    List<SampleUnit> listSampleUnits = sampleService.findSampleUnitsBySurveyRefandExerciseDateTime(
+    List<SampleUnit> listSampleUnits = sampleService.findSampleUnits(
         surveyRef, exerciseDateTime);
 
     ResponseBuilder responseBuilder = Response.ok(CollectionUtils.isEmpty(listSampleUnits) ? null : listSampleUnits);

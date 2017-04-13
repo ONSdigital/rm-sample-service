@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.response.sample.message.impl;
+package uk.gov.ons.ctp.response.sample.message;
 
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.messaging.Message;
@@ -15,32 +15,19 @@ import java.io.IOException;
 * the Sample entity model.
 * @param <T> Survey Sample object extended from SurveyBase
 */
-@MessageEndpoint
-public interface SFTPFileReceiverSample<T extends SurveyBase> {
+public interface SampleReceiver<T extends SurveyBase> {
 
   /**
    * Processes CensusSurveySample transformed from XML
    * @param surveySampleObject surveySample transformed from XML
    */
-  void transformedXMLProcess(T surveySampleObject);
-
-  /**
-   * Confirms file rename successful for XML input file
-   * @param message success message
-   */
-  void sftpSuccessProcess(GenericMessage<GenericMessage<byte[]>> message);
-
-  /**
-   * Confirms file rename unsuccessful for XML input file
-   * @param message failure message
-   */
-  void sftpFailedProcess(GenericMessage<MessagingException> message);
+  void processSample(T surveySampleObject);
 
   /**
    * Creates error file containing the reason for XML validation failure
    * @param errorMessage failure message containing reason for failure
    * @return Message<String> message containing cut down error message and new file names
-   */
-  Message<String> invalidXMLProcessPoll(GenericMessage errorMessage) throws CTPException, IOException;
+   *//*
+  Message<String> processInvalidSample(GenericMessage errorMessage) throws CTPException, IOException;*/
 
 }

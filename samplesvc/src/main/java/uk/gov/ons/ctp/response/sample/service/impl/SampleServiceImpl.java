@@ -50,7 +50,7 @@ public class SampleServiceImpl implements SampleService {
   private RestClient sampleServiceClient;
 
   @Override
-  public <T extends SurveyBase> SampleSummary createandSaveSampleSummary(T surveySampleObject) {
+  public SampleSummary processSampleSummary(SurveyBase surveySampleObject) {
 
     Timestamp effectiveStartDateTime = new Timestamp(surveySampleObject.getEffectiveStartDateTime()
         .toGregorianCalendar().getTimeInMillis());
@@ -68,14 +68,14 @@ public class SampleServiceImpl implements SampleService {
   }
 
   @Override
-  public <T extends SampleUnitBase> void createandSaveSampleUnits(List<T> samplingUnitList,
+  public void createandSaveSampleUnits(List<? extends SampleUnitBase> samplingUnitList,
       SampleSummary sampleSummary) {
 
-    for (T businessSampleUnit : samplingUnitList) {
+    for (SampleUnitBase sampleUnitBase : samplingUnitList) {
       SampleUnit sampleUnit = new SampleUnit();
       sampleUnit.setSampleId(sampleSummary.getSampleId());
-      sampleUnit.setSampleUnitRef(businessSampleUnit.getSampleUnitRef());
-      sampleUnit.setSampleUnitType(businessSampleUnit.getSampleUnitType());
+      sampleUnit.setSampleUnitRef(sampleUnitBase.getSampleUnitRef());
+      sampleUnit.setSampleUnitType(sampleUnitBase.getSampleUnitType());
 
       sampleUnitRepository.save(sampleUnit);
     }
@@ -83,7 +83,7 @@ public class SampleServiceImpl implements SampleService {
 
   @Override
   public SampleSummary findSampleSummaryBySampleId(Integer sampleId) {
-    return sampleSummaryRepository.findBySampleId(sampleId);
+    return sampleSummaryRepository.findOne(sampleId);
   }
 
   /**
@@ -95,24 +95,14 @@ public class SampleServiceImpl implements SampleService {
    */
   @Override
   public SampleSummary activateSampleSummaryState(Integer sampleId) {
-
     SampleSummary targetSampleSummary = sampleSummaryRepository.findOne(sampleId);
-    SampleSummaryDTO.SampleState oldState = targetSampleSummary.getState();
-    SampleSummaryDTO.SampleState newState = null;
-    // make the transition
-    newState = sampleSvcStateTransitionManager.transition(targetSampleSummary.getState(),
-        SampleSummaryDTO.SampleEvent.ACTIVATED);
-    // was a state change effected?
-    if (oldState != newState) {
-      targetSampleSummary.setState(newState);
-      sampleSummaryRepository.saveAndFlush(targetSampleSummary);
-    }
-
+    SampleSummaryDTO.SampleState newState = sampleSvcStateTransitionManager.transition(targetSampleSummary.getState(), SampleSummaryDTO.SampleEvent.ACTIVATED);
+    targetSampleSummary.setState(newState);
+    sampleSummaryRepository.saveAndFlush(targetSampleSummary);
     return targetSampleSummary;
 
   }
 
-  @Override
   public void sendBusinessToParty(Integer sampleId, List<BusinessSampleUnit> samplingUnitList) {
     int size = samplingUnitList.size();
     int position = 1;
@@ -126,7 +116,6 @@ public class SampleServiceImpl implements SampleService {
     }
   }
 
-  @Override
   public void sendCensusToParty(Integer sampleId, List<CensusSampleUnit> samplingUnitList) {
     int size = samplingUnitList.size();
     int position = 1;
@@ -140,7 +129,6 @@ public class SampleServiceImpl implements SampleService {
     }
   }
 
-  @Override
   public void sendSocialToParty(Integer sampleId, List<SocialSampleUnit> samplingUnitList) {
     int size = samplingUnitList.size();
     int position = 1;
@@ -155,7 +143,7 @@ public class SampleServiceImpl implements SampleService {
   }
 
   @Override
-  public List<SampleUnit> findSampleUnitsBySurveyRefandExerciseDateTime(String surveyRef, Timestamp exerciseDateTime) {
+  public List<SampleUnit> findSampleUnits(String surveyRef, Timestamp exerciseDateTime) {
 
     List<SampleSummary> listOfSampleSummaries = sampleSummaryRepository
         .findBySurveyRefAndEffectiveStartDateTime(surveyRef, exerciseDateTime);
