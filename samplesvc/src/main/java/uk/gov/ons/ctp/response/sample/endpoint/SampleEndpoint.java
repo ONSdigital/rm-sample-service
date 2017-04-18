@@ -4,7 +4,13 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -73,7 +79,7 @@ public final class SampleEndpoint implements CTPEndpoint {
      * TODO: GET currently only works with exerciseDateTime in this format: http://localhost:8125/samples/str1234/2012-12-13%2012:12:12
      * exerciseDateTime format has not yet been specified so work with this for now.
      */
-    
+
     List<SampleUnit> listSampleUnits = sampleService.findSampleUnits(
         surveyRef, exerciseDateTime);
 

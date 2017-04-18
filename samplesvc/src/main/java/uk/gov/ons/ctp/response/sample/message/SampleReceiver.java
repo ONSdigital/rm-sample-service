@@ -1,14 +1,6 @@
 package uk.gov.ons.ctp.response.sample.message;
 
-import org.springframework.integration.annotation.MessageEndpoint;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.MessagingException;
-import org.springframework.messaging.support.GenericMessage;
-
-import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
-
-import java.io.IOException;
 
 /**
 * The SampleService interface defines all business behaviours for operations on

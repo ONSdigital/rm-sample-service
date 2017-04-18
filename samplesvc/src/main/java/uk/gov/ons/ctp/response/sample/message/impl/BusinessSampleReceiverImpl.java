@@ -10,7 +10,6 @@ import org.springframework.integration.annotation.ServiceActivator;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.ctp.response.sample.definition.BusinessSampleUnit;
 import uk.gov.ons.ctp.response.sample.definition.BusinessSurveySample;
-import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.message.SampleReceiver;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
@@ -34,10 +33,8 @@ public class BusinessSampleReceiverImpl implements SampleReceiver<BusinessSurvey
     log.debug("BusinessSurveySample (Collection Exercise Ref: {}) transformed successfully.",
         businessSurveySample.getCollectionExerciseRef());
 
-    SampleSummary savedSampleSummary = sampleService.processSampleSummary(businessSurveySample);
     List<BusinessSampleUnit> samplingUnitList = businessSurveySample.getSampleUnits().getBusinessSampleUnits();
-    sampleService.createandSaveSampleUnits(samplingUnitList, savedSampleSummary);
-    sampleService.sendBusinessToParty(savedSampleSummary.getSampleId(), samplingUnitList);
+    sampleService.processSampleSummary(businessSurveySample, samplingUnitList);
   }
 
 }

@@ -5,6 +5,8 @@ import org.springframework.stereotype.Repository;
 
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 
+import java.util.List;
+
 /**
  * JPA Data Repository needed to persist Survey Sample Units
  */
@@ -17,6 +19,6 @@ public interface SampleUnitRepository extends JpaRepository<SampleUnit, Integer>
    * @param sampleId The sampleId
    * @return SampleUnit object or null
    */
-  SampleUnit findBySampleId(Integer sampleId);
+  List<SampleUnit> findBySampleId(Integer sampleId);
 
 }

@@ -10,7 +10,7 @@ info:
 logging:
   level:
     org.springframework: WARN
-    uk.gov.ons.ctp: INFO
+    uk.gov.ons.ctp: DEBUG
 
 liquibase:
   user: samplesvc
