@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -71,7 +71,7 @@ public final class SampleEndpoint implements CTPEndpoint {
    *         specified surveyRef and exerciseDateTime.
    * @throws CTPException if update operation fails
    */
-  @GET
+  @POST
   @Path("/")
   public Response getSampleSummary(@QueryParam("collectionexerciseref") final Integer collectionExerciseId,
       @QueryParam("surveyref") final String surveyRef, 
@@ -81,7 +81,7 @@ public final class SampleEndpoint implements CTPEndpoint {
      * TODO: GET currently only works with exerciseDateTime in this format: 2012-12-13%2012:12:12
      * exerciseDateTime format has not yet been specified so work with this for now.
      */
-
+    
     CollectionExerciseJob collectionExerciseJob = new CollectionExerciseJob();
     collectionExerciseJob.setCollectionExerciseId(collectionExerciseId);
     collectionExerciseJob.setSurveyRef(surveyRef);
