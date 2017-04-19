@@ -44,7 +44,6 @@ public class SFTPSampleReceiver {
     public Message<String> processInvalidSample(GenericMessage errorMessage) {
 
         String error = ((Exception) errorMessage.getPayload()).getCause().toString();
-        log.debug(error);
         String fileName = ((MessagingException) errorMessage.getPayload()).getFailedMessage().getHeaders()
                 .get("file_name").toString();
         String directory = ((MessagingException) errorMessage.getPayload()).getFailedMessage().getHeaders()

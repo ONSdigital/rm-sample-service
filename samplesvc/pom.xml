@@ -35,11 +35,6 @@
 			<artifactId>spring-integration-redis</artifactId>
 		</dependency>
 
-		<!--<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-		</dependency>-->
-
 		<dependency>
 			<groupId>redis.clients</groupId>
 			<artifactId>jedis</artifactId>
