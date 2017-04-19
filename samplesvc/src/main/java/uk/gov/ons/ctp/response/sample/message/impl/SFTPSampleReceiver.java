@@ -43,9 +43,10 @@ public class SFTPSampleReceiver {
     @ServiceActivator(inputChannel = "pollerErrorChannel", outputChannel = "errorUploadChannel")
     public Message<String> processInvalidSample(GenericMessage errorMessage) {
 
+        String error = ((Exception) errorMessage.getPayload()).getCause().toString();
+        log.debug(error);
         String fileName = ((MessagingException) errorMessage.getPayload()).getFailedMessage().getHeaders()
                 .get("file_name").toString();
-        String error = ((Exception) errorMessage.getPayload()).getCause().toString();
         String directory = ((MessagingException) errorMessage.getPayload()).getFailedMessage().getHeaders()
                 .get("sample_type").toString() + "-sftp";
         String shortFileName = fileName.replace(".xml", "");

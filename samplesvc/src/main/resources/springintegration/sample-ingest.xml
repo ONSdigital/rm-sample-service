@@ -47,4 +47,14 @@
                                order="2"
     />
 
+    <bean id="redisConnectionFactory"
+          class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+        <property name="port" value="${redis.port}" />
+        <property name="hostName" value="${redis.host}" />
+    </bean>
+
+    <bean name="metadataStore" class="org.springframework.integration.redis.metadata.RedisMetadataStore">
+        <constructor-arg name="connectionFactory" ref="redisConnectionFactory"/>
+    </bean>
+
 </beans>
