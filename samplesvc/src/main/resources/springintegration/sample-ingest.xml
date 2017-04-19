@@ -31,6 +31,7 @@
                                        charset="UTF-8"
                                        remote-file-separator="/"
                                        remote-directory="${sftp.directory}/errors"
+                                       auto-create-directory="true"
                                        remote-filename-generator-expression="headers['error_file_name']"
                                        order="1"
     />

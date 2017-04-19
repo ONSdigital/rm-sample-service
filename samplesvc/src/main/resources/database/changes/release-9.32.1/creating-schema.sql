@@ -2,7 +2,7 @@ SET SCHEMA 'sample';
 
 CREATE TABLE sample.samplestate
 (
-  state character varying NOT NULL,
+  state character varying (20) NOT NULL,
   CONSTRAINT state_pkey PRIMARY KEY (state)
 );
 
@@ -19,12 +19,12 @@ CREATE SEQUENCE sampleidseq
 
 CREATE TABLE sample.samplesummary
 (
-  sampleid integer DEFAULT nextval('sampleidseq'::regclass) NOT NULL,
+  sampleid bigint DEFAULT nextval('sampleidseq'::regclass) NOT NULL,
   effectivestartdatetime timestamp with time zone,
   effectiveenddatetime timestamp with time zone,
   surveyref character varying,
   ingestdatetime timestamp with time zone,
-  state character varying,
+  state character varying NOT NULL,
   CONSTRAINT sampleid_pkey PRIMARY KEY (sampleid),
   CONSTRAINT state_fkey FOREIGN KEY (state)
       REFERENCES sample.samplestate (state) MATCH SIMPLE
@@ -41,7 +41,7 @@ CREATE SEQUENCE sampleunitidseq
 
 CREATE TABLE sample.sampleunit
 (
-  sampleunitid integer DEFAULT nextval('sampleunitidseq'::regclass) NOT NULL,
+  sampleunitid bigint DEFAULT nextval('sampleunitidseq'::regclass) NOT NULL,
   sampleid bigint NOT NULL,
   sampleunitref character varying,
   sampleunittype character varying(10),
@@ -51,4 +51,20 @@ CREATE TABLE sample.sampleunit
       ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
+-- for primary keys
+CREATE SEQUENCE collectionexercisejobidseq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 999999999999
+    CACHE 1;
+
+CREATE TABLE sample.collectionexercisejob
+(
+  collectionexerciseid bigint NOT NULL,
+  surveyref character varying,
+  exercisedatetime timestamp with time zone,
+  createddatetime timestamp with time zone,
+  CONSTRAINT collectionexerciseid_pkey PRIMARY KEY (collectionexerciseid)
+);
 
