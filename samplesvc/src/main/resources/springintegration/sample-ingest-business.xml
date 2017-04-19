@@ -29,14 +29,11 @@
             channel="sftpInboundBusiness"
             session-factory="sftpSessionFactory"
             local-directory="${sftp.localdirectory}/business-local"
-            filename-pattern="*.xml"
-            local-filter="acceptAllFileListFilter"
+            filter="businessCompositeFilter"
             remote-file-separator="/"
             remote-directory="${sftp.directory}/business-sftp">
-        <int:poller cron="${sftp.cron}"  error-channel="pollerErrorChannel"/>
+        <int:poller cron="${sftp.cron}"  max-messages-per-poll="1" error-channel="pollerErrorChannel"/>
     </int-sftp:inbound-channel-adapter>
-
-    <bean id="acceptAllFileListFilter" class="org.springframework.integration.file.filters.AcceptAllFileListFilter"/>
 
     <int-file:file-to-string-transformer id="fileToStringTransformerBusiness" input-channel="sftpInboundBusiness" output-channel="xmlBusiness" delete-files="true" charset="UTF-8"/> 
 
@@ -76,5 +73,21 @@
   </int-sftp:outbound-gateway>
   <int:channel id="renameSuccessProcess"/>
   <int:channel id="renameFailedProcess"/>
+
+    <bean id="businessCompositeFilter"
+          class="org.springframework.integration.file.filters.CompositeFileListFilter">
+        <constructor-arg>
+            <list>
+                <bean
+                        class="org.springframework.integration.sftp.filters.SftpSimplePatternFileListFilter">
+                    <constructor-arg value="*.xml" />
+                </bean>
+                <bean id="SftpPersistentAcceptOnceFileListFilter" class="org.springframework.integration.sftp.filters.SftpPersistentAcceptOnceFileListFilter">
+                    <constructor-arg ref="metadataStore" />
+                    <constructor-arg value="businessSampleLock_" />
+                </bean>
+            </list>
+        </constructor-arg>
+    </bean>
   
 </beans>

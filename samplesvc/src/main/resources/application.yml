@@ -124,4 +124,8 @@ sftp:
   localdirectory: /tmp/samplesvc
   cron: "* * * * * ?"
   filepattern: "*.xml"
+
+redis:
+  host: localhost
+  port: 6379
   
