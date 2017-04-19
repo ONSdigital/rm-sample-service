@@ -1,7 +1,6 @@
 package uk.gov.ons.ctp.response.sample.endpoint;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -13,18 +12,17 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
-
-import org.springframework.util.CollectionUtils;
 
 import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.endpoint.CTPEndpoint;
 import uk.gov.ons.ctp.common.error.CTPException;
+import uk.gov.ons.ctp.common.time.DateTimeUtil;
+import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
-import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
+import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
+import uk.gov.ons.ctp.response.sample.service.CollectionExerciseJobService;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 /**
@@ -39,6 +37,9 @@ public final class SampleEndpoint implements CTPEndpoint {
   @Inject
   private SampleService sampleService;
 
+  @Inject
+  private CollectionExerciseJobService collectionExerciseJobService;
+  
   @Inject
   private MapperFacade mapperFacade;
 
@@ -72,22 +73,24 @@ public final class SampleEndpoint implements CTPEndpoint {
    */
   @GET
   @Path("/")
-  public Response getSampleSummary(@QueryParam("collectionExerciseRef") final String collectionExerciseRef, @QueryParam("surveyref") final String surveyRef,
+  public Response getSampleSummary(@QueryParam("collectionexerciseref") final Integer collectionExerciseId,
+      @QueryParam("surveyref") final String surveyRef, 
       @QueryParam("exercisedatetime") final Timestamp exerciseDateTime) throws CTPException {
     
-    /* 
-     * TODO: This needs to be modified to save new Object containing parameters to CollectionExercise Table.
-     * 
+    /*
      * TODO: GET currently only works with exerciseDateTime in this format: 2012-12-13%2012:12:12
      * exerciseDateTime format has not yet been specified so work with this for now.
      */
 
-    List<SampleUnit> listSampleUnits = sampleService.findSampleUnits(
-        surveyRef, exerciseDateTime);
+    CollectionExerciseJob collectionExerciseJob = new CollectionExerciseJob();
+    collectionExerciseJob.setCollectionExerciseId(collectionExerciseId);
+    collectionExerciseJob.setSurveyRef(surveyRef);
+    collectionExerciseJob.setExerciseDateTime(exerciseDateTime);
+    collectionExerciseJob.setCreatedDateTime(DateTimeUtil.nowUTC());
 
-    ResponseBuilder responseBuilder = Response.ok(CollectionUtils.isEmpty(listSampleUnits) ? null : listSampleUnits);
-    responseBuilder.status(CollectionUtils.isEmpty(listSampleUnits) ? Status.NO_CONTENT : Status.OK);
-    return responseBuilder.build();
+    collectionExerciseJobService.processCollectionExerciseJob(collectionExerciseJob);
+
+    return Response.ok(mapperFacade.map(collectionExerciseJob, CollectionExerciseJobDTO.class)).build();
 
   }
 

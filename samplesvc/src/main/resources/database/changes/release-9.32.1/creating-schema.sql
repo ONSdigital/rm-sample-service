@@ -51,4 +51,20 @@ CREATE TABLE sample.sampleunit
       ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
+-- for primary keys
+CREATE SEQUENCE collectionexercisejobidseq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 999999999999
+    CACHE 1;
+
+CREATE TABLE sample.collectionexercisejob
+(
+  collectionexerciseid bigint NOT NULL,
+  surveyref character varying,
+  exercisedatetime timestamp with time zone,
+  createddatetime timestamp with time zone,
+  CONSTRAINT collectionexerciseid_pkey PRIMARY KEY (collectionexerciseid)
+);
 
