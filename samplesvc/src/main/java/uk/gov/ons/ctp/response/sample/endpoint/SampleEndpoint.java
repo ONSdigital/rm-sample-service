@@ -72,11 +72,13 @@ public final class SampleEndpoint implements CTPEndpoint {
    */
   @GET
   @Path("/")
-  public Response getSampleSummary(@QueryParam("surveyref") final String surveyRef,
+  public Response getSampleSummary(@QueryParam("collectionExerciseRef") final String collectionExerciseRef, @QueryParam("surveyref") final String surveyRef,
       @QueryParam("exercisedatetime") final Timestamp exerciseDateTime) throws CTPException {
-
-    /*
-     * TODO: GET currently only works with exerciseDateTime in this format: http://localhost:8125/samples/str1234/2012-12-13%2012:12:12
+    
+    /* 
+     * TODO: This needs to be modified to save new Object containing parameters to CollectionExercise Table.
+     * 
+     * TODO: GET currently only works with exerciseDateTime in this format: 2012-12-13%2012:12:12
      * exerciseDateTime format has not yet been specified so work with this for now.
      */
 
