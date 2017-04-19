@@ -44,23 +44,28 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /{surveyref}/{exercisedatetime}:
+  /:
     get:
       summary: List of Sample Units
-      description: Returns a list of Sample Units with the associated surveyref and exercisedatetime
+      description: Returns a list of Sample Units with the associated collectionexerciseref, surveyref and exercisedatetime
       parameters:
         - name: Accept
           in: header
           description: Response type, application/json.
           required: false
           type: string
+        - name: collectionexerciseref
+          in: query
+          description: Collection Exercise Ref
+          required: true
+          type: string          
         - name: surveyref
-          in: path
+          in: query
           description: Survey Ref
           required: true
           type: string
         - name: exercisedatetime
-          in: path
+          in: query
           description: EffectiveStartDateTime of the SampleSummary
           required: true
           type: string
