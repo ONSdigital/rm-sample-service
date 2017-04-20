@@ -21,12 +21,4 @@ public interface SampleUnitRepository extends JpaRepository<SampleUnit, Integer>
    */
   List<SampleUnit> findBySampleId(Integer sampleId);
 
-  /**
-   * Find SampleUnit entity by sampleid
-   *
-   * @param sampleId The sampleId
-   * @return SampleUnit object or null
-   */
-  Integer countBySampleId(Integer sampleId);
-  
 }

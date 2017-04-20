@@ -1,22 +1,13 @@
 SET SCHEMA 'sample';
 
-CREATE TABLE sample.samplesummarystate
+CREATE TABLE sample.samplestate
 (
   state character varying (20) NOT NULL,
   CONSTRAINT state_pkey PRIMARY KEY (state)
 );
 
-INSERT INTO sample.samplesummarystate(state) VALUES('INIT');
-INSERT INTO sample.samplesummarystate(state) VALUES('ACTIVE');
-
-CREATE TABLE sample.sampleunitstate
-(
-  state character varying (20) NOT NULL,
-  CONSTRAINT state_pkey PRIMARY KEY (state)
-);
-
-INSERT INTO sample.sampleunitstate(state) VALUES('INIT');
-INSERT INTO sample.sampleunitstate(state) VALUES('DELIVERED');
+INSERT INTO sample.samplestate(state) VALUES('INIT');
+INSERT INTO sample.samplestate(state) VALUES('ACTIVE');
 
 -- for primary keys
 CREATE SEQUENCE sampleidseq
@@ -29,14 +20,14 @@ CREATE SEQUENCE sampleidseq
 CREATE TABLE sample.samplesummary
 (
   sampleid bigint DEFAULT nextval('sampleidseq'::regclass) NOT NULL,
-  surveyref character varying,
   effectivestartdatetime timestamp with time zone,
   effectiveenddatetime timestamp with time zone,
-  state character varying NOT NULL,
+  surveyref character varying,
   ingestdatetime timestamp with time zone,
+  state character varying NOT NULL,
   CONSTRAINT sampleid_pkey PRIMARY KEY (sampleid),
   CONSTRAINT state_fkey FOREIGN KEY (state)
-      REFERENCES sample.samplesummarystate (state) MATCH SIMPLE
+      REFERENCES sample.samplestate (state) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
@@ -54,14 +45,9 @@ CREATE TABLE sample.sampleunit
   sampleid bigint NOT NULL,
   sampleunitref character varying,
   sampleunittype character varying(10),
-  formtype character varying,
-  state character varying NOT NULL,
   CONSTRAINT sampleunitid_pkey PRIMARY KEY (sampleunitid) ,
   CONSTRAINT summaryid_fkey FOREIGN KEY (sampleid)
       REFERENCES sample.samplesummary (sampleid) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
-  CONSTRAINT state_fkey FOREIGN KEY (state)
-      REFERENCES sample.sampleunitstate (state) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 

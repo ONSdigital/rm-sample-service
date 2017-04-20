@@ -20,8 +20,8 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.time.DateTimeUtil;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
+import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
-import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
 import uk.gov.ons.ctp.response.sample.service.CollectionExerciseJobService;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
@@ -72,32 +72,25 @@ public final class SampleEndpoint implements CTPEndpoint {
    * @throws CTPException if update operation fails
    */
   @POST
-  @Path("/sampleunitrequests")
-  public Response getSampleSummary(@QueryParam("collectionExerciseId") final Integer collectionExerciseId,
-      @QueryParam("surveyRef") final String surveyRef, 
-      @QueryParam("exerciseDateTime") final Timestamp exerciseDateTime) throws CTPException {
+  @Path("/")
+  public Response getSampleSummary(@QueryParam("collectionexerciseref") final Integer collectionExerciseId,
+      @QueryParam("surveyref") final String surveyRef, 
+      @QueryParam("exercisedatetime") final Timestamp exerciseDateTime) throws CTPException {
     
     /*
      * TODO: GET currently only works with exerciseDateTime in this format: 2012-12-13%2012:12:12
      * exerciseDateTime format has not yet been specified so work with this for now.
      */
     
-    Integer sampleUnitsTotal = sampleService.findSampleUnitsSize(surveyRef, exerciseDateTime);
+    CollectionExerciseJob collectionExerciseJob = new CollectionExerciseJob();
+    collectionExerciseJob.setCollectionExerciseId(collectionExerciseId);
+    collectionExerciseJob.setSurveyRef(surveyRef);
+    collectionExerciseJob.setExerciseDateTime(exerciseDateTime);
+    collectionExerciseJob.setCreatedDateTime(DateTimeUtil.nowUTC());
 
-    SampleUnitsRequestDTO sampleUnitsRequest = new SampleUnitsRequestDTO();
-    sampleUnitsRequest.setSampleUnitsTotal(sampleUnitsTotal);
+    collectionExerciseJobService.processCollectionExerciseJob(collectionExerciseJob);
 
-    if (sampleUnitsTotal != 0) {
-      CollectionExerciseJob collectionExerciseJob = new CollectionExerciseJob();
-      collectionExerciseJob.setCollectionExerciseId(collectionExerciseId);
-      collectionExerciseJob.setSurveyRef(surveyRef);
-      collectionExerciseJob.setExerciseDateTime(exerciseDateTime);
-      collectionExerciseJob.setCreatedDateTime(DateTimeUtil.nowUTC());
-      
-      collectionExerciseJobService.processCollectionExerciseJob(collectionExerciseJob);
-    }
-
-    return Response.ok(mapperFacade.map(sampleUnitsRequest, SampleUnitsRequestDTO.class)).build();
+    return Response.ok(mapperFacade.map(collectionExerciseJob, CollectionExerciseJobDTO.class)).build();
 
   }
 
