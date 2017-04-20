@@ -9,6 +9,7 @@ import javax.inject.Named;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.rest.RestClient;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
@@ -26,6 +27,7 @@ import uk.gov.ons.ctp.response.sample.service.SampleService;
 /**
  * Accept feedback from handlers
  */
+@Slf4j
 @Named
 public class SampleServiceImpl implements SampleService {
 
@@ -145,7 +147,7 @@ public class SampleServiceImpl implements SampleService {
   public List<SampleUnit> findSampleUnits(String surveyRef, Timestamp exerciseDateTime) {
 
     List<SampleSummary> listOfSampleSummaries = sampleSummaryRepository
-        .findBySurveyRefAndEffectiveStartDateTime(surveyRef, exerciseDateTime);
+        .findBySurveyRefAndEffectiveStartDateTimeAndState(surveyRef, exerciseDateTime, SampleSummaryDTO.SampleState.ACTIVE);
 
     List<SampleUnit> listOfSampleUnits = new ArrayList<SampleUnit>();
 
@@ -155,6 +157,30 @@ public class SampleServiceImpl implements SampleService {
     }
 
     return listOfSampleUnits;
+  }
+  
+  /**
+   * Find sample units by exercise start date and surveyRef
+   *
+   * @param exerciseDateTime dateTime to search for
+   * @param surveyRef surveyRef to search for
+   * @return listOfSampleUnits list of sample units
+   */
+  @Override
+  public Integer findSampleUnitsSize(String surveyRef, Timestamp exerciseDateTime) {
+
+    List<SampleSummary> listOfSampleSummaries = sampleSummaryRepository
+        .findBySurveyRefAndEffectiveStartDateTimeAndState(surveyRef, exerciseDateTime, SampleSummaryDTO.SampleState.ACTIVE);
+
+    Integer sampleUnitsTotal = 0;
+    
+    for (SampleSummary ss : listOfSampleSummaries) {      
+      sampleUnitsTotal = sampleUnitsTotal + sampleUnitRepository.countBySampleId(ss.getSampleId());
+    }
+
+    log.debug("sampleUnits: {}", sampleUnitsTotal);
+    
+    return sampleUnitsTotal;
   }
 
 }

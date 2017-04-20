@@ -46,4 +46,13 @@ public interface SampleService {
    * @return List<SampleUnit> object list or null
    */
   List<SampleUnit> findSampleUnits(String surveyRef, Timestamp exerciseDateTime);
+  
+  /**
+   * Update the SampleSummary state
+   *
+   * @param surveyRef The surveyRef
+   * @param exerciseDateTime The effectiveStartDateTime
+   * @return List<SampleUnit> object list or null
+   */
+  Integer findSampleUnitsSize(String surveyRef, Timestamp exerciseDateTime);
 }

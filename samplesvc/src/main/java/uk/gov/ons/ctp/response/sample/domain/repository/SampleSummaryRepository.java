@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 
 /**
  * JPA Data Repository needed to persist Survey SampleSummarys
@@ -21,6 +22,6 @@ public interface SampleSummaryRepository extends JpaRepository<SampleSummary, In
    * @param exerciseDateTime The effectiveStateDateTime
    * @return <List>SampleSummary object or null
    */
-  List<SampleSummary> findBySurveyRefAndEffectiveStartDateTime(String surveyRef, Timestamp exerciseDateTime);
+  List<SampleSummary> findBySurveyRefAndEffectiveStartDateTimeAndState(String surveyRef, Timestamp exerciseDateTime, SampleSummaryDTO.SampleState state);
 
 }
