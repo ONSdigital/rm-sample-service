@@ -47,7 +47,7 @@ public class SampleSummary implements Serializable {
 
   @Column(name = "surveyref")
   private String surveyRef;
-  
+
   @Column(name = "effectivestartdatetime")
   private Timestamp effectiveStartDateTime;
 
@@ -56,7 +56,7 @@ public class SampleSummary implements Serializable {
 
   @Enumerated(EnumType.STRING)
   private SampleSummaryDTO.SampleState state;
-  
+
   @Column(name = "ingestdatetime")
   private Timestamp ingestDateTime;
 

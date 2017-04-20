@@ -18,7 +18,7 @@ public class SampleUnitDTO {
    * enum for SampleUnit state
    */
   public enum SampleUnitState {
-    ACTIVE, DELIVERED,
+    INIT, DELIVERED,
   }
 
   private Integer sampleUnitId;

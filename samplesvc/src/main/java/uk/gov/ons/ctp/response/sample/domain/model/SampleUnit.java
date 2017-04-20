@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -54,7 +56,7 @@ public class SampleUnit implements Serializable {
   @Column(name = "formtype")
   private String formType;
 
-  @Column(name = "state")
+  @Enumerated(EnumType.STRING)
   private SampleUnitDTO.SampleUnitState state;
-  
+
 }
