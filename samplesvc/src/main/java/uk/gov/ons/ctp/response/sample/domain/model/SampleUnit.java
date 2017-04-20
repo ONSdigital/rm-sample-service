@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 
 /**
  * Domain model object.
@@ -50,4 +51,10 @@ public class SampleUnit implements Serializable {
   @Column(name = "sampleunittype")
   private String sampleUnitType;
 
+  @Column(name = "formtype")
+  private String formType;
+
+  @Column(name = "state")
+  private SampleUnitDTO.SampleUnitState state;
+  
 }
