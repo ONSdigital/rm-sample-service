@@ -17,12 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.endpoint.CTPEndpoint;
 import uk.gov.ons.ctp.common.error.CTPException;
-import uk.gov.ons.ctp.common.time.DateTimeUtil;
-import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
-import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
-import uk.gov.ons.ctp.response.sample.service.CollectionExerciseJobService;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 /**
@@ -38,41 +35,52 @@ public final class SampleEndpoint implements CTPEndpoint {
   private SampleService sampleService;
 
   @Inject
-  private CollectionExerciseJobService collectionExerciseJobService;
-  
-  @Inject
   private MapperFacade mapperFacade;
 
   /**
-   * GET List of Sample Units by parent SampleSummary surveyRef and
-   * exerciseDateTime
+   * PUT to update state for a specified SampleSummary.
    *
-   * @param surveyRef surveyRef to which SampleUnits are related
-   * @param exerciseDateTime exerciseDateTime to which SampleUnits are related
-   * @return List<SampleUnit> Returns the associated SampleUnits for the
-   *         specified surveyRef and exerciseDateTime.
+   * @param sampleId SampleId of the SampleSummary to update.
+   * @return SampleSummary Returns the updated SampleSummary
    * @throws CTPException if update operation fails
    */
+  @PUT
+  @Path("/{sampleid}")
+  public Response activateSampleSummary(@PathParam("sampleid") final Integer sampleId) throws CTPException {
+
+    log.debug("Activating SampleId: " + sampleId);
+    SampleSummary sampleSummary = sampleService.activateSampleSummaryState(sampleId);
+
+    return Response.ok(mapperFacade.map(sampleSummary, SampleSummaryDTO.class)).build();
+
+  }
+
+  /**
+   * POST CollectionExerciseJob associated to SampleSummary surveyRef and
+   * exerciseDateTime
+   *
+   * @param collectionExerciseId collectionExerciseId to which SampleUnits are related
+   * @param surveyRef surveyRef to which SampleUnits are related
+   * @param exerciseDateTime exerciseDateTime to which SampleUnits are related
+   * @return Reponse Returns sampleUnitsTotal value
+   * @throws CTPException if update operation fails or CollectionExerciseJob already exists
+   */
   @POST
-  @Path("/")
-  public Response getSampleSummary(@QueryParam("collectionexerciseref") final Integer collectionExerciseId,
-      @QueryParam("surveyref") final String surveyRef, 
-      @QueryParam("exercisedatetime") final Timestamp exerciseDateTime) throws CTPException {
-    
+  @Path("/sampleunitrequests")
+  public Response getSampleSummary(@QueryParam("collectionExerciseId") final Integer collectionExerciseId,
+      @QueryParam("surveyRef") final String surveyRef,
+      @QueryParam("exerciseDateTime") final Timestamp exerciseDateTime) throws CTPException {
+
     /*
      * TODO: GET currently only works with exerciseDateTime in this format: 2012-12-13%2012:12:12
      * exerciseDateTime format has not yet been specified so work with this for now.
      */
-    
-    CollectionExerciseJob collectionExerciseJob = new CollectionExerciseJob();
-    collectionExerciseJob.setCollectionExerciseId(collectionExerciseId);
-    collectionExerciseJob.setSurveyRef(surveyRef);
-    collectionExerciseJob.setExerciseDateTime(exerciseDateTime);
-    collectionExerciseJob.setCreatedDateTime(DateTimeUtil.nowUTC());
 
-    collectionExerciseJobService.processCollectionExerciseJob(collectionExerciseJob);
+    Integer sampleUnitsTotal = sampleService.initialiseCollectionExerciseJob(collectionExerciseId, surveyRef, exerciseDateTime);
 
-    return Response.ok(mapperFacade.map(collectionExerciseJob, CollectionExerciseJobDTO.class)).build();
+    SampleUnitsRequestDTO sampleUnitsRequest = new SampleUnitsRequestDTO(sampleUnitsTotal);
+
+      return Response.ok(mapperFacade.map(sampleUnitsRequest, SampleUnitsRequestDTO.class)).build();
 
   }
 

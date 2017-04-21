@@ -1,5 +1,6 @@
 package uk.gov.ons.ctp.response.sample.service;
 
+import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 
 /**
@@ -12,7 +13,8 @@ public interface CollectionExerciseJobService {
    * Create and save a CollectionExerciseJob for the relevant SampleUnits
    *
    * @param collectionExerciseJob CollectionExerciseJob to be used.
+   * @throws CTPException if update operation fails or CollectionExerciseJob already exists
    */
-  void processCollectionExerciseJob(CollectionExerciseJob collectionExerciseJob);
+  void processCollectionExerciseJob(CollectionExerciseJob collectionExerciseJob) throws CTPException;
 
 }

@@ -3,10 +3,10 @@ package uk.gov.ons.ctp.response.sample.service;
 import java.sql.Timestamp;
 import java.util.List;
 
+import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
-import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 
 /**
  * The SampleService interface defines all business behaviours for operations on
@@ -37,15 +37,18 @@ public interface SampleService {
    * @return SampleSummary object or null
    */
   SampleSummary activateSampleSummaryState(Integer sampleId);
-
   
   
   /**
-   * Update the SampleSummary state
+   * Save a CollectionExerciseJob based on the associated CollectionExerciseId, and SampleSummary surveyRef and
+   * exerciseDateTime
    *
-   * @param surveyRef The surveyRef
-   * @param exerciseDateTime The effectiveStartDateTime
-   * @return List<SampleUnit> object list or null
+   * @param collectionExerciseId collectionExerciseId to which SampleUnits are related
+   * @param surveyRef surveyRef to which SampleUnits are related
+   * @param exerciseDateTime exerciseDateTime to which SampleUnits are related
+   * @return Integer sampleUnitsTotal value
+   * @throws CTPException if update operation fails or CollectionExerciseJob already exists
    */
-  List<SampleUnit> findSampleUnits(String surveyRef, Timestamp exerciseDateTime);
+  Integer initialiseCollectionExerciseJob(Integer collectionExerciseId, String surveyRef, Timestamp exerciseDateTime) 
+      throws CTPException;
 }

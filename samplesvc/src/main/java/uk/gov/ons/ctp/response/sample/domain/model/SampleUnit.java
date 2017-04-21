@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -17,6 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 
 /**
  * Domain model object.
@@ -49,5 +52,11 @@ public class SampleUnit implements Serializable {
 
   @Column(name = "sampleunittype")
   private String sampleUnitType;
+
+  @Column(name = "formtype")
+  private String formType;
+
+  @Enumerated(EnumType.STRING)
+  private SampleUnitDTO.SampleUnitState state;
 
 }

@@ -1,7 +1,6 @@
 package uk.gov.ons.ctp.response.sample.service.impl;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -9,23 +8,30 @@ import javax.inject.Named;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
+import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.rest.RestClient;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.common.time.DateTimeUtil;
 import uk.gov.ons.ctp.response.sample.definition.Party;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
+import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
+import uk.gov.ons.ctp.response.sample.service.CollectionExerciseJobService;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 /**
  * Accept feedback from handlers
  */
+@Slf4j
 @Named
 public class SampleServiceImpl implements SampleService {
 
@@ -45,6 +51,9 @@ public class SampleServiceImpl implements SampleService {
   @Inject
   @Qualifier("sampleServiceClient")
   private RestClient sampleServiceClient;
+
+  @Inject
+  private CollectionExerciseJobService collectionExerciseJobService;
 
   @Override
   public void processSampleSummary(SurveyBase surveySample, List<? extends SampleUnitBase> samplingUnitList) {
@@ -82,6 +91,8 @@ public class SampleServiceImpl implements SampleService {
       sampleUnit.setSampleId(sampleSummary.getSampleId());
       sampleUnit.setSampleUnitRef(sampleUnitBase.getSampleUnitRef());
       sampleUnit.setSampleUnitType(sampleUnitBase.getSampleUnitType());
+      sampleUnit.setFormType("formtype_tbd");
+      sampleUnit.setState(SampleUnitDTO.SampleUnitState.INIT);
 
       sampleUnitRepository.save(sampleUnit);
     }
@@ -162,26 +173,68 @@ public class SampleServiceImpl implements SampleService {
   }
 
   /**
-   * Find sample units by exercise start date and surveyRef
+   * Save CollectionExerciseJob to collectionExerciseJob table
    *
-   * @param exerciseDateTime dateTime to search for
-   * @param surveyRef surveyRef to search for
-   * @return listOfSampleUnits list of sample units
+   * @param collectionExerciseId collectionExerciseId to which SampleUnits are related
+   * @param surveyRef surveyRef to which SampleUnits are related
+   * @param exerciseDateTime exerciseDateTime to which SampleUnits are related
+   * @return Integer Returns sampleUnitsTotal value
+   * @throws CTPException if update operation fails or CollectionExerciseJob already exists
    */
   @Override
-  public List<SampleUnit> findSampleUnits(String surveyRef, Timestamp exerciseDateTime) {
+  public Integer initialiseCollectionExerciseJob(Integer collectionExerciseId, String surveyRef,
+      Timestamp exerciseDateTime) throws CTPException {
+
+    Integer sampleUnitsTotal = findSampleUnitsSize(surveyRef, exerciseDateTime);
+
+    SampleUnitsRequestDTO sampleUnitsRequest = new SampleUnitsRequestDTO();
+    sampleUnitsRequest.setSampleUnitsTotal(sampleUnitsTotal);
+
+    if (sampleUnitsTotal != 0) {
+        CollectionExerciseJob collectionExerciseJob = new CollectionExerciseJob();
+        collectionExerciseJob.setCollectionExerciseId(collectionExerciseId);
+        collectionExerciseJob.setSurveyRef(surveyRef);
+        collectionExerciseJob.setExerciseDateTime(exerciseDateTime);
+        collectionExerciseJob.setCreatedDateTime(DateTimeUtil.nowUTC());
+
+        collectionExerciseJobService.processCollectionExerciseJob(collectionExerciseJob);
+
+      }
+
+    return sampleUnitsTotal;
+
+  }
+
+  /**
+   * Find total number of sampleUnits associated to SampleSummary surveyRef and exerciseDateTime
+   *
+   * @param surveyRef surveyRef to which SampleUnits are related
+   * @param exerciseDateTime exerciseDateTime to which SampleUnits are related
+   * @return Integer Returns sampleUnitsTotal value
+   */
+  public Integer findSampleUnitsSize(String surveyRef, Timestamp exerciseDateTime) {
 
     List<SampleSummary> listOfSampleSummaries = sampleSummaryRepository
-        .findBySurveyRefAndEffectiveStartDateTime(surveyRef, exerciseDateTime);
+        .findBySurveyRefAndEffectiveStartDateTimeAndState(surveyRef, exerciseDateTime, 
+            SampleSummaryDTO.SampleState.ACTIVE);
 
-    List<SampleUnit> listOfSampleUnits = new ArrayList<SampleUnit>();
+    Integer sampleUnitsTotal = 0;
 
-    for (SampleSummary ss : listOfSampleSummaries) {
-      List<SampleUnit> su = sampleUnitRepository.findBySampleId(ss.getSampleId());
-      listOfSampleUnits.addAll(su);
+    for (SampleSummary ss : listOfSampleSummaries) {     
+
+      List<SampleUnit> sampleUnitList = sampleUnitRepository.findBySampleId(ss.getSampleId());
+
+      for (SampleUnit su : sampleUnitList) {
+        su.setState(SampleUnitDTO.SampleUnitState.INIT);
+        sampleUnitRepository.saveAndFlush(su);
+      }
+
+      sampleUnitsTotal = sampleUnitsTotal + sampleUnitList.size();
     }
 
-    return listOfSampleUnits;
+    log.debug("sampleUnits: {}", sampleUnitsTotal);
+
+    return sampleUnitsTotal;
   }
 
 }
