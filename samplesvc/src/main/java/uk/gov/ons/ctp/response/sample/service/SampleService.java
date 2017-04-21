@@ -21,7 +21,7 @@ public interface SampleService {
    * @param surveySampleObject SurveySample to be used
    */
   void processSampleSummary(SurveyBase surveySampleObject, List<? extends SampleUnitBase> samplingUnitList);
-
+  
   /**
    * Find SampleSummary entity by sampleid
    *
@@ -38,6 +38,8 @@ public interface SampleService {
    */
   SampleSummary activateSampleSummaryState(Integer sampleId);
 
+  
+  
   /**
    * Update the SampleSummary state
    *

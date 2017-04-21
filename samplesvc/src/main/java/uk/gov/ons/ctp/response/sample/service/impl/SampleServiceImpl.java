@@ -13,7 +13,7 @@ import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.rest.RestClient;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.common.time.DateTimeUtil;
-import uk.gov.ons.ctp.response.party.representation.PartyDTO;
+import uk.gov.ons.ctp.response.sample.definition.Party;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
@@ -64,10 +64,11 @@ public class SampleServiceImpl implements SampleService {
     SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
 
     createAndSaveSampleUnits(samplingUnitList, savedSampleSummary);
+    sendToQue(savedSampleSummary.getSampleId(), samplingUnitList);
     sendToParty(savedSampleSummary.getSampleId(), samplingUnitList);
   }
 
-  /**
+/**
    * create sampleUnits and save them to the Database
    *
    * @param sampleSummary  summary to be saved as sampleUnit
@@ -115,6 +116,31 @@ public class SampleServiceImpl implements SampleService {
 
   }
 
+  private void sendToQue(Integer sampleId, List<? extends SampleUnitBase> samplingUnitList) {
+		
+	//TODO: change to send to que;
+	// copied from receiptserviceimpl
+	/*    log.debug("acknowledging receipt {}", receipt);
+	    validate(receipt);
+
+	    CaseReceipt caseReceipt = new CaseReceipt();
+	    caseReceipt.setCaseRef(receipt.getCaseRef().trim());
+	    caseReceipt.setInboundChannel(receipt.getInboundChannel());
+	    try {
+	      caseReceipt.setResponseDateTime(DateTimeUtil.giveMeCalendarForNow());
+	    } catch (DatatypeConfigurationException e) {
+	      String error = String.format(
+	              "DatatypeConfigurationException thrown while building dateTime for now with msg = %s", e.getMessage());
+	      log.error(error);
+	      throw new CTPException(CTPException.Fault.SYSTEM_ERROR,
+	              String.format("%s%s", EXCEPTION_ACKNOWLEGDING_RECEIPT, error));
+	    }
+
+	    caseReceiptPublisher.send(caseReceipt);
+	  */
+	  
+  }
+  
   /**
    * Send samplingUnits to the party service
    *
@@ -125,13 +151,14 @@ public class SampleServiceImpl implements SampleService {
     int size = samplingUnitList.size();
     int position = 1;
     for (SampleUnitBase bsu : samplingUnitList) {
-      PartyDTO party = mapperFacade.map(bsu, PartyDTO.class);
+      Party party = mapperFacade.map(bsu, Party.class);
       party.setSize(size);
-      party.setPostion(position);
+      party.setPosition(position);
       party.setSampleId(sampleId);
-      sampleServiceClient.postResource("/party/events", party, PartyDTO.class);
+      sampleServiceClient.postResource("/party/events", party, Party.class);
       position++;
     }
+    activateSampleSummaryState(sampleId);
   }
 
   /**

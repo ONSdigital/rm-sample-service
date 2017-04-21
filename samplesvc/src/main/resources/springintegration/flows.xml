@@ -12,6 +12,7 @@
     <import resource="sample-ingest-business.xml"/>
     <import resource="sample-ingest-census.xml"/>
     <import resource="sample-ingest-social.xml"/>
+    <import resource="party-outbound-flow.xml"/>
 
 </beans>
 

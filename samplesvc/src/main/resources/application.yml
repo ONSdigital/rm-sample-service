@@ -76,7 +76,7 @@ spring:
 
   sleuth:
     sampler:
-      percentage: 75    
+      percentage: 75
 
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
@@ -88,7 +88,7 @@ spring:
       max-active: 10
       max-idle: 5
       min-idle: 3
-      
+
   zipkin:
     enabled: false
 
@@ -114,18 +114,26 @@ sample-svc:
     retry-pause-milli-seconds: 5000
     connect-timeout-milli-seconds: 5000
     read-timeout-milli-seconds: 5000
-      
+
 sftp:
   host: localhost
   port: 22
-  username: centos
-  password: "JLibV2&XD,"
+  username: hardmc
+  password: "D5ag0n3a!l71066"
   directory: Documents
   localdirectory: /tmp/samplesvc
   cron: "* * * * * ?"
   filepattern: "*.xml"
 
+rabbitmq:
+  username: guest
+  password: guest
+  host: localhost
+  virtualhost: /
+
 redis:
   host: localhost
   port: 6379
-  
+
+messaging:
+  pubMaxAttempts: 3
