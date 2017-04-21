@@ -22,6 +22,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
+import uk.gov.ons.ctp.response.sample.message.SendToParty;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
@@ -41,6 +42,9 @@ public class SampleServiceImpl implements SampleService {
   @Inject
   private SampleUnitRepository sampleUnitRepository;
 
+  @Inject
+  private SendToParty sendQueue;
+  
   @Inject
   private StateTransitionManager<SampleSummaryDTO.SampleState,
       SampleSummaryDTO.SampleEvent> sampleSvcStateTransitionManager;
@@ -73,7 +77,7 @@ public class SampleServiceImpl implements SampleService {
     SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
 
     createAndSaveSampleUnits(samplingUnitList, savedSampleSummary);
-    sendToQue(savedSampleSummary.getSampleId(), samplingUnitList);
+    sendToQueue(savedSampleSummary.getSampleId(), samplingUnitList);
     sendToParty(savedSampleSummary.getSampleId(), samplingUnitList);
   }
 
@@ -127,29 +131,15 @@ public class SampleServiceImpl implements SampleService {
 
   }
 
-  private void sendToQue(Integer sampleId, List<? extends SampleUnitBase> samplingUnitList) {
+  private void sendToQueue(Integer sampleId, List<? extends SampleUnitBase> samplingUnitList) {
 		
-	//TODO: change to send to que;
-	// copied from receiptserviceimpl
-	/*    log.debug("acknowledging receipt {}", receipt);
-	    validate(receipt);
-
-	    CaseReceipt caseReceipt = new CaseReceipt();
-	    caseReceipt.setCaseRef(receipt.getCaseRef().trim());
-	    caseReceipt.setInboundChannel(receipt.getInboundChannel());
-	    try {
-	      caseReceipt.setResponseDateTime(DateTimeUtil.giveMeCalendarForNow());
-	    } catch (DatatypeConfigurationException e) {
-	      String error = String.format(
-	              "DatatypeConfigurationException thrown while building dateTime for now with msg = %s", e.getMessage());
-	      log.error(error);
-	      throw new CTPException(CTPException.Fault.SYSTEM_ERROR,
-	              String.format("%s%s", EXCEPTION_ACKNOWLEGDING_RECEIPT, error));
-	    }
-
-	    caseReceiptPublisher.send(caseReceipt);
-	  */
-	  
+	//TODO: change to send to queue;	
+	log.debug("Send to queue");
+    for (SampleUnitBase bsu : samplingUnitList) {
+      Party party = mapperFacade.map(bsu, Party.class);
+      party.setSampleId(sampleId);
+      sendQueue.send(party);
+    } 
   }
   
   /**
@@ -159,18 +149,18 @@ public class SampleServiceImpl implements SampleService {
    * @param samplingUnitList list of sampling units to be sent
    */
   private void sendToParty(Integer sampleId, List<? extends SampleUnitBase> samplingUnitList) {
-    int size = samplingUnitList.size();
-    int position = 1;
-    for (SampleUnitBase bsu : samplingUnitList) {
-      Party party = mapperFacade.map(bsu, Party.class);
-      party.setSize(size);
-      party.setPosition(position);
-      party.setSampleId(sampleId);
-      sampleServiceClient.postResource("/party/events", party, Party.class);
-      position++;
-    }
-    activateSampleSummaryState(sampleId);
-  }
+//    int size = samplingUnitList.size();
+//    int position = 1;
+//    for (SampleUnitBase bsu : samplingUnitList) {
+//      Party party = mapperFacade.map(bsu, Party.class);
+//      party.setSize(size);
+//      party.setPosition(position);
+//      party.setSampleId(sampleId);
+//      sampleServiceClient.postResource("/party/events", party, Party.class);
+//      position++;
+//    }
+//    activateSampleSummaryState(sampleId);
+   }
 
   /**
    * Save CollectionExerciseJob to collectionExerciseJob table
