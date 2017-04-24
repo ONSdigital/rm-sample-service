@@ -7,7 +7,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.ons.ctp.response.sample.definition.Party;
+import uk.gov.ons.ctp.response.party.definition.Party;
 import uk.gov.ons.ctp.response.sample.message.SendToParty;
 /**
  * The publisher to queues
@@ -15,7 +15,7 @@ import uk.gov.ons.ctp.response.sample.message.SendToParty;
 @Slf4j
 @Named
 public class SendToPartyImpl implements SendToParty {
-	
+
   @Qualifier("partyRabbitTemplate")
   @Inject
   private RabbitTemplate rabbitTemplate;

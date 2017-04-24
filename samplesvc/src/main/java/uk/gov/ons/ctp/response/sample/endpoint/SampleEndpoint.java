@@ -76,12 +76,10 @@ public final class SampleEndpoint implements CTPEndpoint {
      * exerciseDateTime format has not yet been specified so work with this for now.
      */
 
-    Integer sampleUnitsTotal = sampleService.initialiseCollectionExerciseJob(collectionExerciseId, surveyRef, exerciseDateTime);
-
+    Integer sampleUnitsTotal = sampleService.initialiseCollectionExerciseJob(collectionExerciseId,
+        surveyRef, exerciseDateTime);
     SampleUnitsRequestDTO sampleUnitsRequest = new SampleUnitsRequestDTO(sampleUnitsTotal);
-
-      return Response.ok(mapperFacade.map(sampleUnitsRequest, SampleUnitsRequestDTO.class)).build();
-
+    return Response.ok(mapperFacade.map(sampleUnitsRequest, SampleUnitsRequestDTO.class)).build();
   }
 
 }

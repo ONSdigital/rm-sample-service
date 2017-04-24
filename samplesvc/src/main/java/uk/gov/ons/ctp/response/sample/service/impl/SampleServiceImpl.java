@@ -14,7 +14,7 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.rest.RestClient;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.common.time.DateTimeUtil;
-import uk.gov.ons.ctp.response.sample.definition.Party;
+import uk.gov.ons.ctp.response.party.definition.Party;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
@@ -44,7 +44,7 @@ public class SampleServiceImpl implements SampleService {
 
   @Inject
   private SendToParty sendQueue;
-  
+
   @Inject
   private StateTransitionManager<SampleSummaryDTO.SampleState,
       SampleSummaryDTO.SampleEvent> sampleSvcStateTransitionManager;
@@ -131,17 +131,22 @@ public class SampleServiceImpl implements SampleService {
 
   }
 
+  /**
+   * Send samplingUnits to the queue
+   *
+   * @param sampleId the sampleId of the sample to be sent
+   * @param samplingUnitList list of sampling units to be sent
+   */
   private void sendToQueue(Integer sampleId, List<? extends SampleUnitBase> samplingUnitList) {
-		
-	//TODO: change to send to queue;	
-	log.debug("Send to queue");
+
+    log.debug("Send to queue");
     for (SampleUnitBase bsu : samplingUnitList) {
       Party party = mapperFacade.map(bsu, Party.class);
       party.setSampleId(sampleId);
       sendQueue.send(party);
-    } 
+    }
   }
-  
+
   /**
    * Send samplingUnits to the party service
    *
@@ -149,17 +154,18 @@ public class SampleServiceImpl implements SampleService {
    * @param samplingUnitList list of sampling units to be sent
    */
   private void sendToParty(Integer sampleId, List<? extends SampleUnitBase> samplingUnitList) {
-//    int size = samplingUnitList.size();
-//    int position = 1;
-//    for (SampleUnitBase bsu : samplingUnitList) {
-//      Party party = mapperFacade.map(bsu, Party.class);
-//      party.setSize(size);
-//      party.setPosition(position);
-//      party.setSampleId(sampleId);
-//      sampleServiceClient.postResource("/party/events", party, Party.class);
-//      position++;
-//    }
-//    activateSampleSummaryState(sampleId);
+    int size = samplingUnitList.size();
+    int position = 1;
+    log.debug("Send to party svc");
+    for (SampleUnitBase bsu : samplingUnitList) {
+      Party party = mapperFacade.map(bsu, Party.class);
+      party.setSize(size);
+      party.setPosition(position);
+      party.setSampleId(sampleId);
+      sampleServiceClient.postResource("/party/events", party, Party.class);
+      position++;
+    }
+    activateSampleSummaryState(sampleId);
    }
 
   /**
@@ -205,12 +211,12 @@ public class SampleServiceImpl implements SampleService {
   public Integer findSampleUnitsSize(String surveyRef, Timestamp exerciseDateTime) {
 
     List<SampleSummary> listOfSampleSummaries = sampleSummaryRepository
-        .findBySurveyRefAndEffectiveStartDateTimeAndState(surveyRef, exerciseDateTime, 
+        .findBySurveyRefAndEffectiveStartDateTimeAndState(surveyRef, exerciseDateTime,
             SampleSummaryDTO.SampleState.ACTIVE);
 
     Integer sampleUnitsTotal = 0;
 
-    for (SampleSummary ss : listOfSampleSummaries) {     
+    for (SampleSummary ss : listOfSampleSummaries) {
 
       List<SampleUnit> sampleUnitList = sampleUnitRepository.findBySampleId(ss.getSampleId());
 
