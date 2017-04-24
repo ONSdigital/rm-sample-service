@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.ctp.common.endpoint.CTPEndpoint;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.rest.RestClient;
-import uk.gov.ons.ctp.response.sample.definition.Party;
+import uk.gov.ons.ctp.response.party.definition.Party;
 
 /**
  * The Mock REST endpoint controller for Party Service.
@@ -38,7 +38,6 @@ public class PartyEndpoint implements CTPEndpoint {
   @Path("/events")
   public Response createCaseEvent(final Party partyDTO) throws CTPException {
 
-    log.debug(partyDTO.getForename());
     log.debug(partyDTO.getPosition() + " / " + partyDTO.getSize());
     log.debug(Integer.toString(partyDTO.getSampleId()));
     log.debug(Boolean.toString(sampleServiceClient == null));

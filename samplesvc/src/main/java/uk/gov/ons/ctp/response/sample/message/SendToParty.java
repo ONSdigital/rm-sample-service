@@ -1,5 +1,7 @@
 package uk.gov.ons.ctp.response.sample.message;
-import uk.gov.ons.ctp.response.sample.definition.Party;
+
+import uk.gov.ons.ctp.response.party.definition.Party;
+
 /**
  * The publisher to queues
  */

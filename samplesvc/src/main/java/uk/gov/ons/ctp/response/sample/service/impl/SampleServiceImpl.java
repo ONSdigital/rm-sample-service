@@ -14,7 +14,7 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.rest.RestClient;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.common.time.DateTimeUtil;
-import uk.gov.ons.ctp.response.sample.definition.Party;
+import uk.gov.ons.ctp.response.party.definition.Party;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
@@ -149,17 +149,26 @@ public class SampleServiceImpl implements SampleService {
    * @param samplingUnitList list of sampling units to be sent
    */
   private void sendToParty(Integer sampleId, List<? extends SampleUnitBase> samplingUnitList) {
-//    int size = samplingUnitList.size();
-//    int position = 1;
-//    for (SampleUnitBase bsu : samplingUnitList) {
-//      Party party = mapperFacade.map(bsu, Party.class);
-//      party.setSize(size);
-//      party.setPosition(position);
-//      party.setSampleId(sampleId);
-//      sampleServiceClient.postResource("/party/events", party, Party.class);
-//      position++;
-//    }
-//    activateSampleSummaryState(sampleId);
+
+	  
+	  
+	  
+	  
+	  
+	  
+	  
+	  
+    int size = samplingUnitList.size();
+    int position = 1;
+    for (SampleUnitBase bsu : samplingUnitList) {
+      Party party = mapperFacade.map(bsu, Party.class);
+      party.setSize(size);
+      party.setPosition(position);
+      party.setSampleId(sampleId);
+      sampleServiceClient.postResource("/party/events", party, Party.class);
+      position++;
+    }
+    activateSampleSummaryState(sampleId);
    }
 
   /**
