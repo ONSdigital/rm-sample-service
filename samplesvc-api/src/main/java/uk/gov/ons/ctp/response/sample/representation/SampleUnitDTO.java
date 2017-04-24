@@ -22,14 +22,14 @@ public class SampleUnitDTO {
   }
 
   private Integer sampleUnitId;
-  
+
   private Integer sampleId;
 
   private String sampleUnitRef;
-  
+
   private String sampleUnitType;
 
   private String formType;
-  
+
   private SampleUnitState state;
 }

@@ -21,6 +21,6 @@ public class CollectionExerciseJobDTO {
   private String surveyRef;
 
   private Timestamp exerciseDateTime;
-  
+
   private Timestamp createdDateTime;
 }

@@ -29,7 +29,7 @@ public class CollectionExerciseJobImpl implements CollectionExerciseJobService {
       collectionExerciseJobRepository.saveAndFlush(collectionExerciseJob);
     } else {
       log.debug("CollectionExerciseId {} already exists in the collectionexercisejob table", collectionExerciseId);
-      throw new CTPException(Fault.BAD_REQUEST, 
+      throw new CTPException(Fault.BAD_REQUEST,
           "CollectionExerciseId %s already exists in the collectionexercisejob table", collectionExerciseId);
     }
 
