@@ -33,7 +33,7 @@ public class SocialSampleReceiverImpl implements SampleReceiver<SocialSurveySamp
     log.debug("SocialSurveySample (Collection Exercise Ref: {}) transformed successfully.",
         socialSurveySample.getCollectionExerciseRef());
 
-    List<SocialSampleUnit> samplingUnitList = socialSurveySample.getSampleUnits().getSocialSampleUnits();
+    List<SocialSampleUnit> samplingUnitList = socialSurveySample.getSampleUnits().getSocialSampleUnit();
     sampleService.processSampleSummary(socialSurveySample, samplingUnitList);
 
   }
