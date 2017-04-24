@@ -23,6 +23,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.message.SendToParty;
+import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
@@ -171,15 +172,18 @@ public class SampleServiceImpl implements SampleService {
   /**
    * Save CollectionExerciseJob to collectionExerciseJob table
    *
-   * @param collectionExerciseId collectionExerciseId to which SampleUnits are related
-   * @param surveyRef surveyRef to which SampleUnits are related
-   * @param exerciseDateTime exerciseDateTime to which SampleUnits are related
+   * @param collectionExerciseJobCreationRequestDTO CollectionExerciseJobCreationRequestDTO related to SampleUnits
    * @return Integer Returns sampleUnitsTotal value
    * @throws CTPException if update operation fails or CollectionExerciseJob already exists
    */
   @Override
-  public Integer initialiseCollectionExerciseJob(Integer collectionExerciseId, String surveyRef,
-      Timestamp exerciseDateTime) throws CTPException {
+  public Integer initialiseCollectionExerciseJob(
+      CollectionExerciseJobCreationRequestDTO collectionExerciseJobCreationRequestDTO)
+          throws CTPException {
+
+    String surveyRef = collectionExerciseJobCreationRequestDTO.getSurveyRef();
+    Integer collectionExerciseId = collectionExerciseJobCreationRequestDTO.getCollectionExerciseId();
+    Timestamp exerciseDateTime = collectionExerciseJobCreationRequestDTO.getExerciseDateTime();
 
     Integer sampleUnitsTotal = findSampleUnitsSize(surveyRef, exerciseDateTime);
 
