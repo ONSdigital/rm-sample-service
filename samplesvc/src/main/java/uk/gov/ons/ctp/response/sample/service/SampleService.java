@@ -21,7 +21,7 @@ public interface SampleService {
    * @param surveySampleObject SurveySample to be used
    */
   void processSampleSummary(SurveyBase surveySampleObject, List<? extends SampleUnitBase> samplingUnitList);
-
+  
   /**
    * Find SampleSummary entity by sampleid
    *
@@ -37,7 +37,8 @@ public interface SampleService {
    * @return SampleSummary object or null
    */
   SampleSummary activateSampleSummaryState(Integer sampleId);
-
+  
+  
   /**
    * Save a CollectionExerciseJob based on the associated CollectionExerciseId, and SampleSummary surveyRef and
    * exerciseDateTime

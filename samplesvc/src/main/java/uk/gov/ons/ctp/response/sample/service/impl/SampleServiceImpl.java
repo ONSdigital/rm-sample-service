@@ -14,7 +14,7 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.rest.RestClient;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.common.time.DateTimeUtil;
-import uk.gov.ons.ctp.response.party.representation.PartyDTO;
+import uk.gov.ons.ctp.response.sample.definition.Party;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
@@ -22,6 +22,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
+import uk.gov.ons.ctp.response.sample.message.SendToParty;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
@@ -41,6 +42,9 @@ public class SampleServiceImpl implements SampleService {
   @Inject
   private SampleUnitRepository sampleUnitRepository;
 
+  @Inject
+  private SendToParty sendQueue;
+  
   @Inject
   private StateTransitionManager<SampleSummaryDTO.SampleState,
       SampleSummaryDTO.SampleEvent> sampleSvcStateTransitionManager;
@@ -73,10 +77,11 @@ public class SampleServiceImpl implements SampleService {
     SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
 
     createAndSaveSampleUnits(samplingUnitList, savedSampleSummary);
+    sendToQueue(savedSampleSummary.getSampleId(), samplingUnitList);
     sendToParty(savedSampleSummary.getSampleId(), samplingUnitList);
   }
 
-  /**
+/**
    * create sampleUnits and save them to the Database
    *
    * @param sampleSummary  summary to be saved as sampleUnit
@@ -126,6 +131,17 @@ public class SampleServiceImpl implements SampleService {
 
   }
 
+  private void sendToQueue(Integer sampleId, List<? extends SampleUnitBase> samplingUnitList) {
+		
+	//TODO: change to send to queue;	
+	log.debug("Send to queue");
+    for (SampleUnitBase bsu : samplingUnitList) {
+      Party party = mapperFacade.map(bsu, Party.class);
+      party.setSampleId(sampleId);
+      sendQueue.send(party);
+    } 
+  }
+  
   /**
    * Send samplingUnits to the party service
    *
@@ -133,17 +149,18 @@ public class SampleServiceImpl implements SampleService {
    * @param samplingUnitList list of sampling units to be sent
    */
   private void sendToParty(Integer sampleId, List<? extends SampleUnitBase> samplingUnitList) {
-    int size = samplingUnitList.size();
-    int position = 1;
-    for (SampleUnitBase bsu : samplingUnitList) {
-      PartyDTO party = mapperFacade.map(bsu, PartyDTO.class);
-      party.setSize(size);
-      party.setPostion(position);
-      party.setSampleId(sampleId);
-      sampleServiceClient.postResource("/party/events", party, PartyDTO.class);
-      position++;
-    }
-  }
+//    int size = samplingUnitList.size();
+//    int position = 1;
+//    for (SampleUnitBase bsu : samplingUnitList) {
+//      Party party = mapperFacade.map(bsu, Party.class);
+//      party.setSize(size);
+//      party.setPosition(position);
+//      party.setSampleId(sampleId);
+//      sampleServiceClient.postResource("/party/events", party, Party.class);
+//      position++;
+//    }
+//    activateSampleSummaryState(sampleId);
+   }
 
   /**
    * Save CollectionExerciseJob to collectionExerciseJob table

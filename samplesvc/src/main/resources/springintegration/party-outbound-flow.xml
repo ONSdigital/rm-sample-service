@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+  http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+  http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+  http://www.springframework.org/schema/rabbit
+  http://www.springframework.org/schema/rabbit/spring-rabbit-1.6.xsd
+      http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+    <bean id="partyMarshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+        <property name="contextPath" value="uk.gov.ons.ctp.response.sample.definition" />
+    </bean>
+
+    <bean id="partyMarshallingMessageConverter" class="org.springframework.amqp.support.converter.MarshallingMessageConverter">
+        <constructor-arg ref="partyMarshaller" />
+        <property name="contentType" value="text/xml" />
+    </bean>
+    
+    <rabbit:template id="partyRabbitTemplate"  connection-factory="connectionFactory" exchange="Sample-outbound-exchange" routing-key="Sample.Party.binding"
+                     message-converter="partyMarshallingMessageConverter" channel-transacted="true"/>
+</beans>
