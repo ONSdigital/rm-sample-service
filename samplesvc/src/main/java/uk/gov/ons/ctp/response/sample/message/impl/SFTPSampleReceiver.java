@@ -1,12 +1,19 @@
 package uk.gov.ons.ctp.response.sample.message.impl;
 
-import lombok.extern.slf4j.Slf4j;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
+import javax.xml.transform.stream.StreamSource;
+
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.oxm.jaxb.Jaxb2Marshaller;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created by Kieran Wardle on 13/04/2017.
@@ -59,4 +66,20 @@ public class SFTPSampleReceiver {
 
         return message;
     }
+    
+    public static void main(String[] args) throws Exception {
+    	org.springframework.oxm.jaxb.Jaxb2Marshaller m = new Jaxb2Marshaller();
+    	m.setContextPath("uk.gov.ons.ctp.response.sample.definition");
+    	
+    	FileInputStream is = null;
+		try {
+			is = new FileInputStream("/Users/hardmc/Documents/census-sftp/census-survey-valid.xml");
+			 Object unmarshal = m.unmarshal(new StreamSource(is));
+			 System.out.println(unmarshal.getClass().getName());
+		} finally {
+			if (is != null) {
+				is.close();
+			}
+		}
+	}
 }

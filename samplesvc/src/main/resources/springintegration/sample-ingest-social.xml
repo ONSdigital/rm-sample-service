@@ -32,7 +32,7 @@
             filter="socialCompositeFilter"
             remote-file-separator="/"
             remote-directory="${sftp.directory}/social-sftp">
-        <int:poller cron="${sftp.cron}" max-messages-per-poll="1" error-channel="pollerErrorChannel"/>
+        <int:poller  cron="${sftp.cron}" max-messages-per-poll="1" error-channel="pollerErrorChannel"/>
     </int-sftp:inbound-channel-adapter>
     
     <bean id="acceptAllFileListFilter" class="org.springframework.integration.file.filters.AcceptAllFileListFilter"/>

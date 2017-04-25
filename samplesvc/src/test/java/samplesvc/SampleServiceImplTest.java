@@ -28,7 +28,7 @@ public class SampleServiceImplTest {
 
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
       BusinessSurveySample sample = (BusinessSurveySample) jaxbUnmarshaller.unmarshal(file);
-      for (BusinessSampleUnit unit:sample.getSampleUnits().getBusinessSampleUnit()) {
+      for (BusinessSampleUnit unit:sample.getSampleUnits().getBusinessSampleUnits()) {
         Party p = new Party ();
         p.setSampleUnitType(unit.getSampleUnitType());
         p.setSampleUnitRef(unit.getSampleUnitRef());
