@@ -33,7 +33,7 @@ public class BusinessSampleReceiverImpl implements SampleReceiver<BusinessSurvey
     log.debug("BusinessSurveySample (Collection Exercise Ref: {}) transformed successfully.",
         businessSurveySample.getCollectionExerciseRef());
 
-    List<BusinessSampleUnit> samplingUnitList = businessSurveySample.getSampleUnits().getBusinessSampleUnit();
+    List<BusinessSampleUnit> samplingUnitList = businessSurveySample.getSampleUnits().getBusinessSampleUnits();
     sampleService.processSampleSummary(businessSurveySample, samplingUnitList);
   }
 
