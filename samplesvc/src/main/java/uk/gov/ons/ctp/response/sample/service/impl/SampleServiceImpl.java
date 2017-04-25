@@ -78,7 +78,7 @@ public class SampleServiceImpl implements SampleService {
     SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
 
     createAndSaveSampleUnits(samplingUnitList, savedSampleSummary);
-    sendToQueue(savedSampleSummary.getSampleId(), samplingUnitList);
+    sendToPartyQueue(savedSampleSummary.getSampleId(), samplingUnitList);
     sendToParty(savedSampleSummary.getSampleId(), samplingUnitList);
   }
 
@@ -138,13 +138,17 @@ public class SampleServiceImpl implements SampleService {
    * @param sampleId the sampleId of the sample to be sent
    * @param samplingUnitList list of sampling units to be sent
    */
-  private void sendToQueue(Integer sampleId, List<? extends SampleUnitBase> samplingUnitList) {
-
+  private void sendToPartyQueue(Integer sampleId, List<? extends SampleUnitBase> samplingUnitList) {
+    int size = samplingUnitList.size();
+    int position = 1;
     log.debug("Send to queue");
     for (SampleUnitBase bsu : samplingUnitList) {
       Party party = mapperFacade.map(bsu, Party.class);
+      party.setSize(size);
+      party.setPosition(position);
       party.setSampleId(sampleId);
       sendQueue.send(party);
+      position++;
     }
   }
 

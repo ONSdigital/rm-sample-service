@@ -24,7 +24,7 @@ import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.service.state.SampleSvcStateTransitionManagerFactory;
 
 /**
- * The main entry point into the IAC Service SpringBoot Application.
+ * The main entry point into the Sample Service SpringBoot Application.
  */
 @SpringBootApplication
 @EnableTransactionManagement
@@ -56,7 +56,7 @@ public class SampleSvcApplication {
   @Bean
   @Qualifier("partyServiceClient")
   public RestClient partyServiceClient() {
-    RestClient restHelper = new RestClient(appConfig.getSampleSvc().getConnectionConfig());
+    RestClient restHelper = new RestClient(appConfig.getPartySvc().getConnectionConfig());
     return restHelper;
   }
 
