@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>samplesvc-api</artifactId>
-  <version>9.34.0-SNAPSHOT</version>
+  <version>10.37.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>CTP : ResponseManagement : SampleSvcApi</name>
@@ -12,8 +12,8 @@
 
   <parent>
     <groupId>uk.gov.ons.ctp.product</groupId>
-    <artifactId>responsemanagement</artifactId>
-    <version>9.34.0-SNAPSHOT</version>
+    <artifactId>sampleservice</artifactId>
+    <version>10.37.0-SNAPSHOT</version>
     <relativePath>../</relativePath>
   </parent>
 
@@ -24,13 +24,13 @@
       <version>1.15.0</version>
     </dependency>
     <dependency>
-    	<groupId>org.apache.commons</groupId>
-    	<artifactId>commons-lang3</artifactId>
-    	<version>3.4</version>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.4</version>
     </dependency>
   </dependencies>
 
-<build>
+  <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -43,10 +43,10 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-checkstyle-plugin</artifactId>
-		<configuration>
-		  <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
-		</configuration>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.jvnet.jaxb2.maven2</groupId>
@@ -56,7 +56,7 @@
         <executions>
           <execution>
             <phase>generate-sources</phase>
-            <id>census-xjc</id>
+            <id>inbound-xjc</id>
             <goals>
               <goal>generate</goal>
             </goals>
@@ -64,93 +64,9 @@
               <bindingDirectory>src/main/resources/xsd</bindingDirectory>
               <bindingIncludes>
                 <include>census-survey-sample.xjb</include>
-              </bindingIncludes>
-              <bindingExcludes>
                 <include>business-survey-sample.xjb</include>
                 <include>social-survey-sample.xjb</include>
-              </bindingExcludes>
-              <schemaDirectory>src/main/resources/xsd</schemaDirectory>
-              <schemaIncludes>
-                <include>census-survey-sample.xsd</include>
-                <include>business-survey-sample.xsd</include>
-                <include>social-survey-sample.xsd</include>
-              </schemaIncludes>
-              <generateDirectory>${project.build.directory}/generated-sources/xjc/inbound</generateDirectory>
-              <args>
-                <arg>-Xvalue-constructor</arg>
-                <arg>-Xfluent-builder</arg>
-                <arg>-generateTools=n</arg>
-              </args>
-              <plugins>
-                <plugin>
-                  <groupId>net.codesup.util</groupId>
-                  <artifactId>jaxb2-rich-contract-plugin</artifactId>
-                  <version>1.15.0</version>
-                </plugin>
-                <plugin>
-                  <groupId>org.jvnet.jaxb2_commons</groupId>
-                  <artifactId>jaxb2-value-constructor</artifactId>
-                  <version>3.0</version>
-                </plugin>
-              </plugins>
-            </configuration>
-          </execution>
-          <execution>
-            <phase>generate-sources</phase>
-            <id>business-xjc</id>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-            <configuration>
-              <bindingDirectory>src/main/resources/xsd</bindingDirectory>
-              <bindingIncludes>
-                <include>business-survey-sample.xjb</include>
               </bindingIncludes>
-              <bindingExcludes>
-                <include>census-survey-sample.xjb</include>
-                <include>social-survey-sample.xsd</include>
-              </bindingExcludes>
-              <schemaDirectory>src/main/resources/xsd</schemaDirectory>
-              <schemaIncludes>
-                <include>census-survey-sample.xsd</include>
-                <include>business-survey-sample.xsd</include>
-                <include>social-survey-sample.xsd</include>
-              </schemaIncludes>
-              <generateDirectory>${project.build.directory}/generated-sources/xjc/inbound</generateDirectory>
-              <args>
-                <arg>-Xvalue-constructor</arg>
-                <arg>-Xfluent-builder</arg>
-                <arg>-generateTools=n</arg>
-              </args>
-              <plugins>
-                <plugin>
-                  <groupId>net.codesup.util</groupId>
-                  <artifactId>jaxb2-rich-contract-plugin</artifactId>
-                  <version>1.15.0</version>
-                </plugin>
-                <plugin>
-                  <groupId>org.jvnet.jaxb2_commons</groupId>
-                  <artifactId>jaxb2-value-constructor</artifactId>
-                  <version>3.0</version>
-                </plugin>
-              </plugins>
-            </configuration>
-          </execution>
-          <execution>
-            <phase>generate-sources</phase>
-            <id>social-xjc</id>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-            <configuration>
-              <bindingDirectory>src/main/resources/xsd</bindingDirectory>
-              <bindingIncludes>
-                <include>social-survey-sample.xjb</include>
-              </bindingIncludes>
-              <bindingExcludes>
-                <include>business-survey-sample.xjb</include>
-                <include>census-survey-sample.xjb</include>
-              </bindingExcludes>
               <schemaDirectory>src/main/resources/xsd</schemaDirectory>
               <schemaIncludes>
                 <include>census-survey-sample.xsd</include>

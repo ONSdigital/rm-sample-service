@@ -38,7 +38,6 @@ public class PartyEndpoint implements CTPEndpoint {
   @Path("/events")
   public Response createCaseEvent(final Party partyDTO) throws CTPException {
 
-    log.debug(partyDTO.getForename());
     log.debug(partyDTO.getPosition() + " / " + partyDTO.getSize());
     log.debug(Integer.toString(partyDTO.getSampleId()));
     log.debug(Boolean.toString(sampleServiceClient == null));

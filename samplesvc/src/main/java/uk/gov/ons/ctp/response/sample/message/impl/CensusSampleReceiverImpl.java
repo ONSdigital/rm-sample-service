@@ -33,7 +33,7 @@ public class CensusSampleReceiverImpl implements SampleReceiver<CensusSurveySamp
     log.debug("CensusSurveySample (Collection Exercise Ref: {}) transformed successfully.",
         censusSurveySample.getCollectionExerciseRef());
 
-    List<CensusSampleUnit> samplingUnitList = censusSurveySample.getSampleUnits().getCensusSampleUnits();
+    List<CensusSampleUnit> samplingUnitList = censusSurveySample.getSampleUnits().getCensusSampleUnit();
     sampleService.processSampleSummary(censusSurveySample,  samplingUnitList);
   }
 

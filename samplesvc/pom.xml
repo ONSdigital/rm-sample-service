@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
+    <groupId>uk.gov.ons.ctp.product</groupId>
 	<artifactId>samplesvc</artifactId>
-	<version>9.34.0-SNAPSHOT</version>
+	<version>10.37.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>CTP : ResponseManagement :SampleSvc</name>
@@ -12,24 +12,23 @@
 
 	<parent>
 		<groupId>uk.gov.ons.ctp.product</groupId>
-		<artifactId>responsemanagement</artifactId>
-		<version>9.34.0-SNAPSHOT</version>
-		<relativePath>../../response-management-service</relativePath>
+		<artifactId>sampleservice</artifactId>
+		<version>10.37.0-SNAPSHOT</version>
+		<relativePath>../</relativePath>
 	</parent>
 
 	<dependencies>
 
-
 		<dependency>
 			<groupId>uk.gov.ons.ctp.product</groupId>
 			<artifactId>partysvc-api</artifactId>
-			<version>9.34.0-SNAPSHOT</version>
+			<version>10.37.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>uk.gov.ons.ctp.product</groupId>
 			<artifactId>samplesvc-api</artifactId>
-			<version>9.34.0-SNAPSHOT</version>
+			<version>10.37.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
