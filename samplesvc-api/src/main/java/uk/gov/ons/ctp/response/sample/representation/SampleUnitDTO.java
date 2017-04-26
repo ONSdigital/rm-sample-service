@@ -18,7 +18,14 @@ public class SampleUnitDTO {
    * enum for SampleUnit state
    */
   public enum SampleUnitState {
-    INIT, DELIVERED,
+    INIT, DELIVERED
+  }
+
+  /**
+   * enum for SampleUnit event
+   */
+  public enum SampleUnitEvent {
+    DELIVERING
   }
 
   private Integer sampleUnitId;
@@ -32,4 +39,5 @@ public class SampleUnitDTO {
   private String formType;
 
   private SampleUnitState state;
+
 }

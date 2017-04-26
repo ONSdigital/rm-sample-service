@@ -6,22 +6,28 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.Scheduled;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.rest.RestClient;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.common.time.DateTimeUtil;
 import uk.gov.ons.ctp.response.party.definition.Party;
+import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
+import uk.gov.ons.ctp.response.sample.domain.repository.CollectionExerciseJobRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
+import uk.gov.ons.ctp.response.sample.message.SampleUnitPublisher;
 import uk.gov.ons.ctp.response.sample.message.SendToParty;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
@@ -35,7 +41,14 @@ import uk.gov.ons.ctp.response.sample.service.SampleService;
  */
 @Slf4j
 @Named
+@Configuration
 public class SampleServiceImpl implements SampleService {
+
+  @Autowired
+  private AppConfig appConfig;
+
+  @Inject
+  private CollectionExerciseJobRepository collectionExerciseJobRepository;
 
   @Inject
   private SampleSummaryRepository sampleSummaryRepository;
@@ -46,9 +59,19 @@ public class SampleServiceImpl implements SampleService {
   @Inject
   private SendToParty sendQueue;
 
-  @Inject
+  @Autowired
+  @Qualifier("sampleSummaryTM")
   private StateTransitionManager<SampleSummaryDTO.SampleState,
-      SampleSummaryDTO.SampleEvent> sampleSvcStateTransitionManager;
+          SampleSummaryDTO.SampleEvent> sampleSvcStateTransitionManager;
+
+  @Autowired
+  @Qualifier("sampleUnitTM")
+  private StateTransitionManager<SampleUnitDTO.SampleUnitState,
+          SampleUnitDTO.SampleUnitEvent> sampleUnitStateTransitionManager;
+
+
+  @Inject
+  private SampleUnitPublisher sampleUnitPublisher;
 
   @Inject
   private MapperFacade mapperFacade;
@@ -239,6 +262,48 @@ public class SampleServiceImpl implements SampleService {
     log.debug("sampleUnits: {}", sampleUnitsTotal);
 
     return sampleUnitsTotal;
+  }
+
+  /**
+   * Get and send sample units to collection exercise queue
+   *
+   */
+  @Scheduled(cron = "${rabbitmq.cron}")
+  public void sendSampleUnitsToQueue() {
+
+    List<CollectionExerciseJob> jobs = collectionExerciseJobRepository.findAll();
+
+    for (int i = 0; i < jobs.size(); i++) {
+
+      List<SampleUnit> sampleUnits = sampleUnitRepository.getSampleUnitBatch(jobs.get(i).getSurveyRef(),
+              jobs.get(i).getExerciseDateTime(), SampleSummaryDTO.SampleState.ACTIVE.toString(),
+              appConfig.getRabbitmq().getCount());
+
+      for (SampleUnit sampleUnit : sampleUnits) {
+        uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit = mapperFacade.map(sampleUnit,
+                uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.class);
+        sampleUnitPublisher.send(mappedSampleUnit);
+        activateSampleUnitState(sampleUnit.getSampleId());
+      }
+    }
+  }
+
+  /**
+   * Effect a state transition for the target SampleSummary if the one is
+   * required
+   *
+   * @param sampleId the sampleId to be updated
+   * @return SampleSummary the updated SampleSummary
+   */
+  @Override
+  public SampleUnit activateSampleUnitState(Integer sampleId) {
+    SampleUnit targetSampleUnit = sampleUnitRepository.findOne(sampleId);
+    SampleUnitDTO.SampleUnitState newState = sampleUnitStateTransitionManager.transition(targetSampleUnit.getState(),
+            SampleUnitDTO.SampleUnitEvent.DELIVERING);
+    targetSampleUnit.setState(newState);
+    sampleUnitRepository.saveAndFlush(targetSampleUnit);
+    return targetSampleUnit;
+
   }
 
 }
