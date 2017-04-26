@@ -21,7 +21,7 @@ public interface SampleService {
    * @param samplingUnitList list of sampling units.
    * @param surveySampleObject SurveySample to be used
    */
-  void processSampleSummary(SurveyBase surveySampleObject, List<? extends SampleUnitBase> samplingUnitList);
+  void processSampleSummary(SurveyBase surveySampleObject, List<? extends SampleUnitBase> samplingUnitList) throws Exception;
 
   /**
    * Find SampleSummary entity by sampleid

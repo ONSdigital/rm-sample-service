@@ -31,7 +31,7 @@
             local-directory="${sftp.localdirectory}/social-local"
             filter="socialCompositeFilter"
             remote-file-separator="/"
-            remote-directory="${sftp.directory}/social-sftp">
+            remote-directory="${sftp.directory.social}">
         <int:poller  cron="${sftp.cron}" max-messages-per-poll="1" error-channel="pollerErrorChannel"/>
     </int-sftp:inbound-channel-adapter>
     
@@ -61,8 +61,8 @@
                           auto-startup="true"
                           remote-file-separator="/"
                           command="mv"
-                          expression="'${sftp.directory}/social-sftp/' + headers['file_name']"
-                          rename-expression="'${sftp.directory}/social-sftp/' + headers['file_name'] + '.processed'"
+                          expression="'${sftp.directory.social-sftp}' + headers['file_name']"
+                          rename-expression="'${sftp.directory.social-sftp}' + headers['file_name'] + '.processed'"
                           order="1">
         <int-sftp:request-handler-advice-chain>
             <bean class="org.springframework.integration.handler.advice.ExpressionEvaluatingRequestHandlerAdvice">

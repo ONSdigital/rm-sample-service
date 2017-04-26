@@ -31,9 +31,10 @@ public class BusinessSampleReceiverImpl implements SampleReceiver<BusinessSurvey
   /**
    * To process BusinessSurveySample transformed from XML
    * @param businessSurveySample to process
+ * @throws Exception 
    */
   @ServiceActivator(inputChannel = "xmlTransformedBusiness", outputChannel = "xmlRenameFile")
-  public Message<String> processSample(BusinessSurveySample businessSurveySample ,@Headers Map<String, Object> headerMap) {
+  public Message<String> processSample(BusinessSurveySample businessSurveySample ,@Headers Map<String, Object> headerMap) throws Exception {
     log.debug("BusinessSurveySample (Collection Exercise Ref: {}) transformed successfully.",
         businessSurveySample.getCollectionExerciseRef());
 

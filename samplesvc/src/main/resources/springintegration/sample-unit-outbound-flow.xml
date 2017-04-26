@@ -16,6 +16,6 @@
         <property name="contentType" value="text/xml" />
     </bean>
 
-    <rabbit:template id="sampleUnitRabbitTemplate" connection-factory="connectionFactory" exchange="sample-outbound-exchange" routing-key="SampleDelivery.binding"
+    <rabbit:template id="sampleUnitRabbitTemplate" connection-factory="connectionFactory" exchange="sample-outbound-exchange" routing-key="Sample.SampleDelivery.binding"
                      message-converter="sampleUnitMarshallingMessageConverter" channel-transacted="true"/>
 </beans>
