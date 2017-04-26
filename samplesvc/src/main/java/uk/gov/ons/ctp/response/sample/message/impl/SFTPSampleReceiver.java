@@ -1,17 +1,11 @@
 package uk.gov.ons.ctp.response.sample.message.impl;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-
-import javax.xml.transform.stream.StreamSource;
-
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 import lombok.extern.slf4j.Slf4j;
 

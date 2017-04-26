@@ -23,8 +23,9 @@ public class PartyEndpoint implements CTPEndpoint {
 //  @Inject
 //  @Qualifier("sampleServiceClient")
 //  private RestClient sampleServiceClient;
-//  
-	/**
+//
+//
+  /**
    * POST to update state for a specified PartyDTO.
    *
    * @param partyDTO partyDTO to be updated

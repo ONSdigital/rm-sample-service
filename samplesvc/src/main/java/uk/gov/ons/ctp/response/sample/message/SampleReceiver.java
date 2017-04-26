@@ -20,11 +20,4 @@ public interface SampleReceiver<T extends SurveyBase> {
    */
 	Message<String> processSample(T surveySampleObject, @Headers Map<String, Object> headerMap);
 
-  /**
-   * Creates error file containing the reason for XML validation failure
-   * @param errorMessage failure message containing reason for failure
-   * @return Message<String> message containing cut down error message and new file names
-   *//*
-  Message<String> processInvalidSample(GenericMessage errorMessage) throws CTPException, IOException;*/
-
 }

@@ -130,6 +130,8 @@ rabbitmq:
   password: guest
   host: localhost
   virtualhost: /
+  cron: "* * * * * ?"
+  count: 5
 
 redis:
   host: localhost

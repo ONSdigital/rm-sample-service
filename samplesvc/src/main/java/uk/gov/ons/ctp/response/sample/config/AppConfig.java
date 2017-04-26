@@ -16,4 +16,5 @@ import lombok.Data;
 public class AppConfig {
   private SampleSvc sampleSvc;
   private PartySvc partySvc;
+  private Rabbitmq rabbitmq;
 }
