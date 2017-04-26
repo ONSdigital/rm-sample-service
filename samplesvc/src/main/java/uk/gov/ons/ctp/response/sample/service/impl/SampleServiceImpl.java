@@ -283,7 +283,7 @@ public class SampleServiceImpl implements SampleService {
         uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit = mapperFacade.map(sampleUnit,
                 uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.class);
         sampleUnitPublisher.send(mappedSampleUnit);
-        activateSampleUnitState(sampleUnit.getSampleId());
+        activateSampleUnitState(sampleUnit.getSampleUnitId());
       }
     }
   }
@@ -296,8 +296,8 @@ public class SampleServiceImpl implements SampleService {
    * @return SampleSummary the updated SampleSummary
    */
   @Override
-  public SampleUnit activateSampleUnitState(Integer sampleId) {
-    SampleUnit targetSampleUnit = sampleUnitRepository.findOne(sampleId);
+  public SampleUnit activateSampleUnitState(Integer sampleUnitId) {
+    SampleUnit targetSampleUnit = sampleUnitRepository.findOne(sampleUnitId);
     SampleUnitDTO.SampleUnitState newState = sampleUnitStateTransitionManager.transition(targetSampleUnit.getState(),
             SampleUnitDTO.SampleUnitEvent.DELIVERING);
     targetSampleUnit.setState(newState);
