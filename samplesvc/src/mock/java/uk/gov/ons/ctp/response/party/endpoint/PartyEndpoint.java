@@ -1,6 +1,5 @@
 package uk.gov.ons.ctp.response.party.endpoint;
 
-import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -8,12 +7,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.springframework.beans.factory.annotation.Qualifier;
-
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.ctp.common.endpoint.CTPEndpoint;
 import uk.gov.ons.ctp.common.error.CTPException;
-import uk.gov.ons.ctp.common.rest.RestClient;
 import uk.gov.ons.ctp.response.party.definition.Party;
 
 /**
@@ -24,9 +20,11 @@ import uk.gov.ons.ctp.response.party.definition.Party;
 @Slf4j
 public class PartyEndpoint implements CTPEndpoint {
 
-  @Inject
-  @Qualifier("sampleServiceClient")
-  private RestClient sampleServiceClient;
+//  @Inject
+//  @Qualifier("sampleServiceClient")
+//  private RestClient sampleServiceClient;
+//
+//
   /**
    * POST to update state for a specified PartyDTO.
    *
@@ -40,7 +38,7 @@ public class PartyEndpoint implements CTPEndpoint {
 
     log.debug(partyDTO.getPosition() + " / " + partyDTO.getSize());
     log.debug(Integer.toString(partyDTO.getSampleId()));
-    log.debug(Boolean.toString(sampleServiceClient == null));
+ //   log.debug(Boolean.toString(sampleServiceClient == null));
     /*if (partyDTO.getPosition() == partyDTO.getSize()) {
       sampleServiceClient.putResource("/samples/" + partyDTO.getSampleId(), null, null, partyDTO.getSampleId());
       return Response.ok(partyDTO).status(Status.OK).build();

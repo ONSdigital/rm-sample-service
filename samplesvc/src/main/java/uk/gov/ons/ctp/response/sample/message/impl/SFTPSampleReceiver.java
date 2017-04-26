@@ -1,12 +1,13 @@
 package uk.gov.ons.ctp.response.sample.message.impl;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.messaging.support.MessageBuilder;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created by Kieran Wardle on 13/04/2017.

@@ -20,11 +20,14 @@ import uk.gov.ons.ctp.common.state.StateTransitionManagerFactory;
 import uk.gov.ons.ctp.response.party.endpoint.PartyEndpoint;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.endpoint.SampleEndpoint;
-import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEvent;
 import uk.gov.ons.ctp.response.sample.service.state.SampleSvcStateTransitionManagerFactory;
 
 /**
- * The main entry point into the IAC Service SpringBoot Application.
+ * The main entry point into the Sample Service SpringBoot Application.
  */
 @SpringBootApplication
 @EnableTransactionManagement
@@ -34,7 +37,7 @@ import uk.gov.ons.ctp.response.sample.service.state.SampleSvcStateTransitionMana
 public class SampleSvcApplication {
 
   @Autowired
-  private StateTransitionManagerFactory sampleSummarySvcStateTransitionManagerFactory;
+  private StateTransitionManagerFactory stateTransitionManager;
 
   @Autowired
   private AppConfig appConfig;
@@ -56,7 +59,7 @@ public class SampleSvcApplication {
   @Bean
   @Qualifier("partyServiceClient")
   public RestClient partyServiceClient() {
-    RestClient restHelper = new RestClient(appConfig.getSampleSvc().getConnectionConfig());
+    RestClient restHelper = new RestClient(appConfig.getPartySvc().getConnectionConfig());
     return restHelper;
   }
 
@@ -65,11 +68,21 @@ public class SampleSvcApplication {
    * @return the state transition manager specifically for Samples
    */
   @Bean
-  public StateTransitionManager<SampleSummaryDTO.SampleState,
-      SampleSummaryDTO.SampleEvent> sampleSvcStateTransitionManager() {
-    return sampleSummarySvcStateTransitionManagerFactory.getStateTransitionManager(
-        SampleSvcStateTransitionManagerFactory.SAMPLE_ENTITY);
+  @Qualifier("sampleSummaryTM")
+  public StateTransitionManager<SampleState, SampleEvent> sampleStateTransitionManager() {
+    return stateTransitionManager.getStateTransitionManager(SampleSvcStateTransitionManagerFactory.SAMPLE_ENTITY);
   }
+
+  /**
+   * Bean to allow application to make controlled state transitions of Sample Units
+   * @return the state transition manager specifically for Sample Units
+   */
+  @Bean
+  @Qualifier("sampleUnitTM")
+  public StateTransitionManager<SampleUnitState, SampleUnitEvent> sampleUnitStateTransitionManager() {
+    return stateTransitionManager.getStateTransitionManager(SampleSvcStateTransitionManagerFactory.SAMPLE_UNIT_ENTITY);
+  }
+
 
   /**
    * To register classes in the JAX-RS world.

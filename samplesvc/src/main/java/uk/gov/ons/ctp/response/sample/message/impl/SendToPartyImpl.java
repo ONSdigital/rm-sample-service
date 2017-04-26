@@ -15,7 +15,7 @@ import uk.gov.ons.ctp.response.sample.message.SendToParty;
 @Slf4j
 @Named
 public class SendToPartyImpl implements SendToParty {
-	
+
   @Qualifier("partyRabbitTemplate")
   @Inject
   private RabbitTemplate rabbitTemplate;

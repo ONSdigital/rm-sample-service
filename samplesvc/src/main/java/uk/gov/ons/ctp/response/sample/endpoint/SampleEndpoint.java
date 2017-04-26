@@ -69,13 +69,9 @@ public final class SampleEndpoint implements CTPEndpoint {
           throws CTPException {
 
     log.info("Entering createCollectionExerciseJob with requestObject {}", collectionExerciseJobCreationRequestDTO);
-
     Integer sampleUnitsTotal = sampleService.initialiseCollectionExerciseJob(collectionExerciseJobCreationRequestDTO);
-
     SampleUnitsRequestDTO sampleUnitsRequest = new SampleUnitsRequestDTO(sampleUnitsTotal);
-
     return Response.ok(mapperFacade.map(sampleUnitsRequest, SampleUnitsRequestDTO.class)).build();
-
   }
 
 }
