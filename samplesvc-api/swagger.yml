@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   title: Sample Service Api
   description: The Sample service manages Survey Samples and forms part of the Response Management product.
-  version: "9.36.0"
+  version: "10.37.0"
 schemes:
   - http
 basePath: /samples
@@ -45,48 +45,53 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   /:
-    get:
-      summary: List of Sample Units
-      description: Returns a list of Sample Units with the associated collectionexerciseref, surveyref and exercisedatetime
+    post:
+      summary: Creates a CollectionExerciseJob 
+      description: Creates a CollectionExerciseJob with the associated collectionExerciseId, surveyRef and exercisedatetime
+      consumes:
+      - application/json
       parameters:
         - name: Accept
           in: header
           description: Response type, application/json.
           required: false
           type: string
-        - name: collectionexerciseref
-          in: query
-          description: Collection Exercise Ref
+        - name: collectionExerciseJob
+          in: body
+          description: collectionExerciseJob to be created
           required: true
-          type: string          
-        - name: surveyref
-          in: query
-          description: Survey Ref
-          required: true
-          type: string
-        - name: exercisedatetime
-          in: query
-          description: EffectiveStartDateTime of the SampleSummary
-          required: true
-          type: string
+          schema: 
+            $ref: '#/definitions/CollectionExerciseJobCreationRequest'
       tags:
         - Sample
       responses:
         200:
-          description: An array of SampleUnits
+          description: CollectionExerciseJob is created if there are eligible SampleUnits
+        201:
+          description: No eligible SampleUnits for CollectionExerciseJob
           schema:
-            type: array
             items:
-              $ref: '#/definitions/SampleUnits'
-        404:
-          description: SampleSummary not found
-          schema:
-            $ref: '#/definitions/Error'
+              $ref: '#/definitions/SampleUnitsRequest'
+        400:
+          description: CollectionExerciseJob already exists
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
 definitions:
+  CollectionExerciseJobCreationRequest:
+    type: object
+    properties:
+      surveyref:
+        description: Survey Reference
+        type: string
+      collectionexerciseid:
+        description:  Id of Collection Exercise
+        type: integer
+      exerciseDateTime:
+        description:  Effective Survey start dateTime
+        type: string
+        format: date-time
   Error:
     type: object
     properties:
@@ -105,6 +110,9 @@ definitions:
       sampleid:
         description: Id of Sample Summary
         type: integer
+      surveyref:
+        description: Survey Reference
+        type: string
       effectivestartdatetime:
         description:  Effective Survey start dateTime
         type: string
@@ -113,16 +121,13 @@ definitions:
         description:  Effective Survey end dateTime
         type: string
         format: date-time
-      surveyref:
-        description: Survey Reference
+      state:
+        description: Sample Summary state
         type: string
       ingestdatetime:
         description:  Timestamp of Survey ingestion
         type: string
         format: date-time
-      state:
-        description: Sample Summary state
-        type: string
   SampleUnit:
     type: object
     properties:
@@ -138,7 +143,15 @@ definitions:
       sampleunittype:
         description: Sample Unit Type
         type: string
-  SampleUnits:
-    type: array
-    items:
-      $ref: '#/definitions/SampleUnit'
+      formtype:
+        description: Sample Summary form type
+        type: string
+      state:
+        description: Sample Summary state
+        type: string
+  SampleUnitsRequest:
+    type: object
+    properties:
+      sampleUnitsTotal:
+        description: Number of SampleUnits eligible for CollectionExerciseJob
+        type: integer
