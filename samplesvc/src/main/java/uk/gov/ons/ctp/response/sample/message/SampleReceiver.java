@@ -1,5 +1,10 @@
 package uk.gov.ons.ctp.response.sample.message;
 
+import java.util.Map;
+
+import org.springframework.messaging.Message;
+import org.springframework.messaging.handler.annotation.Headers;
+
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 
 /**
@@ -13,6 +18,6 @@ public interface SampleReceiver<T extends SurveyBase> {
    * Processes CensusSurveySample transformed from XML
    * @param surveySampleObject surveySample transformed from XML
    */
-  void processSample(T surveySampleObject);
+	Message<String> processSample(T surveySampleObject, @Headers Map<String, Object> headerMap);
 
 }
