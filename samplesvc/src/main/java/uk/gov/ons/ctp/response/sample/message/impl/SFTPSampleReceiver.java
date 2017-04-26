@@ -66,20 +66,4 @@ public class SFTPSampleReceiver {
 
         return message;
     }
-    
-    public static void main(String[] args) throws Exception {
-    	org.springframework.oxm.jaxb.Jaxb2Marshaller m = new Jaxb2Marshaller();
-    	m.setContextPath("uk.gov.ons.ctp.response.sample.definition");
-    	
-    	FileInputStream is = null;
-		try {
-			is = new FileInputStream("/Users/hardmc/Documents/census-sftp/census-survey-valid.xml");
-			 Object unmarshal = m.unmarshal(new StreamSource(is));
-			 System.out.println(unmarshal.getClass().getName());
-		} finally {
-			if (is != null) {
-				is.close();
-			}
-		}
-	}
 }

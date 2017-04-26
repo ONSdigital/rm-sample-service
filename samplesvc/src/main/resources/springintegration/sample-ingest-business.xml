@@ -54,7 +54,7 @@
 
      <int-sftp:outbound-gateway id="renameFileBusiness"
                           session-factory="sftpSessionFactory"
-                          request-channel="xmlValidBusiness"
+                          request-channel="xmlRenameFile"
                           reply-channel="nullChannel"
                           auto-startup="true"
                           remote-file-separator="/"
