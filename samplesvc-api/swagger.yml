@@ -74,51 +74,6 @@ definitions:
       message:
         description: Error message
         type: string
-  SampleSummary:
-    type: object
-    properties:
-      sampleid:
-        description: Id of Sample Summary
-        type: integer
-      surveyref:
-        description: Survey Reference
-        type: string
-      effectivestartdatetime:
-        description:  Effective Survey start dateTime
-        type: string
-        format: date-time
-      effectiveenddatetime:
-        description:  Effective Survey end dateTime
-        type: string
-        format: date-time
-      state:
-        description: Sample Summary state
-        type: string
-      ingestdatetime:
-        description:  Timestamp of Survey ingestion
-        type: string
-        format: date-time
-  SampleUnit:
-    type: object
-    properties:
-      sampleunitid:
-        description: Id of Sample Unit
-        type: integer
-      sampleid:
-        description:  Id of associated Sample Summary
-        type: integer
-      sampleunitref:
-        description: Sample Unit Reference
-        type: string
-      sampleunittype:
-        description: Sample Unit Type
-        type: string
-      formtype:
-        description: Sample Summary form type
-        type: string
-      state:
-        description: Sample Summary state
-        type: string
   SampleUnitsRequest:
     type: object
     properties:
@@ -129,4 +84,4 @@ securityDefinitions:
   UserSecurity:
     type: basic
 security:
-  - UserSecurity: []
+  - UserSecurity: [] 
