@@ -2,49 +2,19 @@ swagger: '2.0'
 info:
   title: Sample Service Api
   description: The Sample service manages Survey Samples and forms part of the Response Management product.
+    
+    Note that all of the endpoints this service provides are authenticated using HTTP basic authentication.
   version: "10.37.0"
 schemes:
   - http
-basePath: /samples
+basePath: /
 produces:
   - application/json
 tags:
   - name: Sample
     description: Management of Survey Sample
 paths:
-  /{sampleId}:
-    put:
-      summary: Updates Sample Summary state
-      description: Updates Sample Summary state and returns updated SummarySample
-      parameters:
-        - name: Accept
-          in: header
-          description: Response type, application/json.
-          required: false
-          type: string
-        - name: sampleId
-          in: path
-          description: Sample Id
-          required: true
-          type: integer
-      tags:
-        - Sample
-      responses:
-        200:
-          description: An updated SampleSummary
-          schema:
-            type: object
-            items:
-              $ref: '#/definitions/SampleSummary'
-        404:
-          description: Sample Units not found
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-  /:
+  /sampleunitrequests:
     post:
       summary: Creates a CollectionExerciseJob 
       description: Creates a CollectionExerciseJob with the associated collectionExerciseId, surveyRef and exercisedatetime
@@ -104,54 +74,14 @@ definitions:
       message:
         description: Error message
         type: string
-  SampleSummary:
-    type: object
-    properties:
-      sampleid:
-        description: Id of Sample Summary
-        type: integer
-      surveyref:
-        description: Survey Reference
-        type: string
-      effectivestartdatetime:
-        description:  Effective Survey start dateTime
-        type: string
-        format: date-time
-      effectiveenddatetime:
-        description:  Effective Survey end dateTime
-        type: string
-        format: date-time
-      state:
-        description: Sample Summary state
-        type: string
-      ingestdatetime:
-        description:  Timestamp of Survey ingestion
-        type: string
-        format: date-time
-  SampleUnit:
-    type: object
-    properties:
-      sampleunitid:
-        description: Id of Sample Unit
-        type: integer
-      sampleid:
-        description:  Id of associated Sample Summary
-        type: integer
-      sampleunitref:
-        description: Sample Unit Reference
-        type: string
-      sampleunittype:
-        description: Sample Unit Type
-        type: string
-      formtype:
-        description: Sample Summary form type
-        type: string
-      state:
-        description: Sample Summary state
-        type: string
   SampleUnitsRequest:
     type: object
     properties:
       sampleUnitsTotal:
         description: Number of SampleUnits eligible for CollectionExerciseJob
         type: integer
+securityDefinitions:
+  UserSecurity:
+    type: basic
+security:
+  - UserSecurity: [] 
