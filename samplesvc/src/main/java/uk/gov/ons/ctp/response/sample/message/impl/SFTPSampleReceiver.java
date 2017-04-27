@@ -52,7 +52,8 @@ public class SFTPSampleReceiver {
         String shortFileName = fileName.replace(".xml", "");
         String errorFile = shortFileName + "_error.txt";
 
-        log.debug(fileName + " Was invalid and rejected.");
+        log.info("There was an error processing " + fileName);
+        log.info(error);
 
         final Message<String> message = MessageBuilder.withPayload(error).setHeader("error_file_name",
                 errorFile).setHeader("file_name", fileName).setHeader("short_file_name",

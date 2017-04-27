@@ -295,7 +295,7 @@ public class SampleServiceImpl implements SampleService {
    * Effect a state transition for the target SampleSummary if the one is
    * required
    *
-   * @param sampleId the sampleId to be updated
+   * @param sampleUnitId the sampleUnitId to be updated
    * @return SampleSummary the updated SampleSummary
    */
   @Override

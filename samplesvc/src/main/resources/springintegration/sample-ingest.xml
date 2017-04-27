@@ -30,7 +30,7 @@
                                        auto-startup="true"
                                        charset="UTF-8"
                                        remote-file-separator="/"
-                                       remote-directory="${sftp.directory.errors}"
+                                       remote-directory-expression="'${sftp.directory.Documents}/' + headers['directory'] + '/'"
                                        auto-create-directory="true"
                                        remote-filename-generator-expression="headers['error_file_name']"
                                        order="1"

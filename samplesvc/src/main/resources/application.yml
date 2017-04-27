@@ -124,7 +124,6 @@ sftp:
     social: Documents/social-sftp/
     business: Documents/business-sftp/
     census: Documents/census-sftp/
-    errors: Documents/errors/
     Documents: Documents/
   localdirectory: /tmp/samplesvc
   cron: "* * * * * ?"
