@@ -9,8 +9,10 @@ import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.Headers;
+import org.springframework.messaging.support.MessageBuilder;
 
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.ons.ctp.response.sample.definition.BusinessSampleUnit;
 import uk.gov.ons.ctp.response.sample.definition.SocialSampleUnit;
 import uk.gov.ons.ctp.response.sample.definition.SocialSurveySample;
 import uk.gov.ons.ctp.response.sample.message.SampleReceiver;
@@ -33,13 +35,19 @@ public class SocialSampleReceiverImpl implements SampleReceiver<SocialSurveySamp
  * @return 
    */
   @ServiceActivator(inputChannel = "xmlTransformedSocial")
-  public Message<String> processSample(SocialSurveySample socialSurveySample,@Headers Map<String, Object> headerMap) {
+  public Message<String> processSample(SocialSurveySample socialSurveySample,@Headers Map<String, Object> headerMap) throws Exception{
     log.debug("SocialSurveySample (Collection Exercise Ref: {}) transformed successfully.",
         socialSurveySample.getCollectionExerciseRef());
 
     List<SocialSampleUnit> samplingUnitList = socialSurveySample.getSampleUnits().getSocialSampleUnits();
     sampleService.processSampleSummary(socialSurveySample, samplingUnitList);
-	return null;
+	
+    String load = "";
+    String fileName = (String)headerMap.get("file_name");
+    String type =(String)headerMap.get("sample_type");
+   
+    final Message<String> message = MessageBuilder.withPayload(load).setHeader(fileName, "file_name").build();
+    return message;
 
   }
 

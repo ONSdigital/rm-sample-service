@@ -18,6 +18,6 @@ public interface SampleReceiver<T extends SurveyBase> {
    * Processes CensusSurveySample transformed from XML
    * @param surveySampleObject surveySample transformed from XML
    */
-	Message<String> processSample(T surveySampleObject, @Headers Map<String, Object> headerMap);
+	Message<String> processSample(T surveySampleObject, @Headers Map<String, Object> headerMap) throws Exception;
 
 }

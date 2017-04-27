@@ -29,6 +29,7 @@ import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.message.SampleUnitPublisher;
 import uk.gov.ons.ctp.response.sample.message.SendToParty;
+import uk.gov.ons.ctp.response.sample.party.PartyUtil;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
@@ -84,7 +85,7 @@ public class SampleServiceImpl implements SampleService {
   private CollectionExerciseJobService collectionExerciseJobService;
 
   @Override
-  public void processSampleSummary(SurveyBase surveySample, List<? extends SampleUnitBase> samplingUnitList) {
+  public void processSampleSummary(SurveyBase surveySample, List<? extends SampleUnitBase> samplingUnitList) throws Exception {
 
     Timestamp effectiveStartDateTime = new Timestamp(surveySample.getEffectiveStartDateTime()
         .toGregorianCalendar().getTimeInMillis());
@@ -160,13 +161,14 @@ public class SampleServiceImpl implements SampleService {
    *
    * @param sampleId the sampleId of the sample to be sent
    * @param samplingUnitList list of sampling units to be sent
+ * @throws Exception 
    */
-  private void sendToPartyQueue(Integer sampleId, List<? extends SampleUnitBase> samplingUnitList) {
+  private void sendToPartyQueue(Integer sampleId, List<? extends SampleUnitBase> samplingUnitList) throws Exception {
     int size = samplingUnitList.size();
     int position = 1;
     log.debug("Send to queue");
     for (SampleUnitBase bsu : samplingUnitList) {
-      Party party = mapperFacade.map(bsu, Party.class);
+      Party party = PartyUtil.convertToParty(bsu);
       party.setSize(size);
       party.setPosition(position);
       party.setSampleId(sampleId);
@@ -180,13 +182,14 @@ public class SampleServiceImpl implements SampleService {
    *
    * @param sampleId the sampleId of the sample to be sent
    * @param samplingUnitList list of sampling units to be sent
+ * @throws Exception 
    */
-  private void sendToParty(Integer sampleId, List<? extends SampleUnitBase> samplingUnitList) {
+  private void sendToParty(Integer sampleId, List<? extends SampleUnitBase> samplingUnitList) throws Exception {
     int size = samplingUnitList.size();
     int position = 1;
     log.debug("Send to party svc");
     for (SampleUnitBase bsu : samplingUnitList) {
-      Party party = mapperFacade.map(bsu, Party.class);
+      Party party = PartyUtil.convertToParty(bsu);
       party.setSize(size);
       party.setPosition(position);
       party.setSampleId(sampleId);
@@ -283,7 +286,7 @@ public class SampleServiceImpl implements SampleService {
         uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit = mapperFacade.map(sampleUnit,
                 uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.class);
         sampleUnitPublisher.send(mappedSampleUnit);
-        activateSampleUnitState(sampleUnit.getSampleId());
+        activateSampleUnitState(sampleUnit.getSampleUnitId());
       }
     }
   }
@@ -292,12 +295,12 @@ public class SampleServiceImpl implements SampleService {
    * Effect a state transition for the target SampleSummary if the one is
    * required
    *
-   * @param sampleId the sampleId to be updated
+   * @param sampleUnitId the sampleUnitId to be updated
    * @return SampleSummary the updated SampleSummary
    */
   @Override
-  public SampleUnit activateSampleUnitState(Integer sampleId) {
-    SampleUnit targetSampleUnit = sampleUnitRepository.findOne(sampleId);
+  public SampleUnit activateSampleUnitState(Integer sampleUnitId) {
+    SampleUnit targetSampleUnit = sampleUnitRepository.findOne(sampleUnitId);
     SampleUnitDTO.SampleUnitState newState = sampleUnitStateTransitionManager.transition(targetSampleUnit.getState(),
             SampleUnitDTO.SampleUnitEvent.DELIVERING);
     targetSampleUnit.setState(newState);
