@@ -44,8 +44,8 @@ public class BusinessSampleReceiverImpl implements SampleReceiver<BusinessSurvey
    
     List<BusinessSampleUnit> samplingUnitList = businessSurveySample.getSampleUnits().getBusinessSampleUnits();
     sampleService.processSampleSummary(businessSurveySample, samplingUnitList);
-    
-    final Message<String> message = MessageBuilder.withPayload(load).setHeader(fileName, "file_name").build();
+    log.debug("rename.processed");
+    final Message<String> message = MessageBuilder.withPayload(load).setHeader("file_name", fileName).build();
     return message;
   }
 

@@ -61,8 +61,8 @@
                           auto-startup="true"
                           remote-file-separator="/"
                           command="mv"
-                          expression="'${sftp.directory.social-sftp}' + headers['file_name']"
-                          rename-expression="'${sftp.directory.social-sftp}' + headers['file_name'] + '.processed'"
+                          expression="'${sftp.directory.social}' + headers['file_name']"
+                          rename-expression="'${sftp.directory.social}' + headers['file_name'] + '.processed'"
                           order="1">
         <int-sftp:request-handler-advice-chain>
             <bean class="org.springframework.integration.handler.advice.ExpressionEvaluatingRequestHandlerAdvice">

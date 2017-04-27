@@ -118,9 +118,14 @@ sample-svc:
 sftp:
   host: localhost
   port: 22
-  username: hardmc
-  password: "D5ag0n3a!l71066"
-  directory: Documents
+  username: centos
+  password: "JLibV2&XD,"
+  directory:
+    social: Documents/social-sftp/
+    business: Documents/business-sftp/
+    census: Documents/census-sftp/
+    errors: Documents/errors/
+    Documents: Documents/
   localdirectory: /tmp/samplesvc
   cron: "* * * * * ?"
   filepattern: "*.xml"
