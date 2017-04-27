@@ -22,9 +22,9 @@
 
       <xsd:element name="line1" type="string_1_60" minOccurs="1" maxOccurs="1" />
       <xsd:element name="line2" type="string_1_60" minOccurs="1" maxOccurs="1" />
-      <xsd:element name="line3" type="string_1_60" minOccurs="0" maxOccurs="1" />
-      <xsd:element name="line4" type="string_1_60" minOccurs="0" maxOccurs="1" />
-      <xsd:element name="line5" type="string_1_60" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="line3" type="string_0_60" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="line4" type="string_0_60" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="line5" type="string_0_60" minOccurs="0" maxOccurs="1" />
       <xsd:element name="postcode" minOccurs="1" maxOccurs="1">
         <xsd:simpleType>
           <xsd:restriction base="xsd:string">
@@ -43,6 +43,8 @@
       <xsd:element name="emailAddress" minOccurs="0" maxOccurs="1">
         <xsd:simpleType>
           <xsd:restriction base="xsd:string">
+            <xsd:minLength value="1"/>
+            <xsd:maxLength value="100"/>
             <xsd:pattern value="[_A-Za-z0-9\-\+]+(\.[_A-Za-z0-9\-]+)*@[A-Za-z0-9\-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})" />
           </xsd:restriction>
         </xsd:simpleType>
