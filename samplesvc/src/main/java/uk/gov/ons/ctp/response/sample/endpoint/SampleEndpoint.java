@@ -46,7 +46,6 @@ public final class SampleEndpoint implements CTPEndpoint {
   @PUT
   @Path("/{sampleid}")
   public Response activateSampleSummary(@PathParam("sampleid") final Integer sampleId) throws CTPException {
-
     log.debug("Activating SampleId: " + sampleId);
     SampleSummary sampleSummary = sampleService.activateSampleSummaryState(sampleId);
 
@@ -67,8 +66,7 @@ public final class SampleEndpoint implements CTPEndpoint {
   public Response getSampleSummary(
       @Valid final CollectionExerciseJobCreationRequestDTO collectionExerciseJobCreationRequestDTO)
           throws CTPException {
-
-    log.info("Entering createCollectionExerciseJob with requestObject {}", collectionExerciseJobCreationRequestDTO);
+    log.debug("Entering createCollectionExerciseJob with requestObject {}", collectionExerciseJobCreationRequestDTO);
     Integer sampleUnitsTotal = sampleService.initialiseCollectionExerciseJob(collectionExerciseJobCreationRequestDTO);
     SampleUnitsRequestDTO sampleUnitsRequest = new SampleUnitsRequestDTO(sampleUnitsTotal);
     return Response.ok(mapperFacade.map(sampleUnitsRequest, SampleUnitsRequestDTO.class)).build();

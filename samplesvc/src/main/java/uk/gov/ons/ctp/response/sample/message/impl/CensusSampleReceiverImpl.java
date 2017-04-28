@@ -38,13 +38,11 @@ public class CensusSampleReceiverImpl implements SampleReceiver<CensusSurveySamp
   public Message<String> processSample(CensusSurveySample censusSurveySample,@Headers Map<String, Object> headerMap) throws Exception {
     log.debug("CensusSurveySample (Collection Exercise Ref: {}) transformed successfully.",
         censusSurveySample.getCollectionExerciseRef());
-
-    String load = "";
-    String fileName = (String)headerMap.get("file_name"); 
-    
     List<CensusSampleUnit> samplingUnitList = censusSurveySample.getSampleUnits().getCensusSampleUnits();
     sampleService.processSampleSummary(censusSurveySample,  samplingUnitList);
   
+    String load = "";
+    String fileName = (String)headerMap.get("file_name"); 
     final Message<String> message = MessageBuilder.withPayload(load).setHeader(fileName, "file_name").build();
     return message;
   }
