@@ -46,11 +46,11 @@ Instructions for first time set up
 
 * to run samplesvc
 
-    cd code/rm-sample-service
-    mvn clean install
-    cd samplesvc
-    ./mvnw spring-boot:run
+      cd code/rm-sample-service
+      mvn clean install
+      cd samplesvc
+      ./mvnw spring-boot:run
 
 * to add a collectionExerciseJob to the postgres database
 
-    curl -H "Content-Type: application/json" -X POST -d '{ "collectionExerciseId" : "4","surveyRef" : "str1234","exerciseDateTime" : "2012-12-13T12:12:12.000+00" }' http://localhost:8125/samples/sampleunitrequests
+      curl -H "Content-Type: application/json" -X POST -d '{ "collectionExerciseId" : "4","surveyRef" : "str1234","exerciseDateTime" : "2012-12-13T12:12:12.000+00" }' http://localhost:8125/samples/sampleunitrequests
