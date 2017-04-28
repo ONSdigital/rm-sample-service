@@ -34,17 +34,16 @@ public class SocialSampleReceiverImpl implements SampleReceiver<SocialSurveySamp
    * @param socialSurveySample to process
  * @return 
    */
-  @ServiceActivator(inputChannel = "xmlTransformedSocial")
+  @ServiceActivator(inputChannel = "xmlTransformedSocial", outputChannel = "renameSocialXMLFile")
   public Message<String> processSample(SocialSurveySample socialSurveySample,@Headers Map<String, Object> headerMap) throws Exception{
     log.debug("SocialSurveySample (Collection Exercise Ref: {}) transformed successfully.",
         socialSurveySample.getCollectionExerciseRef());
 
-    List<SocialSampleUnit> samplingUnitList = socialSurveySample.getSampleUnits().getSocialSampleUnits();
-    sampleService.processSampleSummary(socialSurveySample, samplingUnitList);
-	
     String load = "";
     String fileName = (String)headerMap.get("file_name");
-    String type =(String)headerMap.get("sample_type");
+    
+    List<SocialSampleUnit> samplingUnitList = socialSurveySample.getSampleUnits().getSocialSampleUnits();
+    sampleService.processSampleSummary(socialSurveySample, samplingUnitList);
    
     final Message<String> message = MessageBuilder.withPayload(load).setHeader(fileName, "file_name").build();
     return message;

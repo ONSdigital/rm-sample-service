@@ -56,7 +56,7 @@
 
      <int-sftp:outbound-gateway id="renameFileSocial"
                           session-factory="sftpSessionFactory"
-                          request-channel="xmlValidSocial"
+                          request-channel="renameSocialXMLFile"
                           reply-channel="nullChannel"
                           auto-startup="true"
                           remote-file-separator="/"

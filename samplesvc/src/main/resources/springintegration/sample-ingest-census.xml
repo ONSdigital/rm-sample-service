@@ -56,7 +56,7 @@
 
      <int-sftp:outbound-gateway id="renameFileCensus"
                           session-factory="sftpSessionFactory"
-                          request-channel="xmlRenameFile"
+                          request-channel="renameCensusXMLFile"
                           reply-channel="nullChannel"
                           auto-startup="true"
                           remote-file-separator="/"

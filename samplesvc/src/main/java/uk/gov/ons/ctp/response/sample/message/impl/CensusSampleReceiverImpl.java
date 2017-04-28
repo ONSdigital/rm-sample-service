@@ -34,18 +34,17 @@ public class CensusSampleReceiverImpl implements SampleReceiver<CensusSurveySamp
  * @return 
  * @throws Exception 
    */
-  @ServiceActivator(inputChannel = "xmlTransformedCensus")
+  @ServiceActivator(inputChannel = "xmlTransformedCensus" , outputChannel = "renameCensusXMLFile")
   public Message<String> processSample(CensusSurveySample censusSurveySample,@Headers Map<String, Object> headerMap) throws Exception {
     log.debug("CensusSurveySample (Collection Exercise Ref: {}) transformed successfully.",
         censusSurveySample.getCollectionExerciseRef());
 
+    String load = "";
+    String fileName = (String)headerMap.get("file_name"); 
+    
     List<CensusSampleUnit> samplingUnitList = censusSurveySample.getSampleUnits().getCensusSampleUnits();
     sampleService.processSampleSummary(censusSurveySample,  samplingUnitList);
-	
-    String load = "";
-    String fileName = (String)headerMap.get("file_name");
-    String type =(String)headerMap.get("sample_type");
-   
+  
     final Message<String> message = MessageBuilder.withPayload(load).setHeader(fileName, "file_name").build();
     return message;
   }
