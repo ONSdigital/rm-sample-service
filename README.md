@@ -32,7 +32,7 @@ Instructions for first time set up
 
   and build them using
 
-    mvn clean install
+      mvn clean install
 
 * In Documents create the following directory structure:
 
