@@ -29,13 +29,12 @@
             channel="sftpInboundSocial"
             session-factory="sftpSessionFactory"
             local-directory="${sftp.localdirectory}/social-local"
+			local-filter="socialFileListFilter"
             filter="socialCompositeFilter"
             remote-file-separator="/"
             remote-directory="${sftp.directory.social}">
         <int:poller  cron="${sftp.cron}" max-messages-per-poll="1" error-channel="pollerErrorChannel"/>
     </int-sftp:inbound-channel-adapter>
-    
-    <bean id="acceptAllFileListFilter" class="org.springframework.integration.file.filters.AcceptAllFileListFilter"/>
 
     <int-file:file-to-string-transformer id="fileToStringTransformerSocial" input-channel="sftpInboundSocial" output-channel="xmlSocial" delete-files="true" charset="UTF-8"/>
 
@@ -89,4 +88,10 @@
             </list>
         </constructor-arg>
     </bean>
+    
+    <bean id="socialFileListFilter" class="org.springframework.integration.file.filters.FileSystemPersistentAcceptOnceFileListFilter">
+    	<constructor-arg ref="metadataStore" />
+        <constructor-arg value="socialSampleFileLock_" />
+    </bean>
+    
 </beans>

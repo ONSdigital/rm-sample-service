@@ -29,6 +29,7 @@
             channel="sftpInboundBusiness"
             session-factory="sftpSessionFactory"
             local-directory="${sftp.localdirectory}/business-local"
+            local-filter="businessFileListFilter"
             filter="businessCompositeFilter"
             remote-file-separator="/"
             remote-directory="${sftp.directory.business}">
@@ -88,6 +89,11 @@
                 </bean>
             </list>
         </constructor-arg>
+    </bean>
+    
+    <bean id="businessFileListFilter" class="org.springframework.integration.file.filters.FileSystemPersistentAcceptOnceFileListFilter">
+    	<constructor-arg ref="metadataStore" />
+        <constructor-arg value="businessSampleFileLock_" />
     </bean>
   
 </beans>
