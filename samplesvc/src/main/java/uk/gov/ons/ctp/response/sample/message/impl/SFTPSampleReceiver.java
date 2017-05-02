@@ -43,7 +43,6 @@ public class SFTPSampleReceiver {
      */
     @ServiceActivator(inputChannel = "pollerErrorChannel", outputChannel = "errorUploadChannel")
     public Message<String> processInvalidSample(GenericMessage errorMessage) {
-
         String error = ((Exception) errorMessage.getPayload()).getCause().toString();
         String fileName = ((MessagingException) errorMessage.getPayload()).getFailedMessage().getHeaders()
                 .get("file_name").toString();
@@ -61,4 +60,6 @@ public class SFTPSampleReceiver {
 
         return message;
     }
+    
+    
 }

@@ -1,0 +1,21 @@
+@startuml
+actor user
+user -> IDBR: export sample
+user -> user: load into provided spreadsheet\n and export sample xml
+user -> MoveIt: upload sample XML
+loop poll for new sample files
+  Sample --> Redis: get list of processed sample files
+  Sample --> MoveIt: Download new sample XML
+  Sample --> Redis: write downloaded file name/timestamp
+end
+
+Sample -> Sample: validate sample against XSD
+Sample -> Sample: unmarshal to object tree (sample type specific)
+Sample -> DB: persist sample
+loop for each sample unit
+  Sample -> RabbitMQ: enqueue
+  Sample -> PartyAPI: POST Sample Unit
+end
+Sample -> DB: update Sample Summary state to ACTIVE
+Sample -> MoveIt: Rename Sample XML file to *.processed
+@enduml

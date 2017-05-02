@@ -37,13 +37,11 @@ public class BusinessSampleReceiverImpl implements SampleReceiver<BusinessSurvey
   public Message<String> processSample(BusinessSurveySample businessSurveySample ,@Headers Map<String, Object> headerMap) throws Exception {
     log.debug("BusinessSurveySample (Collection Exercise Ref: {}) transformed successfully.",
         businessSurveySample.getCollectionExerciseRef());
+    List<BusinessSampleUnit> samplingUnitList = businessSurveySample.getSampleUnits().getBusinessSampleUnits();
+    sampleService.processSampleSummary(businessSurveySample, samplingUnitList);
 
     String load = "";
     String fileName = (String)headerMap.get("file_name");
-   
-    List<BusinessSampleUnit> samplingUnitList = businessSurveySample.getSampleUnits().getBusinessSampleUnits();
-    sampleService.processSampleSummary(businessSurveySample, samplingUnitList);
-    log.debug("rename.processed");
     final Message<String> message = MessageBuilder.withPayload(load).setHeader("file_name", fileName).build();
     return message;
   }

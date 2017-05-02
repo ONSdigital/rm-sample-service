@@ -1,6 +1,6 @@
 package uk.gov.ons.ctp.response.sample.representation;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -20,7 +20,7 @@ public class CollectionExerciseJobDTO {
 
   private String surveyRef;
 
-  private Timestamp exerciseDateTime;
+  private Date exerciseDateTime;
 
-  private Timestamp createdDateTime;
+  private Date createdDateTime;
 }

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<p:businessSurveySample xmlns:p="http://ons.gov.uk/ctp/response/sample/definition" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ons.gov.uk/ctp/response/sample/definition business-survey-sample.xsd ">
+
+  <surveyRef>str1234</surveyRef>
+  <collectionExerciseRef>str1234</collectionExerciseRef>
+  <effectiveStartDateTime>2012-12-13T12:12:12</effectiveStartDateTime>
+  <effectiveEndDateTime>2012-12-13T12:12:12</effectiveEndDateTime>
+  <sampleUnits>
+    <businessSampleUnit>
+      <sampleUnitRef>str1234</sampleUnitRef>
+      <sampleUnitType>H</sampleUnitType>
+      <treatmentRef>str1234</treatmentRef>
+      <line1>str1234</line1>
+      <line2>str1234</line2>
+      <line3>str1234</line3>
+      <line4>str1234</line4>
+      <line5>str1234</line5>
+      <postcode>SO22 4HJ</postcode>
+      <title>str1234</title>
+      <forename>str1234</forename>
+      <surname>str1234</surname>
+      <phoneNumber>1234</phoneNumber>
+      <emailAddress>phil.is.king@gmail.com</emailAddress>
+      <checkletter>s</checkletter>
+      <frosic2003>str12</frosic2003>
+      <rusic2003>str12</rusic2003>
+      <frosic2007>str12</frosic2007>
+      <rusic2007>str12</rusic2007>
+      <froempees>123</froempees>
+      <employees>123</employees>
+      <froempment>123</froempment>
+      <employment>123</employment>
+      <froFTEempt>123.45</froFTEempt>
+      <FTEempt>123.45</FTEempt>
+      <frotover>123</frotover>
+      <turnover>123</turnover>
+      <entref>str1234</entref>
+      <wowentref>str1234</wowentref>
+      <vatref>str1234</vatref>
+      <payeref>str1234</payeref>
+      <crn>str1234</crn>
+      <live_lu>1234</live_lu>
+      <live_vat>1234</live_vat>
+      <live_paye>1234</live_paye>
+      <legalstatus>s</legalstatus>
+      <entrepmkr>s</entrepmkr>
+      <birthdate>2012-12-13</birthdate>
+      <entname1>str1234</entname1>
+      <entname2>str1234</entname2>
+      <entname3>str1234</entname3>
+      <runame1>str1234</runame1>
+      <runame2>str1234</runame2>
+      <runame3>str1234</runame3>
+      <tradstyle1>str1234</tradstyle1>
+      <tradstyle2>str1234</tradstyle2>
+      <tradstyle3>str1234</tradstyle3>
+      <fax>1234</fax>
+      <seltype>s</seltype>
+      <inclexcl>s</inclexcl>
+      <cell_no>1234</cell_no>
+      <formtype>str1</formtype>
+      <cso_tel>str1234</cso_tel>
+      <currency>s</currency>
+      <businessRegion>st</businessRegion>
+    </businessSampleUnit>
+  </sampleUnits>
+</p:businessSurveySample>
