@@ -19,6 +19,7 @@ import uk.gov.ons.ctp.response.sample.service.SampleService;
 import uk.gov.ons.ctp.response.sample.utility.MockSampleServiceFactory;
 
 public class SampleEndpointUnitTest extends CTPJerseyTest {
+  private static final String SAMPLE_VALIDJSON = "{ \"collectionExerciseId\" : \"1\", \"surveyRef\" : \"string123\", \"exerciseDateTime\" : \"2001-12-31T12:00:00.000+00\" }";
 
   @Override
   public Application configure() {
@@ -39,6 +40,15 @@ public class SampleEndpointUnitTest extends CTPJerseyTest {
         .assertStringInBody("$.ingestDateTime", SAMPLE_INGESTDATETIME_OUTPUT)
         .assertStringInBody("$.state", SAMPLE_STATE.toString())
         .andClose();
+  }
+  
+  @Test
+  public void getSampleSummaryValidJSON() {
+    with("/samples/sampleunitrequests")
+    .post(MediaType.APPLICATION_JSON_TYPE, SAMPLE_VALIDJSON)
+    .assertResponseCodeIs(HttpStatus.OK)
+    .assertIntegerInBody("$.sampleUnitsTotal", 4)
+    .andClose();
   }
 
 }
