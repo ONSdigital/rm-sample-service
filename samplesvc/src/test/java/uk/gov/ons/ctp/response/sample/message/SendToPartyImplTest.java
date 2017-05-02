@@ -26,7 +26,7 @@ public class SendToPartyImplTest {
 	 RabbitTemplate rabbitTemplate;
  
   @Test
-  public void testSendToParty() {
+  public void testSendToPartyAddsToThePartyQueue() {
     Party partyDTO = new Party();
     partyDTO.setId("1");
     partyDTO.setPosition(1);
