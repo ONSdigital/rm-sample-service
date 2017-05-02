@@ -39,7 +39,7 @@ public class CensusSampleReceiverImplTest {
   @Test
   public void TestProcessSample() throws Exception{
     
-    File file = new File("src/test/resources/uk/gov/ons/ctp/response/sample/service/impl/business-survey-sample.xml");
+    File file = new File("src/test/resources/uk/gov/ons/ctp/response/sample/service/impl/census-survey-sample.xml");
     JAXBContext jaxbContext = JAXBContext.newInstance(CensusSurveySample.class);
 
     Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();

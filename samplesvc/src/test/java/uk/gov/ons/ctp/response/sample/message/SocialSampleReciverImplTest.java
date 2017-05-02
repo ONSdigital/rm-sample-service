@@ -18,9 +18,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 
-import uk.gov.ons.ctp.response.sample.definition.CensusSampleUnit;
-import uk.gov.ons.ctp.response.sample.definition.CensusSurveySample;
-import uk.gov.ons.ctp.response.sample.message.impl.CensusSampleReceiverImpl;
+import uk.gov.ons.ctp.response.sample.definition.SocialSampleUnit;
+import uk.gov.ons.ctp.response.sample.definition.SocialSurveySample;
+import uk.gov.ons.ctp.response.sample.message.impl.SocialSampleReceiverImpl;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 /**
@@ -30,7 +30,7 @@ import uk.gov.ons.ctp.response.sample.service.SampleService;
 public class SocialSampleReciverImplTest {
 
   @InjectMocks
-  CensusSampleReceiverImpl receiver;
+  SocialSampleReceiverImpl receiver;
 
   @Mock
   private SampleService sampleService;
@@ -38,17 +38,17 @@ public class SocialSampleReciverImplTest {
   @Test
   public void TestProcessSample() throws Exception {
 
-    File file = new File("src/test/resources/uk/gov/ons/ctp/response/sample/service/impl/business-survey-sample.xml");
-    JAXBContext jaxbContext = JAXBContext.newInstance(CensusSurveySample.class);
+    File file = new File("src/test/resources/uk/gov/ons/ctp/response/sample/service/impl/social-survey-sample.xml");
+    JAXBContext jaxbContext = JAXBContext.newInstance(SocialSurveySample.class);
 
     Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-    CensusSurveySample sample = (CensusSurveySample) jaxbUnmarshaller.unmarshal(file);
+    SocialSurveySample sample = (SocialSurveySample) jaxbUnmarshaller.unmarshal(file);
 
     String load = "";
 
     final Message<String> message = MessageBuilder.withPayload(load).setHeader("file_name", file).build();
 
-    List<CensusSampleUnit> samplingUnitList = sample.getSampleUnits().getCensusSampleUnits();
+    List<SocialSampleUnit> samplingUnitList = sample.getSampleUnits().getSocialSampleUnits();
 
     HashMap<String, Object> map = new HashMap<String, Object>();
     map.put("file_name", file.getAbsolutePath());
