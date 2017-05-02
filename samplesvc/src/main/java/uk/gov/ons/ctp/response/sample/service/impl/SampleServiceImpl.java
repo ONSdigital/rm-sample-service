@@ -310,4 +310,8 @@ public class SampleServiceImpl implements SampleService {
 
   }
 
+  // Used form Test only
+  public void setSampleUnitStateTransitionManager(StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent> sampleUnitStateTransitionManager) {
+    this.sampleUnitStateTransitionManager = sampleUnitStateTransitionManager;
+  }
 }
