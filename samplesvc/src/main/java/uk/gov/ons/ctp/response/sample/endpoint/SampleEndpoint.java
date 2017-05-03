@@ -1,15 +1,14 @@
 package uk.gov.ons.ctp.response.sample.endpoint;
 
-import javax.inject.Inject;
 import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
@@ -24,16 +23,17 @@ import uk.gov.ons.ctp.response.sample.service.SampleService;
 /**
  * The REST endpoint controller for Sample Service.
  */
-@Path("/samples")
-@Consumes({MediaType.APPLICATION_JSON})
-@Produces({MediaType.APPLICATION_JSON})
+
+@RestController
+@RequestMapping (value = "/samples" , produces = "application/json" , consumes = "application/json")
 @Slf4j
 public final class SampleEndpoint implements CTPEndpoint {
 
-  @Inject
+  @Autowired
   private SampleService sampleService;
 
-  @Inject
+  @Qualifier("sampleBeanMapper")
+  @Autowired
   private MapperFacade mapperFacade;
 
   /**
@@ -43,8 +43,7 @@ public final class SampleEndpoint implements CTPEndpoint {
    * @return SampleSummary Returns the updated SampleSummary
    * @throws CTPException if update operation fails
    */
-  @PUT
-  @Path("/{sampleid}")
+  @RequestMapping(value = "/{sampleid}", method = RequestMethod.PUT)
   public Response activateSampleSummary(@PathParam("sampleid") final Integer sampleId) throws CTPException {
     log.debug("Activating SampleId: " + sampleId);
     SampleSummary sampleSummary = sampleService.activateSampleSummaryState(sampleId);
@@ -61,8 +60,7 @@ public final class SampleEndpoint implements CTPEndpoint {
    * @return Response Returns sampleUnitsTotal value
    * @throws CTPException if update operation fails or CollectionExerciseJob already exists
    */
-  @POST
-  @Path("/sampleunitrequests")
+  @RequestMapping(value = "/smapleunitrequests", method = RequestMethod.POST)
   public Response getSampleSummary(
       @Valid final CollectionExerciseJobCreationRequestDTO collectionExerciseJobCreationRequestDTO)
           throws CTPException {
