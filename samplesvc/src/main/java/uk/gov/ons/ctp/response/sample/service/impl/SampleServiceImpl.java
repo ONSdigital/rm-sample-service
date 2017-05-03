@@ -1,6 +1,7 @@
 package uk.gov.ons.ctp.response.sample.service.impl;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -8,11 +9,11 @@ import javax.inject.Named;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.Scheduled;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.rest.RestClient;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
@@ -213,7 +214,7 @@ public class SampleServiceImpl implements SampleService {
 
     String surveyRef = collectionExerciseJobCreationRequestDTO.getSurveyRef();
     Integer collectionExerciseId = collectionExerciseJobCreationRequestDTO.getCollectionExerciseId();
-    Timestamp exerciseDateTime = collectionExerciseJobCreationRequestDTO.getExerciseDateTime();
+    Timestamp exerciseDateTime = new Timestamp(collectionExerciseJobCreationRequestDTO.getExerciseDateTime().getTime());
 
     Integer sampleUnitsTotal = findSampleUnitsSize(surveyRef, exerciseDateTime);
 
@@ -309,4 +310,8 @@ public class SampleServiceImpl implements SampleService {
 
   }
 
+  // Used form Test only
+  public void setSampleUnitStateTransitionManager(StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent> sampleUnitStateTransitionManager) {
+    this.sampleUnitStateTransitionManager = sampleUnitStateTransitionManager;
+  }
 }

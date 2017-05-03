@@ -29,13 +29,12 @@
             channel="sftpInboundCensus"
             session-factory="sftpSessionFactory"
             local-directory="${sftp.localdirectory}/census-local"
+            local-filter="censusFileListFilter"
             filter="censusCompositeFilter"
             remote-file-separator="/"
             remote-directory="${sftp.directory.census}">
         <int:poller cron="${sftp.cron}" max-messages-per-poll="1" error-channel="pollerErrorChannel"/>
     </int-sftp:inbound-channel-adapter>
-
-    <bean id="acceptAllFileListFilter" class="org.springframework.integration.file.filters.AcceptAllFileListFilter"/>
 
     <int-file:file-to-string-transformer id="fileToStringTransformerCensus" input-channel="sftpInboundCensus" output-channel="xmlCensus" delete-files="true" charset="UTF-8"/>
 
@@ -56,7 +55,7 @@
 
      <int-sftp:outbound-gateway id="renameFileCensus"
                           session-factory="sftpSessionFactory"
-                          request-channel="xmlRenameFile"
+                          request-channel="renameCensusXMLFile"
                           reply-channel="nullChannel"
                           auto-startup="true"
                           remote-file-separator="/"
@@ -89,4 +88,10 @@
             </list>
         </constructor-arg>
     </bean>
+    
+    <bean id="censusFileListFilter" class="org.springframework.integration.file.filters.FileSystemPersistentAcceptOnceFileListFilter">
+    	<constructor-arg ref="metadataStore" />
+        <constructor-arg value="censusSampleFileLock_" />
+    </bean>
+    
 </beans>

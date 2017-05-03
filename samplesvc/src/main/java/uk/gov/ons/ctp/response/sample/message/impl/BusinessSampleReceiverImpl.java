@@ -33,18 +33,15 @@ public class BusinessSampleReceiverImpl implements SampleReceiver<BusinessSurvey
    * @param businessSurveySample to process
  * @throws Exception 
    */
-  @ServiceActivator(inputChannel = "xmlTransformedBusiness", outputChannel = "xmlRenameFile")
+  @ServiceActivator(inputChannel = "xmlTransformedBusiness", outputChannel = "renameBuisnessXMLFile")
   public Message<String> processSample(BusinessSurveySample businessSurveySample ,@Headers Map<String, Object> headerMap) throws Exception {
     log.debug("BusinessSurveySample (Collection Exercise Ref: {}) transformed successfully.",
         businessSurveySample.getCollectionExerciseRef());
+    List<BusinessSampleUnit> samplingUnitList = businessSurveySample.getSampleUnits().getBusinessSampleUnits();
+    sampleService.processSampleSummary(businessSurveySample, samplingUnitList);
 
     String load = "";
     String fileName = (String)headerMap.get("file_name");
-    String type =(String)headerMap.get("sample_type");
-   
-    List<BusinessSampleUnit> samplingUnitList = businessSurveySample.getSampleUnits().getBusinessSampleUnits();
-    sampleService.processSampleSummary(businessSurveySample, samplingUnitList);
-    log.debug("rename.processed");
     final Message<String> message = MessageBuilder.withPayload(load).setHeader("file_name", fileName).build();
     return message;
   }

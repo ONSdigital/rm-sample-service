@@ -1,6 +1,6 @@
 package uk.gov.ons.ctp.response.sample.representation;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -32,13 +32,13 @@ public class SampleSummaryDTO {
 
   private Integer sampleId;
 
-  private Timestamp effectiveStartDateTime;
+  private Date effectiveStartDateTime;
 
-  private Timestamp effectiveEndDateTime;
+  private Date effectiveEndDateTime;
 
   private String surveyRef;
 
-  private Timestamp ingestDateTime;
+  private Date ingestDateTime;
 
   private SampleState state;
 }

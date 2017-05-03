@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<p:censusSurveySample xmlns:p="http://ons.gov.uk/ctp/response/sample/definition" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ons.gov.uk/ctp/response/sample/definition census-survey-sample.xsd ">
+  <surveyRef>surveyRef</surveyRef>
+  <collectionExerciseRef>collectionExerciseRef</collectionExerciseRef>
+  <effectiveStartDateTime>2001-12-31T12:00:00</effectiveStartDateTime>
+  <effectiveEndDateTime>2001-12-31T12:00:00</effectiveEndDateTime>
+  <sampleUnits>
+    <censusSampleUnit>
+      <sampleUnitRef>sampleUnitRef</sampleUnitRef>
+      <sampleUnitType>H</sampleUnitType>
+      <treatmentRef>treatmentRef</treatmentRef>
+      <line1>line1</line1>
+      <line2>line2</line2>
+      <postcode>TR2 4SA</postcode>
+    </censusSampleUnit>
+  </sampleUnits>
+</p:censusSurveySample>

@@ -8,5 +8,48 @@ This repository contains the Sample service. This microservice is a RESTful web 
 * Receiving confirmation from the Party service once it has consumed/stored the sample units sent above, and marking the sample summary as ready for collection
 * Providing on request the sample summaries matching a given criteria to the Collection Exercise service
 
+## Prerequisites
+
+* To run this project you must have the following running:
+
+    - rabbitMQ
+    - redis
+    - postgres
+    - an sftp server
+
+  You can get all of this using the following docker project:
+
+    https://github.com/ONSdigital/rm-docker-dev
+
+* You must first clone and build the following projects:
+
+    - https://github.com/ONSdigital/rm-common-service
+    - https://github.com/ONSdigital/rm-party-service-api
+
+  and build them using
+
+      mvn clean install
+
+* In Documents create the following directory structure:
+
+        sftp/business-sftp/
+            /census-sftp/
+            /social-sftp/
+
+  These will act as a mock remote file store
+
+* Add the xml files found in rm-sample-service/samplesvc-api/src/test/resources/xml to the corresponding sftp directories
+
+* to run samplesvc
+
+      cd code/rm-sample-service
+      mvn clean install
+      cd samplesvc
+      ./mvnw spring-boot:run
+
+* to add a collectionExerciseJob to the postgres database
+
+      curl -H "Content-Type: application/json" -X POST -d '{ "collectionExerciseId" : "4","surveyRef" : "str1234","exerciseDateTime" : "2012-12-13T12:12:12.000+00" }' http://localhost:8125/samples/sampleunitrequests
+
 ## Copyright
 Copyright (C) 2017 Crown Copyright (Office for National Statistics)

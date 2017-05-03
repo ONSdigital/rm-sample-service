@@ -1,6 +1,6 @@
 package uk.gov.ons.ctp.response.sample.representation;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 import javax.validation.constraints.NotNull;
 
@@ -25,6 +25,6 @@ public class CollectionExerciseJobCreationRequestDTO {
   private String surveyRef;
 
   @NotNull
-  private Timestamp exerciseDateTime;
+  private Date exerciseDateTime;
 
 }
