@@ -2,10 +2,10 @@
 actor user
 user -> IDBR: export sample
 user -> user: load into provided spreadsheet\n and export sample xml
-user -> MoveIt: upload sample XML
+user -> sftp: upload sample XML
 loop poll for new sample files
   Sample --> Redis: get list of processed sample files
-  Sample --> MoveIt: Download new sample XML
+  Sample --> sftp: Download new sample XML
   Sample --> Redis: write downloaded file name/timestamp
 end
 
@@ -17,5 +17,5 @@ loop for each sample unit
   Sample -> PartyAPI: POST Sample Unit
 end
 Sample -> DB: update Sample Summary state to ACTIVE
-Sample -> MoveIt: Rename Sample XML file to *.processed
+Sample -> sftp: Rename Sample XML file to *.processed
 @enduml
