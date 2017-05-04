@@ -8,14 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.endpoint.CTPEndpoint;
 import uk.gov.ons.ctp.common.error.CTPException;
+import uk.gov.ons.ctp.common.error.InvalidRequestException;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
@@ -25,7 +24,7 @@ import uk.gov.ons.ctp.response.sample.service.SampleService;
  */
 
 @RestController
-@RequestMapping (value = "/samples" , produces = "application/json" , consumes = "application/json")
+@RequestMapping(value = "/samples", produces = "application/json")
 @Slf4j
 public final class SampleEndpoint implements CTPEndpoint {
 
@@ -52,6 +51,11 @@ public final class SampleEndpoint implements CTPEndpoint {
 //
 //  }
 
+  @RequestMapping(method = RequestMethod.GET)
+  public ResponseEntity<?> forTest() {
+    return ResponseEntity.noContent().build();
+  }
+
   /*
    * POST CollectionExerciseJob associated to SampleSummary surveyRef and
    * exerciseDateTime
@@ -60,16 +64,18 @@ public final class SampleEndpoint implements CTPEndpoint {
    * @return Response Returns sampleUnitsTotal value
    * @throws CTPException if update operation fails or CollectionExerciseJob already exists
    */
-  
-  //consumes = "application/json"
-  @RequestMapping(value = "/sampleunitrequests", method = RequestMethod.POST)
-  public ResponseEntity<?>  getSampleSummary(@Valid final CollectionExerciseJobCreationRequestDTO collectionExerciseJobCreationRequestDTO,
-      BindingResult bindingResult)throws CTPException {
-    
+  @RequestMapping(value = "/sampleunitrequests", method = RequestMethod.POST, consumes = "application/json")
+  public ResponseEntity<?>  getSampleSummary(final @RequestBody @Valid CollectionExerciseJobCreationRequestDTO
+                                                       collectionExerciseJobCreationRequestDTO,
+                                             BindingResult bindingResult)throws CTPException {
     log.debug("Entering createCollectionExerciseJob with requestObject {}", collectionExerciseJobCreationRequestDTO);
+    if (bindingResult.hasErrors()) {
+      throw new InvalidRequestException("Binding errors for create action: ", bindingResult);
+    }
     Integer sampleUnitsTotal = sampleService.initialiseCollectionExerciseJob(collectionExerciseJobCreationRequestDTO);
     SampleUnitsRequestDTO sampleUnitsRequest = new SampleUnitsRequestDTO(sampleUnitsTotal);
-    return ResponseEntity.created(URI.create("TODO")).body(mapperFacade.map(sampleUnitsRequest, SampleUnitsRequestDTO.class));
+    return ResponseEntity.created(URI.create("TODO")).body(mapperFacade.map(sampleUnitsRequest,
+            SampleUnitsRequestDTO.class));
   }
 
 }
