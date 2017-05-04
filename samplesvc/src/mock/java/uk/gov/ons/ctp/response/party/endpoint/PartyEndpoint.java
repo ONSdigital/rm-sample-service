@@ -1,30 +1,32 @@
 package uk.gov.ons.ctp.response.party.endpoint;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.actuate.health.Status;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.ctp.common.endpoint.CTPEndpoint;
 import uk.gov.ons.ctp.common.error.CTPException;
+import uk.gov.ons.ctp.common.rest.RestClient;
 import uk.gov.ons.ctp.response.party.definition.Party;
 
 /**
  * The Mock REST endpoint controller for Party Service.
  */
-@Path("/party")
-@Produces({"application/json"})
+@RestController
+@RequestMapping(value = "/party", produces = "application/json")
 @Slf4j
 public class PartyEndpoint implements CTPEndpoint {
 
-//  @Inject
-//  @Qualifier("sampleServiceClient")
-//  private RestClient sampleServiceClient;
-//
-//
+  @Autowired
+  @Qualifier("sampleServiceClient")
+  private RestClient sampleServiceClient;
+
+
   /**
    * POST to update state for a specified PartyDTO.
    *
@@ -32,9 +34,8 @@ public class PartyEndpoint implements CTPEndpoint {
    * @throws CTPException if update operation fails
    * @return Response PartyDTO that has been updated
    */
-  @POST
-  @Path("/events")
-  public Response createCaseEvent(final Party partyDTO) throws CTPException {
+  @RequestMapping(value ="/events", method = RequestMethod.POST, consumes = "application/json")
+  public ResponseEntity<?> createCaseEvent(final Party partyDTO) throws CTPException {
 
     log.debug(partyDTO.getPosition() + " / " + partyDTO.getSize());
     log.debug(Integer.toString(partyDTO.getSampleId()));
@@ -43,19 +44,7 @@ public class PartyEndpoint implements CTPEndpoint {
       sampleServiceClient.putResource("/samples/" + partyDTO.getSampleId(), null, null, partyDTO.getSampleId());
       return Response.ok(partyDTO).status(Status.OK).build();
     }*/
-    return Response.ok(partyDTO).status(Status.CREATED).build();
-
-  }
-
-  /**
-   * GET to retrieve party info
-   * @return Response confirmation
-   */
-  @GET
-  @Path("/events")
-  public Response up() {
-    log.debug("party up");
-    return Response.ok().status(Status.CREATED).build();
+    return ResponseEntity.ok(partyDTO);
 
   }
 

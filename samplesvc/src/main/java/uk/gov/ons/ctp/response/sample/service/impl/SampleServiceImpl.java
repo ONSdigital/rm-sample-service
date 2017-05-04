@@ -1,16 +1,13 @@
 package uk.gov.ons.ctp.response.sample.service.impl;
 
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
@@ -42,23 +39,23 @@ import uk.gov.ons.ctp.response.sample.service.SampleService;
  * Accept feedback from handlers
  */
 @Slf4j
-@Named
+@Component
 @Configuration
 public class SampleServiceImpl implements SampleService {
 
   @Autowired
   private AppConfig appConfig;
 
-  @Inject
+  @Autowired
   private CollectionExerciseJobRepository collectionExerciseJobRepository;
 
-  @Inject
+  @Autowired
   private SampleSummaryRepository sampleSummaryRepository;
 
-  @Inject
+  @Autowired
   private SampleUnitRepository sampleUnitRepository;
 
-  @Inject
+  @Autowired
   private SendToParty sendQueue;
 
   @Autowired
@@ -72,17 +69,17 @@ public class SampleServiceImpl implements SampleService {
           SampleUnitDTO.SampleUnitEvent> sampleUnitStateTransitionManager;
 
 
-  @Inject
+  @Autowired
   private SampleUnitPublisher sampleUnitPublisher;
 
-  @Inject
+  @Autowired
   private MapperFacade mapperFacade;
 
-  @Inject
+  @Autowired
   @Qualifier("sampleServiceClient")
   private RestClient sampleServiceClient;
 
-  @Inject
+  @Autowired
   private CollectionExerciseJobService collectionExerciseJobService;
 
   @Override

@@ -1,23 +1,23 @@
 package uk.gov.ons.ctp.response.sample.message.impl;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
-import uk.gov.ons.ctp.response.sample.message.SampleUnitPublisher;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import lombok.extern.slf4j.Slf4j;
+import uk.gov.ons.ctp.response.sample.message.SampleUnitPublisher;
+import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
 
 /**
  * The publisher to queues
  */
 @Slf4j
-@Named
+@Component
 public class SampleUnitPublisherImpl implements SampleUnitPublisher {
 
     @Qualifier("sampleUnitRabbitTemplate")
-    @Inject
+    @Autowired
     private RabbitTemplate rabbitTemplate;
 
     /**

@@ -1,7 +1,7 @@
 package uk.gov.ons.ctp.response.sample.service.impl;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.ctp.common.error.CTPException;
@@ -13,11 +13,11 @@ import uk.gov.ons.ctp.response.sample.service.CollectionExerciseJobService;
 /**
  * Accept feedback from handlers
  */
-@Named
+@Component
 @Slf4j
 public class CollectionExerciseJobImpl implements CollectionExerciseJobService {
 
-  @Inject
+  @Autowired
   private CollectionExerciseJobRepository collectionExerciseJobRepository;
 
   @Override

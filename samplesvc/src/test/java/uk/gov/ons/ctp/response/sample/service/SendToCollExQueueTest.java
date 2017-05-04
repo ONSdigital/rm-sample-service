@@ -22,9 +22,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyByte;
 import static org.mockito.Mockito.*;
 
-
-import javax.inject.Inject;
-import javax.inject.Qualifier;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;

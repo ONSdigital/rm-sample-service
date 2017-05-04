@@ -3,8 +3,7 @@ package uk.gov.ons.ctp.response.sample.message.impl;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
@@ -25,7 +24,7 @@ import uk.gov.ons.ctp.response.sample.service.SampleService;
 @MessageEndpoint
 public class BusinessSampleReceiverImpl implements SampleReceiver<BusinessSurveySample> {
 
-  @Inject
+  @Autowired
   private SampleService sampleService;
 
   /**
