@@ -65,7 +65,7 @@ public final class SampleEndpoint implements CTPEndpoint {
    * @throws CTPException if update operation fails or CollectionExerciseJob already exists
    */
   @RequestMapping(value = "/sampleunitrequests", method = RequestMethod.POST, consumes = "application/json")
-  public ResponseEntity<?>  getSampleSummary(final @RequestBody @Valid CollectionExerciseJobCreationRequestDTO
+  public ResponseEntity<?>  getSampleSummary(final @RequestBody CollectionExerciseJobCreationRequestDTO
                                                        collectionExerciseJobCreationRequestDTO,
                                              BindingResult bindingResult)throws CTPException {
     log.debug("Entering createCollectionExerciseJob with requestObject {}", collectionExerciseJobCreationRequestDTO);

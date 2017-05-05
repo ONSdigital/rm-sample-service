@@ -36,7 +36,7 @@ management:
 
 server:
   port: 8125
-  servlet-path: /mgmt
+  servlet-path: /
 
 endpoints:
   autoconfig:
