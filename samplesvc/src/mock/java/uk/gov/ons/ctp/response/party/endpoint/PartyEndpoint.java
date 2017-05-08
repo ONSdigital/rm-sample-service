@@ -2,13 +2,13 @@ package uk.gov.ons.ctp.response.party.endpoint;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.actuate.health.Status;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
+import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.endpoint.CTPEndpoint;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.rest.RestClient;
@@ -26,6 +26,9 @@ public class PartyEndpoint implements CTPEndpoint {
   @Qualifier("sampleServiceClient")
   private RestClient sampleServiceClient;
 
+  @Qualifier("sampleBeanMapper")
+  @Autowired
+  private MapperFacade mapperFacade;
 
   /**
    * POST to update state for a specified PartyDTO.
@@ -44,8 +47,7 @@ public class PartyEndpoint implements CTPEndpoint {
       sampleServiceClient.putResource("/samples/" + partyDTO.getSampleId(), null, null, partyDTO.getSampleId());
       return Response.ok(partyDTO).status(Status.OK).build();
     }*/
-    return ResponseEntity.ok(partyDTO);
-
+    return ResponseEntity.ok(mapperFacade.map(partyDTO,Party.class));
   }
 
 }

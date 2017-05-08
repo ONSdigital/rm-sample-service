@@ -2,13 +2,14 @@ package uk.gov.ons.ctp.response.sample.endpoint;
 
 import java.net.URI;
 
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
@@ -74,8 +75,8 @@ public final class SampleEndpoint implements CTPEndpoint {
     }
     Integer sampleUnitsTotal = sampleService.initialiseCollectionExerciseJob(collectionExerciseJobCreationRequestDTO);
     SampleUnitsRequestDTO sampleUnitsRequest = new SampleUnitsRequestDTO(sampleUnitsTotal);
-    return ResponseEntity.created(URI.create("TODO")).body(mapperFacade.map(sampleUnitsRequest,
-            SampleUnitsRequestDTO.class));
+    
+    return ResponseEntity.created(URI.create("TODO")).body(sampleUnitsRequest);
   }
 
 }

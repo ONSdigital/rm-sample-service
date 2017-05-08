@@ -27,7 +27,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 public class SampleEndpointUnitTest{
-  private static final String SAMPLE_VALIDJSON = "{ \"collectionExerciseId\" : \"1\", \"surveyRef\" : \"string123\", \"exerciseDateTime\" : \"20121213\" }";
+  private static final String SAMPLE_VALIDJSON = "{ \"collectionExerciseId\" : \"2\", \"surveyRef\" : \"str1234\", \"exerciseDateTime\" : \"2012-12-13T12:12:12.000+0000\" }";
 
   private static final Integer SAMPLE_ID = 124;
   
@@ -70,14 +70,13 @@ public class SampleEndpointUnitTest{
 //      
 //  }
   
-//  @Test
-//  public void getSampleSummaryValidJSON() throws Exception{
-//    when(sampleService.findSampleSummaryBySampleId(SAMPLE_ID)).thenReturn(sampleSummaryResults.get(0));
-//     
-//    ResultActions actions = mockMvc.perform(postJson(String.format("/samples/sampleunitrequests"), SAMPLE_VALIDJSON));
-//    
-//    actions.andExpect(status().isOk())
-//    .andExpect(jsonPath("$.sampleUnitsTotal", is(4)));
-//  }
+  @Test
+  public void getSampleSummaryValidJSON() throws Exception{
+    //when(sampleService.findSampleSummaryBySampleId(SAMPLE_ID)).thenReturn(sampleSummaryResults.get(0));
+     
+    ResultActions actions = mockMvc.perform(postJson(String.format("/samples/sampleunitrequests"), SAMPLE_VALIDJSON));
+    
+    actions.andExpect(status().isCreated());
+  }
 
 }
