@@ -74,8 +74,7 @@
           class="org.springframework.integration.file.filters.CompositeFileListFilter">
         <constructor-arg>
             <list>
-                <bean
-                        class="org.springframework.integration.sftp.filters.SftpSimplePatternFileListFilter">
+                <bean class="org.springframework.integration.sftp.filters.SftpSimplePatternFileListFilter">
                     <constructor-arg value="*.xml" />
                 </bean>
                 <bean id="SftpPersistentAcceptOnceFileListFilter" class="org.springframework.integration.sftp.filters.SftpPersistentAcceptOnceFileListFilter">

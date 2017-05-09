@@ -14,7 +14,6 @@
     <int:channel id="renameFailedProcess"/>
     <int:publish-subscribe-channel id="errorUploadChannel" />
 
-
     <int-sftp:outbound-channel-adapter id="createErrorFile"
                                        channel="errorUploadChannel"
                                        session-factory="sftpSessionFactory"
