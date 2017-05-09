@@ -41,7 +41,7 @@ public class SocialSampleReceiverImpl implements SampleReceiver<SocialSurveySamp
    
     String load = "";
     String fileName = (String)headerMap.get("file_name");
-    final Message<String> message = MessageBuilder.withPayload(load).setHeader("file_name",fileName ).build();
+    final Message<String> message = MessageBuilder.withPayload(load).setHeader("file_name",fileName).build();
     return message;
   }
 
