@@ -37,7 +37,7 @@ public class PartyEndpoint implements CTPEndpoint {
    * @throws CTPException if update operation fails
    * @return Response PartyDTO that has been updated
    */
-  @RequestMapping(value ="/events", method = RequestMethod.POST, consumes = "application/json")
+  @RequestMapping(value ="/events", method = RequestMethod.POST, consumes = "application/xml")
   public ResponseEntity<?> createCaseEvent(final Party partyDTO) throws CTPException {
 
     log.debug(partyDTO.getPosition() + " / " + partyDTO.getSize());
@@ -47,7 +47,7 @@ public class PartyEndpoint implements CTPEndpoint {
       sampleServiceClient.putResource("/samples/" + partyDTO.getSampleId(), null, null, partyDTO.getSampleId());
       return Response.ok(partyDTO).status(Status.OK).build();
     }*/
-    return ResponseEntity.ok(mapperFacade.map(partyDTO,Party.class));
+    return ResponseEntity.ok(partyDTO);
   }
 
 }
