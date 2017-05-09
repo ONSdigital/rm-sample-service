@@ -2,6 +2,8 @@ package uk.gov.ons.ctp.response.sample.endpoint;
 
 import java.net.URI;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +46,7 @@ public final class SampleEndpoint implements CTPEndpoint {
    * @throws CTPException if update operation fails or CollectionExerciseJob already exists
    */
   @RequestMapping(value = "/sampleunitrequests", method = RequestMethod.POST, consumes = "application/json")
-  public ResponseEntity<?>  getSampleSummary(final @RequestBody CollectionExerciseJobCreationRequestDTO
+  public ResponseEntity<?>  getSampleSummary(final @Valid @RequestBody CollectionExerciseJobCreationRequestDTO
                                                        collectionExerciseJobCreationRequestDTO,
                                              BindingResult bindingResult) throws CTPException {
     log.debug("Entering createCollectionExerciseJob with requestObject {}", collectionExerciseJobCreationRequestDTO);

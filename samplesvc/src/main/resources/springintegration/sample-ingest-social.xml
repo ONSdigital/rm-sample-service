@@ -67,9 +67,10 @@
             </bean>
         </int-sftp:request-handler-advice-chain>
   </int-sftp:outbound-gateway>
-    <int:channel id="renameSuccessProcess"/>
-    <int:channel id="renameFailedProcess"/>
 
+  <int:channel id="renameSuccessProcess"/>
+  <int:channel id="renameFailedProcess"/>
+  
     <bean id="socialCompositeFilter"
           class="org.springframework.integration.file.filters.CompositeFileListFilter">
         <constructor-arg>
