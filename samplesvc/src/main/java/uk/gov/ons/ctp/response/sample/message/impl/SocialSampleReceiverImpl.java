@@ -30,10 +30,10 @@ public class SocialSampleReceiverImpl implements SampleReceiver<SocialSurveySamp
   /**
    * To process SocialSurveySample transformed from XML
    * @param socialSurveySample to process
- * @return 
+   * @return
    */
   @ServiceActivator(inputChannel = "xmlTransformedSocial", outputChannel = "renameSocialXMLFile")
-  public Message<String> processSample(SocialSurveySample socialSurveySample,@Headers Map<String, Object> headerMap) throws Exception{
+  public Message<String> processSample(SocialSurveySample socialSurveySample ,@Headers Map<String, Object> headerMap) throws Exception{
     log.debug("SocialSurveySample (Collection Exercise Ref: {}) transformed successfully.",
         socialSurveySample.getCollectionExerciseRef());
     List<SocialSampleUnit> samplingUnitList = socialSurveySample.getSampleUnits().getSocialSampleUnits();
