@@ -1,0 +1,9 @@
+---
+applications:
+- name: SampleServiceApi
+  memory: 512M
+  host: SampleServiceApi
+  instances: 1
+  path: /samplesvc/target
+  buildpack: https://github.com/cloudfoundry/java-buildpack.git
+  timeout: 120
