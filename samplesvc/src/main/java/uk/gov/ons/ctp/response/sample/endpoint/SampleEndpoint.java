@@ -36,27 +36,6 @@ public final class SampleEndpoint implements CTPEndpoint {
   @Autowired
   private MapperFacade mapperFacade;
 
-//  /**
-//   * PUT to update state for a specified SampleSummary.
-//   *
-//   * @param sampleId SampleId of the SampleSummary to update.
-//   * @return SampleSummary Returns the updated SampleSummary
-//   * @throws CTPException if update operation fails
-//   */
-//  @RequestMapping(value = "/{sampleid}", method = RequestMethod.PUT, consumes = "application/json")
-//  public ResponseEntity<?> activateSampleSummary(@PathVariable("sampleid") final Integer sampleId) throws CTPException {
-//    log.debug("Activating SampleId: " + sampleId);
-//    SampleSummary sampleSummary = sampleService.activateSampleSummaryState(sampleId);
-//
-//    return ResponseEntity.ok(mapperFacade.map(sampleSummary, SampleSummaryDTO.class));
-//
-//  }
-
-  @RequestMapping(method = RequestMethod.GET)
-  public ResponseEntity<?> forTest() {
-    return ResponseEntity.noContent().build();
-  }
-
   /*
    * POST CollectionExerciseJob associated to SampleSummary surveyRef and
    * exerciseDateTime
