@@ -44,11 +44,13 @@ public class JaxbAnnotatedTypeUtil {
         String[] attribs = xmlAnnotation.propOrder();
 
         for (String attrib : attribs) {
-          Field field = xmlClass.getDeclaredField(attrib);
-          field.setAccessible(true);
-          Object obj = field.get(xmlObject);
-          if (obj != null && !obj.toString().equals("")) {
-            attribBucket.put(attrib, obj.toString());
+          if (!attrib.equals("")) {
+            Field field = xmlClass.getDeclaredField(attrib);
+            field.setAccessible(true);
+            Object obj = field.get(xmlObject);
+            if (obj != null && !obj.toString().equals("")) {
+              attribBucket.put(attrib, obj.toString());
+            }
           }
         }
       }
