@@ -50,12 +50,6 @@
           <groupId>org.springframework.amqp</groupId>
           <artifactId>spring-rabbit</artifactId>
         </dependency>
-        
-        <dependency>
-          <groupId>com.rabbitmq.jms</groupId>
-          <artifactId>rabbitmq-jms</artifactId>
-          <version>1.4.7</version>
-        </dependency>
 
 		<dependency>
 			<groupId>redis.clients</groupId>
@@ -109,7 +103,6 @@
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
-
 
 	</dependencies>
 
@@ -231,7 +224,6 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-
 	</build>
 
 </project>
