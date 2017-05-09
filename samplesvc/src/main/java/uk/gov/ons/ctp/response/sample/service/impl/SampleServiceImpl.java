@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
+import org.springframework.stereotype.Service;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.rest.RestClient;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
@@ -39,7 +40,7 @@ import uk.gov.ons.ctp.response.sample.service.SampleService;
  * Accept feedback from handlers
  */
 @Slf4j
-@Component
+@Service
 @Configuration
 public class SampleServiceImpl implements SampleService {
 
@@ -307,7 +308,7 @@ public class SampleServiceImpl implements SampleService {
 
   }
 
-  // Used form Test only
+  // Used for Test only
   public void setSampleUnitStateTransitionManager(StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent> sampleUnitStateTransitionManager) {
     this.sampleUnitStateTransitionManager = sampleUnitStateTransitionManager;
   }

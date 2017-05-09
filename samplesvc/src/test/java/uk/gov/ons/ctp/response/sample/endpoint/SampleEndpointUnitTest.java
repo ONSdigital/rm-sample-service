@@ -26,7 +26,7 @@ import uk.gov.ons.ctp.common.jackson.CustomObjectMapper;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
-public class SampleEndpointUnitTest{
+public class SampleEndpointUnitTest {
   private static final String SAMPLE_VALIDJSON = "{ \"collectionExerciseId\" : \"2\", \"surveyRef\" : \"str1234\", \"exerciseDateTime\" : \"2012-12-13T12:12:12.000+0000\" }";
 
   private static final Integer SAMPLE_ID = 124;

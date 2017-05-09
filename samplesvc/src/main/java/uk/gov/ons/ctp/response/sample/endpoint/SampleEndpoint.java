@@ -36,9 +36,8 @@ public final class SampleEndpoint implements CTPEndpoint {
   @Autowired
   private MapperFacade mapperFacade;
 
-  /*
-   * POST CollectionExerciseJob associated to SampleSummary surveyRef and
-   * exerciseDateTime
+  /**
+   * POST CollectionExerciseJob associated to SampleSummary surveyRef and exerciseDateTime
    *
    * @param collectionExerciseJobCreationRequestDTO CollectionExerciseJobCreationRequestDTO related to SampleUnits
    * @return Response Returns sampleUnitsTotal value
@@ -47,7 +46,7 @@ public final class SampleEndpoint implements CTPEndpoint {
   @RequestMapping(value = "/sampleunitrequests", method = RequestMethod.POST, consumes = "application/json")
   public ResponseEntity<?>  getSampleSummary(final @RequestBody CollectionExerciseJobCreationRequestDTO
                                                        collectionExerciseJobCreationRequestDTO,
-                                             BindingResult bindingResult)throws CTPException {
+                                             BindingResult bindingResult) throws CTPException {
     log.debug("Entering createCollectionExerciseJob with requestObject {}", collectionExerciseJobCreationRequestDTO);
     if (bindingResult.hasErrors()) {
       throw new InvalidRequestException("Binding errors for create action: ", bindingResult);
