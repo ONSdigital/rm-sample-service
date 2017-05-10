@@ -273,16 +273,17 @@ public class SampleServiceImpl implements SampleService {
   public void sendSampleUnitsToQueue() {
 
     List<CollectionExerciseJob> jobs = collectionExerciseJobRepository.findAll();
+    for (CollectionExerciseJob collectionExerciseJob : jobs) {
+      
 
-    for (int i = 0; i < jobs.size(); i++) {
-
-      List<SampleUnit> sampleUnits = sampleUnitRepository.getSampleUnitBatch(jobs.get(i).getSurveyRef(),
-              jobs.get(i).getExerciseDateTime(), SampleSummaryDTO.SampleState.ACTIVE.toString(),
+      List<SampleUnit> sampleUnits = sampleUnitRepository.getSampleUnitBatch(collectionExerciseJob.getSurveyRef(),
+          collectionExerciseJob.getExerciseDateTime(), SampleSummaryDTO.SampleState.ACTIVE.toString(),
               appConfig.getRabbitmq().getCount());
 
       for (SampleUnit sampleUnit : sampleUnits) {
         uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit = mapperFacade.map(sampleUnit,
                 uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.class);
+        mappedSampleUnit.setCollectionExerciseId(collectionExerciseJob.getCollectionExerciseId());
         sampleUnitPublisher.send(mappedSampleUnit);
         activateSampleUnitState(sampleUnit.getSampleUnitId());
       }
