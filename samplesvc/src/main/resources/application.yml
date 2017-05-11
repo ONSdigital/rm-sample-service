@@ -135,7 +135,6 @@ rabbitmq:
   host: localhost
   virtualhost: /
   cron: "* * * * * ?"
-  count: 5
 
 redis:
   host: localhost
@@ -143,3 +142,10 @@ redis:
 
 messaging:
   pubMaxAttempts: 3
+  
+sample-unit-distribution:
+  retrieval-max: 5
+  distribution-max: 10
+  retry-sleep-seconds: 30
+  delay-milli-seconds: 60000
+  

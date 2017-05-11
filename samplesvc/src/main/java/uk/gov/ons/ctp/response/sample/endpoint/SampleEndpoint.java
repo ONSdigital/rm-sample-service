@@ -5,7 +5,6 @@ import java.net.URI;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,6 +17,8 @@ import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.endpoint.CTPEndpoint;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.InvalidRequestException;
+import uk.gov.ons.ctp.common.time.DateTimeUtil;
+import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
@@ -34,9 +35,9 @@ public final class SampleEndpoint implements CTPEndpoint {
   @Autowired
   private SampleService sampleService;
 
-  @Qualifier("sampleBeanMapper")
   @Autowired
   private MapperFacade mapperFacade;
+  
 
   /**
    * POST CollectionExerciseJob associated to SampleSummary surveyRef and exerciseDateTime
@@ -53,7 +54,11 @@ public final class SampleEndpoint implements CTPEndpoint {
     if (bindingResult.hasErrors()) {
       throw new InvalidRequestException("Binding errors for create action: ", bindingResult);
     }
-    Integer sampleUnitsTotal = sampleService.initialiseCollectionExerciseJob(collectionExerciseJobCreationRequestDTO);
+    
+    CollectionExerciseJob cej = mapperFacade.map(collectionExerciseJobCreationRequestDTO, CollectionExerciseJob.class);
+    cej.setCreatedDateTime(DateTimeUtil.nowUTC());
+    
+    Integer sampleUnitsTotal = sampleService.initialiseCollectionExerciseJob(cej);
     SampleUnitsRequestDTO sampleUnitsRequest = new SampleUnitsRequestDTO(sampleUnitsTotal);
     
     return ResponseEntity.created(URI.create("TODO")).body(sampleUnitsRequest);

@@ -65,7 +65,7 @@ public class SampleSvcApplication {
    * @return the state transition manager specifically for Samples
    */
   @Bean
-  @Qualifier("sampleSummaryTM")
+  @Qualifier("sampleSummaryTransitionManager")
   public StateTransitionManager<SampleState, SampleEvent> sampleStateTransitionManager() {
     return stateTransitionManager.getStateTransitionManager(SampleSvcStateTransitionManagerFactory.SAMPLE_ENTITY);
   }
@@ -75,7 +75,7 @@ public class SampleSvcApplication {
    * @return the state transition manager specifically for Sample Units
    */
   @Bean
-  @Qualifier("sampleUnitTM")
+  @Qualifier("sampleUnitTransitionManager")
   public StateTransitionManager<SampleUnitState, SampleUnitEvent> sampleUnitStateTransitionManager() {
     return stateTransitionManager.getStateTransitionManager(SampleSvcStateTransitionManagerFactory.SAMPLE_UNIT_ENTITY);
   }

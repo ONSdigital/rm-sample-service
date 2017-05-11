@@ -5,6 +5,7 @@ import java.util.List;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
+import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
@@ -39,14 +40,6 @@ public interface SampleService {
    */
   SampleSummary activateSampleSummaryState(Integer sampleId);
 
-  /**
-   * Update the SampleSummary state
-   *
-   * @param sampleId The sampleId
-   * @return SampleSummary object or null
-   */
-  SampleUnit activateSampleUnitState(Integer sampleId);
-
 
   /**
    * Save a CollectionExerciseJob based on the associated CollectionExerciseId, and SampleSummary surveyRef and
@@ -56,7 +49,5 @@ public interface SampleService {
    * @return Integer sampleUnitsTotal value
    * @throws CTPException if update operation fails or CollectionExerciseJob already exists
    */
-  Integer initialiseCollectionExerciseJob(
-      CollectionExerciseJobCreationRequestDTO collectionExerciseJobCreationRequestDTO)
-      throws CTPException;
+  Integer initialiseCollectionExerciseJob(CollectionExerciseJob collectionExerciseJob) throws CTPException;
 }

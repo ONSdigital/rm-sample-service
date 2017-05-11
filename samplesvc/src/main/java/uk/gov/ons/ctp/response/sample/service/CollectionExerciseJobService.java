@@ -15,6 +15,6 @@ public interface CollectionExerciseJobService {
    * @param collectionExerciseJob CollectionExerciseJob to be used.
    * @throws CTPException if update operation fails or CollectionExerciseJob already exists
    */
-  void processCollectionExerciseJob(CollectionExerciseJob collectionExerciseJob) throws CTPException;
+  void storeCollectionExerciseJob(CollectionExerciseJob collectionExerciseJob) throws CTPException;
 }
 

@@ -42,11 +42,12 @@ public interface SampleUnitRepository extends JpaRepository<SampleUnit, Integer>
    */
   @Query(value = "SELECT su.* FROM sample.sampleunit su ,sample.samplesummary ss WHERE su.sampleid = ss.sampleid "
           + "AND ss.effectivestartdatetime = :exercisedatetime AND ss.state = :state AND su.state = 'INIT' "
-          + "AND ss.surveyref = :surveyref order by ss.ingestdatetime ASC limit :count  ;",
+          + "AND ss.surveyref = :surveyref AND NOT IN (:excludedcases) order by ss.ingestdatetime ASC limit :count  ;",
           nativeQuery = true)
   List<SampleUnit> getSampleUnitBatch(@Param("surveyref") String surveyRef,
                                       @Param("exercisedatetime") Timestamp excerciseDateTime,
                                       @Param("state") String state,
-                                      @Param("count") Integer count);
+                                      @Param("count") Integer count,
+                                      @Param("excludedcases") List<Integer> excludedCases);
 
 }
