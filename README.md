@@ -1,10 +1,3 @@
-# TODOs Code review
-- Add more coverage to unit test SampleEndpointUnitTest. Check for instance https://github.com/ONSdigital/rm-sdx-gateway/blob/master/src/test/java/uk/gov/ons/ctp/sdx/endpoint/ReceiptEndpointUnitTest.java
-- In SampleEndpoint, should @Valid be added to @RequestBody CollectionExerciseJobCreationRequestDTO collectionExerciseJobCreationRequestDTO as in https://github.com/ONSdigital/rm-sdx-gateway/blob/master/src/main/java/uk/gov/ons/ctp/sdx/endpoint/ReceiptEndpoint.java
-- In SendToCollExQueueTest, you should not use setSampleUnitStateTransitionManager. You should remove this set method from SampleServiceImpl and find a way to autowire the object in test. If you can't find a solution, let me know and I can show you how to do it.
-        - to do it, see https://github.com/ONSdigital/kirona-drs-gateway/blob/master/src/test/java/uk/gov/ons/ctp/response/kirona/drs/service/impl/ReceiptServiceImplTest.java and how  ReceiptServiceImplTestConfig is used to inject the classes required.
-
-
 # Sample Service
 This repository contains the Sample service. This microservice is a RESTful web service implemented using [Spring Boot](http://projects.spring.io/spring-boot/) and has the following responsibilities:
 
