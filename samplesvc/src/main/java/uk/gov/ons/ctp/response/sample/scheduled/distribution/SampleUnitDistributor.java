@@ -31,6 +31,7 @@ import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 @Component
 @Slf4j
 public class SampleUnitDistributor {
+  private static final int E = -9999;
   public static final String SAMPLEUNIT_DISTRIBUTOR_SPAN = "sampleunitDistributor";
   public static final String SAMPLEUNIT_DISTRIBUTOR_LIST_ID = "sampleunit";
 
@@ -87,6 +88,10 @@ public class SampleUnitDistributor {
 
         List<Integer> excludedCases = sampleUnitDistributionListManager.findList(SAMPLEUNIT_DISTRIBUTOR_LIST_ID, false);
         log.debug("retrieve sample units excluding {}", excludedCases);
+        if (excludedCases.size()==0){
+          excludedCases.add(E);
+        }
+        
         
         sampleUnits = sampleUnitRepository.getSampleUnitBatch(job.getSurveyRef(),
             job.getExerciseDateTime(), SampleSummaryDTO.SampleState.ACTIVE.toString(),
@@ -122,7 +127,7 @@ public class SampleUnitDistributor {
       }
 
     } catch (Exception e) {
-      log.error("Failed to process sample units because {}", e.getMessage());
+      log.error("Failed to process sample units because {}", e);
     }
 
     distInfo.setSampleUnitsSucceeded(successes);
