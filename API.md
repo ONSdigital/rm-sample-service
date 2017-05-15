@@ -4,7 +4,7 @@ This page documents the Sample service API endpoints. These endpoints will be se
 ## Create Sample Unit Request
 * `POST /sampleunitrequests` creates a sample unit request.
 
-*Required parameters:* `collectionExerciseID` as the ID of the collection exercise, `collectionExerciseScheduledStart` as the date/time of the collection exercise and `surveyID` as the ID of the survey.
+**Required parameters:** `collectionExerciseID` as the ID of the collection exercise, `collectionExerciseScheduledStart` as the date/time of the collection exercise and `surveyID` as the ID of the survey.
 
 ### Example JSON Request
 ```json
