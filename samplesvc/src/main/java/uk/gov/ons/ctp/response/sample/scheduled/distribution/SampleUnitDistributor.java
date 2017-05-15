@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.sleuth.Span;
 import org.springframework.cloud.sleuth.Tracer;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +28,7 @@ import uk.gov.ons.ctp.response.sample.message.SampleUnitPublisher;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 
-@Service
+@Component
 @Slf4j
 public class SampleUnitDistributor {
   public static final String SAMPLEUNIT_DISTRIBUTOR_SPAN = "sampleunitDistributor";
@@ -90,7 +90,7 @@ public class SampleUnitDistributor {
 
         sampleUnits = sampleUnitRepository.getSampleUnitBatch(job.getSurveyRef(),
             job.getExerciseDateTime(), SampleSummaryDTO.SampleState.ACTIVE.toString(),
-            appConfig.getSampleDistribution().getRetrievalMax(), excludedCases);
+            appConfig.getSampleUnitDistribution().getRetrievalMax(), excludedCases);
 
         if (sampleUnits.size() > 0) {
           sampleUnitDistributionListManager.saveList(SAMPLEUNIT_DISTRIBUTOR_LIST_ID, sampleUnits.stream()

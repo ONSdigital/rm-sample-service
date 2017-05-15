@@ -140,6 +140,12 @@ redis:
   host: localhost
   port: 6379
 
+data-grid:
+  address: localhost:6379
+  list-time-to-live-seconds: 600
+  list-time-to-wait-seconds: 600
+  lock-time-to-live-seconds: 600
+
 messaging:
   pubMaxAttempts: 3
   

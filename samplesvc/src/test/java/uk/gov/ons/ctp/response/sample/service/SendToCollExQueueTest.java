@@ -87,7 +87,7 @@ public class SendToCollExQueueTest {
         when(sampleUnitRepository.findOne(3)).thenReturn(su2);
         SampleUnitDistribution sud = new SampleUnitDistribution();
         sud.setRetrievalMax(2);
-        when(appConfig.getSampleDistribution()).thenReturn(sud);
+        when(appConfig.getSampleUnitDistribution()).thenReturn(sud);
         when(mapperFacade.map(any(),any())).thenReturn(new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit());
         when(sampleUnitStateTransitionManager.transition(any(),any())).thenReturn(SampleUnitDTO.SampleUnitState.DELIVERED);
 

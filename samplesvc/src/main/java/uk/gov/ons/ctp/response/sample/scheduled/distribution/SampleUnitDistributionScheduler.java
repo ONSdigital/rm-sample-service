@@ -25,7 +25,7 @@ public class SampleUnitDistributionScheduler implements HealthIndicator {
   private SampleUnitDistributionInfo distribInfo = new SampleUnitDistributionInfo();
 
   
-  @Scheduled(fixedDelayString = "#{appConfig.sampleunitDistribution.delayMilliSeconds}")
+  @Scheduled(fixedDelayString = "#{appConfig.sampleUnitDistribution.delayMilliSeconds}")
   public void run() {
     try {
       distribInfo = sampleUnitDistributorImpl.distribute();
