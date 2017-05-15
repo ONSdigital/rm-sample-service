@@ -87,7 +87,7 @@ public class SampleUnitDistributor {
 
         List<Integer> excludedCases = sampleUnitDistributionListManager.findList(SAMPLEUNIT_DISTRIBUTOR_LIST_ID, false);
         log.debug("retrieve sample units excluding {}", excludedCases);
-
+        
         sampleUnits = sampleUnitRepository.getSampleUnitBatch(job.getSurveyRef(),
             job.getExerciseDateTime(), SampleSummaryDTO.SampleState.ACTIVE.toString(),
             appConfig.getSampleUnitDistribution().getRetrievalMax(), excludedCases);
