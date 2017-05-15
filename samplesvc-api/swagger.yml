@@ -35,10 +35,8 @@ paths:
       tags:
         - Sample
       responses:
-        200:
-          description: CollectionExerciseJob is created if there are eligible SampleUnits
         201:
-          description: No eligible SampleUnits for CollectionExerciseJob
+          description: CollectionExerciseJob is created if there are eligible SampleUnits
           schema:
             items:
               $ref: '#/definitions/SampleUnitsRequest'
