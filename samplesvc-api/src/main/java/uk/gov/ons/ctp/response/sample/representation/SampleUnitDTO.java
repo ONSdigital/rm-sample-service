@@ -33,7 +33,7 @@ public class SampleUnitDTO {
    */
   //TODO would be better to have (HOUSEHOLD,"H") and get CaseSvc to map with JPA so that in db the value is "H", but code refers to HOUSEHOLD
   public enum SampleUnitType {
-    H,HI,C,CI,B,BI
+    H, HI, C, CI, B, BI
   }
 
   private Integer sampleUnitId;
