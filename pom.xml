@@ -45,14 +45,14 @@
 
   <build>
     <pluginManagement>
-    <plugins>
-      <plugin>
-        <groupId>uk.gov.ons.ctp.product</groupId>
-        <artifactId>rm-common-config</artifactId>
-        <version>${commonbom.version}</version>
-      </plugin>
-    </plugins>
-  </pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>uk.gov.ons.ctp.product</groupId>
+          <artifactId>rm-common-config</artifactId>
+          <version>${commonbom.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <defaultGoal>clean install</defaultGoal>
     <plugins>
       <plugin>
