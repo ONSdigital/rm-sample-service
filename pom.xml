@@ -43,43 +43,6 @@
     <url>scm:git:git@192.168.11.106:ctp/rrm-sample-service.git</url>
   </scm>
 
-  <dependencies>
-        <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-    </dependency>
-
-        <dependency>
-      <groupId>uk.gov.ons.ctp.common</groupId>
-      <artifactId>framework</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>uk.gov.ons.ctp.common</groupId>
-      <artifactId>test-framework</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>ma.glasnost.orika</groupId>
-      <artifactId>orika-core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>ma.glasnost.orika</groupId>
-      <artifactId>orika-eclipse-tools</artifactId>
-    </dependency><dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-  </dependencies>
-
   <build>
     <pluginManagement>
     <plugins>
