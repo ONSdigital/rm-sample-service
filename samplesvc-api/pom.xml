@@ -4,7 +4,6 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>samplesvc-api</artifactId>
-  <version>10.37.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>CTP : ResponseManagement : SampleSvcApi</name>
@@ -18,16 +17,30 @@
   </parent>
 
   <dependencies>
+
     <dependency>
       <groupId>net.codesup.util</groupId>
       <artifactId>jaxb2-rich-contract-plugin</artifactId>
       <version>1.15.0</version>
     </dependency>
+
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
       <version>3.4</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -178,41 +191,41 @@
             </configuration>
           </execution>
           <execution>
-          <phase>generate-sources</phase>
-          <id>outbound-xjc-gen</id>
-          <goals>
-            <goal>generate</goal>
-          </goals>
-          <configuration>
-            <bindingDirectory>src/main/resources/xsd</bindingDirectory>
-            <bindingIncludes>
-              <include>sample-unit.xjb</include>
-            </bindingIncludes>
-            <schemaDirectory>src/main/resources/xsd</schemaDirectory>
-            <schemaIncludes>
-              <include>sample-unit.xsd</include>
-            </schemaIncludes>
-            <generateDirectory>${project.build.directory}/generated-sources/xjc/outbound</generateDirectory>
-            <args>
-              <arg>-Xvalue-constructor</arg>
-              <arg>-Xfluent-builder</arg>
-              <arg>-generateTools=n</arg>
-            </args>
-            <plugins>
-              <plugin>
-                <groupId>net.codesup.util</groupId>
-                <artifactId>jaxb2-rich-contract-plugin</artifactId>
-                <version>1.15.0</version>
-              </plugin>
-              <plugin>
-                <groupId>org.jvnet.jaxb2_commons</groupId>
-                <artifactId>jaxb2-value-constructor</artifactId>
-                <version>3.0</version>
-              </plugin>
-            </plugins>
-          </configuration>
-        </execution>
-      </executions>
+            <phase>generate-sources</phase>
+            <id>outbound-xjc-gen</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <bindingDirectory>src/main/resources/xsd</bindingDirectory>
+              <bindingIncludes>
+                <include>sample-unit.xjb</include>
+              </bindingIncludes>
+              <schemaDirectory>src/main/resources/xsd</schemaDirectory>
+              <schemaIncludes>
+                <include>sample-unit.xsd</include>
+              </schemaIncludes>
+              <generateDirectory>${project.build.directory}/generated-sources/xjc/outbound</generateDirectory>
+              <args>
+                <arg>-Xvalue-constructor</arg>
+                <arg>-Xfluent-builder</arg>
+                <arg>-generateTools=n</arg>
+              </args>
+              <plugins>
+                <plugin>
+                  <groupId>net.codesup.util</groupId>
+                  <artifactId>jaxb2-rich-contract-plugin</artifactId>
+                  <version>1.15.0</version>
+                </plugin>
+                <plugin>
+                  <groupId>org.jvnet.jaxb2_commons</groupId>
+                  <artifactId>jaxb2-value-constructor</artifactId>
+                  <version>3.0</version>
+                </plugin>
+              </plugins>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
