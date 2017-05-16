@@ -10,7 +10,7 @@ This page documents the Sample service API endpoints. These endpoints will be se
 ```json
 {
   "collectionExerciseID": "c6467711-21eb-4e78-804c-1db8392f93fb",
-  "collectionExerciseScheduledStart": "2017-06-01T00:00:00Z",
+  "collectionExerciseActualPublish": "2017-06-01T00:00:00Z",
   "surveyID": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"
 }
 ```
@@ -22,4 +22,4 @@ This page documents the Sample service API endpoints. These endpoints will be se
 }
 ```
 
-An `HTTP 201 Created` status code is returned if the sample unit request creation was a success. An `HTTP 400 Bad Request` is returned if any of the required parameters are missing.
+An `HTTP 201 Created` status code is returned if the sample unit request creation was a success. An `HTTP 400 Bad Request` is returned if any of the required parameters are missing, or if a sample unit request already exists for the same criteria.
