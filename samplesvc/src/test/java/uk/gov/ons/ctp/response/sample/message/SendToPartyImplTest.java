@@ -11,7 +11,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import uk.gov.ons.ctp.response.party.definition.Party;
-import uk.gov.ons.ctp.response.sample.message.impl.SendToPartyImpl;
+import uk.gov.ons.ctp.response.sample.message.impl.PartyPublisherImpl;
 
 /**
  * To unit test CaseReceiptReceiverImpl
@@ -20,7 +20,7 @@ import uk.gov.ons.ctp.response.sample.message.impl.SendToPartyImpl;
 public class SendToPartyImplTest {
 
 	 @InjectMocks
-	 SendToPartyImpl sendToParty;
+	 PartyPublisherImpl sendToParty;
 	 
 	 @Mock 
 	 RabbitTemplate rabbitTemplate;
@@ -35,7 +35,7 @@ public class SendToPartyImplTest {
     partyDTO.setSampleUnitType("H");
     partyDTO.setSize(1);
     
-    sendToParty.send(partyDTO);
+    sendToParty.publish(partyDTO);
     
     verify(rabbitTemplate, times(1)).convertAndSend(partyDTO);
   }

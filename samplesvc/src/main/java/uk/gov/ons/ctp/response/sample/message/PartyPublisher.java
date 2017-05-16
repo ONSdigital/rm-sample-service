@@ -4,12 +4,12 @@ import uk.gov.ons.ctp.response.party.definition.Party;
 /**
  * The publisher to queues
  */
-public interface SendToParty {
+public interface PartyPublisher {
   /**
-   * To publish a caseReceipt to queue
+   * To publish a Party to queue
    * @param partyDTO to be sent
    */
-  void send(Party partyDTO);
+  void publish(Party partyDTO);
 }
 
 

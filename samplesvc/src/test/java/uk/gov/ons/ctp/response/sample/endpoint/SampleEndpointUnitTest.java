@@ -1,7 +1,8 @@
 package uk.gov.ons.ctp.response.sample.endpoint;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.Is.isA;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.isA;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -15,16 +16,21 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.RestExceptionHandler;
 import uk.gov.ons.ctp.common.jackson.CustomObjectMapper;
-import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
+import uk.gov.ons.ctp.response.sample.SampleBeanMapper;
+import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
+import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
+//github.com/ONSdigital/rm-sample-service.git
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 public class SampleEndpointUnitTest{
@@ -39,11 +45,15 @@ public class SampleEndpointUnitTest{
   @Mock
   private SampleService sampleService;
   
+  @Spy
+  private MapperFacade mapperFacade = new SampleBeanMapper();
   
   private MockMvc mockMvc;
-  private List<CollectionExerciseJobCreationRequestDTO> collectionExerciseRequests;
 
-  
+  private List<SampleSummary> sampleSummaryResults;
+
+  private List<CollectionExerciseJob> collectionExerciseRequests;
+
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
@@ -53,13 +63,12 @@ public class SampleEndpointUnitTest{
         .setMessageConverters(new MappingJackson2HttpMessageConverter(new CustomObjectMapper()))
         .build();
     
-    this.collectionExerciseRequests = FixtureHelper.loadClassFixtures(CollectionExerciseJobCreationRequestDTO[].class);
-
+    this.collectionExerciseRequests = FixtureHelper.loadClassFixtures(CollectionExerciseJob[].class);
   }
   
   @Test
   public void getSampleSummaryValidJSON() throws Exception{
-    when(sampleService.initialiseCollectionExerciseJob(collectionExerciseRequests.get(0))).thenReturn(4);
+    when(sampleService.initialiseCollectionExerciseJob(any())).thenReturn(4);
      
     ResultActions actions = mockMvc.perform(postJson(String.format("/samples/sampleunitrequests"), SAMPLE_VALIDJSON));
     

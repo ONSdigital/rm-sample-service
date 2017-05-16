@@ -21,10 +21,8 @@ public class CollectionExerciseJobImpl implements CollectionExerciseJobService {
   private CollectionExerciseJobRepository collectionExerciseJobRepository;
 
   @Override
-  public void processCollectionExerciseJob(CollectionExerciseJob collectionExerciseJob) throws CTPException {
-
+  public void storeCollectionExerciseJob(CollectionExerciseJob collectionExerciseJob) throws CTPException {
     int collectionExerciseId = collectionExerciseJob.getCollectionExerciseId();
-
     if (collectionExerciseJobRepository.findOne(collectionExerciseId) == null) {
       collectionExerciseJobRepository.saveAndFlush(collectionExerciseJob);
     } else {
@@ -32,7 +30,5 @@ public class CollectionExerciseJobImpl implements CollectionExerciseJobService {
       throw new CTPException(Fault.BAD_REQUEST,
           "CollectionExerciseId %s already exists in the collectionexercisejob table", collectionExerciseId);
     }
-
   }
-
 }

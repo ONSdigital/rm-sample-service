@@ -8,6 +8,8 @@ This repository contains the Sample service. This microservice is a RESTful web 
 * Receiving confirmation from the Party service once it has consumed/stored the sample units sent above, and marking the sample summary as ready for collection
 * Providing on request the sample summaries matching a given criteria to the Collection Exercise service
 
+[API documentation](https://github.com/ONSdigital/rm-sample-service/blob/master/API.md).
+
 ## Prerequisites
 
 * To run this project you must have the following running:
@@ -50,6 +52,9 @@ This repository contains the Sample service. This microservice is a RESTful web 
 * to add a collectionExerciseJob to the postgres database
 
       curl -H "Content-Type: application/json" -X POST -d '{ "collectionExerciseId" : "4","surveyRef" : "str1234","exerciseDateTime" : "2012-12-13T12:12:12.000+00" }' http://localhost:8125/samples/sampleunitrequests
+
+## API
+See [API.md](https://github.com/ONSdigital/rm-sample-service/blob/master/API.md) for API documentation.
 
 ## Copyright
 Copyright (C) 2017 Crown Copyright (Office for National Statistics)
