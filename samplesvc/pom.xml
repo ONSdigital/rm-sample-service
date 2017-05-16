@@ -102,32 +102,9 @@
       <optional>true</optional>
     </dependency>
 
-    <dependency>
-      <groupId>uk.gov.ons.ctp.common</groupId>
-      <artifactId>framework</artifactId>
-    </dependency>
 
-    <dependency>
-      <groupId>uk.gov.ons.ctp.common</groupId>
-      <artifactId>test-framework</artifactId>
-      <scope>test</scope>
-    </dependency>
 
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>ma.glasnost.orika</groupId>
-      <artifactId>orika-core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>ma.glasnost.orika</groupId>
-      <artifactId>orika-eclipse-tools</artifactId>
-    </dependency>
+ 
 
   </dependencies>
 
@@ -146,10 +123,6 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-        <version>1.5.3.RELEASE</version>
-        <!--
-        <version>${springboot.version}</version>
-        -->
         <configuration>
           <executable>true</executable>
           <requiresUnpack>

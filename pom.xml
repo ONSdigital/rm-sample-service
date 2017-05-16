@@ -11,6 +11,7 @@
   <description>CTP : SampleService</description>
 
   <properties>
+    <commonbom.version>10.38.0-SNAPSHOT</commonbom.version>
     <skip.integration.tests>true</skip.integration.tests>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.plugin.version>3.5.1</maven.compiler.plugin.version>
@@ -29,7 +30,7 @@
       <dependency>
         <groupId>uk.gov.ons.ctp.product</groupId>
         <artifactId>rm-common-config</artifactId>
-        <version>10.38.0-SNAPSHOT</version>
+        <version>${commonbom.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -43,9 +44,52 @@
   </scm>
 
   <dependencies>
+        <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
+
+        <dependency>
+      <groupId>uk.gov.ons.ctp.common</groupId>
+      <artifactId>framework</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>uk.gov.ons.ctp.common</groupId>
+      <artifactId>test-framework</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ma.glasnost.orika</groupId>
+      <artifactId>orika-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>ma.glasnost.orika</groupId>
+      <artifactId>orika-eclipse-tools</artifactId>
+    </dependency><dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
   </dependencies>
 
   <build>
+    <pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>uk.gov.ons.ctp.product</groupId>
+        <artifactId>rm-common-config</artifactId>
+        <version>${commonbom.version}</version>
+      </plugin>
+    </plugins>
+  </pluginManagement>
     <defaultGoal>clean install</defaultGoal>
     <plugins>
       <plugin>
