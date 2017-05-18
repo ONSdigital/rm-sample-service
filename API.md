@@ -15,7 +15,7 @@ This page documents the Sample service API endpoints. These endpoints will be se
 }
 ```
 
-### Example JSON  Response
+### Example JSON Response
 ```json
 {
   "sampleUnitsTotal": "670"
