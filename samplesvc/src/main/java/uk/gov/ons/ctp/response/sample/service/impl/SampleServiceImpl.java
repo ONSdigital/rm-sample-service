@@ -116,7 +116,7 @@ public class SampleServiceImpl implements SampleService {
       sampleUnit.setSampleId(sampleSummary.getSampleId());
       sampleUnit.setSampleUnitRef(sampleUnitBase.getSampleUnitRef());
       sampleUnit.setSampleUnitType(sampleUnitBase.getSampleUnitType());
-      sampleUnit.setFormType("formtype_tbd");
+      sampleUnit.setFormType("formtype");
       sampleUnit.setState(SampleUnitDTO.SampleUnitState.INIT);
 
       sampleUnitRepository.save(sampleUnit);
