@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://ons.gov.uk/ctp/response/sampleunit/definition"
             targetNamespace="http://ons.gov.uk/ctp/response/sampleunit/definition">
-    <xsd:include schemaLocation="types-common.xsd" />
+
 
     <xsd:element name="sampleUnit" type="SampleUnit" />
-
 
     <xsd:complexType name="SampleUnit">
         <xsd:sequence>
