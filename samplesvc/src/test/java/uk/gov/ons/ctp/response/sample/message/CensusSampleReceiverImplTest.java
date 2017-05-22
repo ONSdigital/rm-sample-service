@@ -17,6 +17,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 
+import uk.gov.ons.ctp.common.xml.ValidatingXmlUnmarshaller;
 import uk.gov.ons.ctp.response.sample.definition.CensusSampleUnit;
 import uk.gov.ons.ctp.response.sample.definition.CensusSurveySample;
 import uk.gov.ons.ctp.response.sample.message.impl.CensusSampleReceiverImpl;
@@ -38,19 +39,16 @@ public class CensusSampleReceiverImplTest {
 
   @Test
   public void TestProcessSample() throws Exception{
-    
-    File file = new File("src/test/resources/uk/gov/ons/ctp/response/sample/service/impl/census-survey-sample.xml");
-    JAXBContext jaxbContext = JAXBContext.newInstance(CensusSurveySample.class);
+		String xmlFileLocation = "src/test/resources/uk/gov/ons/ctp/response/sample/service/impl/census-survey-sample.xml";
 
-    Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-    CensusSurveySample sample = (CensusSurveySample) jaxbUnmarshaller.unmarshal(file);
-    
-    String load = "";
-    
-    final Message<String> message = MessageBuilder.withPayload(load).setHeader("file_name", file).build();
-    
+	  ValidatingXmlUnmarshaller<CensusSurveySample> unmarshaller = new ValidatingXmlUnmarshaller<CensusSurveySample>(
+	      "xsd/inbound",
+	      "census-survey-sample.xsd",
+	      CensusSurveySample.class);
+	  CensusSurveySample sample = unmarshaller.unmarshal(xmlFileLocation);
     List<CensusSampleUnit> samplingUnitList = sample.getSampleUnits().getCensusSampleUnits();
     
+		File file = new File(xmlFileLocation);
     HashMap<String,Object> map = new HashMap<String,Object>();
     map.put("file_name", file.getAbsolutePath());
     

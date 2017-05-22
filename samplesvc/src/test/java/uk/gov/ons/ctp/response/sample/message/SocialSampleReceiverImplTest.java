@@ -6,17 +6,13 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.support.MessageBuilder;
 
+import uk.gov.ons.ctp.common.xml.ValidatingXmlUnmarshaller;
 import uk.gov.ons.ctp.response.sample.definition.SocialSampleUnit;
 import uk.gov.ons.ctp.response.sample.definition.SocialSurveySample;
 import uk.gov.ons.ctp.response.sample.message.impl.SocialSampleReceiverImpl;
@@ -39,18 +35,16 @@ public class SocialSampleReceiverImplTest {
   @Test
   public void TestProcessSample() throws Exception{
     
-    File file = new File("src/test/resources/uk/gov/ons/ctp/response/sample/service/impl/social-survey-sample.xml");
-    JAXBContext jaxbContext = JAXBContext.newInstance(SocialSurveySample.class);
+		String xmlFileLocation = "src/test/resources/uk/gov/ons/ctp/response/sample/service/impl/social-survey-sample.xml";
 
-    Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-    SocialSurveySample sample = (SocialSurveySample) jaxbUnmarshaller.unmarshal(file);
-    
-    String load = "";
-    
-    final Message<String> message = MessageBuilder.withPayload(load).setHeader("file_name", file).build();
-    
+	  ValidatingXmlUnmarshaller<SocialSurveySample> unmarshaller = new ValidatingXmlUnmarshaller<SocialSurveySample>(
+	      "xsd/inbound",
+	      "social-survey-sample.xsd",
+	      SocialSurveySample.class);
+	  SocialSurveySample sample = unmarshaller.unmarshal(xmlFileLocation);
     List<SocialSampleUnit> samplingUnitList = sample.getSampleUnits().getSocialSampleUnits();
     
+		File file = new File(xmlFileLocation);
     HashMap<String,Object> map = new HashMap<String,Object>();
     map.put("file_name", file.getAbsolutePath());
     
