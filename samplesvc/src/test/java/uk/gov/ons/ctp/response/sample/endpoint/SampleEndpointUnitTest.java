@@ -35,9 +35,7 @@ import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 public class SampleEndpointUnitTest{
   private static final String SAMPLE_VALIDJSON = "{ \"collectionExerciseId\" : \"1\", \"surveyRef\" : \"str1234\", \"exerciseDateTime\" : \"2012-12-13T12:12:12.000+0000\" }";
-  private static final String SAMPLE_INVALIDJSON1 = "{ \"collectionExerciseId\" : \"2\", \"surveyRef\" : \"str1234\", \"exerciseDateTime\" : \"201.000+0000\" }";
-  private static final String SAMPLE_INVALIDJSON2 = "{ \"collectionExerciseId\" : \"\", \"surveyRef\" : \"str1234\", \"exerciseDateTime\" : \"2012-12-13T12:12:12.000+0000\" }";
-  
+  private static final String SAMPLE_INVALIDJSON = "{ \"collectionExerciseId\" : \"2\", \"surveyRef\" : \"str1234\", \"exerciseDateTime\" : \"201.000+0000\" }";
   
   @InjectMocks
   private SampleEndpoint sampleEndpoint;
@@ -79,22 +77,12 @@ public class SampleEndpointUnitTest{
 
   @Test
   public void acknowledgeReceiptBadJsonProvidedScenario1() throws Exception {
-    ResultActions actions = mockMvc.perform(postJson(String.format("/samples/sampleunitrequests"), SAMPLE_INVALIDJSON1));
+    ResultActions actions = mockMvc.perform(postJson(String.format("/samples/sampleunitrequests"), SAMPLE_INVALIDJSON));
 
     actions.andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.error.code", is(CTPException.Fault.VALIDATION_FAILED.name())))
         .andExpect(jsonPath("$.error.timestamp", isA(String.class)))
         .andExpect(jsonPath("$.error.message", is("Provided json is incorrect.")));
-  }
-  
-  @Test
-  public void acknowledgeReceiptBadJsonProvidedScenario2() throws Exception {
-    ResultActions actions = mockMvc.perform(postJson(String.format("/samples/sampleunitrequests"), SAMPLE_INVALIDJSON2));
-
-    actions.andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.error.code", is(CTPException.Fault.VALIDATION_FAILED.name())))
-        .andExpect(jsonPath("$.error.timestamp", isA(String.class)))
-        .andExpect(jsonPath("$.error.message", is("Provided json fails validation.")));
   }
   
 }
