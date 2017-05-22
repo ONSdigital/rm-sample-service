@@ -38,7 +38,7 @@
     </int:header-enricher>
 
     <int-xml:validating-filter id="xmlValidatorBusiness" input-channel="xmlBusinessAddedHeader"
-                                output-channel="xmlValidBusiness" schema-location="classpath:xsd/business-survey-sample.xsd" throw-exception-on-rejection="true"/>
+                                output-channel="xmlValidBusiness" schema-location="classpath:xsd/arse/business-survey-sample.xsd" throw-exception-on-rejection="true"/>
        
     <int-xml:unmarshalling-transformer input-channel="xmlValidBusiness" output-channel="xmlTransformedBusiness" unmarshaller="unmarshallerBusiness" />
     

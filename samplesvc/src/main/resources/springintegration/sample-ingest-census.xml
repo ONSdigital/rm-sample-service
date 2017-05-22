@@ -38,7 +38,7 @@
     </int:header-enricher>
 
     <int-xml:validating-filter id="xmlValidatorCensus" input-channel="xmlCensusAddedHeader"
-                                output-channel="xmlValidCensus" schema-location="classpath:xsd/census-survey-sample.xsd" throw-exception-on-rejection="true"/>
+                                output-channel="xmlValidCensus" schema-location="classpath:xsd/inbound/census-survey-sample.xsd" throw-exception-on-rejection="true"/>
        
     <int-xml:unmarshalling-transformer input-channel="xmlValidCensus" output-channel="xmlTransformedCensus" unmarshaller="unmarshallerCensus" />
     

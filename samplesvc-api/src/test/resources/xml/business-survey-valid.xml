@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <p:businessSurveySample xmlns:p="http://ons.gov.uk/ctp/response/sample/definition" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ons.gov.uk/ctp/response/sample/definition business-survey-sample.xsd ">
-
   <surveyRef>str1234</surveyRef>
   <collectionExerciseRef>str1234</collectionExerciseRef>
   <effectiveStartDateTime>2012-12-13T12:12:12</effectiveStartDateTime>
