@@ -7,8 +7,6 @@ import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
-import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
-import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 
 /**
  * The SampleService interface defines all business behaviours for operations on
