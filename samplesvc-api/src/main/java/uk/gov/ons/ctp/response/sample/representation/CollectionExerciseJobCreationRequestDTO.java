@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 public class CollectionExerciseJobCreationRequestDTO {
 
   @NotNull
-  private Integer collectionExerciseId;
+  private String collectionExerciseId;
 
   @NotNull
   private String surveyRef;
