@@ -35,17 +35,17 @@ public class SampleUnit implements Serializable {
   private static final long serialVersionUID = 7778360895016862172L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "sampleunitidseq_gen")
-  @GenericGenerator(name = "sampleunitidseq_gen", strategy =
+  @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "sampleunitseq_gen")
+  @GenericGenerator(name = "sampleunitseq_gen", strategy =
   "org.hibernate.id.enhanced.SequenceStyleGenerator", parameters = {
-      @Parameter(name = "sequence_name", value = "sample.sampleunitidseq"),
+      @Parameter(name = "sequence_name", value = "sample.sampleunitseq"),
       @Parameter(name = "increment_size", value = "1")
   })
-  @Column(name = "sampleunitid")
-  private Integer sampleUnitId;
+  @Column(name = "sampleunitpk")
+  private Integer sampleUnitPK;
 
-  @Column(name = "sampleid")
-  private Integer sampleId;
+  @Column(name = "samplesummaryfk")
+  private Integer sampleSummaryFK;
 
   @Column(name = "sampleunitref")
   private String sampleUnitRef;

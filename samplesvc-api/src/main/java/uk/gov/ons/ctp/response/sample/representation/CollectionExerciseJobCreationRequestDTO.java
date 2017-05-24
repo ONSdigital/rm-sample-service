@@ -1,6 +1,7 @@
 package uk.gov.ons.ctp.response.sample.representation;
 
 import java.util.Date;
+import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
 
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 public class CollectionExerciseJobCreationRequestDTO {
 
   @NotNull
-  private String collectionExerciseId;
+  private UUID collectionExerciseId;
 
   @NotNull
   private String surveyRef;

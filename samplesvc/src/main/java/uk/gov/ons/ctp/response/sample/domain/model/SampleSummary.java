@@ -42,8 +42,8 @@ public class SampleSummary implements Serializable {
       @Parameter(name = "sequence_name", value = "sample.samplesummaryseq"),
       @Parameter(name = "increment_size", value = "1")
   })
-  @Column(name = "sampleid")
-  private Integer sampleId;
+  @Column(name = "samplesummarypk")
+  private Integer sampleSummaryPK;
 
   @Column(name = "surveyref")
   private String surveyRef;

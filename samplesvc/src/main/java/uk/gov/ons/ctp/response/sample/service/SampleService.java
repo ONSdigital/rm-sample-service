@@ -25,18 +25,18 @@ public interface SampleService {
   /**
    * Find SampleSummary entity by sampleid
    *
-   * @param sampleId The sampleId
+   * @param sampleSummaryPK The sampleSummaryPK
    * @return SampleSummary object or null
    */
-  SampleSummary findSampleSummaryBySampleId(Integer sampleId);
+  SampleSummary findSampleSummaryBySampleSummaryPK(Integer sampleSummaryPK);
 
   /**
    * Update the SampleSummary state
    *
-   * @param sampleId The sampleId
+   * @param sampleSummaryPK The sampleSummaryPK
    * @return SampleSummary object or null
    */
-  SampleSummary activateSampleSummaryState(Integer sampleId);
+  SampleSummary activateSampleSummaryState(Integer sampleSummaryPK);
 
 
   /**

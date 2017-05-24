@@ -10,6 +10,7 @@ import static uk.gov.ons.ctp.common.MvcHelper.postJson;
 import static uk.gov.ons.ctp.common.utility.MockMvcControllerAdviceHelper.mockAdviceFor;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -34,8 +35,8 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 public class SampleEndpointUnitTest{
-  private static final String SAMPLE_VALIDJSON = "{ \"collectionExerciseId\" : \"1\", \"surveyRef\" : \"str1234\", \"exerciseDateTime\" : \"2012-12-13T12:12:12.000+0000\" }";
-  private static final String SAMPLE_INVALIDJSON = "{ \"collectionExerciseId\" : \"2\", \"surveyRef\" : \"str1234\", \"exerciseDateTime\" : \"201.000+0000\" }";
+  private static final String SAMPLE_VALIDJSON = "{ \"collectionExerciseId\" : \"c6467711-21eb-4e78-804c-1db8392f93fb\", \"surveyRef\" : \"str1234\", \"exerciseDateTime\" : \"2012-12-13T12:12:12.000+0000\" }";
+  private static final String SAMPLE_INVALIDJSON = "{ \"collectionExerciseId\" : \"c6467711-21eb-4e78-804c-1db8393f93fb\", \"surveyRef\" : \"str1234\", \"exerciseDateTime\" : \"201.000+0000\" }";
   
   @InjectMocks
   private SampleEndpoint sampleEndpoint;
@@ -67,7 +68,7 @@ public class SampleEndpointUnitTest{
   @Test
   public void getSampleSummaryValidJSON() throws Exception{
     when(sampleService.initialiseCollectionExerciseJob(any())).thenReturn(4);
-     
+
     ResultActions actions = mockMvc.perform(postJson(String.format("/samples/sampleunitrequests"), SAMPLE_VALIDJSON));
     
     actions.andExpect(status().isCreated());

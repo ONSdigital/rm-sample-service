@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -76,9 +77,10 @@ public class SendToCollExQueueTest {
     
     @Test
     public void verifySendingSampleUnitsToQueueAddsThemToQueueAndChangesStateToDelivered() throws Exception{
-        when(collectionExerciseJobRepository.findAll()).thenReturn(Collections.singletonList(new CollectionExerciseJob(1,"str1234",new Timestamp(0),new Timestamp(0))));
-        SampleUnit su1 = SampleUnit.builder().sampleId(1).sampleUnitId(2).sampleUnitRef("str1234").sampleUnitType("H").state(SampleUnitDTO.SampleUnitState.INIT).build();
-        SampleUnit su2 = SampleUnit.builder().sampleUnitId(3).build();
+        UUID cEId = UUID.randomUUID();
+        when(collectionExerciseJobRepository.findAll()).thenReturn(Collections.singletonList(new CollectionExerciseJob(1,cEId,"str1234",new Timestamp(0),new Timestamp(0))));
+        SampleUnit su1 = SampleUnit.builder().sampleSummaryFK(1).sampleUnitPK(2).sampleUnitRef("str1234").sampleUnitType("H").state(SampleUnitDTO.SampleUnitState.INIT).build();
+        SampleUnit su2 = SampleUnit.builder().sampleUnitPK(3).build();
         List<SampleUnit> suList = new ArrayList<>();
         suList.add(su1);
         suList.add(su2);

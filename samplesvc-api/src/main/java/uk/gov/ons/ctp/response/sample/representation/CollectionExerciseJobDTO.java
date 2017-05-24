@@ -1,6 +1,7 @@
 package uk.gov.ons.ctp.response.sample.representation;
 
 import java.util.Date;
+import java.util.UUID;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ import lombok.NoArgsConstructor;
 
 public class CollectionExerciseJobDTO {
 
-  private Integer collectionExerciseId;
+  private UUID collectionExerciseId;
 
   private String surveyRef;
 

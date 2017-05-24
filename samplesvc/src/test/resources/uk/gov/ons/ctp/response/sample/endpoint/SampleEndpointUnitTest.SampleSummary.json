@@ -1,5 +1,5 @@
 {
-  "sampleId": 5,
+  "sampleSummaryPK": 5,
   "surveyRef": "survey",
   "effectiveStartDateTime": "2012-12-13T12:12:12.000Z",
   "effectiveEndDateTime": "2012-12-13T12:12:12.000Z",

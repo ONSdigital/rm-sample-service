@@ -30,7 +30,7 @@ public class SampleSummaryDTO {
     ACTIVATED
   }
 
-  private Integer sampleId;
+  private Integer sampleSummaryPK;
 
   private Date effectiveStartDateTime;
 

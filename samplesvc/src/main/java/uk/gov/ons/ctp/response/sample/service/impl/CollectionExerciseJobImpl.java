@@ -10,6 +10,8 @@ import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.repository.CollectionExerciseJobRepository;
 import uk.gov.ons.ctp.response.sample.service.CollectionExerciseJobService;
 
+import java.util.UUID;
+
 /**
  * Accept feedback from handlers
  */
@@ -22,8 +24,8 @@ public class CollectionExerciseJobImpl implements CollectionExerciseJobService {
 
   @Override
   public void storeCollectionExerciseJob(CollectionExerciseJob collectionExerciseJob) throws CTPException {
-    int collectionExerciseId = collectionExerciseJob.getCollectionExerciseId();
-    if (collectionExerciseJobRepository.findOne(collectionExerciseId) == null) {
+    UUID collectionExerciseId = collectionExerciseJob.getCollectionExerciseId();
+    if (collectionExerciseJobRepository.findByCollectionExerciseId(collectionExerciseId) == null) {
       collectionExerciseJobRepository.saveAndFlush(collectionExerciseJob);
     } else {
       log.debug("CollectionExerciseId {} already exists in the collectionexercisejob table", collectionExerciseId);

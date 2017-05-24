@@ -99,7 +99,7 @@ public class SampleUnitDistributor {
 
         if (sampleUnits.size() > 0) {
           sampleUnitDistributionListManager.saveList(SAMPLEUNIT_DISTRIBUTOR_LIST_ID, sampleUnits.stream()
-              .map(su -> su.getSampleUnitId())
+              .map(su -> su.getSampleUnitPK())
               .collect(Collectors.toList()), true);
         }
 
@@ -113,7 +113,7 @@ public class SampleUnitDistributor {
             // single case/questionnaire db changes rolled back
             log.error(
                 "Exception {} thrown processing sampleunit {}. Processing postponed",
-                e.getMessage(), sampleUnit.getSampleUnitId());
+                e.getMessage(), sampleUnit.getSampleUnitPK());
             failures++;
           }
         }
@@ -140,12 +140,12 @@ public class SampleUnitDistributor {
   @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
   private void sendSampleUnitToCollectionExcerciseQueue(SampleUnit sampleUnit,
       uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit) {
-    transitionSampleUnitStateFromDeliveryEvent(sampleUnit.getSampleUnitId());
+    transitionSampleUnitStateFromDeliveryEvent(sampleUnit.getSampleUnitPK());
     sampleUnitPublisher.send(mappedSampleUnit);
   }
 
-  public SampleUnit transitionSampleUnitStateFromDeliveryEvent(Integer sampleUnitId) {
-    SampleUnit targetSampleUnit = sampleUnitRepository.findOne(sampleUnitId);
+  public SampleUnit transitionSampleUnitStateFromDeliveryEvent(Integer sampleUnitPK) {
+    SampleUnit targetSampleUnit = sampleUnitRepository.findOne(sampleUnitPK);
     SampleUnitDTO.SampleUnitState newState = sampleUnitStateTransitionManager.transition(targetSampleUnit.getState(),
         SampleUnitDTO.SampleUnitEvent.DELIVERING);
     targetSampleUnit.setState(newState);

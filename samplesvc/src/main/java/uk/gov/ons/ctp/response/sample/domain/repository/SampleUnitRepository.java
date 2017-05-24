@@ -17,32 +17,32 @@ import java.util.List;
 public interface SampleUnitRepository extends JpaRepository<SampleUnit, Integer> {
 
   /**
-   * Find SampleUnit entity by sampleid
+   * Find SampleUnit entity by samplesummaryfk
    *
-   * @param sampleId The sampleId
+   * @param sampleSummaryFK The sampleSummaryFK
    * @return SampleUnit object or null
    */
-  List<SampleUnit> findBySampleId(Integer sampleId);
+  List<SampleUnit> findBySampleSummaryFK(Integer sampleSummaryFK);
 
   /**
-   * Count SampleUnit entity by sampleid
+   * Count SampleUnit entity by samplesummaryfk
    *
-   * @param sampleId The sampleId
-   * @return Integer number of SampleUnits with sampleId
+   * @param sampleSummaryFK The sampleSummaryFK
+   * @return Integer number of SampleUnits with sampleSummaryFK
    */
-  Integer countBySampleId(Integer sampleId);
+  Integer countBySampleSummaryFK(Integer sampleSummaryFK);
 
   /**
-   * find list of samples by sampleID, surveyref, exerciseDateTime, and state limited by count
+   * find list of samples by sampleSummaryFK, surveyref, exerciseDateTime, and state limited by count
    * @param surveyRef to find by
    * @param excerciseDateTime to find by
    * @param state state to search by
    * @param count configurable number of entries to fetch
    * @return SampleUnit list of mathcing sample units or null if not found
    */
-  @Query(value = "SELECT su.* FROM sample.sampleunit su ,sample.samplesummary ss WHERE su.sampleid = ss.sampleid "
+  @Query(value = "SELECT su.* FROM sample.sampleunit su ,sample.samplesummary ss WHERE su.samplesummaryfk = ss.samplesummarypk "
           + "AND ss.effectivestartdatetime = :exercisedatetime AND ss.state = :state AND su.state = 'INIT' "
-          + "AND ss.surveyref = :surveyref AND su.sampleunitid  NOT IN ( :excludedcases ) order by ss.ingestdatetime ASC limit :count  ;",
+          + "AND ss.surveyref = :surveyref AND su.sampleunitpk  NOT IN ( :excludedcases ) order by ss.ingestdatetime ASC limit :count  ;",
           nativeQuery = true)
   List<SampleUnit> getSampleUnitBatch(@Param("surveyref") String surveyRef,
                                       @Param("exercisedatetime") Timestamp excerciseDateTime,

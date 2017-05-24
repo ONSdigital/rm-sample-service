@@ -9,5 +9,5 @@ curl http://localhost:8125/mgmt/samples -v -X GET
 
 
 - To test your endpoint:
-curl -H "Accept: application/json" -H "Content-Type: application/json" http://localhost:8125/mgmt/samples/sampleunitrequests -v -X POST -d "{\"collectionExerciseId\":\"1\", \"surveyRef\":\"str1234\", \"exerciseDateTime\":\"2012-12-13T12:12:12.000+00\"}"
+curl -H "Accept: application/json" -H "Content-Type: application/json" http://localhost:8125/mgmt/samples/sampleunitrequests -v -X POST -d "{\"collectionExerciseJobPK\":\"1\", \"surveyRef\":\"str1234\", \"exerciseDateTime\":\"2012-12-13T12:12:12.000+00\"}"
 400 at the moment

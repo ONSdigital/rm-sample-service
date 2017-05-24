@@ -51,7 +51,7 @@ This repository contains the Sample service. This microservice is a RESTful web 
 
 * to add a collectionExerciseJob to the postgres database
 
-      curl -H "Content-Type: application/json" -X POST -d '{ "collectionExerciseId" : "4","surveyRef" : "str1234","exerciseDateTime" : "2012-12-13T12:12:12.000+00" }' http://localhost:8125/samples/sampleunitrequests
+      curl -H "Content-Type: application/json" -X POST -d '{ "collectionExerciseJobPK" : "4","surveyRef" : "str1234","exerciseDateTime" : "2012-12-13T12:12:12.000+00" }' http://localhost:8125/samples/sampleunitrequests
 
 ## API
 See [API.md](https://github.com/ONSdigital/rm-sample-service/blob/master/API.md) for API documentation.

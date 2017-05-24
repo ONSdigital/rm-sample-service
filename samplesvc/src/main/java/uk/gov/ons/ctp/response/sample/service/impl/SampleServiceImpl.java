@@ -91,15 +91,15 @@ public class SampleServiceImpl implements SampleService {
     SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
 
     createAndSaveSampleUnits(samplingUnitList, savedSampleSummary);
-    sendToPartyQueue(savedSampleSummary.getSampleId(), samplingUnitList);
-    sendToPartyService(savedSampleSummary.getSampleId(), samplingUnitList);
+    sendToPartyQueue(savedSampleSummary.getSampleSummaryPK(), samplingUnitList);
+    sendToPartyService(savedSampleSummary.getSampleSummaryPK(), samplingUnitList);
   }
 
   /**
    * Effect a state transition for the target SampleSummary if the one is
    * required
    *
-   * @param sampleUnitId the sampleUnitId to be updated
+   * @param sampleUnitPK the sampleUnitPK to be updated
    * @return SampleSummary the updated SampleSummary
    */
 
@@ -113,7 +113,7 @@ public class SampleServiceImpl implements SampleService {
   private void createAndSaveSampleUnits(List<? extends SampleUnitBase> samplingUnitList, SampleSummary sampleSummary) {
     for (SampleUnitBase sampleUnitBase : samplingUnitList) {
       SampleUnit sampleUnit = new SampleUnit();
-      sampleUnit.setSampleId(sampleSummary.getSampleId());
+      sampleUnit.setSampleSummaryFK(sampleSummary.getSampleSummaryPK());
       sampleUnit.setSampleUnitRef(sampleUnitBase.getSampleUnitRef());
       sampleUnit.setSampleUnitType(sampleUnitBase.getSampleUnitType());
       sampleUnit.setFormType("formtype");
@@ -124,26 +124,26 @@ public class SampleServiceImpl implements SampleService {
   }
 
   /**
-   * Search for SampleSummary by sampleID
+   * Search for SampleSummary by sampleSummaryPK
    *
-   * @param sampleId the sampleId to be searched for
+   * @param sampleSummaryPK the sampleSummaryPK to be searched for
    * @return SampleSummary matching SampleSummary
    */
   @Override
-  public SampleSummary findSampleSummaryBySampleId(Integer sampleId) {
-    return sampleSummaryRepository.findOne(sampleId);
+  public SampleSummary findSampleSummaryBySampleSummaryPK(Integer sampleSummaryPK) {
+    return sampleSummaryRepository.findOne(sampleSummaryPK);
   }
 
   /**
    * Effect a state transition for the target SampleSummary if the one is
    * required
    *
-   * @param sampleId the sampleId to be updated
+   * @param sampleSummaryPK the sampleSummaryPK to be updated
    * @return SampleSummary the updated SampleSummary
    */
   @Override
-  public SampleSummary activateSampleSummaryState(Integer sampleId) {
-    SampleSummary targetSampleSummary = sampleSummaryRepository.findOne(sampleId);
+  public SampleSummary activateSampleSummaryState(Integer sampleSummaryPK) {
+    SampleSummary targetSampleSummary = sampleSummaryRepository.findOne(sampleSummaryPK);
     SampleSummaryDTO.SampleState newState = sampleSvcStateTransitionManager.transition(targetSampleSummary.getState(), SampleSummaryDTO.SampleEvent.ACTIVATED);
     targetSampleSummary.setState(newState);
     sampleSummaryRepository.saveAndFlush(targetSampleSummary);
@@ -153,19 +153,18 @@ public class SampleServiceImpl implements SampleService {
   /**
    * Send samplingUnits to the queue
    *
-   * @param sampleId the sampleId of the sample to be sent
+   * @param sampleKey the sampleKey of the sample to be sent
    * @param samplingUnitList list of sampling units to be sent
    * @throws Exception
    */
-  private void sendToPartyQueue(Integer sampleId, List<? extends SampleUnitBase> samplingUnitList) throws Exception {
+  private void sendToPartyQueue(Integer sampleKey, List<? extends SampleUnitBase> samplingUnitList) throws Exception {
     int size = samplingUnitList.size();
     int position = 1;
-    log.debug("Send sampleId: {} to Party queue", sampleId);
+    log.debug("Send sampleSummaryFK: {} to Party queue", sampleKey);
     for (SampleUnitBase sub : samplingUnitList) {
       Party party = PartyUtil.convertToParty(sub);
       party.setSize(size);
       party.setPosition(position);
-      party.setSampleId(sampleId);
       sendQueue.publish(party);
       position++;
     }
@@ -174,11 +173,11 @@ public class SampleServiceImpl implements SampleService {
   /**
    * Send samplingUnits to the party service
    *
-   * @param sampleId the sampleId of the sample to be sent
+   * @param sampleKey the sampleKey of the sample to be sent
    * @param samplingUnitList list of sampling units to be sent
    * @throws Exception
    */
-  private void sendToPartyService(Integer sampleId, List<? extends SampleUnitBase> samplingUnitList) throws Exception {
+  private void sendToPartyService(Integer sampleKey, List<? extends SampleUnitBase> samplingUnitList) throws Exception {
     int size = samplingUnitList.size();
     int position = 1;
     log.debug("Send to party svc");
@@ -186,11 +185,10 @@ public class SampleServiceImpl implements SampleService {
       Party party = PartyUtil.convertToParty(bsu);
       party.setSize(size);
       party.setPosition(position);
-      party.setSampleId(sampleId);
       sampleServiceClient.postResource("/party/events", party, Party.class);
       position++;
     }
-    activateSampleSummaryState(sampleId);
+    activateSampleSummaryState(sampleKey);
   }
 
   /**
@@ -227,9 +225,10 @@ public class SampleServiceImpl implements SampleService {
 
     Integer sampleUnitsTotal = 0;
     for (SampleSummary ss : listOfSampleSummaries) {
-      List<SampleUnit> sampleUnitList = sampleUnitRepository.findBySampleId(ss.getSampleId());
+      List<SampleUnit> sampleUnitList = sampleUnitRepository.findBySampleSummaryFK(ss.getSampleSummaryPK());
       for (SampleUnit su : sampleUnitList) {
         su.setState(SampleUnitDTO.SampleUnitState.INIT);
+        log.debug("" + su.getSampleUnitPK());
         sampleUnitRepository.saveAndFlush(su); 
       }
       sampleUnitsTotal = sampleUnitsTotal + sampleUnitList.size();

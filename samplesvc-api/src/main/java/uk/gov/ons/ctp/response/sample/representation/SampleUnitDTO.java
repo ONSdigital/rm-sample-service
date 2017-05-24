@@ -36,9 +36,9 @@ public class SampleUnitDTO {
     H, HI, C, CI, B, BI
   }
 
-  private Integer sampleUnitId;
+  private Integer sampleUnitPK;
 
-  private Integer sampleId;
+  private Integer sampleSummaryFK;
 
   private String sampleUnitRef;
 
