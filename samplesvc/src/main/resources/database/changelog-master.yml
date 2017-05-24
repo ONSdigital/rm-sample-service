@@ -5,6 +5,4 @@ databaseChangeLog:
         username: samplesvc
 
   - include:
-      file: database/changes/release-9.32.0/changelog.yml
-  - include:
-      file: database/changes/release-9.32.1/changelog.yml
+      file: database/changes/release-9.39.0/changelog.yml
