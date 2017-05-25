@@ -107,6 +107,7 @@ public class SampleUnitDistributor {
           try {
             uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit = mapperFacade.map(sampleUnit,
                 uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.class);
+            mappedSampleUnit.setCollectionExerciseId(job.getCollectionExerciseId().toString());
             sendSampleUnitToCollectionExcerciseQueue(sampleUnit, mappedSampleUnit);
             successes++;
           } catch (Exception e) {
