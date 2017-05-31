@@ -1,28 +1,14 @@
 package samplesvc;
 
-import java.io.File;
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Stream;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Test;
+import uk.gov.ons.ctp.response.party.definition.Party;
+import uk.gov.ons.ctp.response.sample.definition.*;
+import uk.gov.ons.ctp.response.sample.party.PartyUtil;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlType;
-
-import org.junit.Test;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import uk.gov.ons.ctp.response.party.definition.Party;
-import uk.gov.ons.ctp.response.party.definition.PartyAttributeMap;
-import uk.gov.ons.ctp.response.sample.definition.BusinessSampleUnit;
-import uk.gov.ons.ctp.response.sample.definition.BusinessSurveySample;
-import uk.gov.ons.ctp.response.sample.definition.CensusSampleUnit;
-import uk.gov.ons.ctp.response.sample.definition.CensusSurveySample;
-import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
-import uk.gov.ons.ctp.response.sample.party.PartyUtil;
-import uk.gov.ons.ctp.response.sample.xml.JaxbAnnotatedTypeUtil;
+import java.io.File;
 
 public class SampleServiceImplTest {
 
@@ -54,5 +40,18 @@ public class SampleServiceImplTest {
     }
   }
 
+  @Test
+  public void testRemarshalSocial() throws Exception {
+    File file = new File("src/test/resources/uk/gov/ons/ctp/response/sample/service/impl/social-survey-sample.xml");
+    JAXBContext jaxbContext = JAXBContext.newInstance(SocialSurveySample.class);
+
+    Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+    SocialSurveySample sample = (SocialSurveySample) jaxbUnmarshaller.unmarshal(file);
+    for (SocialSampleUnit unit : sample.getSampleUnits().getSocialSampleUnits()) {
+      Party p = PartyUtil.convertToParty(unit);
+      ObjectMapper mapper = new ObjectMapper();
+      System.out.println(mapper.writeValueAsString(p));
+    }
+  }
 
 }
