@@ -8,9 +8,10 @@
     <socialSampleUnit>
       <sampleUnitRef>sampleUnitRef</sampleUnitRef>
       <sampleUnitType>H</sampleUnitType>
+      <formType>113</formType>
       <line1>line1</line1>
       <line2>line2</line2>
-      <postcode>TR2 4SA</postcode>
+      <postcode>PO15 5RR</postcode>
     </socialSampleUnit>
   </sampleUnits>
 </p:socialSurveySample>

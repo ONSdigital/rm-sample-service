@@ -6,49 +6,49 @@
 <effectiveEndDateTime>2017-03-04T00:00:00.000</effectiveEndDateTime>
 <sampleUnits>
 <businessSampleUnit>
-<sampleUnitRef>50000066526</sampleUnitRef>
-<sampleUnitType>B</sampleUnitType>
-<line1>67 BROMPTON ROAD</line1>
-<line2>67 BROMPTON ROAD</line2>
-<line3>LONDON</line3>
-<line4></line4>
-<line5></line5>
-<postcode>SW3 1DB</postcode>
-<surname>TYRONE SARUCAN</surname>
-<phoneNumber>0203 144 0900</phoneNumber>
-<checkletter>T</checkletter>
-<frosic2003>52423</frosic2003>
-<rusic2003>52423</rusic2003>
-<frosic2007>47710</frosic2007>
-<rusic2007>47710</rusic2007>
-<froempees>241</froempees>
-<employees>241</employees>
-<froempment>241</froempment>
-<employment>241</employment>
-<froFTEempt>170</froFTEempt>
-<FTEempt>170</FTEempt>
-<frotover>23173</frotover>
-<turnover>23173</turnover>
-<entref>9900000602</entref>
-<wowentref>214566044</wowentref>
-<vatref>214566044</vatref>
-<crn>NI005449</crn>
-<live_lu>23</live_lu>
-<live_vat>1</live_vat>
-<live_paye>1</live_paye>
-<legalstatus>1</legalstatus>
-<entrepmkr>L</entrepmkr>
-<birthdate>2008-06-12</birthdate>
-<entname1>CALVIN KLEIN STORES UK LIMITED</entname1>
-<runame1>CALVIN KLEIN STORES LTD</runame1>
-<tradstyle1>ACTIVITY IN ENGLAND SCOTLAND AND</tradstyle1>
-<tradstyle2>WALES</tradstyle2>
-<seltype>C</seltype>
-<cell_no>9154</cell_no>
-<formtype>112</formtype>
-<cso_tel>*</cso_tel>
-<currency>S</currency>
-<businessRegion>HH</businessRegion>
+    <sampleUnitRef>50000066526</sampleUnitRef>
+    <sampleUnitType>B</sampleUnitType><formType>113</formType>
+    <line1>67 BROMPTON ROAD</line1>
+    <line2>67 BROMPTON ROAD</line2>
+    <line3>LONDON</line3>
+    <line4></line4>
+    <line5></line5>
+    <postcode>SW3 1DB</postcode>
+    <surname>TYRONE SARUCAN</surname>
+    <phoneNumber>0203 144 0900</phoneNumber>
+    <checkletter>T</checkletter>
+    <frosic2003>52423</frosic2003>
+    <rusic2003>52423</rusic2003>
+    <frosic2007>47710</frosic2007>
+    <rusic2007>47710</rusic2007>
+    <froempees>241</froempees>
+    <employees>241</employees>
+    <froempment>241</froempment>
+    <employment>241</employment>
+    <froFTEempt>170</froFTEempt>
+    <FTEempt>170</FTEempt>
+    <frotover>23173</frotover>
+    <turnover>23173</turnover>
+    <entref>9900000602</entref>
+    <wowentref>214566044</wowentref>
+    <vatref>214566044</vatref>
+    <crn>NI005449</crn>
+    <live_lu>23</live_lu>
+    <live_vat>1</live_vat>
+    <live_paye>1</live_paye>
+    <legalstatus>1</legalstatus>
+    <entrepmkr>L</entrepmkr>
+    <birthdate>2008-06-12</birthdate>
+    <entname1>CALVIN KLEIN STORES UK LIMITED</entname1>
+    <runame1>CALVIN KLEIN STORES LTD</runame1>
+    <tradstyle1>ACTIVITY IN ENGLAND SCOTLAND AND</tradstyle1>
+    <tradstyle2>WALES</tradstyle2>
+    <seltype>C</seltype>
+    <cell_no>9154</cell_no>
+    <formtype>112</formtype>
+    <cso_tel>*</cso_tel>
+    <currency>S</currency>
+    <businessRegion>HH</businessRegion>
 </businessSampleUnit>
 </sampleUnits>
 </p:businessSurveySample>

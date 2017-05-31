@@ -6,17 +6,18 @@
 <effectiveEndDateTime>2017-03-04T00:00:00.000</effectiveEndDateTime>
 <sampleUnits>
 <censusSampleUnit>
-<sampleUnitRef>50000066526</sampleUnitRef>
-<sampleUnitType>B</sampleUnitType>
-<line1>67 BROMPTON ROAD</line1>
-<line2>67 BROMPTON ROAD</line2>
-<line3>LONDON</line3>
-<line4></line4>
-<line5></line5>
-<postcode>SW3 1DB</postcode>
-<surname>TYRONE SARUCAN</surname>
-<phoneNumber>0203 144 0900</phoneNumber>
-<latitude>123456</latitude>
+    <sampleUnitRef>50000066526</sampleUnitRef>
+    <sampleUnitType>B</sampleUnitType>
+    <formType>113</formType>
+    <line1>67 BROMPTON ROAD</line1>
+    <line2>67 BROMPTON ROAD</line2>
+    <line3>LONDON</line3>
+    <line4></line4>
+    <line5></line5>
+    <postcode>SW3 1DB</postcode>
+    <surname>TYRONE SARUCAN</surname>
+    <phoneNumber>0203 144 0900</phoneNumber>
+    <latitude>123456</latitude>
 </censusSampleUnit>
 </sampleUnits>
 </ns1:censusSurveySample>
