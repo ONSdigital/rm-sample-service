@@ -1,0 +1,156 @@
+ info:
+  contactEmail: phil.whiles@ons.gov.uk
+  version: ${project.version}
+  commit: ${buildNumber}
+  branch: ${scmBranch}
+  buildTime: ${timestamp}
+
+# logging config here as a reminder as to how to override logback from cmd line
+# ie -Dlogging.level.org.springframework=DEBUG
+logging:
+  level:
+    org.springframework: WARN
+    uk.gov.ons.ctp: DEBUG
+
+liquibase:
+  user: ${cloud.services.postgresql.connection.username}
+  password: ${cloud.services.postgresql.connection.password}
+  default-schema: sample
+  url: ${cloud.services.postgresql.connection.jdbcurl}
+  changeLog: classpath:/database/changelog-master.yml
+
+security:
+  basic:
+    enabled: false
+    realm: onsctpiac
+  user:
+    name: admin
+    password: secret
+
+management:
+  port: 8225
+  context-path: /mgmt
+  security:
+    roles: SUPERUSER
+    enabled: false
+
+server:
+  port: 8125
+  servlet-path: /
+
+endpoints:
+  autoconfig:
+    enabled: true
+    sensitive: true
+  beans:
+    enabled: true
+    sensitive: true
+  configprops:
+    enabled: true
+    sensitive: true
+  dump:
+    enabled: true
+    sensitive: true
+  env:
+    enabled: true
+    sensitive: true
+  info:
+    enabled: true
+    sensitive: true
+  metrics:
+    enabled: true
+    sensitive: true
+  mappings:
+    enabled: true
+    sensitive: true
+  shutdown:
+    enabled: true
+    sensitive: true
+  trace:
+    enabled: true
+    sensitive: true
+
+spring:
+  application:
+    name: ONS SampleService
+
+  sleuth:
+    sampler:
+      percentage: 75
+
+  datasource:
+    driverClassName: org.postgresql.Driver
+    tomcat:
+      initial-size: 5
+      max-active: 10
+      max-idle: 5
+      min-idle: 3
+    continue-on-error: true
+    schema: classpath:/schema-cloud.sql
+
+  zipkin:
+    enabled: false
+
+
+party-svc:
+  sample-path: /events
+  connection-config:
+    scheme: http
+    host: localhost
+    port: 8125
+    retry-attempts: 10
+    retry-pause-milli-seconds: 5000
+    connect-timeout-milli-seconds: 5000
+    read-timeout-milli-seconds: 5000
+
+sample-svc:
+  sample-path: /events
+  connection-config:
+    scheme: http
+    host: localhost
+    port: 8125
+    retry-attempts: 10
+    retry-pause-milli-seconds: 5000
+    connect-timeout-milli-seconds: 5000
+    read-timeout-milli-seconds: 5000
+
+sftp:
+  host: localhost
+  port: 22
+  username: centos
+  password: "JLibV2&XD,"
+  directory:
+    social: Documents/sftp/social-sftp/
+    business: Documents/sftp/business-sftp/
+    census: Documents/sftp/census-sftp/
+    Documents: Documents/sftp/
+  localdirectory: /tmp/samplesvc
+  cron: "* * * * * ?"
+  filepattern: "*.xml"
+
+rabbitmq:
+  username: ${cloud.services.rabbitmq.connection.username}
+  password: ${cloud.services.rabbitmq.connection.password}
+  host: ${cloud.services.rabbitmq.connection.host}
+  port: ${cloud.services.rabbitmq.connection.port}
+  virtualhost: /
+  cron: "* * * * * ?"
+
+redis:
+  host: ${cloud.services.redis.connection.host}
+  port: ${cloud.services.redis.connection.port}
+
+data-grid:
+  address: ${cloud.services.redis.connection.host}:6379
+  list-time-to-live-seconds: 600
+  list-time-to-wait-seconds: 600
+  lock-time-to-live-seconds: 600
+
+messaging:
+  pubMaxAttempts: 3
+
+sample-unit-distribution:
+  retrieval-max: 5
+  distribution-max: 10
+  retry-sleep-seconds: 30
+  delay-milli-seconds: 60000

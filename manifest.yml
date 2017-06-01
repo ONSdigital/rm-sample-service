@@ -1,9 +1,20 @@
 ---
 applications:
-- name: SampleServiceApi
-  memory: 512M
-  host: SampleServiceApi
-  instances: 1
-  path: samplesvc/target
+- name: samplesvc
   buildpack: https://github.com/cloudfoundry/java-buildpack.git
+  instances: 1
+  host: samplesvc
+  memory: 512M
+  path: samplesvc/target
   timeout: 120
+  services:
+    - samplesvc_pg_db
+    - redis
+    - rabbitmq
+  env:
+    partySvc_connectionConfig_host: ras-party-v2.apps.mvp.onsclofo.uk
+    partySvc_connectionConfig_port: "80"
+    partySvc_connectionConfig_scheme: http
+    sampleSvc_connectionConfig_host: samplesvc.apps.mvp.onsclofo.uk
+    sampleSvc_connectionConfig_port: "80"
+    sampleSvc_connectionConfig_scheme: http
