@@ -63,5 +63,4 @@ public final class SampleEndpoint implements CTPEndpoint {
     
     return ResponseEntity.created(URI.create("TODO")).body(sampleUnitsRequest);
   }
-
 }

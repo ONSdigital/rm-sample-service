@@ -40,12 +40,6 @@ import uk.gov.ons.ctp.response.sample.service.SampleService;
 @Configuration
 public class SampleServiceImpl implements SampleService {
   @Autowired
-  private AppConfig appConfig;
-
-  @Autowired
-  private CollectionExerciseJobRepository collectionExerciseJobRepository;
-
-  @Autowired
   private SampleSummaryRepository sampleSummaryRepository;
 
   @Autowired
@@ -61,12 +55,6 @@ public class SampleServiceImpl implements SampleService {
   @Autowired
   @Qualifier("sampleUnitTransitionManager")
   private StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent> sampleUnitStateTransitionManager;
-
-  @Autowired
-  private SampleUnitPublisher sampleUnitPublisher;
-
-  @Autowired
-  private MapperFacade mapperFacade;
 
   @Autowired
   @Qualifier("sampleServiceClient")
@@ -228,12 +216,11 @@ public class SampleServiceImpl implements SampleService {
       List<SampleUnit> sampleUnitList = sampleUnitRepository.findBySampleSummaryFK(ss.getSampleSummaryPK());
       for (SampleUnit su : sampleUnitList) {
         su.setState(SampleUnitDTO.SampleUnitState.INIT);
-        log.debug("" + su.getSampleUnitPK());
         sampleUnitRepository.saveAndFlush(su); 
       }
       sampleUnitsTotal = sampleUnitsTotal + sampleUnitList.size();
     }
-    log.debug("sampleUnits: {}", sampleUnitsTotal);
+    log.debug("sampleUnits found for surveyref : {} {}", surveyRef, sampleUnitsTotal);
     return sampleUnitsTotal;
   }
 
