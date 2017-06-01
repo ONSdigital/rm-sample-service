@@ -1,4 +1,4 @@
- info:
+info:
   contactEmail: phil.whiles@ons.gov.uk
   version: ${project.version}
   commit: ${buildNumber}
