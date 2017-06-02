@@ -4,8 +4,8 @@ applications:
   buildpack: https://github.com/cloudfoundry/java-buildpack.git
   instances: 1
   host: samplesvc
-  memory: 512M
-  path: samplesvc/target
+  memory: 1024M
+  path: samplesvc/target/samplesvc.jar
   timeout: 120
   services:
     - samplesvc_pg_db
