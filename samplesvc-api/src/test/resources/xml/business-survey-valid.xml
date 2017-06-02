@@ -57,7 +57,6 @@
       <seltype>s</seltype>
       <inclexcl>s</inclexcl>
       <cell_no>1234</cell_no>
-      <formtype>str1</formtype>
       <cso_tel>str1234</cso_tel>
       <currency>s</currency>
       <businessRegion>st</businessRegion>

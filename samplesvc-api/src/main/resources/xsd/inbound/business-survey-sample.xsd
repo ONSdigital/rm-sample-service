@@ -65,7 +65,6 @@
           <xsd:element name="seltype" type="string_1_1" minOccurs="0" maxOccurs="1" />
           <xsd:element name="inclexcl" type="string_1_1" minOccurs="0" maxOccurs="1" />
           <xsd:element name="cell_no" type="integer_1_4" minOccurs="0" maxOccurs="1" />
-          <xsd:element name="formtype" type="string_1_4" minOccurs="0" maxOccurs="1" />
           <xsd:element name="cso_tel" type="xsd:string" minOccurs="0" maxOccurs="1" />
           <xsd:element name="currency" type="string_1_1" minOccurs="0" maxOccurs="1" />
           <xsd:element name="businessRegion" type="string_1_2" minOccurs="0" maxOccurs="1" />
