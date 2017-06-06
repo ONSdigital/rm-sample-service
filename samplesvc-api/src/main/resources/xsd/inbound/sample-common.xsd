@@ -19,7 +19,6 @@
         </xsd:simpleType>
       </xsd:element>
 
-      <!--formType added to sample-common as correct usage is still being discussed - previously a 'business-only' property-->
       <xsd:element name="formType" type="string_1_4" minOccurs="0" maxOccurs="1" />
 
       <xsd:element name="line1" type="string_1_60" minOccurs="1" maxOccurs="1" />
