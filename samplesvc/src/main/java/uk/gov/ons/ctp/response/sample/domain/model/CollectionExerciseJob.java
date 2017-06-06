@@ -1,16 +1,5 @@
 package uk.gov.ons.ctp.response.sample.domain.model;
 
-import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.UUID;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +7,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.UUID;
 
 /**
  * Domain model object.
@@ -34,7 +33,8 @@ public class CollectionExerciseJob implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "collectionexercisejobseq_gen")
-  @GenericGenerator(name = "collectionexercisejobseq_gen", strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+  @GenericGenerator(name = "collectionexercisejobseq_gen",
+          strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
           parameters = {
                   @Parameter(name = "sequence_name", value = "sample.collectionexercisejobseq"),
                   @Parameter(name = "increment_size", value = "1")

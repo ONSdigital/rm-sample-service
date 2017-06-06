@@ -13,6 +13,12 @@ import java.util.UUID;
 @Repository
 public interface CollectionExerciseJobRepository extends JpaRepository<CollectionExerciseJob, Integer> {
 
+    /**
+     * Find CollectionExerciseJob entity by collectionExerciseId
+     *
+     * @param collectionExerciseId The collectionExerciseId
+     * @return CollectionExerciseJob object or null
+     */
     CollectionExerciseJob findByCollectionExerciseId(UUID collectionExerciseId);
 
 }

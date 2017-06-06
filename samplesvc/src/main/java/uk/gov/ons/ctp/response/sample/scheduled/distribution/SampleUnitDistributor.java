@@ -1,9 +1,7 @@
 package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import lombok.extern.slf4j.Slf4j;
+import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.sleuth.Span;
@@ -13,9 +11,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
-
-import lombok.extern.slf4j.Slf4j;
-import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.distributed.DistributedListManager;
 import uk.gov.ons.ctp.common.distributed.LockingException;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
@@ -28,6 +23,13 @@ import uk.gov.ons.ctp.response.sample.message.SampleUnitPublisher;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * Distributes SampleUnits
+ */
 @Component
 @Slf4j
 public class SampleUnitDistributor {
@@ -55,7 +57,8 @@ public class SampleUnitDistributor {
 
   @Autowired
   @Qualifier("sampleUnitTransitionManager")
-  private StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent> sampleUnitStateTransitionManager;
+  private StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent>
+          sampleUnitStateTransitionManager;
 
   // single TransactionTemplate shared amongst all methods in this instance
   private final TransactionTemplate transactionTemplate;
@@ -68,12 +71,14 @@ public class SampleUnitDistributor {
    *
    * @param transactionManager provided by Spring
    */
-
   @Autowired
   public SampleUnitDistributor(final PlatformTransactionManager transactionManager) {
     this.transactionTemplate = new TransactionTemplate(transactionManager);
   }
 
+  /**
+   * @return SampleUnitDistributionInfo Information for SampelUnit Distribution
+   */
   public final SampleUnitDistributionInfo distribute() {
     Span distribSpan = tracer.createSpan(SAMPLEUNIT_DISTRIBUTOR_SPAN);
     log.info("ActionDistributor is in the house");
@@ -88,11 +93,10 @@ public class SampleUnitDistributor {
 
         List<Integer> excludedCases = sampleUnitDistributionListManager.findList(SAMPLEUNIT_DISTRIBUTOR_LIST_ID, false);
         log.debug("retrieve sample units excluding {}", excludedCases);
-        if (excludedCases.size()==0){
+        if (excludedCases.size() == 0) {
           excludedCases.add(E);
         }
-        
-        
+
         sampleUnits = sampleUnitRepository.getSampleUnitBatch(job.getSurveyRef(),
             job.getExerciseDateTime(), SampleSummaryDTO.SampleState.ACTIVE.toString(),
             appConfig.getSampleUnitDistribution().getRetrievalMax(), excludedCases);
@@ -138,6 +142,11 @@ public class SampleUnitDistributor {
     return distInfo;
   }
 
+  /**
+   * Sends SampleUnit to the CollectionExercise queue
+   * @param sampleUnit sample unit to be mapped
+   * @param mappedSampleUnit mapped sample unit to be sent
+   */
   @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
   private void sendSampleUnitToCollectionExcerciseQueue(SampleUnit sampleUnit,
       uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit) {
@@ -145,6 +154,11 @@ public class SampleUnitDistributor {
     sampleUnitPublisher.send(mappedSampleUnit);
   }
 
+  /**
+   * Transitions SampleUnit State from Delivery Event
+   * @param sampleUnitPK sample unit primary key
+   * @return SampleUnit the target sampleunit
+   */
   public SampleUnit transitionSampleUnitStateFromDeliveryEvent(Integer sampleUnitPK) {
     SampleUnit targetSampleUnit = sampleUnitRepository.findOne(sampleUnitPK);
     SampleUnitDTO.SampleUnitState newState = sampleUnitStateTransitionManager.transition(targetSampleUnit.getState(),

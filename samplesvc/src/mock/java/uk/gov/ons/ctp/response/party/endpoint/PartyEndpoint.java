@@ -37,7 +37,7 @@ public class PartyEndpoint implements CTPEndpoint {
    * @throws CTPException if update operation fails
    * @return Response PartyDTO that has been updated
    */
-  @RequestMapping(value ="/events", method = RequestMethod.POST, consumes = "application/xml")
+  @RequestMapping(value = "/events", method = RequestMethod.POST, consumes = "application/xml")
   public ResponseEntity<?> createCaseEvent(final Party partyDTO) throws CTPException {
 
     log.debug(partyDTO.getPosition() + " / " + partyDTO.getSize());

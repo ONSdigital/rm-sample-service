@@ -1,11 +1,10 @@
 package uk.gov.ons.ctp.response.sample.message;
 
-import java.util.Map;
-
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.Headers;
-
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
+
+import java.util.Map;
 
 /**
 * The SampleService interface defines all business behaviours for operations on
@@ -17,7 +16,10 @@ public interface SampleReceiver<T extends SurveyBase> {
   /**
    * Processes CensusSurveySample transformed from XML
    * @param surveySampleObject surveySample transformed from XML
+   * @param headerMap Map of Header
+   * @return Message<String> message containing sample payload
+   * @throws Exception error exception thrown
    */
-	Message<String> processSample(T surveySampleObject, @Headers Map<String, Object> headerMap) throws Exception;
+  Message<String> processSample(T surveySampleObject, @Headers Map<String, Object> headerMap) throws Exception;
 
 }

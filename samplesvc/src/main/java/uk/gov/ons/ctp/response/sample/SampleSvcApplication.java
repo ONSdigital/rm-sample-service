@@ -39,20 +39,32 @@ import uk.gov.ons.ctp.response.sample.service.state.SampleSvcStateTransitionMana
 public class SampleSvcApplication {
 
   public static final String SAMPLE_UNIT_DISTRIBUTION_LIST = "samplesvc.sampleunit.distribution";
-  
+
   @Autowired
   private StateTransitionManagerFactory stateTransitionManager;
 
   @Autowired
   private AppConfig appConfig;
 
+  /**
+   * Bean used to access Distributed Lock Manager
+   *
+   * @param redissonClient Redisson Client
+   * @return the Distributed Lock Manager
+   */
   @Bean
   public DistributedListManager<Integer> actionDistributionListManager(RedissonClient redissonClient) {
-    return new DistributedListManagerRedissonImpl<Integer>(SampleSvcApplication.SAMPLE_UNIT_DISTRIBUTION_LIST, redissonClient,
-        appConfig.getDataGrid().getListTimeToWaitSeconds(),
-        appConfig.getDataGrid().getListTimeToLiveSeconds());
+    return new DistributedListManagerRedissonImpl<Integer>(SampleSvcApplication.SAMPLE_UNIT_DISTRIBUTION_LIST,
+            redissonClient,
+            appConfig.getDataGrid().getListTimeToWaitSeconds(),
+            appConfig.getDataGrid().getListTimeToLiveSeconds());
   }
 
+  /**
+   * Bean used to create and configure Redisson Client
+   *
+   * @return the Redisson client
+   */
   @Bean
   public RedissonClient redissonClient() {
     Config config = new Config();
@@ -61,10 +73,7 @@ public class SampleSvcApplication {
         .setPassword(appConfig.getDataGrid().getPassword());
     return Redisson.create(config);
   }
-  
-  
-  
-  
+
   /**
    * The SampleService client bean
    * @return the RestClient for the SampleService
@@ -105,19 +114,27 @@ public class SampleSvcApplication {
   public StateTransitionManager<SampleUnitState, SampleUnitEvent> sampleUnitStateTransitionManager() {
     return stateTransitionManager.getStateTransitionManager(SampleSvcStateTransitionManagerFactory.SAMPLE_UNIT_ENTITY);
   }
-  
 
+  /**
+   * Rest Exception Handler
+   *
+   * @return a Rest Exception Handler
+   */
   @Bean
   public RestExceptionHandler restExceptionHandler() {
     return new RestExceptionHandler();
   }
 
-
+  /**
+   * Custom Object Mapper
+   *
+   * @return a customer object mapper
+   */
   @Bean @Primary
-  public CustomObjectMapper CustomObjectMapper() {
+  public CustomObjectMapper customObjectMapper() {
     return new CustomObjectMapper();
   }
-  
+
   /**
    * This method is the entry point to the Spring Boot application.
    *
