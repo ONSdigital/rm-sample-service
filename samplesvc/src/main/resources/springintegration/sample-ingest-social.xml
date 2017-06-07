@@ -38,7 +38,7 @@
     </int:header-enricher>
 
     <int-xml:validating-filter id="xmlValidatorSocial" input-channel="xmlSocialAddedHeader"
-                                output-channel="xmlValidSocial" schema-location="classpath:xsd/inbound/social-survey-sample.xsd" throw-exception-on-rejection="true"/>
+                                output-channel="xmlValidSocial" schema-location="classpath:samplesvc/xsd/inbound/social-survey-sample.xsd" throw-exception-on-rejection="true"/>
        
     <int-xml:unmarshalling-transformer input-channel="xmlValidSocial" output-channel="xmlTransformedSocial" unmarshaller="unmarshallerSocial" />
     
