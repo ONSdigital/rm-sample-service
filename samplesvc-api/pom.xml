@@ -74,7 +74,7 @@
               <goal>generate</goal>
             </goals>
             <configuration>
-              <bindingDirectory>src/main/resources/xsd/inbound</bindingDirectory>
+              <bindingDirectory>src/main/resources/samplesvc/xsd/inbound</bindingDirectory>
               <bindingIncludes>
                 <include>census-survey-sample.xjb</include>
               </bindingIncludes>
@@ -82,7 +82,7 @@
                 <include>business-survey-sample.xjb</include>
                 <include>social-survey-sample.xjb</include>
               </bindingExcludes>
-              <schemaDirectory>src/main/resources/xsd/inbound</schemaDirectory>
+              <schemaDirectory>src/main/resources/samplesvc/xsd/inbound</schemaDirectory>
               <schemaIncludes>
                 <include>census-survey-sample.xsd</include>
                 <include>business-survey-sample.xsd</include>
@@ -115,7 +115,7 @@
               <goal>generate</goal>
             </goals>
             <configuration>
-              <bindingDirectory>src/main/resources/xsd/inbound</bindingDirectory>
+              <bindingDirectory>src/main/resources/samplesvc/xsd/inbound</bindingDirectory>
               <bindingIncludes>
                 <include>business-survey-sample.xjb</include>
               </bindingIncludes>
@@ -123,7 +123,7 @@
                 <include>census-survey-sample.xjb</include>
                 <include>social-survey-sample.xsd</include>
               </bindingExcludes>
-              <schemaDirectory>src/main/resources/xsd/inbound</schemaDirectory>
+              <schemaDirectory>src/main/resources/samplesvc/xsd/inbound</schemaDirectory>
               <schemaIncludes>
                 <include>census-survey-sample.xsd</include>
                 <include>business-survey-sample.xsd</include>
@@ -156,7 +156,7 @@
               <goal>generate</goal>
             </goals>
             <configuration>
-              <bindingDirectory>src/main/resources/xsd/inbound</bindingDirectory>
+              <bindingDirectory>src/main/resources/samplesvc/xsd/inbound</bindingDirectory>
               <bindingIncludes>
                 <include>social-survey-sample.xjb</include>
               </bindingIncludes>
@@ -164,7 +164,7 @@
                 <include>business-survey-sample.xjb</include>
                 <include>census-survey-sample.xjb</include>
               </bindingExcludes>
-              <schemaDirectory>src/main/resources/xsd/inbound</schemaDirectory>
+              <schemaDirectory>src/main/resources/samplesvc/xsd/inbound</schemaDirectory>
               <schemaIncludes>
                 <include>census-survey-sample.xsd</include>
                 <include>business-survey-sample.xsd</include>
@@ -197,11 +197,11 @@
               <goal>generate</goal>
             </goals>
             <configuration>
-              <bindingDirectory>src/main/resources/xsd/outbound</bindingDirectory>
+              <bindingDirectory>src/main/resources/samplesvc/xsd/outbound</bindingDirectory>
               <bindingIncludes>
                 <include>sample-unit.xjb</include>
               </bindingIncludes>
-              <schemaDirectory>src/main/resources/xsd/outbound</schemaDirectory>
+              <schemaDirectory>src/main/resources/samplesvc/xsd/outbound</schemaDirectory>
               <schemaIncludes>
                 <include>sample-unit.xsd</include>
               </schemaIncludes>

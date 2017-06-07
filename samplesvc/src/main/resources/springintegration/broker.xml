@@ -10,7 +10,9 @@
     <rabbit:connection-factory id="connectionFactory"
                                host="${rabbitmq.host}"
                                username="${rabbitmq.username}" 
-	                           password="${rabbitmq.password}"/>
+	                           password="${rabbitmq.password}"
+                               port="${rabbitmq.port}"
+                               virtual-host="${rabbitmq.virtualhost}"/>
 
     <rabbit:template id="amqpTemplate" connection-factory="connectionFactory" retry-template="retryTemplate"/>
 
