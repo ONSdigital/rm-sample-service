@@ -115,10 +115,6 @@ sample-svc:
     read-timeout-milli-seconds: 5000
 
 sftp:
-  host: ${cloud.services.user-provided.connection.host}
-  port: ${cloud.services.user-provided.connection.port}
-  username: ${cloud.services.user-provided.connection.username}
-  password: ${cloud.services.user-provided.connection.password}
   directory:
     social: social-sftp/
     business: business-sftp/
