@@ -6,7 +6,7 @@ applications:
   host: samplesvc
   memory: 1024M
   path: samplesvc/target/samplesvc.jar
-  timeout: 120
+  timeout: 180
   services:
     - samplesvc-pg-db
     - rm-redis
