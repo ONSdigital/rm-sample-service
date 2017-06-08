@@ -133,7 +133,7 @@ rabbitmq:
   username: guest
   password: guest
   host: localhost
-  port: 5
+  port: 5672
   virtualhost: /
   cron: "* * * * * ?"
 
@@ -149,10 +149,9 @@ data-grid:
 
 messaging:
   pubMaxAttempts: 3
-  
+
 sample-unit-distribution:
   retrieval-max: 5672
   distribution-max: 10
   retry-sleep-seconds: 30
   delay-milli-seconds: 60000
-  
