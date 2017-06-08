@@ -75,7 +75,7 @@ public class SampleServiceImpl implements SampleService {
 
     createAndSaveSampleUnits(samplingUnitList, savedSampleSummary);
     sendToPartyQueue(savedSampleSummary.getSampleSummaryPK(), samplingUnitList);
-    sendToPartyService(savedSampleSummary.getSampleSummaryPK(), samplingUnitList);
+    //sendToPartyService(savedSampleSummary.getSampleSummaryPK(), samplingUnitList);
   }
 
   /**
@@ -152,19 +152,19 @@ public class SampleServiceImpl implements SampleService {
    * @param samplingUnitList list of sampling units to be sent
    * @throws Exception exception thrown
    */
-  private void sendToPartyService(Integer sampleKey, List<? extends SampleUnitBase> samplingUnitList) throws Exception {
-    int size = samplingUnitList.size();
-    int position = 1;
-    log.debug("Send to party svc");
-    for (SampleUnitBase bsu : samplingUnitList) {
-      Party party = PartyUtil.convertToParty(bsu);
-      party.setSize(size);
-      party.setPosition(position);
-      sampleServiceClient.postResource("/party/events", party, Party.class);
-      position++;
-    }
-    activateSampleSummaryState(sampleKey);
-  }
+//  private void sendToPartyService(Integer sampleKey, List<? extends SampleUnitBase> samplingUnitList) throws Exception {
+//    int size = samplingUnitList.size();
+//    int position = 1;
+//    log.debug("Send to party svc");
+//    for (SampleUnitBase bsu : samplingUnitList) {
+//      Party party = PartyUtil.convertToParty(bsu);
+//      party.setSize(size);
+//      party.setPosition(position);
+//      sampleServiceClient.postResource("/party/events", party, Party.class);
+//      position++;
+//    }
+//    activateSampleSummaryState(sampleKey);
+//  }
 
   /**
    * Save CollectionExerciseJob to collectionExerciseJob table
