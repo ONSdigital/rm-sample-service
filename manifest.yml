@@ -8,7 +8,7 @@ applications:
   path: samplesvc/target/samplesvc.jar
   timeout: 180
   services:
-    - samplesvc-pg-db
+    - rm-pg-db
     - rm-redis
     - rm-rabbitmq
     - samplesvc-moveit
