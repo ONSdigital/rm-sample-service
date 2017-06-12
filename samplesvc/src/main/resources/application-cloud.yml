@@ -146,7 +146,7 @@ messaging:
   pubMaxAttempts: 3
 
 sample-unit-distribution:
-  retrieval-max: 5
+  retrieval-max: 500
   distribution-max: 10
   retry-sleep-seconds: 30
   delay-milli-seconds: 60000
