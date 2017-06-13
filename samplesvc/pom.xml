@@ -36,6 +36,12 @@
     </dependency>
 
     <dependency>
+      <groupId>net.logstash.logback</groupId>
+      <artifactId>logstash-logback-encoder</artifactId>
+      <version>4.10</version>
+    </dependency>
+
+    <dependency>
       <groupId>uk.gov.ons.ctp.common</groupId>
       <artifactId>test-framework</artifactId>
       <scope>test</scope>
