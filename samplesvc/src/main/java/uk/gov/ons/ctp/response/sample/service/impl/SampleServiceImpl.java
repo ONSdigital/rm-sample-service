@@ -74,8 +74,9 @@ public class SampleServiceImpl implements SampleService {
     SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
 
     createAndSaveSampleUnits(samplingUnitList, savedSampleSummary);
-    sendToPartyQueue(savedSampleSummary.getSampleSummaryPK(), samplingUnitList);
+    //sendToPartyQueue(savedSampleSummary.getSampleSummaryPK(), samplingUnitList);
     sendToPartyService(savedSampleSummary.getSampleSummaryPK(), samplingUnitList);
+    activateSampleSummaryState(savedSampleSummary.getSampleSummaryPK());
   }
 
   /**
@@ -160,10 +161,9 @@ public class SampleServiceImpl implements SampleService {
       Party party = PartyUtil.convertToParty(bsu);
       party.setSize(size);
       party.setPosition(position);
-      sampleServiceClient.postResource("/party/events", party, Party.class);
+//      sampleServiceClient.postResource("/party/events", party, Party.class);
       position++;
     }
-    activateSampleSummaryState(sampleKey);
   }
 
   /**

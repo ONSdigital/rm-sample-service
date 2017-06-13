@@ -9,13 +9,14 @@
 
     <rabbit:connection-factory id="connectionFactory"
                                host="${rabbitmq.host}"
-                               username="${rabbitmq.username}" 
+                               username="${rabbitmq.username}"
 	                           password="${rabbitmq.password}"
                                port="${rabbitmq.port}"
                                virtual-host="${rabbitmq.virtualhost}"/>
 
     <rabbit:template id="amqpTemplate" connection-factory="connectionFactory" retry-template="retryTemplate"/>
-
+    <rabbit:admin id="amqpAdmin" connection-factory="connectionFactory"/>
+    
 	<!-- Retry policy for a failed publish -->
 	<bean id="retryTemplate" class="org.springframework.retry.support.RetryTemplate">
       <property name="backOffPolicy">
