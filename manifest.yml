@@ -13,7 +13,7 @@ applications:
     - rm-rabbitmq
     - samplesvc-moveit
   env:
-    partySvc_connectionConfig_host: ras-party-v2.apps.mvp.onsclofo.uk
+    partySvc_connectionConfig_host: ras-party-v2-int.apps.mvp.onsclofo.uk
     partySvc_connectionConfig_port: "80"
     partySvc_connectionConfig_scheme: http
     sampleSvc_connectionConfig_host: samplesvc.apps.mvp.onsclofo.uk
