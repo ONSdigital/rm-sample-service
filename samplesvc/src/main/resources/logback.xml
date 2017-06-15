@@ -9,8 +9,21 @@
     value="${LOG_LEVEL_PATTERN:-%5level} %-40.40logger{39} : %message%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}" />
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-    <encoder>
-      <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+    <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+      <providers>
+        <mdc/>
+        <pattern>
+          <pattern>
+            {
+            "created": "%date{ISO8601}",
+            "service": "SampleSvc",
+            "level": "%level",
+            "event": "%message",
+            "data": {"test": "test", "test2": "test2"}
+            }
+          </pattern>
+        </pattern>
+      </providers>
     </encoder>
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>DEBUG</level>
@@ -18,18 +31,26 @@
   </appender>
 
   <appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
-    <encoder>
+    <!--<encoder>
       <pattern>${CONSOLE_LOG_PATTERN}</pattern>
-    </encoder>
+    </encoder>-->
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>ERROR</level>
     </filter>
   </appender>
 
   <appender name="SYSLOG" class="ch.qos.logback.classic.net.SyslogAppender">
+
     <syslogHost>localhost</syslogHost>
     <facility>DAEMON</facility>
-    <suffixPattern>${SYSLOG_PATTERN}</suffixPattern>
+    <suffixPattern>{
+      "created": "%date{ISO8601}",
+      "service": "SampleSvc",
+      "level": "%level",
+      "event": "%message",
+      "data": {"test": "test", "test2": "test2"}
+      }</suffixPattern>
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>WARN</level>
     </filter>
