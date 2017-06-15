@@ -9,11 +9,23 @@
     value="${LOG_LEVEL_PATTERN:-%5level} %-40.40logger{39} : %message%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}" />
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-    <encoder>
-      <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+    <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+      <providers>
+        <mdc/>
+        <pattern>
+          <pattern>
+            {
+            "created": "%date{ISO8601}",
+            "service": "SampleSvc",
+            "level": "%level",
+            "event": "%message"
+            }
+          </pattern>
+        </pattern>
+      </providers>
     </encoder>
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <level>WARN</level>
+      <level>DEBUG</level>
     </filter>
   </appender>
 
