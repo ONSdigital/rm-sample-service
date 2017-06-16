@@ -11,6 +11,7 @@ logging:
   level:
     org.springframework: WARN
     uk.gov.ons.ctp: WARN
+  profile: DEV
 
 liquibase:
   user: samplesvc
