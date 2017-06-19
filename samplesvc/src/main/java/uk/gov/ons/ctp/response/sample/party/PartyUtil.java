@@ -5,12 +5,15 @@ import uk.gov.ons.ctp.response.party.definition.PartyAttributeMap;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.xml.JaxbAnnotatedTypeUtil;
 
+/**
+ * Util for the Party Service
+ */
 public class PartyUtil {
 
   /**
    * Util method to convert from any of the SampleUnitBase subtypes to the Generic PartyService Party type.
    * All fields other than identity fields will be collected into a key:value map in Party.attributes.
-   * @param unit the SampleUnitBase subtype for a Census,Business or Social SampleUnit
+   * @param unit the SampleUnitBase subtype for a Census, Business or Social SampleUnit
    * @return the created Party object
    * @throws Exception unlikely, but indicated something really wrong
    */

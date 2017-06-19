@@ -6,14 +6,14 @@ applications:
   host: samplesvc
   memory: 1024M
   path: samplesvc/target/samplesvc.jar
-  timeout: 120
+  timeout: 180
   services:
-    - samplesvc_pg_db
-    - redis
-    - rabbitmq
-    - sample_moveit
+    - rm-pg-db
+    - rm-redis
+    - rm-rabbitmq
+    - samplesvc-moveit
   env:
-    partySvc_connectionConfig_host: ras-party-v2.apps.mvp.onsclofo.uk
+    partySvc_connectionConfig_host: ras-party-v2-int.apps.mvp.onsclofo.uk
     partySvc_connectionConfig_port: "80"
     partySvc_connectionConfig_scheme: http
     sampleSvc_connectionConfig_host: samplesvc.apps.mvp.onsclofo.uk

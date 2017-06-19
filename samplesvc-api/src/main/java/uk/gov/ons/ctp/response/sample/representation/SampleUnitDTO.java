@@ -31,9 +31,18 @@ public class SampleUnitDTO {
   /**
    * enum for SampleUnit type
    */
-  //TODO would be better to have (HOUSEHOLD,"H") and get CaseSvc to map with JPA so that in db the value is "H", but code refers to HOUSEHOLD
   public enum SampleUnitType {
-    H, HI, C, CI, B, BI
+    H(true), HI(false), C(true), CI(false), B(true), BI(false);
+    
+    private boolean isParent;
+    
+    SampleUnitType(boolean isParent) {
+      this.isParent = isParent;
+    }
+    
+    public boolean isParent() {
+      return isParent;
+    }
   }
 
   private Integer sampleUnitPK;

@@ -21,7 +21,7 @@
     <dependency>
       <groupId>uk.gov.ons.ctp.product</groupId>
       <artifactId>partysvc-api</artifactId>
-      <version>10.37.0-SNAPSHOT</version>
+      <version>10.40.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -33,6 +33,12 @@
     <dependency>
       <groupId>uk.gov.ons.ctp.common</groupId>
       <artifactId>framework</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>net.logstash.logback</groupId>
+      <artifactId>logstash-logback-encoder</artifactId>
+      <version>4.10</version>
     </dependency>
 
     <dependency>
@@ -280,25 +286,6 @@
             <item>timestamp</item>
           </items>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <version>3.0.0</version>
-        <executions>
-          <execution>
-            <id>add-source</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>add-source</goal>
-            </goals>
-            <configuration>
-              <sources>
-                <source>src/mock/java</source>
-              </sources>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
 

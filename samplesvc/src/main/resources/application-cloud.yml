@@ -11,6 +11,7 @@ logging:
   level:
     org.springframework: WARN
     uk.gov.ons.ctp: DEBUG
+  profile: CLOUD
 
 liquibase:
   user: ${cloud.services.postgresql.connection.username}
@@ -115,10 +116,6 @@ sample-svc:
     read-timeout-milli-seconds: 5000
 
 sftp:
-  host: ${cloud.services.user-provided.connection.host}
-  port: ${cloud.services.user-provided.connection.port}
-  username: ${cloud.services.user-provided.connection.username}
-  password: ${cloud.services.user-provided.connection.password}
   directory:
     social: social-sftp/
     business: business-sftp/
@@ -133,7 +130,7 @@ rabbitmq:
   password: ${cloud.services.rabbitmq.connection.password}
   host: ${cloud.services.rabbitmq.connection.host}
   port: ${cloud.services.rabbitmq.connection.port}
-  virtualhost: /
+  virtualhost: ${cloud.services.rabbitmq.connection.virtualhost}
   cron: "* * * * * ?"
 
 redis:
@@ -150,7 +147,7 @@ messaging:
   pubMaxAttempts: 3
 
 sample-unit-distribution:
-  retrieval-max: 5
+  retrieval-max: 500
   distribution-max: 10
   retry-sleep-seconds: 30
   delay-milli-seconds: 60000

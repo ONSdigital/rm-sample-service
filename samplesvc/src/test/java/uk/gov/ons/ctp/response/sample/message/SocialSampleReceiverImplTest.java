@@ -38,7 +38,7 @@ public class SocialSampleReceiverImplTest {
 		String xmlFileLocation = "src/test/resources/uk/gov/ons/ctp/response/sample/service/impl/social-survey-sample.xml";
 
 	  ValidatingXmlUnmarshaller<SocialSurveySample> unmarshaller = new ValidatingXmlUnmarshaller<SocialSurveySample>(
-	      "xsd/inbound",
+              "samplesvc/xsd/inbound",
 	      "social-survey-sample.xsd",
 	      SocialSurveySample.class);
 	  SocialSurveySample sample = unmarshaller.unmarshal(xmlFileLocation);

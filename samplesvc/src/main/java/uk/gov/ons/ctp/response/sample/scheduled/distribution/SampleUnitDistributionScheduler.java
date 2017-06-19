@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Schedules SampleUnit Distribution
+ */
 @Service
 @Slf4j
 public class SampleUnitDistributionScheduler implements HealthIndicator {
@@ -18,13 +21,15 @@ public class SampleUnitDistributionScheduler implements HealthIndicator {
         .withDetail("activationInfo", distribInfo)
         .build();
   }
-  
+
   @Autowired
   private SampleUnitDistributor sampleUnitDistributorImpl;
 
   private SampleUnitDistributionInfo distribInfo = new SampleUnitDistributionInfo();
 
-  
+  /**
+   * Scheduled Runner for distributing SampleUnits
+   */
   @Scheduled(fixedDelayString = "#{appConfig.sampleUnitDistribution.delayMilliSeconds}")
   public void run() {
     try {

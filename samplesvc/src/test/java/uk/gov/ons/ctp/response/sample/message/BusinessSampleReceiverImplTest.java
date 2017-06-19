@@ -37,7 +37,7 @@ public class BusinessSampleReceiverImplTest {
 		String xmlFileLocation = "src/test/resources/uk/gov/ons/ctp/response/sample/service/impl/business-survey-sample.xml";
 
 	  ValidatingXmlUnmarshaller<BusinessSurveySample> unmarshaller = new ValidatingXmlUnmarshaller<BusinessSurveySample>(
-	      "xsd/inbound",
+			  "samplesvc/xsd/inbound",
 	      "business-survey-sample.xsd",
 	      BusinessSurveySample.class);
 	  BusinessSurveySample sample = unmarshaller.unmarshal(xmlFileLocation);

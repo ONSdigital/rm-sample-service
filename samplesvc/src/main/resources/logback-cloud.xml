@@ -1,8 +1,6 @@
 <configuration>
   <include resource="org/springframework/boot/logging/logback/defaults.xml" />
   <timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss" />
-  <property resource="application.yml" />
-  <springProperty name="profile" source="logging.profile" />
   <springProperty scope="context" name="springAppName"
     source="spring.application.name" />
   <property name="CONSOLE_LOG_PATTERN"
@@ -10,7 +8,7 @@
   <property name="SYSLOG_PATTERN"
     value="${LOG_LEVEL_PATTERN:-%5level} %-40.40logger{39} : %message%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}" />
 
-  <appender name="CLOUD" class="ch.qos.logback.core.ConsoleAppender">
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
       <providers>
         <mdc/>
@@ -31,15 +29,6 @@
     </filter>
   </appender>
 
-  <appender name="DEV" class="ch.qos.logback.core.ConsoleAppender">
-    <encoder>
-      <pattern>${CONSOLE_LOG_PATTERN}</pattern>
-    </encoder>
-    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <level>DEBUG</level>
-    </filter>
-  </appender>
-
   <appender name="SYSLOG" class="ch.qos.logback.classic.net.SyslogAppender">
     <syslogHost>localhost</syslogHost>
     <facility>DAEMON</facility>
@@ -50,12 +39,18 @@
       "event": "%message"
       }</suffixPattern>
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <level>TRACE</level>
+      <level>ERROR</level>
     </filter>
   </appender>
 
   <root level="WARN">
-    <appender-ref ref="${profile}" />
+    <appender-ref ref="STDOUT" />
+    <appender-ref ref="SYSLOG" />
   </root>
+
+  <!--<root level="DEBUG">
+    <appender-ref ref="STDOUT" />
+    <appender-ref ref="SYSLOG" />
+  </root>-->
 
 </configuration>

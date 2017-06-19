@@ -1,12 +1,12 @@
 package uk.gov.ons.ctp.response.sample.service;
 
-import java.util.List;
-
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
+
+import java.util.List;
 
 /**
  * The SampleService interface defines all business behaviours for operations on
@@ -19,8 +19,10 @@ public interface SampleService {
    *
    * @param samplingUnitList list of sampling units.
    * @param surveySampleObject SurveySample to be used
+   * @throws Exception exception thrown
    */
-  void processSampleSummary(SurveyBase surveySampleObject, List<? extends SampleUnitBase> samplingUnitList) throws Exception;
+  void processSampleSummary(SurveyBase surveySampleObject, List<? extends SampleUnitBase> samplingUnitList)
+          throws Exception;
 
   /**
    * Find SampleSummary entity by sampleid
@@ -43,7 +45,7 @@ public interface SampleService {
    * Save a CollectionExerciseJob based on the associated CollectionExerciseId, and SampleSummary surveyRef and
    * exerciseDateTime
    *
-   * @param collectionExerciseJobCreationRequestDTO CollectionExerciseJobCreationRequestDTO related to SampleUnits
+   * @param collectionExerciseJob CollectionExerciseJobCreationRequestDTO related to SampleUnits
    * @return Integer sampleUnitsTotal value
    * @throws CTPException if update operation fails or CollectionExerciseJob already exists
    */

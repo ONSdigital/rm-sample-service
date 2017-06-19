@@ -6,16 +6,11 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.support.MessageBuilder;
 
 import uk.gov.ons.ctp.common.xml.ValidatingXmlUnmarshaller;
 import uk.gov.ons.ctp.response.sample.definition.CensusSampleUnit;
@@ -42,7 +37,7 @@ public class CensusSampleReceiverImplTest {
 		String xmlFileLocation = "src/test/resources/uk/gov/ons/ctp/response/sample/service/impl/census-survey-sample.xml";
 
 	  ValidatingXmlUnmarshaller<CensusSurveySample> unmarshaller = new ValidatingXmlUnmarshaller<CensusSurveySample>(
-	      "xsd/inbound",
+              "samplesvc/xsd/inbound",
 	      "census-survey-sample.xsd",
 	      CensusSurveySample.class);
 	  CensusSurveySample sample = unmarshaller.unmarshal(xmlFileLocation);
