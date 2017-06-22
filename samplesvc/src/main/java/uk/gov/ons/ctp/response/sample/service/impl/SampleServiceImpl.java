@@ -10,6 +10,7 @@ import uk.gov.ons.ctp.common.rest.RestClient;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.common.time.DateTimeUtil;
 import uk.gov.ons.ctp.response.party.definition.Party;
+import uk.gov.ons.ctp.response.party.representation.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
@@ -29,6 +30,7 @@ import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Accept feedback from handlers
@@ -83,7 +85,7 @@ public class SampleServiceImpl implements SampleService {
     SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
 
     createAndSaveSampleUnits(samplingUnitList, savedSampleSummary);
-    //sendToPartyService(savedSampleSummary.getSampleSummaryPK(), samplingUnitList);
+    sendToPartyService(savedSampleSummary.getSampleSummaryPK(), samplingUnitList);
     activateSampleSummaryState(savedSampleSummary.getSampleSummaryPK());
   }
 
@@ -144,9 +146,13 @@ public class SampleServiceImpl implements SampleService {
   private void sendToPartyService(Integer sampleKey, List<? extends SampleUnitBase> samplingUnitList) throws Exception {
     log.debug("Send to party svc");
     for (SampleUnitBase sampleUnitBase : samplingUnitList) {
-      PartyDTO party = PartyUtil.convertToPartyDTO(sampleUnitBase);
-      PartyDTO returned = partySvcClient.postParty(party);
-      log.info(returned.getAttributes().toString());
+      PartyCreationRequestDTO party = PartyUtil.convertToPartyDTO(sampleUnitBase);
+      try {
+        PartyDTO returned = partySvcClient.postParty(party);
+        log.info("HELLO" + returned.getId());
+      } catch (Exception e) {
+        log.info("failed to post to party", e);
+      }
     }
   }
 

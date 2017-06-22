@@ -12,5 +12,5 @@ import uk.gov.ons.ctp.common.rest.RestClientConfig;
 @Data
 public class PartySvc {
   private RestClientConfig connectionConfig;
-  private String postPartyByPartyId;
+  private String postPartyPath;
 }

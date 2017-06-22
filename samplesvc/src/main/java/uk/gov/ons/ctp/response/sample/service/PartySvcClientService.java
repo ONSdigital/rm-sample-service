@@ -1,6 +1,7 @@
 package uk.gov.ons.ctp.response.sample.service;
 
 import uk.gov.ons.ctp.response.party.definition.Party;
+import uk.gov.ons.ctp.response.party.representation.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 
 import java.util.UUID;
@@ -18,5 +19,5 @@ public interface PartySvcClientService {
      * @param party the PartySvc UUID
      * @return the Party we fetched!
      */
-    PartyDTO postParty(PartyDTO party);
+    PartyDTO postParty(PartyCreationRequestDTO newPartyDTO);
 }

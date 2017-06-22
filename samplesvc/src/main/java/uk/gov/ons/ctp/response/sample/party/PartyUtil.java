@@ -2,6 +2,7 @@ package uk.gov.ons.ctp.response.sample.party;
 
 import uk.gov.ons.ctp.response.party.definition.Party;
 import uk.gov.ons.ctp.response.party.definition.PartyAttributeMap;
+import uk.gov.ons.ctp.response.party.representation.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.xml.JaxbAnnotatedTypeUtil;
@@ -29,8 +30,8 @@ public class PartyUtil {
     return p;
   }
 
-  public static PartyDTO convertToPartyDTO(SampleUnitBase unit) throws Exception {
-    PartyDTO p = new PartyDTO();
+  public static PartyCreationRequestDTO convertToPartyDTO(SampleUnitBase unit) throws Exception {
+    PartyCreationRequestDTO p = new PartyCreationRequestDTO();
     p.setSampleUnitType(unit.getSampleUnitType());
     p.setSampleUnitRef(unit.getSampleUnitRef());
 

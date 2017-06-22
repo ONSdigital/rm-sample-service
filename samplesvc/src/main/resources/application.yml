@@ -96,10 +96,10 @@ spring:
 
 party-svc:
   sample-path: /events
-  post-party-by-party-id: /party-api/v1/parties
+  post-party-path: /party-api/v1/parties
   connection-config:
     scheme: http
-    host: localhost
+    host: ras-party-v2-int.apps.mvp.onsclofo.uk
     port: 80
     retry-attempts: 10
     retry-pause-milli-seconds: 5000
