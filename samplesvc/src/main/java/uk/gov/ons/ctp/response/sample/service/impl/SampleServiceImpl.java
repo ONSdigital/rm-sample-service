@@ -125,9 +125,10 @@ public class SampleServiceImpl implements SampleService {
    *
    * @param sampleSummaryPK the sampleSummaryPK to be updated
    * @return SampleSummary the updated SampleSummary
+   * @throws CTPException if transition errors
    */
   @Override
-  public SampleSummary activateSampleSummaryState(Integer sampleSummaryPK) {
+  public SampleSummary activateSampleSummaryState(Integer sampleSummaryPK) throws CTPException {
     SampleSummary targetSampleSummary = sampleSummaryRepository.findOne(sampleSummaryPK);
     SampleSummaryDTO.SampleState newState = sampleSvcStateTransitionManager.transition(targetSampleSummary.getState(),
             SampleSummaryDTO.SampleEvent.ACTIVATED);
