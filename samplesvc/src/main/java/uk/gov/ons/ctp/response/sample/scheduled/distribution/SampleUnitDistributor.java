@@ -82,7 +82,7 @@ public class SampleUnitDistributor {
    */
   public final SampleUnitDistributionInfo distribute() {
     Span distribSpan = tracer.createSpan(SAMPLEUNIT_DISTRIBUTOR_SPAN);
-    log.info("ActionDistributor is in the house");
+    log.info("SampleUnitDistributor is in the house");
     SampleUnitDistributionInfo distInfo = new SampleUnitDistributionInfo();
 
     int successes = 0, failures = 0;
