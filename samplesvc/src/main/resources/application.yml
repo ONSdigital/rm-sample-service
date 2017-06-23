@@ -157,3 +157,10 @@ sample-unit-distribution:
   distribution-max: 10
   retry-sleep-seconds: 30
   delay-milli-seconds: 60000
+
+swagger-settings:
+  swagger-ui-active: true
+  group-name: "sampleeservice-api"
+  title: "Sample Service API"
+  description: "API for the Sample Service"
+  version: "10.41"
