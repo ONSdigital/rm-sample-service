@@ -18,4 +18,5 @@ public class AppConfig {
   private PartySvc partySvc;
   private SampleUnitDistribution sampleUnitDistribution;
   private DataGrid dataGrid;
+  private SwaggerSettings swaggerSettings;
 }

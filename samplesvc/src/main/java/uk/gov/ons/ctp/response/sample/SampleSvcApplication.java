@@ -89,8 +89,8 @@ public class SampleSvcApplication {
    * @return the RestClient for the SampleService
    */
   @Bean
-  @Qualifier("partyServiceClient")
-  public RestClient partyServiceClient() {
+  @Qualifier("partySvcClient")
+  public RestClient partySvcClient() {
     RestClient restHelper = new RestClient(appConfig.getPartySvc().getConnectionConfig());
     return restHelper;
   }

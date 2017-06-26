@@ -11,6 +11,7 @@ logging:
   level:
     org.springframework: WARN
     uk.gov.ons.ctp: DEBUG
+  profile: CLOUD
 
 liquibase:
   user: ${cloud.services.postgresql.connection.username}

@@ -37,8 +37,9 @@ public interface SampleService {
    *
    * @param sampleSummaryPK The sampleSummaryPK
    * @return SampleSummary object or null
+   * @throws CTPException if transition errors
    */
-  SampleSummary activateSampleSummaryState(Integer sampleSummaryPK);
+  SampleSummary activateSampleSummaryState(Integer sampleSummaryPK) throws CTPException;
 
 
   /**

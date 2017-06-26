@@ -29,12 +29,9 @@ public class SendToPartyImplTest {
   public void testSendToPartyAddsToThePartyQueue() {
     Party partyDTO = new Party();
     partyDTO.setId("1");
-    partyDTO.setPosition(1);
-    partyDTO.setSampleId(123);
     partyDTO.setSampleUnitRef("str123");
     partyDTO.setSampleUnitType("H");
-    partyDTO.setSize(1);
-    
+
     sendToParty.publish(partyDTO);
     
     verify(rabbitTemplate, times(1)).convertAndSend(partyDTO);

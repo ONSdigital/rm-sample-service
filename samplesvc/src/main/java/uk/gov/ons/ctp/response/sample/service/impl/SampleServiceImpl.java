@@ -10,6 +10,9 @@ import uk.gov.ons.ctp.common.rest.RestClient;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.common.time.DateTimeUtil;
 import uk.gov.ons.ctp.response.party.definition.Party;
+import uk.gov.ons.ctp.response.party.representation.PartyCreationRequestDTO;
+import uk.gov.ons.ctp.response.party.representation.PartyDTO;
+import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
@@ -22,10 +25,12 @@ import uk.gov.ons.ctp.response.sample.party.PartyUtil;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.service.CollectionExerciseJobService;
+import uk.gov.ons.ctp.response.sample.service.PartySvcClientService;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Accept feedback from handlers
@@ -36,6 +41,9 @@ import java.util.List;
 public class SampleServiceImpl implements SampleService {
   @Autowired
   private SampleSummaryRepository sampleSummaryRepository;
+
+  @Autowired
+  private AppConfig appConfig;
 
   @Autowired
   private SampleUnitRepository sampleUnitRepository;
@@ -51,6 +59,9 @@ public class SampleServiceImpl implements SampleService {
   @Autowired
   @Qualifier("sampleServiceClient")
   private RestClient sampleServiceClient;
+
+  @Autowired
+  private PartySvcClientService partySvcClient;
 
   @Autowired
   private CollectionExerciseJobService collectionExerciseJobService;
@@ -74,7 +85,6 @@ public class SampleServiceImpl implements SampleService {
     SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
 
     createAndSaveSampleUnits(samplingUnitList, savedSampleSummary);
-    //sendToPartyQueue(savedSampleSummary.getSampleSummaryPK(), samplingUnitList);
     sendToPartyService(savedSampleSummary.getSampleSummaryPK(), samplingUnitList);
     activateSampleSummaryState(savedSampleSummary.getSampleSummaryPK());
   }
@@ -115,35 +125,16 @@ public class SampleServiceImpl implements SampleService {
    *
    * @param sampleSummaryPK the sampleSummaryPK to be updated
    * @return SampleSummary the updated SampleSummary
+   * @throws CTPException if transition errors
    */
   @Override
-  public SampleSummary activateSampleSummaryState(Integer sampleSummaryPK) {
+  public SampleSummary activateSampleSummaryState(Integer sampleSummaryPK) throws CTPException {
     SampleSummary targetSampleSummary = sampleSummaryRepository.findOne(sampleSummaryPK);
     SampleSummaryDTO.SampleState newState = sampleSvcStateTransitionManager.transition(targetSampleSummary.getState(),
             SampleSummaryDTO.SampleEvent.ACTIVATED);
     targetSampleSummary.setState(newState);
     sampleSummaryRepository.saveAndFlush(targetSampleSummary);
     return targetSampleSummary;
-  }
-
-  /**
-   * Send samplingUnits to the queue
-   *
-   * @param sampleKey the sampleKey of the sample to be sent
-   * @param samplingUnitList list of sampling units to be sent
-   * @throws Exception exception thrown
-   */
-  private void sendToPartyQueue(Integer sampleKey, List<? extends SampleUnitBase> samplingUnitList) throws Exception {
-    int size = samplingUnitList.size();
-    int position = 1;
-    log.debug("Send sampleSummaryFK: {} to Party queue", sampleKey);
-    for (SampleUnitBase sub : samplingUnitList) {
-      Party party = PartyUtil.convertToParty(sub);
-      party.setSize(size);
-      party.setPosition(position);
-      sendQueue.publish(party);
-      position++;
-    }
   }
 
   /**
@@ -154,15 +145,15 @@ public class SampleServiceImpl implements SampleService {
    * @throws Exception exception thrown
    */
   private void sendToPartyService(Integer sampleKey, List<? extends SampleUnitBase> samplingUnitList) throws Exception {
-    int size = samplingUnitList.size();
-    int position = 1;
     log.debug("Send to party svc");
-    for (SampleUnitBase bsu : samplingUnitList) {
-      Party party = PartyUtil.convertToParty(bsu);
-      party.setSize(size);
-      party.setPosition(position);
-//      sampleServiceClient.postResource("/party/events", party, Party.class);
-      position++;
+    for (SampleUnitBase sampleUnitBase : samplingUnitList) {
+      PartyCreationRequestDTO party = PartyUtil.convertToPartyDTO(sampleUnitBase);
+      try {
+        PartyDTO returned = partySvcClient.postParty(party);
+        log.info("HELLO" + returned.getId());
+      } catch (Exception e) {
+        log.info("failed to post to party", e);
+      }
     }
   }
 

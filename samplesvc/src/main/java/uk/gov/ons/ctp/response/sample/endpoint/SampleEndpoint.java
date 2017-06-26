@@ -44,11 +44,12 @@ public final class SampleEndpoint implements CTPEndpoint {
    * @param bindingResult collects errors thrown
    * @return Response Returns sampleUnitsTotal value
    * @throws CTPException if update operation fails or CollectionExerciseJob already exists
+   * @throws InvalidRequestException if binding errors
    */
   @RequestMapping(value = "/sampleunitrequests", method = RequestMethod.POST, consumes = "application/json")
   public ResponseEntity<?> getSampleSummary(final @Valid @RequestBody CollectionExerciseJobCreationRequestDTO
                                                        collectionExerciseJobCreationRequestDTO,
-                                             BindingResult bindingResult) throws CTPException {
+                                             BindingResult bindingResult) throws CTPException, InvalidRequestException {
     log.debug("Entering createCollectionExerciseJob with requestObject {}", collectionExerciseJobCreationRequestDTO);
     if (bindingResult.hasErrors()) {
       throw new InvalidRequestException("Binding errors for create action: ", bindingResult);

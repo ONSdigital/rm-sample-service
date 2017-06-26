@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 import uk.gov.ons.ctp.common.distributed.DistributedListManager;
 import uk.gov.ons.ctp.common.distributed.LockingException;
+import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
@@ -81,7 +82,7 @@ public class SampleUnitDistributor {
    */
   public final SampleUnitDistributionInfo distribute() {
     Span distribSpan = tracer.createSpan(SAMPLEUNIT_DISTRIBUTOR_SPAN);
-    log.info("ActionDistributor is in the house");
+    log.info("SampleUnitDistributor is in the house");
     SampleUnitDistributionInfo distInfo = new SampleUnitDistributionInfo();
 
     int successes = 0, failures = 0;
@@ -112,13 +113,12 @@ public class SampleUnitDistributor {
             uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit = mapperFacade.map(sampleUnit,
                 uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.class);
             mappedSampleUnit.setCollectionExerciseId(job.getCollectionExerciseId().toString());
-            sendSampleUnitToCollectionExcerciseQueue(sampleUnit, mappedSampleUnit);
+            sendSampleUnitToCollectionExerciseQueue(sampleUnit, mappedSampleUnit);
             successes++;
-          } catch (Exception e) {
+          } catch (CTPException e) {
             // single case/questionnaire db changes rolled back
-            log.error(
-                "Exception {} thrown processing sampleunit {}. Processing postponed",
-                e.getMessage(), sampleUnit.getSampleUnitPK());
+            log.error("Exception {} thrown processing sampleunit {}. Processing postponed", e.getMessage(),
+                    sampleUnit.getSampleUnitPK());
             failures++;
           }
         }
@@ -146,10 +146,11 @@ public class SampleUnitDistributor {
    * Sends SampleUnit to the CollectionExercise queue
    * @param sampleUnit sample unit to be mapped
    * @param mappedSampleUnit mapped sample unit to be sent
+   * @throws CTPException if transition issue
    */
   @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
-  private void sendSampleUnitToCollectionExcerciseQueue(SampleUnit sampleUnit,
-      uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit) {
+  private void sendSampleUnitToCollectionExerciseQueue(SampleUnit sampleUnit,
+                                                       uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit) throws CTPException {
     transitionSampleUnitStateFromDeliveryEvent(sampleUnit.getSampleUnitPK());
     sampleUnitPublisher.send(mappedSampleUnit);
   }
@@ -158,8 +159,9 @@ public class SampleUnitDistributor {
    * Transitions SampleUnit State from Delivery Event
    * @param sampleUnitPK sample unit primary key
    * @return SampleUnit the target sampleunit
+   * @throws CTPException if transition issue
    */
-  public SampleUnit transitionSampleUnitStateFromDeliveryEvent(Integer sampleUnitPK) {
+  public SampleUnit transitionSampleUnitStateFromDeliveryEvent(Integer sampleUnitPK) throws CTPException {
     SampleUnit targetSampleUnit = sampleUnitRepository.findOne(sampleUnitPK);
     SampleUnitDTO.SampleUnitState newState = sampleUnitStateTransitionManager.transition(targetSampleUnit.getState(),
         SampleUnitDTO.SampleUnitEvent.DELIVERING);
