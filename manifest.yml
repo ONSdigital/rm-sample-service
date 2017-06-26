@@ -1,7 +1,6 @@
 ---
 applications:
 - name: samplesvc
-  buildpack: https://github.com/cloudfoundry/java-buildpack.git
   instances: 1
   host: samplesvc
   memory: 1024M
@@ -11,7 +10,6 @@ applications:
     - rm-pg-db
     - rm-redis
     - rm-rabbitmq
-    - samplesvc-moveit
   env:
     partySvc_connectionConfig_host: ras-party-v2-int.apps.mvp.onsclofo.uk
     partySvc_connectionConfig_port: "80"
