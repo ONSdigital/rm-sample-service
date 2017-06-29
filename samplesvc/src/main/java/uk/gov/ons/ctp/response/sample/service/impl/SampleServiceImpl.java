@@ -150,7 +150,7 @@ public class SampleServiceImpl implements SampleService {
       PartyCreationRequestDTO party = PartyUtil.convertToPartyDTO(sampleUnitBase);
       try {
         PartyDTO returned = partySvcClient.postParty(party);
-        log.info("HELLO" + returned.getId());
+        log.info(returned.getId());
       } catch (Exception e) {
         log.info("failed to post to party", e);
       }
