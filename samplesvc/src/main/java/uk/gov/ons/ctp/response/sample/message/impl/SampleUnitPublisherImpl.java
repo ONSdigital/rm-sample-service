@@ -1,5 +1,6 @@
 package uk.gov.ons.ctp.response.sample.message.impl;
 
+import net.sourceforge.cobertura.CoverageIgnore;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -12,6 +13,7 @@ import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
 /**
  * The publisher to queues
  */
+@CoverageIgnore
 @Slf4j
 @MessageEndpoint
 public class SampleUnitPublisherImpl implements SampleUnitPublisher {

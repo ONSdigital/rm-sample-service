@@ -76,7 +76,7 @@ public class SendToCollExQueueTest {
 
     
     @Test
-    public void verifySendingSampleUnitsToQueueAddsThemToQueueAndChangesStateToDelivered() throws Exception{
+    public void verifyRetrievedSampleUnitsAreDeliveredToTheQueue() throws Exception{
         UUID cEId = UUID.randomUUID();
         when(collectionExerciseJobRepository.findAll()).thenReturn(Collections.singletonList(new CollectionExerciseJob(1,cEId,"str1234",new Timestamp(0),new Timestamp(0))));
         SampleUnit su1 = SampleUnit.builder().sampleSummaryFK(1).sampleUnitPK(2).sampleUnitRef("str1234").sampleUnitType("H").state(SampleUnitDTO.SampleUnitState.INIT).build();

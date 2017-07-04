@@ -19,17 +19,6 @@ public class PartyUtil {
    * @return the created Party object
    * @throws Exception unlikely, but indicated something really wrong
    */
-  public static Party convertToParty(SampleUnitBase unit) throws Exception {
-    Party p = new Party();
-    p.setSampleUnitType(unit.getSampleUnitType());
-    p.setSampleUnitRef(unit.getSampleUnitRef());
-
-    PartyAttributeMap partyAttribs = new PartyAttributeMap();
-    partyAttribs.putAll(JaxbAnnotatedTypeUtil.extractXmlProperties(unit));
-    p.setAttributes(partyAttribs);
-    return p;
-  }
-
   public static PartyCreationRequestDTO convertToPartyDTO(SampleUnitBase unit) throws Exception {
     PartyCreationRequestDTO p = new PartyCreationRequestDTO();
     p.setSampleUnitType(unit.getSampleUnitType());
