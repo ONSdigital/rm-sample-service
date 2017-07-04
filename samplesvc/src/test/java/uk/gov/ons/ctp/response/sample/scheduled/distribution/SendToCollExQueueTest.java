@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.response.sample.service;
+package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
