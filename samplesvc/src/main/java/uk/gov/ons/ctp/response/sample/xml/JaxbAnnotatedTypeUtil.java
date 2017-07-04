@@ -9,7 +9,7 @@ import java.util.Map;
  * Util class to manipulate or inspect Jaxb type annotated objects
  *
  */
-public class JaxbAnnotatedTypeUtil {
+public final class JaxbAnnotatedTypeUtil {
 
   /**
    * Takes the given object and extracts using reflection the @XmlType annotated
