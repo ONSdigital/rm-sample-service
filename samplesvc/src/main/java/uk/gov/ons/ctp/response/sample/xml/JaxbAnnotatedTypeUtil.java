@@ -11,6 +11,7 @@ import java.util.Map;
  */
 public final class JaxbAnnotatedTypeUtil {
 
+  private JaxbAnnotatedTypeUtil(){}
   /**
    * Takes the given object and extracts using reflection the @XmlType annotated
    * properties, returning a map where the keys are the property names and the
