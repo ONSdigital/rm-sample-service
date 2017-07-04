@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
  * Created by wardlk on 04/07/2017.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class postToPartySvcAndReceivePartyBackTest {
+public class PartySvcClientServiceTest {
 
 
 
