@@ -1,5 +1,6 @@
 package uk.gov.ons.ctp.response.sample;
 
+import net.sourceforge.cobertura.CoverageIgnore;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -31,6 +32,7 @@ import uk.gov.ons.ctp.response.sample.service.state.SampleSvcStateTransitionMana
 /**
  * The main entry point into the Sample Service SpringBoot Application.
  */
+@CoverageIgnore
 @SpringBootApplication
 @EnableTransactionManagement
 @EnableCaching

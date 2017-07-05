@@ -26,10 +26,10 @@ import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 /**
  * Domain model object.
  */
-@CoverageIgnore
 @Entity
 @Data
 @AllArgsConstructor
+@CoverageIgnore
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Table(name = "samplesummary", schema = "sample")

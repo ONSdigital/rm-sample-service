@@ -98,7 +98,6 @@ public class SampleEndpointUnitTest{
    BindingResult bindingResult = mock(BindingResult.class);
    when(bindingResult.hasErrors()).thenReturn(true);
    sampleEndpoint.getSampleSummary(collectionExerciseJobCreationRequestDTO, bindingResult);
-
   }
   
 }

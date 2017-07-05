@@ -1,5 +1,6 @@
 package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 
+import net.sourceforge.cobertura.CoverageIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Schedules SampleUnit Distribution
  */
+@CoverageIgnore
 @Service
 @Slf4j
 public class SampleUnitDistributionScheduler implements HealthIndicator {

@@ -1,6 +1,7 @@
 package uk.gov.ons.ctp.response.sample.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import net.sourceforge.cobertura.CoverageIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
@@ -64,6 +65,16 @@ public class SampleServiceImpl implements SampleService {
   @Override
   public void processSampleSummary(SurveyBase surveySample, List<? extends SampleUnitBase> samplingUnitList)
           throws Exception {
+    SampleSummary sampleSummary = createSampleSummary(surveySample);
+
+    SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
+
+    createAndSaveSampleUnits(samplingUnitList, savedSampleSummary);
+    sendToPartyService(savedSampleSummary.getSampleSummaryPK(), samplingUnitList);
+    activateSampleSummaryState(savedSampleSummary.getSampleSummaryPK());
+  }
+
+  protected SampleSummary createSampleSummary(SurveyBase surveySample) {
     Timestamp effectiveStartDateTime = new Timestamp(surveySample.getEffectiveStartDateTime()
             .toGregorianCalendar().getTimeInMillis());
     Timestamp effectiveEndDateTime = new Timestamp(surveySample.getEffectiveEndDateTime()
@@ -75,12 +86,7 @@ public class SampleServiceImpl implements SampleService {
     sampleSummary.setSurveyRef(surveySample.getSurveyRef());
     sampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
     sampleSummary.setState(SampleSummaryDTO.SampleState.INIT);
-
-    SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
-
-    createAndSaveSampleUnits(samplingUnitList, savedSampleSummary);
-    sendToPartyService(savedSampleSummary.getSampleSummaryPK(), samplingUnitList);
-    activateSampleSummaryState(savedSampleSummary.getSampleSummaryPK());
+    return sampleSummary;
   }
 
   /**
@@ -89,17 +95,22 @@ public class SampleServiceImpl implements SampleService {
    * @param sampleSummary summary to be saved as sampleUnit
    * @param samplingUnitList list of samplingUnits to be saved
    */
+  @CoverageIgnore
   private void createAndSaveSampleUnits(List<? extends SampleUnitBase> samplingUnitList, SampleSummary sampleSummary) {
     for (SampleUnitBase sampleUnitBase : samplingUnitList) {
-      SampleUnit sampleUnit = new SampleUnit();
-      sampleUnit.setSampleSummaryFK(sampleSummary.getSampleSummaryPK());
-      sampleUnit.setSampleUnitRef(sampleUnitBase.getSampleUnitRef());
-      sampleUnit.setSampleUnitType(sampleUnitBase.getSampleUnitType());
-      sampleUnit.setFormType(sampleUnitBase.getFormType());
-      sampleUnit.setState(SampleUnitDTO.SampleUnitState.INIT);
-
+      SampleUnit sampleUnit = createSampleUnit(sampleSummary, sampleUnitBase);
       sampleUnitRepository.save(sampleUnit);
     }
+  }
+
+  protected SampleUnit createSampleUnit(SampleSummary sampleSummary, SampleUnitBase sampleUnitBase) {
+    SampleUnit sampleUnit = new SampleUnit();
+    sampleUnit.setSampleSummaryFK(sampleSummary.getSampleSummaryPK());
+    sampleUnit.setSampleUnitRef(sampleUnitBase.getSampleUnitRef());
+    sampleUnit.setSampleUnitType(sampleUnitBase.getSampleUnitType());
+    sampleUnit.setFormType(sampleUnitBase.getFormType());
+    sampleUnit.setState(SampleUnitDTO.SampleUnitState.INIT);
+    return sampleUnit;
   }
 
   /**
@@ -108,6 +119,7 @@ public class SampleServiceImpl implements SampleService {
    * @param sampleSummaryPK the sampleSummaryPK to be searched for
    * @return SampleSummary matching SampleSummary
    */
+  @CoverageIgnore
   @Override
   public SampleSummary findSampleSummaryBySampleSummaryPK(Integer sampleSummaryPK) {
     return sampleSummaryRepository.findOne(sampleSummaryPK);
