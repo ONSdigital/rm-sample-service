@@ -104,22 +104,11 @@ party-svc:
     connect-timeout-milli-seconds: 5000
     read-timeout-milli-seconds: 5000
 
-sample-svc:
-  sample-path: /events
-  connection-config:
-    scheme: http
-    host: localhost
-    port: 8125
-    retry-attempts: 10
-    retry-pause-milli-seconds: 5000
-    connect-timeout-milli-seconds: 5000
-    read-timeout-milli-seconds: 5000
-
 sftp:
   directory:
-    social: social-sftp/
-    business: business-sftp/
-    census: census-sftp/
+    social: SSD/
+    business: BSD/
+    census: CTP/
     Documents: .
   localdirectory: /tmp/samplesvc
   cron: "* * * * * ?"
