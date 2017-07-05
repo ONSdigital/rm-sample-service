@@ -111,7 +111,7 @@ sftp:
     census: CTP/
     Documents: .
   localdirectory: /tmp/samplesvc
-  cron: "* * * * * ?"
+  cron: "0/5 * * * * ?"
   filepattern: "*.xml"
 
 rabbitmq:
