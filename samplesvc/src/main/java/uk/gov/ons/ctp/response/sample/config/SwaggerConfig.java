@@ -1,6 +1,7 @@
 package uk.gov.ons.ctp.response.sample.config;
 
 import com.google.common.base.Predicates;
+import net.sourceforge.cobertura.CoverageIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -18,6 +19,7 @@ import uk.gov.ons.ctp.response.sample.endpoint.SampleEndpoint;
 /**
  * Application config bean for Swagger UI.
  */
+@CoverageIgnore
 @Configuration
 @EnableSwagger2
 @ComponentScan(basePackageClasses = {

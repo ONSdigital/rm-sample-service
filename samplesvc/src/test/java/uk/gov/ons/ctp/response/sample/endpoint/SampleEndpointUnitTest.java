@@ -3,6 +3,7 @@ package uk.gov.ons.ctp.response.sample.endpoint;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.isA;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -24,14 +25,18 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import ma.glasnost.orika.MapperFacade;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.CTPException;
+import uk.gov.ons.ctp.common.error.InvalidRequestException;
 import uk.gov.ons.ctp.common.error.RestExceptionHandler;
 import uk.gov.ons.ctp.common.jackson.CustomObjectMapper;
 import uk.gov.ons.ctp.response.sample.SampleBeanMapper;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 //github.com/ONSdigital/rm-sample-service.git
+import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 public class SampleEndpointUnitTest{
@@ -52,6 +57,8 @@ public class SampleEndpointUnitTest{
   private List<SampleSummary> sampleSummaryResults;
 
   private List<CollectionExerciseJob> collectionExerciseRequests;
+
+  private CollectionExerciseJobCreationRequestDTO collectionExerciseJobCreationRequestDTO;
 
   @Before
   public void setUp() throws Exception {
@@ -84,6 +91,14 @@ public class SampleEndpointUnitTest{
         .andExpect(jsonPath("$.error.code", is(CTPException.Fault.VALIDATION_FAILED.name())))
         .andExpect(jsonPath("$.error.timestamp", isA(String.class)))
         .andExpect(jsonPath("$.error.message", is("Provided json is incorrect.")));
+  }
+
+  @Test(expected = InvalidRequestException.class)
+  public void verifyBadBindingResultThrowsException() throws Exception {
+   BindingResult bindingResult = mock(BindingResult.class);
+   when(bindingResult.hasErrors()).thenReturn(true);
+   sampleEndpoint.getSampleSummary(collectionExerciseJobCreationRequestDTO, bindingResult);
+
   }
   
 }

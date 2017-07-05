@@ -3,6 +3,8 @@ package samplesvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import uk.gov.ons.ctp.response.party.definition.Party;
+import uk.gov.ons.ctp.response.party.representation.PartyCreationRequestDTO;
+import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 import uk.gov.ons.ctp.response.sample.definition.*;
 import uk.gov.ons.ctp.response.sample.party.PartyUtil;
 
@@ -20,7 +22,7 @@ public class SampleServiceImplTest {
     Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
     CensusSurveySample sample = (CensusSurveySample) jaxbUnmarshaller.unmarshal(file);
     for (CensusSampleUnit unit : sample.getSampleUnits().getCensusSampleUnits()) {
-      Party p = PartyUtil.convertToParty(unit);
+      PartyCreationRequestDTO p = PartyUtil.convertToPartyDTO(unit);
       ObjectMapper mapper = new ObjectMapper();
       System.out.println(mapper.writeValueAsString(p));
     }
@@ -34,7 +36,7 @@ public class SampleServiceImplTest {
     Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
     BusinessSurveySample sample = (BusinessSurveySample) jaxbUnmarshaller.unmarshal(file);
     for (BusinessSampleUnit unit : sample.getSampleUnits().getBusinessSampleUnits()) {
-      Party p = PartyUtil.convertToParty(unit);
+      PartyCreationRequestDTO p = PartyUtil.convertToPartyDTO(unit);
       ObjectMapper mapper = new ObjectMapper();
       System.out.println(mapper.writeValueAsString(p));
     }
@@ -48,7 +50,7 @@ public class SampleServiceImplTest {
     Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
     SocialSurveySample sample = (SocialSurveySample) jaxbUnmarshaller.unmarshal(file);
     for (SocialSampleUnit unit : sample.getSampleUnits().getSocialSampleUnits()) {
-      Party p = PartyUtil.convertToParty(unit);
+      PartyCreationRequestDTO p = PartyUtil.convertToPartyDTO(unit);
       ObjectMapper mapper = new ObjectMapper();
       System.out.println(mapper.writeValueAsString(p));
     }

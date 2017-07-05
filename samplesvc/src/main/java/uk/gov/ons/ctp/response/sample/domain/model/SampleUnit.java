@@ -11,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import net.sourceforge.cobertura.CoverageIgnore;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -24,6 +25,7 @@ import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 /**
  * Domain model object.
  */
+@CoverageIgnore
 @Entity
 @Data
 @AllArgsConstructor
