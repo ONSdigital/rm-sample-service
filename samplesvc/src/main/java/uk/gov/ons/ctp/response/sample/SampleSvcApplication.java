@@ -74,16 +74,7 @@ public class SampleSvcApplication {
     return Redisson.create(config);
   }
 
-  /**
-   * The SampleService client bean
-   * @return the RestClient for the SampleService
-   */
-  @Bean
-  @Qualifier("sampleServiceClient")
-  public RestClient sampleServiceClient() {
-    RestClient restHelper = new RestClient(appConfig.getSampleSvc().getConnectionConfig());
-    return restHelper;
-  }
+
   /**
    * The SampleService client bean
    * @return the RestClient for the SampleService

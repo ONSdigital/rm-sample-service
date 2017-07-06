@@ -57,10 +57,6 @@ public class SampleServiceImpl implements SampleService {
           sampleSvcStateTransitionManager;
 
   @Autowired
-  @Qualifier("sampleServiceClient")
-  private RestClient sampleServiceClient;
-
-  @Autowired
   private PartySvcClientService partySvcClient;
 
   @Autowired
