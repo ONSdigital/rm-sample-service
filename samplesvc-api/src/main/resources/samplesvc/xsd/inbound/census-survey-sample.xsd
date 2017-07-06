@@ -28,19 +28,47 @@
     <xsd:complexContent>
       <xsd:extension base="SampleUnitBase">
         <xsd:sequence>
-          <xsd:element name="addressType" type="string_1_6" minOccurs="0" maxOccurs="1" />
-          <xsd:element name="estabType" type="string_1_6" minOccurs="0" maxOccurs="1" />
-          <xsd:element name="organisationName" type="string_1_60" minOccurs="0" maxOccurs="1" />
-          <xsd:element name="category" type="string_1_20" minOccurs="0" maxOccurs="1" />
-          <xsd:element name="ladCode" type="alphanum_1_9" minOccurs="0" maxOccurs="1" />
-          <xsd:element name="latitude" type="xsd:decimal" minOccurs="0" maxOccurs="1" />
-          <xsd:element name="longitude" type="xsd:decimal" minOccurs="0" maxOccurs="1" />
-          <xsd:element name="htc" type="xsd:int" minOccurs="0" maxOccurs="1" />
-          <xsd:element name="locality" type="alphanum_1_35" minOccurs="0" maxOccurs="1" />
-          <xsd:element name="oa" type="alphanum_1_9" minOccurs="0" maxOccurs="1" />
-          <xsd:element name="msoa" type="alphanum_1_9" minOccurs="0" maxOccurs="1" />
-          <xsd:element name="lsoa" type="alphanum_1_9" minOccurs="0" maxOccurs="1" />
-          <xsd:element name="censusRegion" type="alphanum_1_9" minOccurs="0" maxOccurs="1" />
+
+
+      <xsd:element name="line1" type="string_1_60" minOccurs="1" maxOccurs="1" />
+      <xsd:element name="line2" type="string_1_60" minOccurs="1" maxOccurs="1" />
+      <xsd:element name="line3" type="string_0_60" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="line4" type="string_0_60" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="line5" type="string_0_60" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="postcode" minOccurs="1" maxOccurs="1">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:string">
+            <xsd:pattern
+              value="GIR[ ]?0AA|((AB|AL|B|BA|BB|BD|BH|BL|BN|BR|BS|BT|BX|CA|CB|CF|CH|CM|CO|CR|CT|CV|CW|DA|DD|DE|DG|DH|DL|DN|DT|DY|E|EC|EH|EN|EX|FK|FY|G|GL|GY|GU|HA|HD|HG|HP|HR|HS|HU|HX|IG|IM|IP|IV|JE|KA|KT|KW|KY|L|LA|LD|LE|LL|LN|LS|LU|M|ME|MK|ML|N|NE|NG|NN|NP|NR|NW|OL|OX|PA|PE|PH|PL|PO|PR|RG|RH|RM|S|SA|SE|SG|SK|SL|SM|SN|SO|SP|SR|SS|ST|SW|SY|TA|TD|TF|TN|TQ|TR|TS|TW|UB|W|WA|WC|WD|WF|WN|WR|WS|WV|YO|ZE)(\d[\dA-Z]?[ ]?\d[ABD-HJLN-UW-Z]{2}))|BFPO[ ]?\d{1,4}" />
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:element>
+      <xsd:element name="title" type="string_0_20" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="forename" type="string_0_35" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="surname" type="string_0_35" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="phoneNumber" type="phoneNum" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="emailAddress" minOccurs="0" maxOccurs="1">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:string">
+            <xsd:minLength value="0"/>
+            <xsd:maxLength value="100"/>
+            <xsd:pattern value="[_A-Za-z0-9\-\+]+(\.[_A-Za-z0-9\-]+)*@[A-Za-z0-9\-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})" />
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:element>
+          <xsd:element name="addressType" type="string_0_6" minOccurs="0" maxOccurs="1" />
+          <xsd:element name="estabType" type="string_0_6" minOccurs="0" maxOccurs="1" />
+          <xsd:element name="organisationName" type="string_0_60" minOccurs="0" maxOccurs="1" />
+          <xsd:element name="category" type="string_0_20" minOccurs="0" maxOccurs="1" />
+          <xsd:element name="ladCode" type="alphanum_1_9" minOccurs="1" maxOccurs="1" />
+          <xsd:element name="latitude" type="xsd:decimal" minOccurs="1" maxOccurs="1" />
+          <xsd:element name="longitude" type="xsd:decimal" minOccurs="1" maxOccurs="1" />
+          <xsd:element name="htc" type="xsd:int" minOccurs="1" maxOccurs="1" />
+          <xsd:element name="locality" type="string_0_35" minOccurs="0" maxOccurs="1" />
+          <xsd:element name="oa" type="alphanum_1_9" minOccurs="1" maxOccurs="1" />
+          <xsd:element name="msoa" type="alphanum_1_9" minOccurs="1" maxOccurs="1" />
+          <xsd:element name="lsoa" type="alphanum_1_9" minOccurs="1" maxOccurs="1" />
+          <xsd:element name="censusRegion" type="alphanum_1_9" minOccurs="1" maxOccurs="1" />
         </xsd:sequence>
       </xsd:extension>
     </xsd:complexContent>

@@ -1,5 +1,7 @@
 package uk.gov.ons.ctp.response.sample.xml;
 
+import net.sourceforge.cobertura.CoverageIgnore;
+
 import javax.xml.bind.annotation.XmlType;
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -9,8 +11,10 @@ import java.util.Map;
  * Util class to manipulate or inspect Jaxb type annotated objects
  *
  */
-public class JaxbAnnotatedTypeUtil {
+public final class JaxbAnnotatedTypeUtil {
 
+  @CoverageIgnore
+  private JaxbAnnotatedTypeUtil(){}
   /**
    * Takes the given object and extracts using reflection the @XmlType annotated
    * properties, returning a map where the keys are the property names and the
