@@ -1,4 +1,4 @@
-FROM openjdk 
+FROM openjdk:8u121-jre
 ARG jar
 VOLUME /tmp
 ADD $jar samplesvc.jar

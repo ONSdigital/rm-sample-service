@@ -16,7 +16,7 @@ import lombok.Data;
 @ConfigurationProperties
 @Data
 public class AppConfig {
-  private SampleSvc sampleSvc;
+ 
   private PartySvc partySvc;
   private SampleUnitDistribution sampleUnitDistribution;
   private DataGrid dataGrid;

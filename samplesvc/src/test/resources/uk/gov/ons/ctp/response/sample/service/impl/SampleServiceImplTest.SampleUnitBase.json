@@ -1,0 +1,13 @@
+[
+  {
+    "sampleUnitRef": "abc",
+    "sampleUnitType": "B",
+    "formType": "112"
+  },
+  {
+    "sampleUnitRef": "def",
+    "sampleUnitType": "B",
+    "formType": "113"
+  }
+
+]

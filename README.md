@@ -1,4 +1,4 @@
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/ddd594229c8641afae64acdb31c69745)](https://www.codacy.com/app/sdcplatform/rm-sample-service?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ONSdigital/rm-sample-service&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/ddd594229c8641afae64acdb31c69745)](https://www.codacy.com/app/sdcplatform/rm-sample-service?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ONSdigital/rm-sample-service&amp;utm_campaign=Badge_Grade) [![Docker Pulls](https://img.shields.io/docker/pulls/sdcplatform/samplesvc.svg)]()
 
 # Sample Service
 This repository contains the Sample service. This microservice is a RESTful web service implemented using [Spring Boot](http://projects.spring.io/spring-boot/) and has the following responsibilities:

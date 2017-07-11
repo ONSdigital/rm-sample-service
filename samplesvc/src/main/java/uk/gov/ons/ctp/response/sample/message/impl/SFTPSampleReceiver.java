@@ -1,5 +1,6 @@
 package uk.gov.ons.ctp.response.sample.message.impl;
 
+import net.sourceforge.cobertura.CoverageIgnore;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
@@ -20,6 +21,7 @@ public class SFTPSampleReceiver {
      * Confirms file rename successful for XML input file
      * @param message success message
      */
+    @CoverageIgnore
     @ServiceActivator(inputChannel = "renameSuccessProcess")
     public void sftpSuccessProcess(GenericMessage<GenericMessage<byte[]>> message) {
         String filename = (String) message.getPayload().getHeaders().get("file_name");
@@ -30,6 +32,7 @@ public class SFTPSampleReceiver {
      * Confirms file rename unsuccessful for XML input file
      * @param message failure message
      */
+    @CoverageIgnore
     @ServiceActivator(inputChannel = "renameFailedProcess")
     public void sftpFailedProcess(GenericMessage<MessagingException> message) {
         String filename = (String) message.getPayload().getFailedMessage().getHeaders().get("file_name");
