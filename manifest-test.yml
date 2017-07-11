@@ -1,8 +1,8 @@
 ---
 applications:
-- name: samplesvc-demo
+- name: samplesvc-test
   instances: 1
-  host: samplesvc-demo
+  host: samplesvc-test
   memory: 1024M
   path: samplesvc/target/samplesvc.jar
   timeout: 180
@@ -11,6 +11,6 @@ applications:
     - rm-redis
     - rm-rabbitmq
   env:
-    partySvc_connectionConfig_host: ras-party-service-demo.apps.devtest.onsclofo.uk
+    partySvc_connectionConfig_host: ras-party-service-test.apps.devtest.onsclofo.uk
     partySvc_connectionConfig_port: "80"
     partySvc_connectionConfig_scheme: http

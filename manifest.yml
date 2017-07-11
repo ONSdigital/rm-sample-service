@@ -14,6 +14,3 @@ applications:
     partySvc_connectionConfig_host: ras-party-v2-int.apps.devtest.onsclofo.uk
     partySvc_connectionConfig_port: "80"
     partySvc_connectionConfig_scheme: http
-    sampleSvc_connectionConfig_host: samplesvc.apps.devtest.onsclofo.uk
-    sampleSvc_connectionConfig_port: "80"
-    sampleSvc_connectionConfig_scheme: http
