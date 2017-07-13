@@ -30,6 +30,10 @@ public class SwaggerConfig {
   @Autowired
   private AppConfig appConfig;
 
+  /**
+   * Creates Docket for swagger ui configuration
+   * @return Docket springfox api configuration object
+   */
   @Bean
   public Docket postsApi() {
 

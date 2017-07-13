@@ -142,7 +142,7 @@ sample-unit-distribution:
 
 swagger-settings:
   swagger-ui-active: false
-  group-name: "sampleeservice-api"
-  title: "Sample Service API"
-  description: "API for the Sample Service"
-  version: "10.41"
+  group-name: sampleeservice-api
+  title: Sample Service API
+  description: API for ${project.artifactId}
+  version: ${project.version}
