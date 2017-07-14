@@ -1,10 +1,13 @@
 package uk.gov.ons.ctp.response.sample.service;
 
 import uk.gov.ons.ctp.common.error.CTPException;
+import uk.gov.ons.ctp.response.party.definition.Party;
+import uk.gov.ons.ctp.response.sample.definition.BusinessSampleUnit;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
+import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 
 import java.util.List;
 
@@ -51,4 +54,7 @@ public interface SampleService {
    * @throws CTPException if update operation fails or CollectionExerciseJob already exists
    */
   Integer initialiseCollectionExerciseJob(CollectionExerciseJob collectionExerciseJob) throws CTPException;
+
+  void sendToPartyService(Party party) throws Exception;
+
 }

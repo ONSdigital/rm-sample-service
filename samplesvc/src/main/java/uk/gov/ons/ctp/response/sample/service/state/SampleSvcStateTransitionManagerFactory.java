@@ -69,8 +69,12 @@ public class SampleSvcStateTransitionManagerFactory implements StateTransitionMa
   private StateTransitionManager<SampleUnitState, SampleUnitEvent> createSampleUnitStateTransitionManager() {
     Map<SampleUnitState, Map<SampleUnitEvent, SampleUnitState>> transitions = new HashMap<>();
 
+    Map<SampleUnitEvent, SampleUnitState> transitionMapForSampledPersisted = new HashMap<>();
+    transitionMapForSampledPersisted.put(SampleUnitEvent.DELIVERING, SampleUnitState.DELIVERED);
+    transitions.put(SampleUnitState.PERSISTED, transitionMapForSampledPersisted);
+
     Map<SampleUnitEvent, SampleUnitState> transitionMapForSampledInit = new HashMap<>();
-    transitionMapForSampledInit.put(SampleUnitEvent.DELIVERING, SampleUnitState.DELIVERED);
+    transitionMapForSampledInit.put(SampleUnitEvent.PERSISTING, SampleUnitState.PERSISTED);
     transitions.put(SampleUnitState.INIT, transitionMapForSampledInit);
 
     StateTransitionManager<SampleUnitState, SampleUnitEvent> stateTransitionManager =

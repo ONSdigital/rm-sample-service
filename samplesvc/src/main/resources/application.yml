@@ -10,7 +10,7 @@ info:
 logging:
   level:
     org.springframework: WARN
-    uk.gov.ons.ctp: INFO
+    uk.gov.ons.ctp: DEBUG
   profile: DEV
 
 liquibase:
@@ -101,7 +101,7 @@ party-svc:
     scheme: http
     host: ras-party-service-int.apps.devtest.onsclofo.uk
     port: 80
-    retry-attempts: 10
+    retry-attempts: 1
     retry-pause-milli-seconds: 5000
     connect-timeout-milli-seconds: 5000
     read-timeout-milli-seconds: 5000 
@@ -139,6 +139,13 @@ data-grid:
   lock-time-to-live-seconds: 600
 
 messaging:
+  backoffInitial: 5000
+  backoffMultiplier: 3
+  backoffMax: 45000
+  consumingThreads: 1
+  maxAttempts: 3
+  prefetchCount: 10
+  txSize: 1
   pubMaxAttempts: 3
 
 sample-unit-distribution:

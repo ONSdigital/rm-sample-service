@@ -5,14 +5,15 @@ import net.sourceforge.cobertura.CoverageIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ctp.common.error.CTPException;
-import uk.gov.ons.ctp.common.rest.RestClient;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.common.time.DateTimeUtil;
-import uk.gov.ons.ctp.response.party.representation.PartyCreationRequestDTO;
+import uk.gov.ons.ctp.response.party.definition.Party;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
+import uk.gov.ons.ctp.response.sample.definition.BusinessSampleUnit;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
@@ -20,6 +21,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
+import uk.gov.ons.ctp.response.sample.message.PartyPostingPublisher;
 import uk.gov.ons.ctp.response.sample.party.PartyUtil;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
@@ -52,7 +54,15 @@ public class SampleServiceImpl implements SampleService {
           sampleSvcStateTransitionManager;
 
   @Autowired
+  @Qualifier("sampleUnitTransitionManager")
+  private StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent>
+          sampleSvcUnitStateTransitionManager;
+
+  @Autowired
   private PartySvcClientService partySvcClient;
+
+  @Autowired
+   private PartyPostingPublisher partyPostingPublisher;
 
   @Autowired
   private CollectionExerciseJobService collectionExerciseJobService;
@@ -62,12 +72,9 @@ public class SampleServiceImpl implements SampleService {
   public void processSampleSummary(SurveyBase surveySample, List<? extends SampleUnitBase> samplingUnitList)
           throws Exception {
     SampleSummary sampleSummary = createSampleSummary(surveySample);
-
     SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
-
-    createAndSaveSampleUnits(samplingUnitList, savedSampleSummary);
-    sendToPartyService(savedSampleSummary.getSampleSummaryPK(), samplingUnitList);
-    activateSampleSummaryState(savedSampleSummary.getSampleSummaryPK());
+    saveSampleUnits(samplingUnitList, savedSampleSummary);
+    publishToPartyQueue(samplingUnitList);
   }
 
   protected SampleSummary createSampleSummary(SurveyBase surveySample) {
@@ -85,28 +92,37 @@ public class SampleServiceImpl implements SampleService {
     return sampleSummary;
   }
 
-  /**
-   * create sampleUnits and save them to the Database
-   *
-   * @param sampleSummary summary to be saved as sampleUnit
-   * @param samplingUnitList list of samplingUnits to be saved
-   */
   @CoverageIgnore
-  private void createAndSaveSampleUnits(List<? extends SampleUnitBase> samplingUnitList, SampleSummary sampleSummary) {
+  private void saveSampleUnits(List<? extends SampleUnitBase> samplingUnitList, SampleSummary sampleSummary) {
     for (SampleUnitBase sampleUnitBase : samplingUnitList) {
-      SampleUnit sampleUnit = createSampleUnit(sampleSummary, sampleUnitBase);
+      SampleUnit sampleUnit = new SampleUnit();
+      sampleUnit.setSampleSummaryFK(sampleSummary.getSampleSummaryPK());
+      sampleUnit.setSampleUnitRef(sampleUnitBase.getSampleUnitRef());
+      sampleUnit.setSampleUnitType(sampleUnitBase.getSampleUnitType());
+      sampleUnit.setFormType(sampleUnitBase.getFormType());
+      sampleUnit.setState(SampleUnitDTO.SampleUnitState.INIT);
       sampleUnitRepository.save(sampleUnit);
     }
   }
 
-  protected SampleUnit createSampleUnit(SampleSummary sampleSummary, SampleUnitBase sampleUnitBase) {
-    SampleUnit sampleUnit = new SampleUnit();
-    sampleUnit.setSampleSummaryFK(sampleSummary.getSampleSummaryPK());
-    sampleUnit.setSampleUnitRef(sampleUnitBase.getSampleUnitRef());
-    sampleUnit.setSampleUnitType(sampleUnitBase.getSampleUnitType());
-    sampleUnit.setFormType(sampleUnitBase.getFormType());
-    sampleUnit.setState(SampleUnitDTO.SampleUnitState.INIT);
-    return sampleUnit;
+    /**
+     * create sampleUnits, save them to the Database and post to internal queue
+     *
+     * @param samplingUnitList list of samplingUnits to be saved
+     */
+  @CoverageIgnore
+  @ServiceActivator(outputChannel = "partyPostingChannel")
+  private void publishToPartyQueue(List<? extends SampleUnitBase> samplingUnitList) {
+    for (SampleUnitBase sampleUnitBase : samplingUnitList) {
+      try {
+        if (sampleUnitBase instanceof  BusinessSampleUnit) {
+          Party party = PartyUtil.convertToPartyDTO(sampleUnitBase);
+          partyPostingPublisher.publish(party);
+        }
+      } catch (Exception e) {
+        log.debug("publish exception", e);
+      }
+    }
   }
 
   /**
@@ -140,23 +156,35 @@ public class SampleServiceImpl implements SampleService {
   }
 
   /**
-   * Send samplingUnits to the party service
+   * Retrieve parties from internal queue and post to partySvc
    *
-   * @param sampleKey the sampleKey of the sample to be sent
-   * @param samplingUnitList list of sampling units to be sent
+   * @param party party picked up from queue
    * @throws Exception exception thrown
    */
-  private void sendToPartyService(Integer sampleKey, List<? extends SampleUnitBase> samplingUnitList) throws Exception {
+  @ServiceActivator(inputChannel = "partyTransformed", adviceChain = "partyRetryAdvice")
+  public void sendToPartyService(Party party) throws Exception {
     log.debug("Send to party svc");
-    for (SampleUnitBase sampleUnitBase : samplingUnitList) {
-      PartyCreationRequestDTO party = PartyUtil.convertToPartyDTO(sampleUnitBase);
-      try {
-        PartyDTO returned = partySvcClient.postParty(party);
-        log.info(returned.getId());
-      } catch (Exception e) {
-        log.info("failed to post to party", e);
+    PartyDTO returned = partySvcClient.postParty(party);
+    log.info(returned.getId());
+    SampleUnit sampleUnit = sampleUnitRepository.findBySampleUnitRefAndType(party.getSampleUnitRef(),
+            party.getSampleUnitType());
+    changeSampleUnitState(sampleUnit);
+    sampleSummaryStateCheck(sampleUnit);
+  }
+
+  private void changeSampleUnitState(SampleUnit sampleUnit) throws CTPException {
+    SampleUnitDTO.SampleUnitState newState = sampleSvcUnitStateTransitionManager.transition(sampleUnit.getState(),
+            SampleUnitDTO.SampleUnitEvent.PERSISTING);
+    sampleUnit.setState(newState);
+    sampleUnitRepository.saveAndFlush(sampleUnit);
+  }
+
+  private void sampleSummaryStateCheck(SampleUnit sampleUnit) throws CTPException {
+    int partied = sampleUnitRepository.getPartiedForSampleSummary(sampleUnit.getSampleSummaryFK());
+    int total = sampleUnitRepository.getTotalForSampleSummary(sampleUnit.getSampleSummaryFK());
+      if(total == partied) {
+        activateSampleSummaryState(sampleUnit.getSampleSummaryFK());
       }
-    }
   }
 
   /**

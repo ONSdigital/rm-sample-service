@@ -2,8 +2,6 @@ package uk.gov.ons.ctp.response.sample.party;
 
 import uk.gov.ons.ctp.response.party.definition.Party;
 import uk.gov.ons.ctp.response.party.definition.PartyAttributeMap;
-import uk.gov.ons.ctp.response.party.representation.PartyCreationRequestDTO;
-import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.xml.JaxbAnnotatedTypeUtil;
 
@@ -19,8 +17,8 @@ public class PartyUtil {
    * @return the created Party object
    * @throws Exception unlikely, but indicated something really wrong
    */
-  public static PartyCreationRequestDTO convertToPartyDTO(SampleUnitBase unit) throws Exception {
-    PartyCreationRequestDTO p = new PartyCreationRequestDTO();
+  public static Party convertToPartyDTO(SampleUnitBase unit) throws Exception {
+    Party p = new Party();
     p.setSampleUnitType(unit.getSampleUnitType());
     p.setSampleUnitRef(unit.getSampleUnitRef());
 

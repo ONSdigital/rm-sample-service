@@ -43,7 +43,7 @@ public interface SampleUnitRepository extends JpaRepository<SampleUnit, Integer>
    */
   @Query(value = "SELECT su.* FROM sample.sampleunit su ,sample.samplesummary ss WHERE "
           + "su.samplesummaryfk = ss.samplesummarypk AND ss.effectivestartdatetime = :exercisedatetime "
-          + "AND ss.state = :state AND su.state = 'INIT' AND ss.surveyref = :surveyref AND "
+          + "AND ss.state = :state AND su.state = 'PERSISTED' AND ss.surveyref = :surveyref AND "
           + "su.sampleunitpk  NOT IN ( :excludedcases ) order by ss.ingestdatetime ASC limit :count  ;",
           nativeQuery = true)
   List<SampleUnit> getSampleUnitBatch(@Param("surveyref") String surveyRef,
@@ -51,5 +51,36 @@ public interface SampleUnitRepository extends JpaRepository<SampleUnit, Integer>
                                       @Param("state") String state,
                                       @Param("count") Integer count,
                                       @Param("excludedcases") List<Integer> excludedCases);
+
+  /**
+   * find SampleUnit by sampleUnitRef and sampleUnitType from Party object
+   * @param sampleUnitRef sampleUnitRef of Party
+   * @param sampleUnitType sampleUnitType of Party
+   * @return SampleUnit with required type/ref combo
+   */
+  @Query(value = "SELECT su.* FROM sample.sampleunit su WHERE "
+          + "su.sampleunitref = :sampleunitref AND su.sampleunittype = :sampleunittype ;",
+          nativeQuery = true)
+  SampleUnit findBySampleUnitRefAndType(@Param("sampleunitref") String sampleUnitRef,
+                                        @Param("sampleunittype") String sampleUnitType);
+
+  /**
+   * Find how many SampleUnits from a given SampleSummary have been POSTed to Party and are now 'PERSISTED'
+   * @param sampleSummaryFK sampleSummaryFK of SampleSummary to be counted, from a SampleUnit in that summary.
+   * @return int count of matching sampleUnits
+   */
+  @Query(value = "SELECT COUNT(sampleUnitPK) FROM sample.sampleunit su WHERE su.samplesummaryfk = :samplesummaryfk "
+          + "AND su.state = 'PERSISTED' ;",
+          nativeQuery = true)
+  int getPartiedForSampleSummary(@Param("samplesummaryfk") int sampleSummaryFK);
+
+  /**
+   * Find total amount of sampleUnits in a SampleSummary
+   * @param sampleSummaryFK SampleSummaryFK of SampleSummary to be counted, from a SampleUnit in that summary.
+   * @return int count of SampleUnits in SampleSummary
+   */
+  @Query(value = "SELECT COUNT(sampleUnitPK) FROM sample.sampleunit su WHERE su.samplesummaryfk = :samplesummaryfk ;",
+          nativeQuery = true)
+  int getTotalForSampleSummary(@Param("samplesummaryfk") int sampleSummaryFK);
 
 }

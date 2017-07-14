@@ -34,6 +34,12 @@
    </bean>
 
     <!-- Start of Queues -->
+    <rabbit:queue name="Sample.Party" durable="true">
+        <rabbit:queue-arguments value-type="java.lang.String">
+            <entry key="x-dead-letter-exchange" value="sample-deadletter-exchange" />
+            <entry key="x-dead-letter-routing-key" value="Sample.Party.binding" />
+        </rabbit:queue-arguments>
+    </rabbit:queue>
     <rabbit:queue name="Sample.SampleDelivery" durable="true">
         <rabbit:queue-arguments value-type="java.lang.String">
             <entry key="x-dead-letter-exchange" value="sample-deadletter-exchange" />
@@ -41,9 +47,15 @@
         </rabbit:queue-arguments>
     </rabbit:queue>
     <rabbit:queue name="Sample.SampleDeliveryDLQ" durable="true"/>
+    <rabbit:queue name="Sample.PartyDLQ" durable="true"/>
     <!-- End of Queues -->
 
     <!-- Start of Exchanges -->
+    <rabbit:direct-exchange name="sample-party-outbound-exchange">
+        <rabbit:bindings>
+            <rabbit:binding queue="Sample.Party" key="Sample.Party.binding" />
+        </rabbit:bindings>
+    </rabbit:direct-exchange>
     <rabbit:direct-exchange name="sample-outbound-exchange">
         <rabbit:bindings>
             <rabbit:binding queue="Sample.SampleDelivery" key="Sample.SampleDelivery.binding" />
@@ -52,6 +64,11 @@
     <rabbit:direct-exchange name="sample-deadletter-exchange">
         <rabbit:bindings>
             <rabbit:binding queue="Sample.SampleDeliveryDLQ" key="Sample.SampleDelivery.binding" />
+        </rabbit:bindings>
+    </rabbit:direct-exchange>
+    <rabbit:direct-exchange name="sample-party-deadletter-exchange">
+        <rabbit:bindings>
+            <rabbit:binding queue="Sample.PartyDLQ" key="Sample.Party.binding" />
         </rabbit:bindings>
     </rabbit:direct-exchange>
     <!-- End of Exchanges -->

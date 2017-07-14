@@ -92,7 +92,8 @@ public class SampleUnitDistributor {
 
         List<SampleUnit> sampleUnits = new ArrayList<SampleUnit>();
 
-        List<Integer> excludedCases = sampleUnitDistributionListManager.findList(SAMPLEUNIT_DISTRIBUTOR_LIST_ID, false);
+        List<Integer> excludedCases = sampleUnitDistributionListManager.findList(SAMPLEUNIT_DISTRIBUTOR_LIST_ID,
+                false);
         log.debug("retrieve sample units excluding {}", excludedCases);
         if (excludedCases.size() == 0) {
           excludedCases.add(E);

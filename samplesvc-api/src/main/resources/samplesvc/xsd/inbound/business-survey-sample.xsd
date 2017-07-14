@@ -6,7 +6,7 @@
   <xsd:include schemaLocation="sample-common.xsd" />
   <xsd:include schemaLocation="survey-common.xsd" />
 
-  <xsd:element name="businessSurveySample" type="BusinessSurveySample" />
+    <xsd:element name="businessSurveySample" type="BusinessSurveySample" />
 
   <xsd:complexType name="BusinessSurveySample">
     <xsd:complexContent>

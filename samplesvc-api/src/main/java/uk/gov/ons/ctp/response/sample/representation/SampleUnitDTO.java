@@ -18,14 +18,14 @@ public class SampleUnitDTO {
    * enum for SampleUnit state
    */
   public enum SampleUnitState {
-    INIT, DELIVERED
+    INIT, DELIVERED, PERSISTED
   }
 
   /**
    * enum for SampleUnit event
    */
   public enum SampleUnitEvent {
-    DELIVERING
+    DELIVERING, PERSISTING
   }
 
   /**

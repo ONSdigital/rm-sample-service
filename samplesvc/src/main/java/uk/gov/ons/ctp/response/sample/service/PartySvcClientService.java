@@ -19,5 +19,5 @@ public interface PartySvcClientService {
      * @param party the PartySvc UUID
      * @return the Party we fetched!
      */
-    PartyDTO postParty(PartyCreationRequestDTO newPartyDTO);
+    PartyDTO postParty(Party newPartyDTO);
 }

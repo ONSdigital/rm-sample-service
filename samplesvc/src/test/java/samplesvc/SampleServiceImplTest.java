@@ -22,7 +22,7 @@ public class SampleServiceImplTest {
     Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
     CensusSurveySample sample = (CensusSurveySample) jaxbUnmarshaller.unmarshal(file);
     for (CensusSampleUnit unit : sample.getSampleUnits().getCensusSampleUnits()) {
-      PartyCreationRequestDTO p = PartyUtil.convertToPartyDTO(unit);
+      Party p = PartyUtil.convertToPartyDTO(unit);
       ObjectMapper mapper = new ObjectMapper();
       System.out.println(mapper.writeValueAsString(p));
     }
@@ -36,7 +36,7 @@ public class SampleServiceImplTest {
     Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
     BusinessSurveySample sample = (BusinessSurveySample) jaxbUnmarshaller.unmarshal(file);
     for (BusinessSampleUnit unit : sample.getSampleUnits().getBusinessSampleUnits()) {
-      PartyCreationRequestDTO p = PartyUtil.convertToPartyDTO(unit);
+      Party p = PartyUtil.convertToPartyDTO(unit);
       ObjectMapper mapper = new ObjectMapper();
       System.out.println(mapper.writeValueAsString(p));
     }
@@ -50,7 +50,7 @@ public class SampleServiceImplTest {
     Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
     SocialSurveySample sample = (SocialSurveySample) jaxbUnmarshaller.unmarshal(file);
     for (SocialSampleUnit unit : sample.getSampleUnits().getSocialSampleUnits()) {
-      PartyCreationRequestDTO p = PartyUtil.convertToPartyDTO(unit);
+      Party p = PartyUtil.convertToPartyDTO(unit);
       ObjectMapper mapper = new ObjectMapper();
       System.out.println(mapper.writeValueAsString(p));
     }

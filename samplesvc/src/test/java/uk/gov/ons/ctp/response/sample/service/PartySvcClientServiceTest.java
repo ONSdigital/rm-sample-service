@@ -8,6 +8,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.rest.RestClient;
+import uk.gov.ons.ctp.response.party.definition.Party;
 import uk.gov.ons.ctp.response.party.representation.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
@@ -20,12 +21,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * Created by wardlk on 04/07/2017.
- */
 @RunWith(MockitoJUnitRunner.class)
 public class PartySvcClientServiceTest {
-
 
 
     @InjectMocks
@@ -44,7 +41,7 @@ public class PartySvcClientServiceTest {
     @Test
     public void verifyPartyPostedTo() throws CTPException {
         PartyDTO party = new PartyDTO();
-        PartyCreationRequestDTO newParty = new PartyCreationRequestDTO();
+        Party newParty = new Party();
 
         PartySvc partySvc = new PartySvc();
         partySvc.setPostPartyPath("/path");
