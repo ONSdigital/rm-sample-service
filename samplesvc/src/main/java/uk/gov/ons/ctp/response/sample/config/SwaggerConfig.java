@@ -1,6 +1,5 @@
 package uk.gov.ons.ctp.response.sample.config;
 
-import com.google.common.base.Predicates;
 import net.sourceforge.cobertura.CoverageIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -57,7 +56,7 @@ public class SwaggerConfig {
             .groupName(swaggerSettings.getGroupName())
             .apiInfo(apiInfo)
             .select()
-            .apis(Predicates.not(RequestHandlerSelectors.basePackage("org.springframework.boot")))
+            .apis(RequestHandlerSelectors.basePackage("uk.gov.ons.ctp.response.sample.endpoint"))
             .paths(pathSelector::test)
             .build();
   }
