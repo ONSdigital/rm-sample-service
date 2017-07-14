@@ -47,7 +47,7 @@ public final class SampleEndpoint implements CTPEndpoint {
    * @throws InvalidRequestException if binding errors
    */
   @RequestMapping(value = "/sampleunitrequests", method = RequestMethod.POST, consumes = "application/json")
-  public ResponseEntity<?> getSampleSummary(final @Valid @RequestBody CollectionExerciseJobCreationRequestDTO
+  public ResponseEntity<SampleUnitsRequestDTO> getSampleSummary(final @Valid @RequestBody CollectionExerciseJobCreationRequestDTO
                                                        collectionExerciseJobCreationRequestDTO,
                                              BindingResult bindingResult) throws CTPException, InvalidRequestException {
     log.debug("Entering createCollectionExerciseJob with requestObject {}", collectionExerciseJobCreationRequestDTO);

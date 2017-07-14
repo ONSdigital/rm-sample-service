@@ -1,6 +1,21 @@
 # Sample Service API
 This page documents the Sample service API endpoints. These endpoints will be secured using HTTP basic authentication initially. All endpoints return an `HTTP 200 OK` status code except where noted otherwise.
 
+## Service Information
+* `GET /info` will return information about this service, collated from when it was last built.
+
+### Example JSON Response
+```json
+{
+    "name": "samplesvc",
+    "version": "10.42.0",
+    "origin": "git@github.com:ONSdigital/rm-sample-service.git",
+    "commit": "4b53f1c4e56d5d59e753696ac524233626eaed64",
+    "branch": "master",
+    "built": "2017-07-12T13:18:28Z"
+}
+```
+
 ## Create Sample Unit Request
 * `POST /sampleunitrequests` creates a sample unit request.
 
