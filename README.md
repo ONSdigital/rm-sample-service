@@ -19,7 +19,7 @@ This repository contains the Sample service. This microservice is a RESTful web 
     - postgres
     - an sftp server
 
-  You can get all of this using the following docker project:
+  You can get all of this using the following Docker project:
 
     https://github.com/ONSdigital/rm-docker-dev
 
