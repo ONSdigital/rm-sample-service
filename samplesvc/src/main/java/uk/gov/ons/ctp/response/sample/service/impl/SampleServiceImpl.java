@@ -1,6 +1,7 @@
 package uk.gov.ons.ctp.response.sample.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import ma.glasnost.orika.MapperFacade;
 import net.sourceforge.cobertura.CoverageIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,6 +12,7 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.common.time.DateTimeUtil;
 import uk.gov.ons.ctp.response.party.definition.Party;
+import uk.gov.ons.ctp.response.party.representation.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.definition.BusinessSampleUnit;
@@ -30,7 +32,9 @@ import uk.gov.ons.ctp.response.sample.service.PartySvcClientService;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Accept feedback from handlers
@@ -66,6 +70,9 @@ public class SampleServiceImpl implements SampleService {
 
   @Autowired
   private CollectionExerciseJobService collectionExerciseJobService;
+
+  @Autowired
+  private MapperFacade mapperFacade;
 
 
   @Override
@@ -164,7 +171,14 @@ public class SampleServiceImpl implements SampleService {
   @ServiceActivator(inputChannel = "partyTransformed", adviceChain = "partyRetryAdvice")
   public void sendToPartyService(Party party) throws Exception {
     log.debug("Send to party svc");
-    PartyDTO returned = partySvcClient.postParty(party);
+    PartyCreationRequestDTO partyCreationRequestDTO = new PartyCreationRequestDTO();
+    partyCreationRequestDTO.setSampleUnitRef(party.getSampleUnitRef());
+    partyCreationRequestDTO.setSampleUnitType(party.getSampleUnitType());
+    Map<String, String> attMap = new HashMap<>();
+    attMap.putAll(party.getAttributes());
+    partyCreationRequestDTO.setAttributes(attMap);
+
+    PartyDTO returned = partySvcClient.postParty(partyCreationRequestDTO);
     log.info(returned.getId());
     SampleUnit sampleUnit = sampleUnitRepository.findBySampleUnitRefAndType(party.getSampleUnitRef(),
             party.getSampleUnitType());

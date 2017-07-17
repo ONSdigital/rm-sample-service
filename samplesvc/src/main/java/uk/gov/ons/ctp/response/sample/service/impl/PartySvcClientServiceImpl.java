@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ctp.common.rest.RestClient;
 import uk.gov.ons.ctp.response.party.definition.Party;
+import uk.gov.ons.ctp.response.party.representation.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.service.PartySvcClientService;
@@ -25,7 +26,7 @@ public class PartySvcClientServiceImpl implements PartySvcClientService {
     private RestClient partySvcClient;
 
     @Override
-    public PartyDTO postParty(final Party newPartyDTO) {
+    public PartyDTO postParty(final PartyCreationRequestDTO newPartyDTO) {
         PartyDTO party = partySvcClient.postResource(appConfig.getPartySvc().getPostPartyPath(),
                 newPartyDTO, PartyDTO.class);
         log.debug("PARTY GOTTEN: " + party.toString());

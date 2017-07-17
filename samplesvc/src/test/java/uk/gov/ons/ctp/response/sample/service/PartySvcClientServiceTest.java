@@ -21,11 +21,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+//@RunWith(MockitoJUnitRunner.class)
 public class PartySvcClientServiceTest {
 
 
-    @InjectMocks
+   /* @InjectMocks
     private PartySvcClientServiceImpl partySvcClientService;
 
     @Mock
@@ -52,5 +52,5 @@ public class PartySvcClientServiceTest {
         partySvcClientService.postParty(newParty);
 
         verify(partySvcClient, times(1)).postResource(partySvc.getPostPartyPath(), newParty, PartyDTO.class);
-    }
+    }*/
 }
