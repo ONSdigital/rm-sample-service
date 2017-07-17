@@ -235,7 +235,7 @@ public class SampleServiceImpl implements SampleService {
     for (SampleSummary ss : listOfSampleSummaries) {
       List<SampleUnit> sampleUnitList = sampleUnitRepository.findBySampleSummaryFK(ss.getSampleSummaryPK());
       for (SampleUnit su : sampleUnitList) {
-        su.setState(SampleUnitDTO.SampleUnitState.INIT);
+        su.setState(SampleUnitDTO.SampleUnitState.PERSISTED);
         sampleUnitRepository.saveAndFlush(su);
       }
       sampleUnitsTotal = sampleUnitsTotal + sampleUnitList.size();
