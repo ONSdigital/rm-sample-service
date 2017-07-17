@@ -10,8 +10,6 @@ This repository contains the Sample service. This microservice is a RESTful web 
 * Receiving confirmation from the Party service once it has consumed/stored the sample units sent above, and marking the sample summary as ready for collection
 * Providing on request the sample summaries matching a given criteria to the Collection Exercise service
 
-[API documentation](https://github.com/ONSdigital/rm-sample-service/blob/master/API.md).
-
 ## Prerequisites
 
 * To run this project you must have the following running:
@@ -21,7 +19,7 @@ This repository contains the Sample service. This microservice is a RESTful web 
     - postgres
     - an sftp server
 
-  You can get all of this using the following docker project:
+  You can get all of this using the following Docker project:
 
     https://github.com/ONSdigital/rm-docker-dev
 
