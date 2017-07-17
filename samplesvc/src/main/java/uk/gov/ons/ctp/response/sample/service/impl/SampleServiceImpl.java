@@ -71,10 +71,6 @@ public class SampleServiceImpl implements SampleService {
   @Autowired
   private CollectionExerciseJobService collectionExerciseJobService;
 
-  @Autowired
-  private MapperFacade mapperFacade;
-
-
   @Override
   public void processSampleSummary(SurveyBase surveySample, List<? extends SampleUnitBase> samplingUnitList)
           throws Exception {
@@ -123,7 +119,7 @@ public class SampleServiceImpl implements SampleService {
     for (SampleUnitBase sampleUnitBase : samplingUnitList) {
       try {
         if (sampleUnitBase instanceof  BusinessSampleUnit) {
-          Party party = PartyUtil.convertToPartyDTO(sampleUnitBase);
+          Party party = PartyUtil.convertToParty(sampleUnitBase);
           partyPostingPublisher.publish(party);
         }
       } catch (Exception e) {
@@ -171,7 +167,8 @@ public class SampleServiceImpl implements SampleService {
   @ServiceActivator(inputChannel = "partyTransformed", adviceChain = "partyRetryAdvice")
   public void sendToPartyService(Party party) throws Exception {
     log.debug("Send to party svc");
-    PartyCreationRequestDTO partyCreationRequestDTO = new PartyCreationRequestDTO();
+
+    PartyCreationRequestDTO partyCreationRequestDTO = PartyUtil.createPartyCreationRequestDTO(party);
     partyCreationRequestDTO.setSampleUnitRef(party.getSampleUnitRef());
     partyCreationRequestDTO.setSampleUnitType(party.getSampleUnitType());
     Map<String, String> attMap = new HashMap<>();
