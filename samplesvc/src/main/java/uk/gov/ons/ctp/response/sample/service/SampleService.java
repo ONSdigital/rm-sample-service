@@ -2,12 +2,10 @@ package uk.gov.ons.ctp.response.sample.service;
 
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.party.definition.Party;
-import uk.gov.ons.ctp.response.sample.definition.BusinessSampleUnit;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
-import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 
 import java.util.List;
 
@@ -26,14 +24,6 @@ public interface SampleService {
    */
   void processSampleSummary(SurveyBase surveySampleObject, List<? extends SampleUnitBase> samplingUnitList)
           throws Exception;
-
-  /**
-   * Find SampleSummary entity by sampleid
-   *
-   * @param sampleSummaryPK The sampleSummaryPK
-   * @return SampleSummary object or null
-   */
-  SampleSummary findSampleSummaryBySampleSummaryPK(Integer sampleSummaryPK);
 
   /**
    * Update the SampleSummary state
@@ -55,6 +45,13 @@ public interface SampleService {
    */
   Integer initialiseCollectionExerciseJob(CollectionExerciseJob collectionExerciseJob) throws CTPException;
 
+  /**
+   * Retrieve parties from internal queue and post to partySvc.
+   * If successful, it then goes on to change SampleUnit(s) state and to effect a state transition for the target
+   * SampleSummary if one is required.
+   *
+   * @param party party picked up from queue
+   * @throws Exception exception thrown
+   */
   void sendToPartyService(Party party) throws Exception;
-
 }

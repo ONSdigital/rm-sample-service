@@ -1,7 +1,6 @@
 package uk.gov.ons.ctp.response.sample.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import ma.glasnost.orika.MapperFacade;
 import net.sourceforge.cobertura.CoverageIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,9 +31,7 @@ import uk.gov.ons.ctp.response.sample.service.PartySvcClientService;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 import java.sql.Timestamp;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Accept feedback from handlers
@@ -43,6 +40,7 @@ import java.util.Map;
 @Service
 @Configuration
 public class SampleServiceImpl implements SampleService {
+
   @Autowired
   private SampleSummaryRepository sampleSummaryRepository;
 
@@ -108,11 +106,11 @@ public class SampleServiceImpl implements SampleService {
     }
   }
 
-    /**
-     * create sampleUnits, save them to the Database and post to internal queue
-     *
-     * @param samplingUnitList list of samplingUnits to be saved
-     */
+  /**
+   * create sampleUnits, save them to the Database and post to internal queue
+   *
+   *
+   * */
   @CoverageIgnore
   @ServiceActivator(outputChannel = "partyPostingChannel")
   private void publishToPartyQueue(List<? extends SampleUnitBase> samplingUnitList) {
@@ -129,20 +127,7 @@ public class SampleServiceImpl implements SampleService {
   }
 
   /**
-   * Search for SampleSummary by sampleSummaryPK
-   *
-   * @param sampleSummaryPK the sampleSummaryPK to be searched for
-   * @return SampleSummary matching SampleSummary
-   */
-  @CoverageIgnore
-  @Override
-  public SampleSummary findSampleSummaryBySampleSummaryPK(Integer sampleSummaryPK) {
-    return sampleSummaryRepository.findOne(sampleSummaryPK);
-  }
-
-  /**
-   * Effect a state transition for the target SampleSummary if the one is
-   * required
+   * Effect a state transition for the target SampleSummary if one is required
    *
    * @param sampleSummaryPK the sampleSummaryPK to be updated
    * @return SampleSummary the updated SampleSummary
@@ -158,25 +143,13 @@ public class SampleServiceImpl implements SampleService {
     return targetSampleSummary;
   }
 
-  /**
-   * Retrieve parties from internal queue and post to partySvc
-   *
-   * @param party party picked up from queue
-   * @throws Exception exception thrown
-   */
   @ServiceActivator(inputChannel = "partyTransformed", adviceChain = "partyRetryAdvice")
   public void sendToPartyService(Party party) throws Exception {
     log.debug("Send to party svc");
-
     PartyCreationRequestDTO partyCreationRequestDTO = PartyUtil.createPartyCreationRequestDTO(party);
-    partyCreationRequestDTO.setSampleUnitRef(party.getSampleUnitRef());
-    partyCreationRequestDTO.setSampleUnitType(party.getSampleUnitType());
-    Map<String, String> attMap = new HashMap<>();
-    attMap.putAll(party.getAttributes());
-    partyCreationRequestDTO.setAttributes(attMap);
+    PartyDTO returnedParty = partySvcClient.postParty(partyCreationRequestDTO);
+    log.info("Returned party is {}", returnedParty);
 
-    PartyDTO returned = partySvcClient.postParty(partyCreationRequestDTO);
-    log.info(returned.getId());
     SampleUnit sampleUnit = sampleUnitRepository.findBySampleUnitRefAndType(party.getSampleUnitRef(),
             party.getSampleUnitType());
     changeSampleUnitState(sampleUnit);
@@ -193,9 +166,9 @@ public class SampleServiceImpl implements SampleService {
   private void sampleSummaryStateCheck(SampleUnit sampleUnit) throws CTPException {
     int partied = sampleUnitRepository.getPartiedForSampleSummary(sampleUnit.getSampleSummaryFK());
     int total = sampleUnitRepository.getTotalForSampleSummary(sampleUnit.getSampleSummaryFK());
-      if(total == partied) {
-        activateSampleSummaryState(sampleUnit.getSampleSummaryFK());
-      }
+    if (total == partied) {
+      activateSampleSummaryState(sampleUnit.getSampleSummaryFK());
+    }
   }
 
   /**

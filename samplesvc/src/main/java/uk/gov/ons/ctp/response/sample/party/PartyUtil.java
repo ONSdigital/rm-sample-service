@@ -17,21 +17,28 @@ public class PartyUtil {
   /**
    * Util method to convert from any of the SampleUnitBase subtypes to the Generic PartyService Party type.
    * All fields other than identity fields will be collected into a key:value map in Party.attributes.
+   *
    * @param unit the SampleUnitBase subtype for a Census, Business or Social SampleUnit
    * @return the created Party object
    * @throws Exception unlikely, but indicated something really wrong
    */
   public static Party convertToParty(SampleUnitBase unit) throws Exception {
-    Party p = new Party();
-    p.setSampleUnitType(unit.getSampleUnitType());
-    p.setSampleUnitRef(unit.getSampleUnitRef());
+    Party party = new Party();
+    party.setSampleUnitType(unit.getSampleUnitType());
+    party.setSampleUnitRef(unit.getSampleUnitRef());
 
     PartyAttributeMap partyAttribs = new PartyAttributeMap();
     partyAttribs.putAll(JaxbAnnotatedTypeUtil.extractXmlProperties(unit));
-    p.setAttributes(partyAttribs);
-    return p;
+    party.setAttributes(partyAttribs);
+    return party;
   }
 
+  /**
+   * Utility to go from Party to PartyCreationRequestDTO
+   *
+   * @param party the party object
+   * @return the PartyCreationRequestDTO
+   */
   public static PartyCreationRequestDTO createPartyCreationRequestDTO(Party party){
     PartyCreationRequestDTO partyCreationRequestDTO = new PartyCreationRequestDTO();
     partyCreationRequestDTO.setSampleUnitRef(party.getSampleUnitRef());
