@@ -30,3 +30,5 @@ public class PartySvcClientServiceImpl implements PartySvcClientService {
         return party;
     }
 }
+
+
