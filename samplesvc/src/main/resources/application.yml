@@ -12,6 +12,7 @@ logging:
   level:
     org.springframework: WARN
     uk.gov.ons.ctp: DEBUG
+    io.pivotal.springcloud.ssl: DEBUG
   profile: DEV
 
 liquibase:

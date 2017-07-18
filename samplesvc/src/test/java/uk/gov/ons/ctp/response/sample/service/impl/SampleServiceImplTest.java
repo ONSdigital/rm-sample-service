@@ -18,11 +18,7 @@ import java.util.List;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-
-/**
- * Created by wardlk on 04/07/2017.
- */
-//@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class SampleServiceImplTest {
 
     @InjectMocks
@@ -50,16 +46,5 @@ public class SampleServiceImplTest {
         assertTrue(sampleSummary.getEffectiveStartDateTime().getTime() == 1483743600000L);
         assertTrue(sampleSummary.getState() == SampleSummaryDTO.SampleState.INIT);
     }
-/*
-    @Test
-    public void verifySampleUnitsCreatedCorrectly() throws Exception {
-        SampleSummary sampleSummary = sampleServiceImpl.createSampleSummary(surveySample.get(0));
-        sampleSummary.setSampleSummaryPK(SAMPLE_SUMMARY_PK);
-        SampleUnit sampleUnit = sampleServiceImpl.createSampleUnit(sampleSummary, sampleUnitList.get(0));
-        assertTrue(sampleUnit.getFormType().equals("112"));
-        assertTrue(sampleUnit.getSampleUnitRef().equals("abc"));
-        assertTrue(sampleUnit.getSampleUnitType().equals("B"));
-        assertTrue(sampleUnit.getSampleSummaryFK() == SAMPLE_SUMMARY_PK);
-    }*/
 
 }
