@@ -10,8 +10,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import java.util.List;
 
 /**
- * The SampleService interface defines all business behaviours for operations on
- * the Sample entity model.
+ * The SampleService interface defines all business behaviours for operations on the Sample entity model.
  */
 public interface SampleService {
 
@@ -46,7 +45,7 @@ public interface SampleService {
   Integer initialiseCollectionExerciseJob(CollectionExerciseJob collectionExerciseJob) throws CTPException;
 
   /**
-   * Retrieve parties from internal queue and post to partySvc.
+   * Post to partySvc.
    * If successful, it then goes on to change SampleUnit(s) state and to effect a state transition for the target
    * SampleSummary if one is required.
    *

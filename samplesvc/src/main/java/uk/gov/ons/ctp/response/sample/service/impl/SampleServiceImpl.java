@@ -5,7 +5,6 @@ import net.sourceforge.cobertura.CoverageIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
@@ -22,7 +21,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
-import uk.gov.ons.ctp.response.sample.message.PartyPostingPublisher;
+import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
 import uk.gov.ons.ctp.response.sample.party.PartyUtil;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
@@ -33,9 +32,6 @@ import uk.gov.ons.ctp.response.sample.service.SampleService;
 import java.sql.Timestamp;
 import java.util.List;
 
-/**
- * Accept feedback from handlers
- */
 @Slf4j
 @Service
 @Configuration
@@ -64,7 +60,7 @@ public class SampleServiceImpl implements SampleService {
   private PartySvcClientService partySvcClient;
 
   @Autowired
-   private PartyPostingPublisher partyPostingPublisher;
+  private PartyPublisher partyPublisher;
 
   @Autowired
   private CollectionExerciseJobService collectionExerciseJobService;
@@ -108,17 +104,14 @@ public class SampleServiceImpl implements SampleService {
 
   /**
    * create sampleUnits, save them to the Database and post to internal queue
-   *
-   *
    * */
   @CoverageIgnore
-  @ServiceActivator(outputChannel = "partyPostingChannel")
   private void publishToPartyQueue(List<? extends SampleUnitBase> samplingUnitList) {
     for (SampleUnitBase sampleUnitBase : samplingUnitList) {
       try {
-        if (sampleUnitBase instanceof  BusinessSampleUnit) {
+        if (sampleUnitBase instanceof BusinessSampleUnit) {
           Party party = PartyUtil.convertToParty(sampleUnitBase);
-          partyPostingPublisher.publish(party);
+          partyPublisher.publish(party);
         }
       } catch (Exception e) {
         log.debug("publish exception", e);
@@ -143,7 +136,6 @@ public class SampleServiceImpl implements SampleService {
     return targetSampleSummary;
   }
 
-  @ServiceActivator(inputChannel = "partyTransformed", adviceChain = "partyRetryAdvice")
   public void sendToPartyService(Party party) throws Exception {
     log.debug("Send to party svc");
     PartyCreationRequestDTO partyCreationRequestDTO = PartyUtil.createPartyCreationRequestDTO(party);
