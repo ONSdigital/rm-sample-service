@@ -98,9 +98,9 @@ party-svc:
   sample-path: /events
   post-party-path: /party-api/v1/parties
   connection-config:
-    scheme: https
+    scheme: http
     host: ras-party-service-int.apps.devtest.onsclofo.uk
-    port: 442
+    port: 80
     retry-attempts: 1
     retry-pause-milli-seconds: 5000
     connect-timeout-milli-seconds: 5000
