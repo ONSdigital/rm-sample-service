@@ -188,7 +188,6 @@ public class SampleUnitDistributorTest {
     verify(collectionExerciseJobRepository, times(1)).findAll();
     verify(sampleUnitDistributionListManager, times(1)).findList(any(String.class), any(Boolean.class));
 
-//    verify(sampleUnitPublisher, times(2)).send(any(uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.class));
     verify(sampleUnitDistributionListManager, times(1)).deleteList(any(String.class),
             any(Boolean.class));
     verify(sampleUnitDistributionListManager, times(1)).unlockContainer();
