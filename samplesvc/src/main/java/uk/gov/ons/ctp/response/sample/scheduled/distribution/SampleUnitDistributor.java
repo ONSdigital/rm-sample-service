@@ -129,12 +129,14 @@ public class SampleUnitDistributor {
         } catch (LockingException le) {
           // oh well - will time out or we never had the lock
         }
-        tracer.close(distribSpan);
+
       }
 
     } catch (Exception e) {
       log.error("Failed to process sample units because {}", e);
     }
+
+    tracer.close(distribSpan);
 
     distInfo.setSampleUnitsSucceeded(successes);
     distInfo.setSampleUnitsFailed(failures);
@@ -164,7 +166,8 @@ public class SampleUnitDistributor {
    */
   public SampleUnit transitionSampleUnitStateFromDeliveryEvent(Integer sampleUnitPK) throws CTPException {
     SampleUnit targetSampleUnit = sampleUnitRepository.findOne(sampleUnitPK);
-    SampleUnitDTO.SampleUnitState newState = sampleUnitStateTransitionManager.transition(targetSampleUnit.getState(),
+    SampleUnitDTO.SampleUnitState newState = sampleUnitStateTransitionManager.transition(
+            targetSampleUnit.getState(),
         SampleUnitDTO.SampleUnitEvent.DELIVERING);
     targetSampleUnit.setState(newState);
     sampleUnitRepository.saveAndFlush(targetSampleUnit);
