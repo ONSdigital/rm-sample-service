@@ -10,7 +10,7 @@ info:
 # ie -Dlogging.level.org.springframework=DEBUG
 logging:
   level:
-    org.springframework: WARN
+    org.springframework: DEBUG
     uk.gov.ons.ctp: DEBUG
   profile: CLOUD
 
