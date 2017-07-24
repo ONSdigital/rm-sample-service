@@ -41,9 +41,6 @@ public class SampleServiceImpl implements SampleService {
   private SampleSummaryRepository sampleSummaryRepository;
 
   @Autowired
-  private AppConfig appConfig;
-
-  @Autowired
   private SampleUnitRepository sampleUnitRepository;
 
   @Autowired
@@ -89,7 +86,6 @@ public class SampleServiceImpl implements SampleService {
     return sampleSummary;
   }
 
-  @CoverageIgnore
   private void saveSampleUnits(List<? extends SampleUnitBase> samplingUnitList, SampleSummary sampleSummary) {
     for (SampleUnitBase sampleUnitBase : samplingUnitList) {
       SampleUnit sampleUnit = new SampleUnit();
@@ -105,7 +101,6 @@ public class SampleServiceImpl implements SampleService {
   /**
    * create sampleUnits, save them to the Database and post to internal queue
    * */
-  @CoverageIgnore
   private void publishToPartyQueue(List<? extends SampleUnitBase> samplingUnitList) {
     for (SampleUnitBase sampleUnitBase : samplingUnitList) {
       try {
