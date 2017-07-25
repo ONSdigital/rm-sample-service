@@ -104,10 +104,10 @@ public class SampleServiceImpl implements SampleService {
   private void publishToPartyQueue(List<? extends SampleUnitBase> samplingUnitList) {
     for (SampleUnitBase sampleUnitBase : samplingUnitList) {
       try {
-        if (sampleUnitBase instanceof BusinessSampleUnit) {
+       // if (sampleUnitBase instanceof BusinessSampleUnit) {
           Party party = PartyUtil.convertToParty(sampleUnitBase);
           partyPublisher.publish(party);
-        }
+       // }
       } catch (Exception e) {
         log.debug("publish exception", e);
       }
