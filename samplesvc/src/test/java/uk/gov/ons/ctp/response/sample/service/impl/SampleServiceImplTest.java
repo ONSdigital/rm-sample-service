@@ -6,10 +6,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertThat;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.junit.Before;
@@ -25,6 +27,7 @@ import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.response.party.definition.Party;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 import uk.gov.ons.ctp.response.sample.definition.BusinessSurveySample;
+import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
@@ -41,6 +44,14 @@ import uk.gov.ons.ctp.response.sample.service.PartySvcClientService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SampleServiceImplTest {
+
+  private static final String SAMPLEUNITTYPE = "H";
+
+  private static final String SAMPLEUNITREF = "222";
+
+  private static final String EXERCISEREF = "ref";
+
+  private static final Timestamp EXERCISEDATETIME = Timestamp.valueOf("2017-09-08 00:00:00.0");
 
   @Mock
   private SampleSummaryRepository sampleSummaryRepository;
@@ -71,6 +82,7 @@ public class SampleServiceImplTest {
   private List<PartyDTO> partyDTO;
   private List<SampleUnit> sampleUnit;
   private List<SampleSummary> sampleSummary;
+  private List<CollectionExerciseJob> collectionExerciseJobs;
 
   @Before
   public void setUp() throws Exception {
@@ -80,6 +92,7 @@ public class SampleServiceImplTest {
     partyDTO = FixtureHelper.loadClassFixtures(PartyDTO[].class);
     sampleUnit = FixtureHelper.loadClassFixtures(SampleUnit[].class);
     sampleSummary = FixtureHelper.loadClassFixtures(SampleSummary[].class);
+    collectionExerciseJobs = FixtureHelper.loadClassFixtures(CollectionExerciseJob[].class);
 
   }
 
@@ -106,33 +119,50 @@ public class SampleServiceImplTest {
   @Test
   public void sendToPartyServiceTestStateTransitions() throws Exception {
     when(partySvcClient.postParty(any())).thenReturn(partyDTO.get(0));
-    when(sampleUnitRepository.findBySampleUnitRefAndType("222", "H")).thenReturn(sampleUnit.get(0));
+    when(sampleUnitRepository.findBySampleUnitRefAndType(SAMPLEUNITREF, SAMPLEUNITTYPE)).thenReturn(sampleUnit.get(0));
     when(sampleSvcUnitStateTransitionManager.transition(SampleUnitState.INIT, SampleUnitEvent.PERSISTING))
         .thenReturn(SampleUnitState.PERSISTED);
     when(sampleSummaryRepository.findOne(1)).thenReturn(sampleSummary.get(0));
     when(sampleSvcStateTransitionManager.transition(SampleState.INIT, SampleEvent.ACTIVATED))
         .thenReturn(SampleState.ACTIVE);
-    
+
     sampleServiceImpl.sendToPartyService(party.get(0));
-    
+
     assertThat(sampleUnit.get(0).getState(), is(SampleUnitState.PERSISTED));
     assertThat(sampleSummary.get(0).getState(), is(SampleState.ACTIVE));
   }
-  
+
   @Test
   public void sendToPartyServiceTestNotAllSampleUnitsPosted() throws Exception {
     when(partySvcClient.postParty(any())).thenReturn(partyDTO.get(0));
-    when(sampleUnitRepository.findBySampleUnitRefAndType("222", "H")).thenReturn(sampleUnit.get(0));
+    when(sampleUnitRepository.findBySampleUnitRefAndType(SAMPLEUNITREF, SAMPLEUNITTYPE)).thenReturn(sampleUnit.get(0));
     when(sampleSvcUnitStateTransitionManager.transition(SampleUnitState.INIT, SampleUnitEvent.PERSISTING))
         .thenReturn(SampleUnitState.PERSISTED);
     when(sampleSummaryRepository.findOne(1)).thenReturn(sampleSummary.get(0));
     when(sampleSvcStateTransitionManager.transition(SampleState.INIT, SampleEvent.ACTIVATED))
         .thenReturn(SampleState.ACTIVE);
     when(sampleUnitRepository.getTotalForSampleSummary(1)).thenReturn(1);
-    
+
     sampleServiceImpl.sendToPartyService(party.get(0));
-    
+
     assertThat(sampleUnit.get(0).getState(), is(SampleUnitState.PERSISTED));
     assertThat(sampleSummary.get(0).getState(), not(SampleState.ACTIVE));
+  }
+
+  @Test
+  public void testNoCollectionExerciseStoredWhenNoSampleUnits() throws Exception {
+    Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
+    verify(collectionExerciseJobService, times(0)).storeCollectionExerciseJob(any());
+    assertThat(sampleUnitsTotal, is(0));
+  }
+
+  @Test
+  public void testOneCollectionExerciseJobIsStoredWhenSampleUnitsAreFound() throws Exception {
+    when(sampleSummaryRepository.findBySurveyRefAndEffectiveStartDateTimeAndState(EXERCISEREF, EXERCISEDATETIME,
+        SampleState.ACTIVE)).thenReturn(sampleSummary);
+    when(sampleUnitRepository.findBySampleSummaryFK(1)).thenReturn(sampleUnit);
+    Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
+    verify(collectionExerciseJobService, times(1)).storeCollectionExerciseJob(any());
+    assertThat(sampleUnitsTotal, is(1));
   }
 }
