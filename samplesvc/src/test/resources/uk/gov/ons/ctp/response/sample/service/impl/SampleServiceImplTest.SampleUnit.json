@@ -1,0 +1,10 @@
+[
+  {
+    "sampleUnitPK":1,
+    "sampleSummaryFK":1,
+    "sampleUnitRef":"sampleUnitRef",
+    "sampleUnitType":"H",
+    "formType":"CuFT",
+    "state":"INIT"
+  }
+]
