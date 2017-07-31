@@ -152,19 +152,6 @@ public class SampleServiceImplTest {
   }
 
   @Test
-  public void testCollectionExerciseJobIsStoredWhenSampleUnitsAreFound() throws Exception {
-    CollectionExerciseJob collex = CollectionExerciseJob.builder().collectionExerciseJobPK(1)
-        .collectionExerciseId(UUID.fromString("14fb3e68-4dca-46db-bf49-04b84e07e77c")).surveyRef("ref")
-        .exerciseDateTime(EXERCISEDATETIME).createdDateTime(EXERCISEDATETIME).build();
-    when(sampleSummaryRepository.findBySurveyRefAndEffectiveStartDateTimeAndState(EXERCISEREF, EXERCISEDATETIME,
-        SampleState.ACTIVE)).thenReturn(sampleSummaryList);
-    when(sampleUnitRepository.findBySampleSummaryFK(1)).thenReturn(sampleUnit);
-    Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collex);
-    verify(collectionExerciseJobService, times(1)).storeCollectionExerciseJob(any());
-    assertThat(sampleUnitsTotal, is(1));
-  }
-
-  @Test
   public void testNoCollectionExerciseStoredWhenNoSampleUnits() throws Exception {
     Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(0)).storeCollectionExerciseJob(any());
