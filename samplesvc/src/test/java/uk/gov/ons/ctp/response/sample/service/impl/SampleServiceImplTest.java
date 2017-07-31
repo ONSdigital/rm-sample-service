@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertThat;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
@@ -151,8 +152,11 @@ public class SampleServiceImplTest {
 
   @Test
   public void testCollectionExerciseJobIsStoredWhenSampleUnitsAreFound() throws Exception {
-    when(sampleSummaryRepository.findBySurveyRefAndEffectiveStartDateTimeAndState(any(), any(),
-        any())).thenReturn(sampleSummaryList);
+    List<SampleSummary> sampleSummarys= new ArrayList<>();
+    SampleSummary sampleSummary = SampleSummary.builder().sampleSummaryPK(1).surveyRef("222").state(SampleState.INIT).build();
+    sampleSummarys.add(sampleSummary);
+    when(sampleSummaryRepository.findBySurveyRefAndEffectiveStartDateTimeAndState(EXERCISEREF, EXERCISEDATETIME,
+        SampleState.ACTIVE)).thenReturn(sampleSummarys);
     when(sampleUnitRepository.findBySampleSummaryFK(1)).thenReturn(sampleUnit);
     Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(1)).storeCollectionExerciseJob(any());
