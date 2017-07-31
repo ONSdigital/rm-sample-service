@@ -81,7 +81,7 @@ public class SampleServiceImplTest {
   private List<Party> party;
   private List<PartyDTO> partyDTO;
   private List<SampleUnit> sampleUnit;
-  private List<SampleSummary> sampleSummary;
+  private List<SampleSummary> sampleSummaryList;
   private List<CollectionExerciseJob> collectionExerciseJobs;
 
   @Before
@@ -91,7 +91,7 @@ public class SampleServiceImplTest {
     party = FixtureHelper.loadClassFixtures(Party[].class);
     partyDTO = FixtureHelper.loadClassFixtures(PartyDTO[].class);
     sampleUnit = FixtureHelper.loadClassFixtures(SampleUnit[].class);
-    sampleSummary = FixtureHelper.loadClassFixtures(SampleSummary[].class);
+    sampleSummaryList = FixtureHelper.loadClassFixtures(SampleSummary[].class);
     collectionExerciseJobs = FixtureHelper.loadClassFixtures(CollectionExerciseJob[].class);
 
   }
@@ -122,14 +122,14 @@ public class SampleServiceImplTest {
     when(sampleUnitRepository.findBySampleUnitRefAndType(SAMPLEUNITREF, SAMPLEUNITTYPE)).thenReturn(sampleUnit.get(0));
     when(sampleSvcUnitStateTransitionManager.transition(SampleUnitState.INIT, SampleUnitEvent.PERSISTING))
         .thenReturn(SampleUnitState.PERSISTED);
-    when(sampleSummaryRepository.findOne(1)).thenReturn(sampleSummary.get(0));
+    when(sampleSummaryRepository.findOne(1)).thenReturn(sampleSummaryList.get(0));
     when(sampleSvcStateTransitionManager.transition(SampleState.INIT, SampleEvent.ACTIVATED))
         .thenReturn(SampleState.ACTIVE);
 
     sampleServiceImpl.sendToPartyService(party.get(0));
 
     assertThat(sampleUnit.get(0).getState(), is(SampleUnitState.PERSISTED));
-    assertThat(sampleSummary.get(0).getState(), is(SampleState.ACTIVE));
+    assertThat(sampleSummaryList.get(0).getState(), is(SampleState.ACTIVE));
   }
 
   @Test
@@ -138,7 +138,7 @@ public class SampleServiceImplTest {
     when(sampleUnitRepository.findBySampleUnitRefAndType(SAMPLEUNITREF, SAMPLEUNITTYPE)).thenReturn(sampleUnit.get(0));
     when(sampleSvcUnitStateTransitionManager.transition(SampleUnitState.INIT, SampleUnitEvent.PERSISTING))
         .thenReturn(SampleUnitState.PERSISTED);
-    when(sampleSummaryRepository.findOne(1)).thenReturn(sampleSummary.get(0));
+    when(sampleSummaryRepository.findOne(1)).thenReturn(sampleSummaryList.get(0));
     when(sampleSvcStateTransitionManager.transition(SampleState.INIT, SampleEvent.ACTIVATED))
         .thenReturn(SampleState.ACTIVE);
     when(sampleUnitRepository.getTotalForSampleSummary(1)).thenReturn(1);
@@ -146,7 +146,17 @@ public class SampleServiceImplTest {
     sampleServiceImpl.sendToPartyService(party.get(0));
 
     assertThat(sampleUnit.get(0).getState(), is(SampleUnitState.PERSISTED));
-    assertThat(sampleSummary.get(0).getState(), not(SampleState.ACTIVE));
+    assertThat(sampleSummaryList.get(0).getState(), not(SampleState.ACTIVE));
+  }
+
+  @Test
+  public void testCollectionExerciseJobIsStoredWhenSampleUnitsAreFound() throws Exception {
+    when(sampleSummaryRepository.findBySurveyRefAndEffectiveStartDateTimeAndState(EXERCISEREF, EXERCISEDATETIME,
+        SampleState.ACTIVE)).thenReturn(sampleSummaryList);
+    when(sampleUnitRepository.findBySampleSummaryFK(1)).thenReturn(sampleUnit);
+    Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
+    verify(collectionExerciseJobService, times(1)).storeCollectionExerciseJob(any());
+    assertThat(sampleUnitsTotal, is(1));
   }
 
   @Test
@@ -156,13 +166,4 @@ public class SampleServiceImplTest {
     assertThat(sampleUnitsTotal, is(0));
   }
 
-  @Test
-  public void testOneCollectionExerciseJobIsStoredWhenSampleUnitsAreFound() throws Exception {
-    when(sampleSummaryRepository.findBySurveyRefAndEffectiveStartDateTimeAndState(EXERCISEREF, EXERCISEDATETIME,
-        SampleState.ACTIVE)).thenReturn(sampleSummary);
-    when(sampleUnitRepository.findBySampleSummaryFK(1)).thenReturn(sampleUnit);
-    Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
-    verify(collectionExerciseJobService, times(1)).storeCollectionExerciseJob(any());
-    assertThat(sampleUnitsTotal, is(1));
-  }
 }
