@@ -25,7 +25,6 @@ import uk.gov.ons.ctp.response.sample.domain.repository.CollectionExerciseJobRep
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.message.SampleUnitPublisher;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
-import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -63,9 +62,6 @@ public class SampleUnitDistributorTest {
   private CollectionExerciseJobRepository collectionExerciseJobRepository;
 
   @Mock
-  private SampleService sampleService;
-
-  @Mock
   private SampleUnitPublisher sampleUnitPublisher;
 
   @Spy
@@ -94,11 +90,10 @@ public class SampleUnitDistributorTest {
 
   @Test
   public void testHappyPath() throws LockingException, CTPException {
-    when(collectionExerciseJobRepository.findAll())
-            .thenReturn(collectionExerciseJobsList);
+    when(collectionExerciseJobRepository.findAll()).thenReturn(collectionExerciseJobsList);
 
-    when(sampleUnitRepo.getSampleUnitBatch(any(String.class), any(Timestamp.class), any(String.class), any(Integer.class),
-            any(List.class))).thenReturn(sampleUnitList);
+    when(sampleUnitRepo.getSampleUnitBatch(any(String.class), any(Timestamp.class), any(String.class),
+            any(Integer.class), any(List.class))).thenReturn(sampleUnitList);
 
     when(sampleUnitRepo.findOne(any(Integer.class))).thenReturn(sampleUnitList.get(0));
 
@@ -108,15 +103,18 @@ public class SampleUnitDistributorTest {
 
     verify(tracer, times(1)).createSpan(any(String.class));
     verify(collectionExerciseJobRepository, times(1)).findAll();
-    verify(sampleUnitDistributionListManager, times(1)).findList(any(String.class), any(Boolean.class));
+    verify(sampleUnitDistributionListManager, times(1)).findList(any(String.class),
+            any(Boolean.class));
     verify(sampleUnitDistributionListManager, times(1)).saveList(any(String.class),
             any(List.class), any(Boolean.class));
     verify(sampleUnitRepo, times(2)).findOne(any(Integer.class));
 
-    verify(sampleUnitStateTransitionManager, times(1)).transition(sampleUnitList.get(0).getState(), SampleUnitDTO.SampleUnitEvent.DELIVERING);
+    verify(sampleUnitStateTransitionManager, times(1)).transition(
+            sampleUnitList.get(0).getState(), SampleUnitDTO.SampleUnitEvent.DELIVERING);
     verify(sampleUnitRepo, times(2)).saveAndFlush(any(SampleUnit.class));
 
-    verify(sampleUnitPublisher, times(2)).send(any(uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.class));
+    verify(sampleUnitPublisher, times(2)).send(
+            any(uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.class));
     verify(sampleUnitDistributionListManager, times(1)).deleteList(any(String.class),
             any(Boolean.class));
     verify(sampleUnitDistributionListManager, times(1)).unlockContainer();
@@ -128,8 +126,8 @@ public class SampleUnitDistributorTest {
     when(collectionExerciseJobRepository.findAll())
             .thenThrow(new RuntimeException("Database access failed"));
 
-    when(sampleUnitRepo.getSampleUnitBatch(any(String.class), any(Timestamp.class), any(String.class), any(Integer.class),
-            any(List.class))).thenReturn(sampleUnitList);
+    when(sampleUnitRepo.getSampleUnitBatch(any(String.class), any(Timestamp.class), any(String.class),
+            any(Integer.class), any(List.class))).thenReturn(sampleUnitList);
 
     when(sampleUnitRepo.findOne(any(Integer.class))).thenReturn(sampleUnitList.get(0));
 
@@ -139,7 +137,8 @@ public class SampleUnitDistributorTest {
 
     verify(tracer, times(1)).createSpan(any(String.class));
     verify(collectionExerciseJobRepository, times(1)).findAll();
-    verify(sampleUnitDistributionListManager, times(0)).findList(any(String.class), any(Boolean.class));
+    verify(sampleUnitDistributionListManager, times(0)).findList(any(String.class),
+            any(Boolean.class));
     verify(sampleUnitDistributionListManager, times(0)).saveList(any(String.class),
             any(List.class), any(Boolean.class));
     verify(tracer, times(1)).close(any(Span.class));
@@ -153,7 +152,8 @@ public class SampleUnitDistributorTest {
     when(collectionExerciseJobRepository.findAll())
             .thenReturn(collectionExerciseJobs);
 
-    when(sampleUnitRepo.getSampleUnitBatch(any(String.class), any(Timestamp.class), any(String.class), any(Integer.class),
+    when(sampleUnitRepo.getSampleUnitBatch(any(String.class), any(Timestamp.class), any(String.class),
+            any(Integer.class),
             any(List.class))).thenReturn(sampleUnitList);
 
     when(sampleUnitRepo.findOne(any(Integer.class))).thenReturn(sampleUnitList.get(0));
@@ -175,7 +175,8 @@ public class SampleUnitDistributorTest {
 
     List<SampleUnit> sampleUnits = new ArrayList<>();
 
-    when(sampleUnitRepo.getSampleUnitBatch(any(String.class), any(Timestamp.class), any(String.class), any(Integer.class),
+    when(sampleUnitRepo.getSampleUnitBatch(any(String.class), any(Timestamp.class), any(String.class),
+            any(Integer.class),
             any(List.class))).thenReturn(sampleUnits);
 
     when(sampleUnitRepo.findOne(any(Integer.class))).thenReturn(sampleUnitList.get(0));
@@ -186,7 +187,8 @@ public class SampleUnitDistributorTest {
 
     verify(tracer, times(1)).createSpan(any(String.class));
     verify(collectionExerciseJobRepository, times(1)).findAll();
-    verify(sampleUnitDistributionListManager, times(1)).findList(any(String.class), any(Boolean.class));
+    verify(sampleUnitDistributionListManager, times(1)).findList(any(String.class),
+            any(Boolean.class));
 
     verify(sampleUnitDistributionListManager, times(1)).deleteList(any(String.class),
             any(Boolean.class));
@@ -199,7 +201,8 @@ public class SampleUnitDistributorTest {
     when(collectionExerciseJobRepository.findAll())
             .thenReturn(collectionExerciseJobsList);
 
-    when(sampleUnitRepo.getSampleUnitBatch(any(String.class), any(Timestamp.class), any(String.class), any(Integer.class),
+    when(sampleUnitRepo.getSampleUnitBatch(any(String.class), any(Timestamp.class), any(String.class),
+            any(Integer.class),
             any(List.class))).thenThrow(new RuntimeException("Database access failed"));
 
     when(sampleUnitRepo.findOne(any(Integer.class))).thenReturn(sampleUnitList.get(0));
@@ -210,7 +213,8 @@ public class SampleUnitDistributorTest {
 
     verify(tracer, times(1)).createSpan(any(String.class));
     verify(collectionExerciseJobRepository, times(1)).findAll();
-    verify(sampleUnitDistributionListManager, times(1)).findList(any(String.class), any(Boolean.class));
+    verify(sampleUnitDistributionListManager, times(1)).findList(any(String.class),
+            any(Boolean.class));
     verify(tracer, times(1)).close(any(Span.class));
   }
 
@@ -219,7 +223,8 @@ public class SampleUnitDistributorTest {
     when(collectionExerciseJobRepository.findAll())
             .thenReturn(collectionExerciseJobsList);
 
-    when(sampleUnitRepo.getSampleUnitBatch(any(String.class), any(Timestamp.class), any(String.class), any(Integer.class),
+    when(sampleUnitRepo.getSampleUnitBatch(any(String.class), any(Timestamp.class), any(String.class),
+            any(Integer.class),
             any(List.class))).thenReturn(sampleUnitList);
 
     when(sampleUnitRepo.findOne(any(Integer.class))).thenReturn(sampleUnitList.get(0));
@@ -230,19 +235,21 @@ public class SampleUnitDistributorTest {
 
     verify(tracer, times(1)).createSpan(any(String.class));
     verify(collectionExerciseJobRepository, times(1)).findAll();
-    verify(sampleUnitDistributionListManager, times(1)).findList(any(String.class), any(Boolean.class));
+    verify(sampleUnitDistributionListManager, times(1)).findList(any(String.class),
+            any(Boolean.class));
     verify(sampleUnitDistributionListManager, times(1)).saveList(any(String.class),
             any(List.class), any(Boolean.class));
     verify(sampleUnitRepo, times(2)).findOne(any(Integer.class));
 
-    verify(sampleUnitStateTransitionManager, times(1)).transition(sampleUnitList.get(0).getState(), SampleUnitDTO.SampleUnitEvent.DELIVERING);
+    verify(sampleUnitStateTransitionManager, times(1)).transition(
+            sampleUnitList.get(0).getState(), SampleUnitDTO.SampleUnitEvent.DELIVERING);
     verify(sampleUnitRepo, times(2)).saveAndFlush(any(SampleUnit.class));
 
-    verify(sampleUnitPublisher, times(2)).send(any(uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.class));
+    verify(sampleUnitPublisher, times(2)).send(
+            any(uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.class));
     verify(sampleUnitDistributionListManager, times(1)).deleteList(any(String.class),
             any(Boolean.class));
     verify(sampleUnitDistributionListManager, times(1)).unlockContainer();
     verify(tracer, times(1)).close(any(Span.class));
   }
-
 }

@@ -89,8 +89,7 @@ public class SampleUnitDistributor {
     try {
       List<CollectionExerciseJob> jobs = collectionExerciseJobRepository.findAll();
       for (CollectionExerciseJob job : jobs) {
-
-        List<SampleUnit> sampleUnits = new ArrayList<SampleUnit>();
+        List<SampleUnit> sampleUnits;
 
         List<Integer> excludedCases = sampleUnitDistributionListManager.findList(SAMPLEUNIT_DISTRIBUTOR_LIST_ID,
                 false);
@@ -129,9 +128,7 @@ public class SampleUnitDistributor {
         } catch (LockingException le) {
           // oh well - will time out or we never had the lock
         }
-
       }
-
     } catch (Exception e) {
       log.error("Failed to process sample units because {}", e);
     }
