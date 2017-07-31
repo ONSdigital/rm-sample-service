@@ -14,6 +14,7 @@ import static org.junit.Assert.assertThat;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -152,13 +153,13 @@ public class SampleServiceImplTest {
 
   @Test
   public void testCollectionExerciseJobIsStoredWhenSampleUnitsAreFound() throws Exception {
-    List<SampleUnit> sampleUnits= new ArrayList<>();
-    SampleUnit sampleUnitB = SampleUnit.builder().sampleUnitPK(1).sampleSummaryFK(1).sampleUnitRef(SAMPLEUNITREF).sampleUnitType(SAMPLEUNITTYPE).formType("Cuft").state(SampleUnitState.INIT).build();
-    sampleUnits.add(sampleUnitB);
+    CollectionExerciseJob collex = CollectionExerciseJob.builder().collectionExerciseJobPK(1)
+        .collectionExerciseId(UUID.fromString("14fb3e68-4dca-46db-bf49-04b84e07e77c")).surveyRef("ref")
+        .exerciseDateTime(EXERCISEDATETIME).createdDateTime(EXERCISEDATETIME).build();
     when(sampleSummaryRepository.findBySurveyRefAndEffectiveStartDateTimeAndState(EXERCISEREF, EXERCISEDATETIME,
         SampleState.ACTIVE)).thenReturn(sampleSummaryList);
-    when(sampleUnitRepository.findBySampleSummaryFK(1)).thenReturn(sampleUnits);
-    Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
+    when(sampleUnitRepository.findBySampleSummaryFK(1)).thenReturn(sampleUnit);
+    Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collex);
     verify(collectionExerciseJobService, times(1)).storeCollectionExerciseJob(any());
     assertThat(sampleUnitsTotal, is(1));
   }
