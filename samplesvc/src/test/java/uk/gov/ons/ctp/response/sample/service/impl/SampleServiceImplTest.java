@@ -152,12 +152,12 @@ public class SampleServiceImplTest {
 
   @Test
   public void testCollectionExerciseJobIsStoredWhenSampleUnitsAreFound() throws Exception {
-    List<SampleSummary> sampleSummarys= new ArrayList<>();
-    SampleSummary sampleSummary = SampleSummary.builder().sampleSummaryPK(1).surveyRef("222").state(SampleState.INIT).build();
-    sampleSummarys.add(sampleSummary);
+    List<SampleUnit> sampleUnits= new ArrayList<>();
+    SampleUnit sampleUnitB = SampleUnit.builder().sampleUnitPK(1).sampleSummaryFK(1).sampleUnitRef(SAMPLEUNITREF).sampleUnitType(SAMPLEUNITTYPE).formType("Cuft").state(SampleUnitState.INIT).build();
+    sampleUnits.add(sampleUnitB);
     when(sampleSummaryRepository.findBySurveyRefAndEffectiveStartDateTimeAndState(EXERCISEREF, EXERCISEDATETIME,
-        SampleState.ACTIVE)).thenReturn(sampleSummarys);
-    when(sampleUnitRepository.findBySampleSummaryFK(1)).thenReturn(sampleUnit);
+        SampleState.ACTIVE)).thenReturn(sampleSummaryList);
+    when(sampleUnitRepository.findBySampleSummaryFK(1)).thenReturn(sampleUnits);
     Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(1)).storeCollectionExerciseJob(any());
     assertThat(sampleUnitsTotal, is(1));
