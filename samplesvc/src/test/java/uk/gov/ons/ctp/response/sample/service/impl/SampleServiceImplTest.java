@@ -3,18 +3,17 @@ package uk.gov.ons.ctp.response.sample.service.impl;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.junit.Assert.assertThat;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -51,9 +50,7 @@ public class SampleServiceImplTest {
 
   private static final String SAMPLEUNITREF = "222";
 
-  private static final String EXERCISEREF = "ref";
-
-  private static final Timestamp EXERCISEDATETIME = Timestamp.valueOf("2017-09-08 00:00:00.0");
+  private static final String SURVEYREF = "ref";
 
   @Mock
   private SampleSummaryRepository sampleSummaryRepository;
@@ -156,6 +153,16 @@ public class SampleServiceImplTest {
     Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(0)).storeCollectionExerciseJob(any());
     assertThat(sampleUnitsTotal, is(0));
+  }
+  
+  @Test
+  public void testOneCollectionExerciseJobIsStoredWhenSampleUnitsAreFound() throws Exception {
+    when(sampleSummaryRepository.findBySurveyRefAndEffectiveStartDateTimeAndState(eq(SURVEYREF), any(Timestamp.class),
+        eq(SampleState.ACTIVE))).thenReturn(sampleSummaryList);
+    when(sampleUnitRepository.findBySampleSummaryFK(1)).thenReturn(sampleUnit);
+    Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
+    verify(collectionExerciseJobService, times(1)).storeCollectionExerciseJob(any());
+    assertThat(sampleUnitsTotal, is(1));
   }
 
 }
