@@ -116,8 +116,8 @@ public class SampleServiceImplTest {
   }
 
   /**
-   * Verify that a SampleSummary is created and then saved to the database. Also
-   * verifies that SampleUnits are saved to the database and then published to
+   * Verify that a SampleSummary containing two SampleUnits is created and then saved to the database. Also
+   * verifies that both SampleUnits are saved to the database and then published to
    * the internal queue.
    * 
    * @throws Exception oops
@@ -130,8 +130,8 @@ public class SampleServiceImplTest {
     sampleServiceImpl.processSampleSummary(businessSample, businessSample.getSampleUnits().getBusinessSampleUnits());
 
     verify(sampleSummaryRepository).save(any(SampleSummary.class));
-    verify(sampleUnitRepository).save(any(SampleUnit.class));
-    verify(partyPublisher).publish(any(Party.class));
+    verify(sampleUnitRepository, times(2)).save(any(SampleUnit.class));
+    verify(partyPublisher, times(2)).publish(any(Party.class));
   }
 
   /**
