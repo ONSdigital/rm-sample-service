@@ -1,31 +1,30 @@
 package uk.gov.ons.ctp.response.sample.service;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.rest.RestClient;
-import uk.gov.ons.ctp.response.party.definition.Party;
 import uk.gov.ons.ctp.response.party.representation.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.config.PartySvc;
 import uk.gov.ons.ctp.response.sample.service.impl.PartySvcClientServiceImpl;
 
-
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-//@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class PartySvcClientServiceTest {
 
 
-   /* @InjectMocks
+    @InjectMocks
     private PartySvcClientServiceImpl partySvcClientService;
 
     @Mock
@@ -41,7 +40,7 @@ public class PartySvcClientServiceTest {
     @Test
     public void verifyPartyPostedTo() throws CTPException {
         PartyDTO party = new PartyDTO();
-        Party newParty = new Party();
+        PartyCreationRequestDTO newParty = new PartyCreationRequestDTO();
 
         PartySvc partySvc = new PartySvc();
         partySvc.setPostPartyPath("/path");
@@ -52,5 +51,5 @@ public class PartySvcClientServiceTest {
         partySvcClientService.postParty(newParty);
 
         verify(partySvcClient, times(1)).postResource(partySvc.getPostPartyPath(), newParty, PartyDTO.class);
-    }*/
+    }
 }
