@@ -1,13 +1,6 @@
-- To test the info endpoint:
-curl http://localhost:8225/mgmt/info -v -X GET
-{"contactEmail":"phil.whiles@ons.gov.uk","version":"10.37.0-SNAPSHOT","commit":"","branch":"${scmBranch}","buildTime":""}
+curl http://localhost:8125/info -v -X GET
+200 {"name":"samplesvc","version":"10.44.0-SNAPSHOT","origin":"git@github.com:ONSdigital/rm-sample-service.git","commit":"0d5ebe966d2fabe2f2d67f54c35d6542c5a8e86f","branch":"master","built":"2017-08-02T14:50:00Z"}
 
 
-- To test the manual endpoint:
-curl http://localhost:8125/mgmt/samples -v -X GET
-204
-
-
-- To test your endpoint:
-curl -H "Accept: application/json" -H "Content-Type: application/json" http://localhost:8125/mgmt/samples/sampleunitrequests -v -X POST -d "{\"collectionExerciseJobPK\":\"1\", \"surveyRef\":\"str1234\", \"exerciseDateTime\":\"2012-12-13T12:12:12.000+00\"}"
-400 at the moment
+curl -H "Accept: application/json" -H "Content-Type: application/json" http://localhost:8125/samples/sampleunitrequests -v -X POST -d "{\"collectionExerciseId\":\"14fb3e68-4dca-46db-bf49-04b84e07e77c\", \"surveyRef\":\"221\", \"exerciseDateTime\":\"2017-08-29T23:00:00.000+0000\"}"
+201 {"sampleUnitsTotal":0}
