@@ -26,6 +26,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.response.party.definition.Party;
+import uk.gov.ons.ctp.response.party.representation.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 import uk.gov.ons.ctp.response.sample.definition.BusinessSurveySample;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
@@ -83,6 +84,9 @@ public class SampleServiceImplTest {
   private List<SampleSummary> sampleSummaryList;
   private List<CollectionExerciseJob> collectionExerciseJobs;
 
+  /**
+   * Before the test
+   */
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
@@ -92,12 +96,18 @@ public class SampleServiceImplTest {
     sampleUnit = FixtureHelper.loadClassFixtures(SampleUnit[].class);
     sampleSummaryList = FixtureHelper.loadClassFixtures(SampleSummary[].class);
     collectionExerciseJobs = FixtureHelper.loadClassFixtures(CollectionExerciseJob[].class);
-
   }
 
+  /**
+   * Verify that a SampleSummary is correctly created when a SurveySample is
+   * passed into the method.
+   * 
+   * @throws Exception oops
+   */
   @Test
   public void verifySampleSummaryCreatedCorrectly() throws Exception {
     SampleSummary sampleSummary = sampleServiceImpl.createSampleSummary(surveySample.get(0));
+
     assertTrue(sampleSummary.getSurveyRef().equals("abc"));
     assertNotNull(sampleSummary.getIngestDateTime());
     assertTrue(sampleSummary.getEffectiveEndDateTime().getTime() == 1583743600000L);
@@ -105,18 +115,33 @@ public class SampleServiceImplTest {
     assertTrue(sampleSummary.getState() == SampleSummaryDTO.SampleState.INIT);
   }
 
+  /**
+   * Verify that a SampleSummary is created and then saved to the database. Also
+   * verifies that SampleUnits are saved to the database and then published to
+   * the internal queue.
+   * 
+   * @throws Exception oops
+   */
   @Test
-  public void processSampleSummaryTest() throws Exception {
+  public void testSampleSummaryAndSampleUnitsAreSavedAndThenSampleUnitsPublishedToQueue() throws Exception {
     BusinessSurveySample businessSample = surveySample.get(0);
     when(sampleSummaryRepository.save(any(SampleSummary.class))).then(returnsFirstArg());
+
     sampleServiceImpl.processSampleSummary(businessSample, businessSample.getSampleUnits().getBusinessSampleUnits());
+
     verify(sampleSummaryRepository).save(any(SampleSummary.class));
     verify(sampleUnitRepository).save(any(SampleUnit.class));
     verify(partyPublisher).publish(any(Party.class));
   }
 
+  /**
+   * Test that when a Party is posted to Party Service the appropriate states
+   * are changed
+   * 
+   * @throws Exception oops
+   */
   @Test
-  public void sendToPartyServiceTestStateTransitions() throws Exception {
+  public void postPartyDTOToPartyServiceAndUpdateStatesTest() throws Exception {
     when(partySvcClient.postParty(any())).thenReturn(partyDTO.get(0));
     when(sampleUnitRepository.findBySampleUnitRefAndType(SAMPLEUNITREF, SAMPLEUNITTYPE)).thenReturn(sampleUnit.get(0));
     when(sampleSvcUnitStateTransitionManager.transition(SampleUnitState.INIT, SampleUnitEvent.PERSISTING))
@@ -127,10 +152,17 @@ public class SampleServiceImplTest {
 
     sampleServiceImpl.sendToPartyService(party.get(0));
 
+    verify(partySvcClient).postParty(any(PartyCreationRequestDTO.class));
     assertThat(sampleUnit.get(0).getState(), is(SampleUnitState.PERSISTED));
     assertThat(sampleSummaryList.get(0).getState(), is(SampleState.ACTIVE));
   }
 
+  /**
+   * Test that SampleSummary state is not changed to active unless all Party
+   * objects have been sent to the Party Service
+   * 
+   * @throws Exception oops
+   */
   @Test
   public void sendToPartyServiceTestNotAllSampleUnitsPosted() throws Exception {
     when(partySvcClient.postParty(any())).thenReturn(partyDTO.get(0));
@@ -144,17 +176,30 @@ public class SampleServiceImplTest {
 
     sampleServiceImpl.sendToPartyService(party.get(0));
 
+    verify(partySvcClient).postParty(any(PartyCreationRequestDTO.class));
     assertThat(sampleUnit.get(0).getState(), is(SampleUnitState.PERSISTED));
     assertThat(sampleSummaryList.get(0).getState(), not(SampleState.ACTIVE));
   }
 
+  /**
+   * Test that a CollectionExerciseJob is only stored if there are SampleUnits
+   * found for the surveyRef and have not been previously sent
+   * 
+   * @throws Exception oops
+   */
   @Test
   public void testNoCollectionExerciseStoredWhenNoSampleUnits() throws Exception {
     Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(0)).storeCollectionExerciseJob(any());
     assertThat(sampleUnitsTotal, is(0));
   }
-  
+
+  /**
+   * Test that a CollectionExerciseJob is stored if there are SampleUnits
+   * found for the surveyRef that have not been previously sent to CollectionExercise
+   * 
+   * @throws Exception oops
+   */
   @Test
   public void testOneCollectionExerciseJobIsStoredWhenSampleUnitsAreFound() throws Exception {
     when(sampleSummaryRepository.findBySurveyRefAndEffectiveStartDateTimeAndState(eq(SURVEYREF), any(Timestamp.class),
