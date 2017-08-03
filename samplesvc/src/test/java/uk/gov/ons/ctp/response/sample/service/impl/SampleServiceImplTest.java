@@ -44,8 +44,15 @@ import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitSta
 import uk.gov.ons.ctp.response.sample.service.CollectionExerciseJobService;
 import uk.gov.ons.ctp.response.sample.service.PartySvcClientService;
 
+/**
+ *tests
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class SampleServiceImplTest {
+
+  private static final long EFFECTIVESTARTDATETIME = 1483743600000L;
+
+  private static final long EFFECTIVEENDDATETIME = 1583743600000L;
 
   private static final String SAMPLEUNITTYPE = "H";
 
@@ -86,6 +93,8 @@ public class SampleServiceImplTest {
 
   /**
    * Before the test
+   *
+   * @throws Exception oops
    */
   @Before
   public void setUp() throws Exception {
@@ -101,7 +110,7 @@ public class SampleServiceImplTest {
   /**
    * Verify that a SampleSummary is correctly created when a SurveySample is
    * passed into the method.
-   * 
+   *
    * @throws Exception oops
    */
   @Test
@@ -110,16 +119,16 @@ public class SampleServiceImplTest {
 
     assertTrue(sampleSummary.getSurveyRef().equals("abc"));
     assertNotNull(sampleSummary.getIngestDateTime());
-    assertTrue(sampleSummary.getEffectiveEndDateTime().getTime() == 1583743600000L);
-    assertTrue(sampleSummary.getEffectiveStartDateTime().getTime() == 1483743600000L);
+    assertTrue(sampleSummary.getEffectiveEndDateTime().getTime() == EFFECTIVEENDDATETIME);
+    assertTrue(sampleSummary.getEffectiveStartDateTime().getTime() == EFFECTIVESTARTDATETIME);
     assertTrue(sampleSummary.getState() == SampleSummaryDTO.SampleState.INIT);
   }
 
   /**
-   * Verify that a SampleSummary is created and then saved to the database. Also
-   * verifies that SampleUnits are saved to the database and then published to
+   * Verify that a SampleSummary containing two SampleUnits is created and then saved to the database. Also
+   * verifies that both SampleUnits are saved to the database and then published to
    * the internal queue.
-   * 
+   *
    * @throws Exception oops
    */
   @Test
@@ -130,14 +139,14 @@ public class SampleServiceImplTest {
     sampleServiceImpl.processSampleSummary(businessSample, businessSample.getSampleUnits().getBusinessSampleUnits());
 
     verify(sampleSummaryRepository).save(any(SampleSummary.class));
-    verify(sampleUnitRepository).save(any(SampleUnit.class));
-    verify(partyPublisher).publish(any(Party.class));
+    verify(sampleUnitRepository, times(2)).save(any(SampleUnit.class));
+    verify(partyPublisher, times(2)).publish(any(Party.class));
   }
 
   /**
    * Test that when a Party is posted to Party Service the appropriate states
    * are changed
-   * 
+   *
    * @throws Exception oops
    */
   @Test
@@ -160,7 +169,7 @@ public class SampleServiceImplTest {
   /**
    * Test that SampleSummary state is not changed to active unless all Party
    * objects have been sent to the Party Service
-   * 
+   *
    * @throws Exception oops
    */
   @Test
@@ -184,7 +193,7 @@ public class SampleServiceImplTest {
   /**
    * Test that a CollectionExerciseJob is only stored if there are SampleUnits
    * found for the surveyRef and have not been previously sent
-   * 
+   *
    * @throws Exception oops
    */
   @Test
@@ -197,7 +206,7 @@ public class SampleServiceImplTest {
   /**
    * Test that a CollectionExerciseJob is stored if there are SampleUnits
    * found for the surveyRef that have not been previously sent to CollectionExercise
-   * 
+   *
    * @throws Exception oops
    */
   @Test

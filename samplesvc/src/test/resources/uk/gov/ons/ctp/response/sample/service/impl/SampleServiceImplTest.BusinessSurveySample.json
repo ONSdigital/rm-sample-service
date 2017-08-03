@@ -4,7 +4,7 @@
   "effectiveStartDateTime":"1483743600000",
   "effectiveEndDateTime":"1583743600000",
   "sampleUnits":{
-  	"businessSampleUnits":{
+  	"businessSampleUnits":[{
   		   "sampleUnitRef": "1234567890",
 		   "sampleUnitType": "B",
 		   "formType": "0015",
@@ -30,7 +30,33 @@
 		   "cellNo": "7",
 		   "formtype": "0015",
 		   "currency": "S"
-	}
+	},
+	{	  "sampleUnitRef": "0987654321",
+		  "sampleUnitType": "B",
+		  "formType": "0015",
+		  "checkletter": "F",
+		  "frosic92": "50300",
+		  "rusic92": "50300",
+		  "frosic2007": "45320",
+		  "rusic2007": "45320",
+		  "froempment": "8478",
+		  "frotover": "801325",
+		  "entref": "1234567890",
+		  "legalstatus": "1",
+		  "entrepmkr": "E",
+		  "region": "FE",
+		  "birthdate": "01/09/1993",
+		  "entname1": "ENT NAME",
+		  "entname2": "MEMBERS",
+		  "runame1": "RU NAME",
+		  "runame2": "MEMBERS",
+		  "tradstyle1": "TOTAL UK ACTIVITY",
+		  "seltype": "C",
+		  "inclexcl": "D",
+		  "cellNo": "7",
+		  "formtype": "0015",
+		  "currency": "S"
+	  }]
   }
 }
 ]
