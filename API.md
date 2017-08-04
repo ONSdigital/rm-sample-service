@@ -7,12 +7,12 @@ This page documents the Sample service API endpoints. These endpoints will be se
 ### Example JSON Response
 ```json
 {
-    "name": "samplesvc",
-    "version": "10.42.0",
-    "origin": "git@github.com:ONSdigital/rm-sample-service.git",
-    "commit": "4b53f1c4e56d5d59e753696ac524233626eaed64",
-    "branch": "master",
-    "built": "2017-07-12T13:18:28Z"
+  "name": "samplesvc",
+  "version": "10.42.0",
+  "origin": "git@github.com:ONSdigital/rm-sample-service.git",
+  "commit": "4b53f1c4e56d5d59e753696ac524233626eaed64",
+  "branch": "master",
+  "built": "2017-07-12T13:18:28Z"
 }
 ```
 
