@@ -9,8 +9,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.cloud.sleuth.Span;
-import org.springframework.cloud.sleuth.Tracer;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.distributed.DistributedListManager;
 import uk.gov.ons.ctp.common.distributed.LockingException;
@@ -48,9 +46,6 @@ public class SampleUnitDistributorTest {
 
   @Spy
   private AppConfig appConfig = new AppConfig();
-
-  @Mock
-  private Tracer tracer;
 
   @Mock
   private DistributedListManager<Integer> sampleUnitDistributionListManager;
@@ -101,7 +96,6 @@ public class SampleUnitDistributorTest {
     assertEquals(0, info.getSampleUnitsFailed());
     assertEquals(2, info.getSampleUnitsSucceeded());
 
-    verify(tracer, times(1)).createSpan(any(String.class));
     verify(collectionExerciseJobRepository, times(1)).findAll();
     verify(sampleUnitDistributionListManager, times(1)).findList(any(String.class),
             any(Boolean.class));
@@ -118,7 +112,6 @@ public class SampleUnitDistributorTest {
     verify(sampleUnitDistributionListManager, times(1)).deleteList(any(String.class),
             any(Boolean.class));
     verify(sampleUnitDistributionListManager, times(1)).unlockContainer();
-    verify(tracer, times(1)).close(any(Span.class));
   }
 
   @Test
@@ -135,13 +128,11 @@ public class SampleUnitDistributorTest {
     assertEquals(0, info.getSampleUnitsFailed());
     assertEquals(0, info.getSampleUnitsSucceeded());
 
-    verify(tracer, times(1)).createSpan(any(String.class));
     verify(collectionExerciseJobRepository, times(1)).findAll();
     verify(sampleUnitDistributionListManager, times(0)).findList(any(String.class),
             any(Boolean.class));
     verify(sampleUnitDistributionListManager, times(0)).saveList(any(String.class),
             any(List.class), any(Boolean.class));
-    verify(tracer, times(1)).close(any(Span.class));
   }
 
   @Test
@@ -162,9 +153,7 @@ public class SampleUnitDistributorTest {
     assertEquals(0, info.getSampleUnitsFailed());
     assertEquals(0, info.getSampleUnitsSucceeded());
 
-    verify(tracer, times(1)).createSpan(any(String.class));
     verify(collectionExerciseJobRepository, times(1)).findAll();
-    verify(tracer, times(1)).close(any(Span.class));
 
   }
 
@@ -185,7 +174,6 @@ public class SampleUnitDistributorTest {
     assertEquals(0, info.getSampleUnitsFailed());
     assertEquals(0, info.getSampleUnitsSucceeded());
 
-    verify(tracer, times(1)).createSpan(any(String.class));
     verify(collectionExerciseJobRepository, times(1)).findAll();
     verify(sampleUnitDistributionListManager, times(1)).findList(any(String.class),
             any(Boolean.class));
@@ -193,7 +181,6 @@ public class SampleUnitDistributorTest {
     verify(sampleUnitDistributionListManager, times(1)).deleteList(any(String.class),
             any(Boolean.class));
     verify(sampleUnitDistributionListManager, times(1)).unlockContainer();
-    verify(tracer, times(1)).close(any(Span.class));
   }
 
   @Test
@@ -211,11 +198,9 @@ public class SampleUnitDistributorTest {
     assertEquals(0, info.getSampleUnitsFailed());
     assertEquals(0, info.getSampleUnitsSucceeded());
 
-    verify(tracer, times(1)).createSpan(any(String.class));
     verify(collectionExerciseJobRepository, times(1)).findAll();
     verify(sampleUnitDistributionListManager, times(1)).findList(any(String.class),
             any(Boolean.class));
-    verify(tracer, times(1)).close(any(Span.class));
   }
 
   @Test
@@ -233,7 +218,6 @@ public class SampleUnitDistributorTest {
     assertEquals(0, info.getSampleUnitsFailed());
     assertEquals(2, info.getSampleUnitsSucceeded());
 
-    verify(tracer, times(1)).createSpan(any(String.class));
     verify(collectionExerciseJobRepository, times(1)).findAll();
     verify(sampleUnitDistributionListManager, times(1)).findList(any(String.class),
             any(Boolean.class));
@@ -250,6 +234,5 @@ public class SampleUnitDistributorTest {
     verify(sampleUnitDistributionListManager, times(1)).deleteList(any(String.class),
             any(Boolean.class));
     verify(sampleUnitDistributionListManager, times(1)).unlockContainer();
-    verify(tracer, times(1)).close(any(Span.class));
   }
 }

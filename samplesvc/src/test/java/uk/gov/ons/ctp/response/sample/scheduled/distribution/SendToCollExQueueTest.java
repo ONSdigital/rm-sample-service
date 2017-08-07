@@ -20,7 +20,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.cloud.sleuth.Tracer;
 
 import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.distributed.DistributedListManager;
@@ -63,9 +62,6 @@ public class SendToCollExQueueTest {
     private StateTransitionManager sampleUnitStateTransitionManager;
     
     @Mock
-    private Tracer tracer;
-    
-    @Mock
     private DistributedListManager<Integer> sampleUnitDistributionListManager;
     
     
@@ -92,8 +88,6 @@ public class SendToCollExQueueTest {
         when(appConfig.getSampleUnitDistribution()).thenReturn(sud);
         when(mapperFacade.map(any(),any())).thenReturn(new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit());
         when(sampleUnitStateTransitionManager.transition(any(),any())).thenReturn(SampleUnitDTO.SampleUnitState.DELIVERED);
-
-        when(tracer.createSpan(any())).thenReturn(null);
 
         when(sampleUnitDistributionListManager.findList(anyString(), anyBoolean())).thenReturn(new ArrayList<Integer>());
         

@@ -76,9 +76,6 @@ spring:
   application:
     name: ONS SampleService
 
-  sleuth:
-    sampler:
-      percentage: 75
 
   datasource:
     url: jdbc:postgresql://localhost:6432/postgres
