@@ -88,10 +88,6 @@ spring:
       max-idle: 5
       min-idle: 3
 
-  zipkin:
-    enabled: false
-
-
 party-svc:
   sample-path: /events
   post-party-path: /party-api/v1/parties

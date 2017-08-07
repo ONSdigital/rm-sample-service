@@ -84,10 +84,6 @@ spring:
     continue-on-error: true
     schema: classpath:/schema-cloud.sql
 
-  zipkin:
-    enabled: false
-
-
 party-svc:
   sample-path: /events
   connection-config:
