@@ -12,7 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import uk.gov.ons.ctp.common.xml.ValidatingXmlUnmarshaller;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
 import uk.gov.ons.ctp.response.sample.definition.CensusSampleUnit;
 import uk.gov.ons.ctp.response.sample.definition.CensusSurveySample;
 import uk.gov.ons.ctp.response.sample.message.impl.CensusSampleReceiverImpl;
@@ -34,18 +35,16 @@ public class CensusSampleReceiverImplTest {
 
   @Test
   public void TestProcessSample() throws Exception{
-		String xmlFileLocation = "src/test/resources/uk/gov/ons/ctp/response/sample/service/impl/census-survey-sample.xml";
+    File xmlFileLocation = new File("src/test/resources/uk/gov/ons/ctp/response/sample/service/impl/census-survey-sample.xml");
 
-	  ValidatingXmlUnmarshaller<CensusSurveySample> unmarshaller = new ValidatingXmlUnmarshaller<CensusSurveySample>(
-              "samplesvc/xsd/inbound",
-	      "census-survey-sample.xsd",
-	      CensusSurveySample.class);
-	  CensusSurveySample sample = unmarshaller.unmarshal(xmlFileLocation);
+    JAXBContext jaxbContext = JAXBContext.newInstance(CensusSurveySample.class);
+
+    Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+    CensusSurveySample sample = (CensusSurveySample) jaxbUnmarshaller.unmarshal(xmlFileLocation);
     List<CensusSampleUnit> samplingUnitList = sample.getSampleUnits().getCensusSampleUnits();
     
-		File file = new File(xmlFileLocation);
     HashMap<String,Object> map = new HashMap<String,Object>();
-    map.put("file_name", file.getAbsolutePath());
+    map.put("file_name", xmlFileLocation.getAbsolutePath());
     
     receiver.processSample(sample, map);
       

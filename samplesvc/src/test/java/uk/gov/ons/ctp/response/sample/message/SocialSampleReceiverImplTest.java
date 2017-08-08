@@ -12,11 +12,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import uk.gov.ons.ctp.common.xml.ValidatingXmlUnmarshaller;
 import uk.gov.ons.ctp.response.sample.definition.SocialSampleUnit;
 import uk.gov.ons.ctp.response.sample.definition.SocialSurveySample;
 import uk.gov.ons.ctp.response.sample.message.impl.SocialSampleReceiverImpl;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
 
 
 /**
@@ -34,23 +36,20 @@ public class SocialSampleReceiverImplTest {
 
   @Test
   public void TestProcessSample() throws Exception{
-    
-		String xmlFileLocation = "src/test/resources/uk/gov/ons/ctp/response/sample/service/impl/social-survey-sample.xml";
+      File xmlFileLocation = new File("src/test/resources/uk/gov/ons/ctp/response/sample/service/impl/social-survey-sample.xml");
 
-	  ValidatingXmlUnmarshaller<SocialSurveySample> unmarshaller = new ValidatingXmlUnmarshaller<SocialSurveySample>(
-              "samplesvc/xsd/inbound",
-	      "social-survey-sample.xsd",
-	      SocialSurveySample.class);
-	  SocialSurveySample sample = unmarshaller.unmarshal(xmlFileLocation);
-    List<SocialSampleUnit> samplingUnitList = sample.getSampleUnits().getSocialSampleUnits();
-    
-		File file = new File(xmlFileLocation);
-    HashMap<String,Object> map = new HashMap<String,Object>();
-    map.put("file_name", file.getAbsolutePath());
-    
-    receiver.processSample(sample, map);
-      
-    verify(sampleService, times(1)).processSampleSummary(sample,samplingUnitList);
+      JAXBContext jaxbContext = JAXBContext.newInstance(SocialSurveySample.class);
+
+      Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+	  SocialSurveySample sample = (SocialSurveySample) jaxbUnmarshaller.unmarshal(xmlFileLocation);
+      List<SocialSampleUnit> samplingUnitList = sample.getSampleUnits().getSocialSampleUnits();
+
+      HashMap<String,Object> map = new HashMap<String,Object>();
+      map.put("file_name", xmlFileLocation.getAbsolutePath());
+
+      receiver.processSample(sample, map);
+
+      verify(sampleService, times(1)).processSampleSummary(sample,samplingUnitList);
     
   }
 

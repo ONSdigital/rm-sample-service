@@ -13,11 +13,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import uk.gov.ons.ctp.common.xml.ValidatingXmlUnmarshaller;
 import uk.gov.ons.ctp.response.sample.definition.BusinessSampleUnit;
 import uk.gov.ons.ctp.response.sample.definition.BusinessSurveySample;
 import uk.gov.ons.ctp.response.sample.message.impl.BusinessSampleReceiverImpl;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
 
 
 /**
@@ -34,22 +36,20 @@ public class BusinessSampleReceiverImplTest {
 
 	@Test
 	public void TestProcessSample() throws Exception {
-		String xmlFileLocation = "src/test/resources/uk/gov/ons/ctp/response/sample/service/impl/business-survey-sample.xml";
+		File xmlFileLocation = new File("src/test/resources/uk/gov/ons/ctp/response/sample/service/impl/business-survey-sample.xml");
 
-	  ValidatingXmlUnmarshaller<BusinessSurveySample> unmarshaller = new ValidatingXmlUnmarshaller<BusinessSurveySample>(
-			  "samplesvc/xsd/inbound",
-	      "business-survey-sample.xsd",
-	      BusinessSurveySample.class);
-	  BusinessSurveySample sample = unmarshaller.unmarshal(xmlFileLocation);
-    List<BusinessSampleUnit> samplingUnitList = sample.getSampleUnits().getBusinessSampleUnits();
+		JAXBContext jaxbContext = JAXBContext.newInstance(BusinessSurveySample.class);
+
+		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+	  	BusinessSurveySample sample = (BusinessSurveySample) jaxbUnmarshaller.unmarshal(xmlFileLocation);
+		List<BusinessSampleUnit> samplingUnitList = sample.getSampleUnits().getBusinessSampleUnits();
+
+		HashMap<String,Object> map = new HashMap<String,Object>();
+		map.put("file_name", xmlFileLocation.getAbsolutePath());
     
-		File file = new File(xmlFileLocation);
-    HashMap<String,Object> map = new HashMap<String,Object>();
-    map.put("file_name", file.getAbsolutePath());
-    
-	  receiver.processSample(sample, map);
-	    
-	  verify(sampleService, times(1)).processSampleSummary(sample,samplingUnitList);
+		receiver.processSample(sample, map);
+
+		verify(sampleService, times(1)).processSampleSummary(sample,samplingUnitList);
 	  
 	}
 
