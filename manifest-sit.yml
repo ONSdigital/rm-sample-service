@@ -1,0 +1,16 @@
+---
+applications:
+- name: samplesvc-sit
+  instances: 1
+  host: samplesvc-sit
+  memory: 1024M
+  path: samplesvc/target/samplesvc.jar
+  timeout: 180
+  services:
+    - rm-pg-db
+    - rm-redis
+    - rm-rabbitmq
+  env:
+    partySvc_connectionConfig_host: ras-party-service-sit.apps.devtest.onsclofo.uk
+    partySvc_connectionConfig_port: "80"
+    partySvc_connectionConfig_scheme: http

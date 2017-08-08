@@ -1,19 +1,20 @@
 package uk.gov.ons.ctp.response.sample.service.impl;
 
-import lombok.extern.slf4j.Slf4j;
-import net.sourceforge.cobertura.CoverageIgnore;
+import java.sql.Timestamp;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
+
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.common.time.DateTimeUtil;
 import uk.gov.ons.ctp.response.party.definition.Party;
 import uk.gov.ons.ctp.response.party.representation.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
-import uk.gov.ons.ctp.response.sample.config.AppConfig;
-import uk.gov.ons.ctp.response.sample.definition.BusinessSampleUnit;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
@@ -29,9 +30,6 @@ import uk.gov.ons.ctp.response.sample.service.CollectionExerciseJobService;
 import uk.gov.ons.ctp.response.sample.service.PartySvcClientService;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
-import java.sql.Timestamp;
-import java.util.List;
-
 @Slf4j
 @Service
 @Configuration
@@ -39,9 +37,6 @@ public class SampleServiceImpl implements SampleService {
 
   @Autowired
   private SampleSummaryRepository sampleSummaryRepository;
-
-  @Autowired
-  private AppConfig appConfig;
 
   @Autowired
   private SampleUnitRepository sampleUnitRepository;
@@ -89,7 +84,6 @@ public class SampleServiceImpl implements SampleService {
     return sampleSummary;
   }
 
-  @CoverageIgnore
   private void saveSampleUnits(List<? extends SampleUnitBase> samplingUnitList, SampleSummary sampleSummary) {
     for (SampleUnitBase sampleUnitBase : samplingUnitList) {
       SampleUnit sampleUnit = new SampleUnit();
@@ -105,14 +99,11 @@ public class SampleServiceImpl implements SampleService {
   /**
    * create sampleUnits, save them to the Database and post to internal queue
    * */
-  @CoverageIgnore
   private void publishToPartyQueue(List<? extends SampleUnitBase> samplingUnitList) {
     for (SampleUnitBase sampleUnitBase : samplingUnitList) {
       try {
-        if (sampleUnitBase instanceof BusinessSampleUnit) {
           Party party = PartyUtil.convertToParty(sampleUnitBase);
           partyPublisher.publish(party);
-        }
       } catch (Exception e) {
         log.debug("publish exception", e);
       }

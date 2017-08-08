@@ -12,7 +12,8 @@ logging:
   level:
     org.springframework: WARN
     uk.gov.ons.ctp: DEBUG
-    io.pivotal.springcloud.ssl: DEBUG
+    io.pivotal.springcloud: DEBUG
+
   profile: DEV
 
 liquibase:
@@ -75,9 +76,6 @@ spring:
   application:
     name: ONS SampleService
 
-  sleuth:
-    sampler:
-      percentage: 75
 
   datasource:
     url: jdbc:postgresql://localhost:6432/postgres
@@ -89,10 +87,6 @@ spring:
       max-active: 10
       max-idle: 5
       min-idle: 3
-
-  zipkin:
-    enabled: false
-
 
 party-svc:
   sample-path: /events

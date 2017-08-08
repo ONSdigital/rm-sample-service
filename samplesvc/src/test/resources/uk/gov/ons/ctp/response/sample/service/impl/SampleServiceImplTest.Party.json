@@ -1,0 +1,11 @@
+[
+	{
+		"sampleUnitType":"H",
+		"sampleUnitRef": "222",
+		"attributes": {
+			"surname": "bob",
+			"phonenumber": "07235235235235235",
+			"emailAddress": "test@test.com"
+		}
+	}
+]

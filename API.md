@@ -7,26 +7,26 @@ This page documents the Sample service API endpoints. These endpoints will be se
 ### Example JSON Response
 ```json
 {
-    "name": "samplesvc",
-    "version": "10.42.0",
-    "origin": "git@github.com:ONSdigital/rm-sample-service.git",
-    "commit": "4b53f1c4e56d5d59e753696ac524233626eaed64",
-    "branch": "master",
-    "built": "2017-07-12T13:18:28Z"
+  "name": "samplesvc",
+  "version": "10.42.0",
+  "origin": "git@github.com:ONSdigital/rm-sample-service.git",
+  "commit": "4b53f1c4e56d5d59e753696ac524233626eaed64",
+  "branch": "master",
+  "built": "2017-07-12T13:18:28Z"
 }
 ```
 
 ## Create Sample Unit Request
 * `POST /sampleunitrequests` creates a sample unit request.
 
-**Required parameters:** `collectionExerciseID` as the ID of the collection exercise, `collectionExerciseScheduledStart` as the date/time of the collection exercise and `surveyID` as the ID of the survey.
+**Required parameters:** `collectionExerciseId` as the ID of the collection exercise, `exerciseDateTime` as the date/time of the collection exercise and `surveyRef` as the ID of the survey.
 
 ### Example JSON Request
 ```json
 {
-  "collectionExerciseID": "c6467711-21eb-4e78-804c-1db8392f93fb",
-  "collectionExerciseActualPublish": "2017-06-01T00:00:00Z",
-  "surveyID": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"
+  "collectionExerciseId": "14fb3e68-4dca-46db-bf49-04b84e07e77c",
+  "exerciseDateTime": "2017-08-29T23:00:00.000+0000",
+  "surveyRef": "221"
 }
 ```
 

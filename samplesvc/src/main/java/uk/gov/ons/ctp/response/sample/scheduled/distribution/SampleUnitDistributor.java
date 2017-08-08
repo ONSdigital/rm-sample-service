@@ -4,8 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cloud.sleuth.Span;
-import org.springframework.cloud.sleuth.Tracer;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
@@ -37,9 +35,6 @@ public class SampleUnitDistributor {
   private static final int E = -9999;
   public static final String SAMPLEUNIT_DISTRIBUTOR_SPAN = "sampleunitDistributor";
   public static final String SAMPLEUNIT_DISTRIBUTOR_LIST_ID = "sampleunit";
-
-  @Autowired
-  private Tracer tracer;
 
   @Autowired
   private CollectionExerciseJobRepository collectionExerciseJobRepository;
@@ -81,7 +76,6 @@ public class SampleUnitDistributor {
    * @return SampleUnitDistributionInfo Information for SampelUnit Distribution
    */
   public final SampleUnitDistributionInfo distribute() {
-    Span distribSpan = tracer.createSpan(SAMPLEUNIT_DISTRIBUTOR_SPAN);
     log.info("SampleUnitDistributor is in the house");
     SampleUnitDistributionInfo distInfo = new SampleUnitDistributionInfo();
 
@@ -89,8 +83,7 @@ public class SampleUnitDistributor {
     try {
       List<CollectionExerciseJob> jobs = collectionExerciseJobRepository.findAll();
       for (CollectionExerciseJob job : jobs) {
-
-        List<SampleUnit> sampleUnits = new ArrayList<SampleUnit>();
+        List<SampleUnit> sampleUnits;
 
         List<Integer> excludedCases = sampleUnitDistributionListManager.findList(SAMPLEUNIT_DISTRIBUTOR_LIST_ID,
                 false);
@@ -129,14 +122,10 @@ public class SampleUnitDistributor {
         } catch (LockingException le) {
           // oh well - will time out or we never had the lock
         }
-
       }
-
     } catch (Exception e) {
       log.error("Failed to process sample units because {}", e);
     }
-
-    tracer.close(distribSpan);
 
     distInfo.setSampleUnitsSucceeded(successes);
     distInfo.setSampleUnitsFailed(failures);

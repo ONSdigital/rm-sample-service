@@ -11,7 +11,6 @@ import static uk.gov.ons.ctp.common.MvcHelper.postJson;
 import static uk.gov.ons.ctp.common.utility.MockMvcControllerAdviceHelper.mockAdviceFor;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +24,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import ma.glasnost.orika.MapperFacade;
-import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.CTPException;
@@ -97,7 +95,7 @@ public class SampleEndpointUnitTest{
   public void verifyBadBindingResultThrowsException() throws Exception {
    BindingResult bindingResult = mock(BindingResult.class);
    when(bindingResult.hasErrors()).thenReturn(true);
-   sampleEndpoint.getSampleSummary(collectionExerciseJobCreationRequestDTO, bindingResult);
+   sampleEndpoint.createSampleUnitRequest(collectionExerciseJobCreationRequestDTO, bindingResult);
   }
   
 }

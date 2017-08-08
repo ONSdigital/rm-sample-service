@@ -12,59 +12,32 @@
   <parent>
     <groupId>uk.gov.ons.ctp.product</groupId>
     <artifactId>sampleservice</artifactId>
-    <version>10.41.0-SNAPSHOT</version>
+    <version>10.44.0-SNAPSHOT</version>
     <relativePath>../</relativePath>
   </parent>
 
-  <scm>
-    <connection>scm:git:git@github.com:ONSdigital/rm-sample-service.git</connection>
-    <developerConnection>scm:git:git@github.com:ONSdigital/rm-sample-service.git</developerConnection>
-    <url>git@github.com:ONSdigital/rm-sample-service.git</url>
-  </scm>
-
   <dependencies>
+    <dependency>
+      <groupId>uk.gov.ons.ctp.common</groupId>
+      <artifactId>framework</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>net.codesup.util</groupId>
       <artifactId>jaxb2-rich-contract-plugin</artifactId>
-      <version>1.15.0</version>
     </dependency>
 
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-      <version>3.4</version>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger2</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-validation</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
   </dependencies>
 
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>${maven.compiler.plugin.version}</version>
-        <configuration>
-          <source>${java.version}</source>
-          <target>${java.version}</target>
-        </configuration>
-      </plugin>
-      <plugin>
         <groupId>org.jvnet.jaxb2.maven2</groupId>
         <artifactId>maven-jaxb2-plugin</artifactId>
-        <version>0.13.1</version>
-
         <executions>
           <execution>
             <phase>generate-sources</phase>
@@ -97,7 +70,7 @@
                 <plugin>
                   <groupId>net.codesup.util</groupId>
                   <artifactId>jaxb2-rich-contract-plugin</artifactId>
-                  <version>1.15.0</version>
+                  <version>1.18.0</version>
                 </plugin>
                 <plugin>
                   <groupId>org.jvnet.jaxb2_commons</groupId>
@@ -138,7 +111,7 @@
                 <plugin>
                   <groupId>net.codesup.util</groupId>
                   <artifactId>jaxb2-rich-contract-plugin</artifactId>
-                  <version>1.15.0</version>
+                  <version>1.18.0</version>
                 </plugin>
                 <plugin>
                   <groupId>org.jvnet.jaxb2_commons</groupId>
@@ -179,7 +152,7 @@
                 <plugin>
                   <groupId>net.codesup.util</groupId>
                   <artifactId>jaxb2-rich-contract-plugin</artifactId>
-                  <version>1.15.0</version>
+                  <version>1.18.0</version>
                 </plugin>
                 <plugin>
                   <groupId>org.jvnet.jaxb2_commons</groupId>
@@ -214,7 +187,7 @@
                 <plugin>
                   <groupId>net.codesup.util</groupId>
                   <artifactId>jaxb2-rich-contract-plugin</artifactId>
-                  <version>1.15.0</version>
+                  <version>1.18.0</version>
                 </plugin>
                 <plugin>
                   <groupId>org.jvnet.jaxb2_commons</groupId>

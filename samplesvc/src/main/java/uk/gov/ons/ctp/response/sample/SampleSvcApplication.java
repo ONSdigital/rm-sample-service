@@ -1,5 +1,6 @@
 package uk.gov.ons.ctp.response.sample;
 
+//import io.pivotal.springcloud.ssl.CloudFoundryCertificateTruster;
 import net.sourceforge.cobertura.CoverageIgnore;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
@@ -28,6 +29,7 @@ import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleStat
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
 import uk.gov.ons.ctp.response.sample.service.state.SampleSvcStateTransitionManagerFactory;
+
 
 /**
  * The main entry point into the Sample Service SpringBoot Application.
@@ -134,6 +136,6 @@ public class SampleSvcApplication {
    * @param args These are the optional command line arguments
    */
   public static void main(final String[] args) {
-    SpringApplication.run(SampleSvcApplication.class, args);
+     SpringApplication.run(SampleSvcApplication.class, args);
   }
 }
