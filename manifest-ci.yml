@@ -1,7 +1,7 @@
 ---
 applications:
 - name: samplesvc-ci
-  instances: 1
+  instances: 2
   host: samplesvc-ci
   memory: 1024M
   path: samplesvc/target/samplesvc.jar
