@@ -555,5 +555,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION sample.testdata_load_sample(text, text, text, integer)
-  OWNER TO postgres;
