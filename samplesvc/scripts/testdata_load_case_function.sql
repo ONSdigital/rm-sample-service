@@ -40,21 +40,19 @@ AND  ce.surveyfk = s.surveypk INTO v_surveypk, v_exercisepk, v_exerciseid;
 
 SELECT state FROM casesvc.casestate WHERE state = p_case_state INTO v_case_state;
 
-SELECT  ce.id FROM  collectionexercise.collectionexercise ce WHERE ce.exercisepk = v_exercisepk INTO v_exerciseid;
-
 -- Check if cases already created for this exercise
 IF NOT EXISTS (SELECT 1 FROM casesvc.casegroup cg WHERE cg.collectionexerciseid = v_exerciseid) THEN 
 
-   INSERT INTO casesvc.casegroup(casegrouppk, id, collectionexerciseid, sampleunitref, sampleunittype) 
+INSERT INTO casesvc.casegroup(casegrouppk, id, collectionexerciseid, sampleunitref, sampleunittype) 
    SELECT  nextval('casesvc.casegroupseq')
          , gen_random_uuid()
          , v_exerciseid
-         , su.sampleunitref
-         , su.sampleunittype
-   FROM sample.sampleunit su
-      , sample.samplesummary ss
-   WHERE ss.surveyref = v_surveyref 
-   AND   ss.samplesummarypk = su.samplesummaryfk;
+         , u.sampleunitref
+         , u.sampleunittypefk
+   FROM   collectionexercise.sampleunitgroup g
+        , collectionexercise.sampleunit u
+    WHERE g.exercisefk = v_exercisepk
+    AND u.sampleunitgroupfk = g.sampleunitgrouppk;
 
    GET DIAGNOSTICS v_cg_rows = ROW_COUNT;
 
@@ -106,5 +104,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION sample.testdata_load_case(text, text, text)
-  OWNER TO postgres;
