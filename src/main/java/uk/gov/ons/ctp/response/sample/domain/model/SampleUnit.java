@@ -59,6 +59,7 @@ public class SampleUnit implements Serializable {
   private String formType;
 
   @Enumerated(EnumType.STRING)
+  @Column(name = "statefk")
   private SampleUnitDTO.SampleUnitState state;
 
 }
