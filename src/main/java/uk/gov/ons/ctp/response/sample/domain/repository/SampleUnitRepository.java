@@ -70,7 +70,7 @@ public interface SampleUnitRepository extends JpaRepository<SampleUnit, Integer>
    * @return int count of matching sampleUnits
    */
   @Query(value = "SELECT COUNT(sampleUnitPK) FROM sample.sampleunit su WHERE su.samplesummaryfk = :samplesummaryfk "
-          + "AND su.state = 'PERSISTED' ;",
+          + "AND su.statefk = 'PERSISTED' ;",
           nativeQuery = true)
   int getPartiedForSampleSummary(@Param("samplesummaryfk") int sampleSummaryFK);
 

@@ -57,7 +57,7 @@ public class SampleSummary implements Serializable {
   private Timestamp effectiveEndDateTime;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "state")
+  @Column(name = "statefk")
   private SampleSummaryDTO.SampleState state;
 
   @Column(name = "ingestdatetime")
