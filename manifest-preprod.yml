@@ -12,5 +12,5 @@ applications:
     - rm-rabbitmq
   env:
     partySvc_connectionConfig_host: ras-party-service-preprod.apps.prod.cf5.onsclofo.uk
-    partySvc_connectionConfig_port: "80"
+    partySvc_connectionConfig_port: "443"
     partySvc_connectionConfig_scheme: https
