@@ -4,7 +4,7 @@ applications:
   instances: 1
   host: samplesvc-test
   memory: 1024M
-  path: samplesvc/target/samplesvc.jar
+  path: target/samplesvc.jar
   timeout: 180
   services:
     - rm-pg-db
