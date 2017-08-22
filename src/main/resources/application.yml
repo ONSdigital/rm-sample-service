@@ -95,6 +95,7 @@ spring:
     properties:
       hibernate:
         ddl-auto: update
+        default_schema: sample
 
 party-svc:
   sample-path: /events
