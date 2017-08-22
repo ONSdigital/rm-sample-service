@@ -57,7 +57,7 @@ This repository contains the Sample service. This microservice is a RESTful web 
 See [API.md](https://github.com/ONSdigital/rm-sample-service/blob/master/API.md) for API documentation.
 
 ## Swagger Specifications
-To view the Swagger Specifications for the Sample Service, run the service and navigate to http://localhost:8125/swagger-ui.html. 
+To view the Swagger Specifications for the Sample Service, run the service and navigate to http://localhost:8125/swagger-ui.html.
 
 ## Copyright
 Copyright (C) 2017 Crown Copyright (Office for National Statistics)
