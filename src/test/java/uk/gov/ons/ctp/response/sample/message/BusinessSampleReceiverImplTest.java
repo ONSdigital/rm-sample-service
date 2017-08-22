@@ -16,6 +16,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.ons.ctp.response.sample.definition.BusinessSampleUnit;
 import uk.gov.ons.ctp.response.sample.definition.BusinessSurveySample;
 import uk.gov.ons.ctp.response.sample.message.impl.BusinessSampleReceiverImpl;
+import uk.gov.ons.ctp.response.sample.service.SampleReportService;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 import javax.xml.bind.JAXBContext;
@@ -33,6 +34,9 @@ public class BusinessSampleReceiverImplTest {
 
 	@Mock
 	private SampleService sampleService;
+	
+	@Mock
+	private SampleReportService sampleReportService;
 
 	@Test
 	public void TestProcessSample() throws Exception {

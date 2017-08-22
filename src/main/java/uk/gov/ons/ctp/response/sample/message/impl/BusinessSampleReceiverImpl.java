@@ -7,9 +7,11 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.support.MessageBuilder;
+
 import uk.gov.ons.ctp.response.sample.definition.BusinessSampleUnit;
 import uk.gov.ons.ctp.response.sample.definition.BusinessSurveySample;
 import uk.gov.ons.ctp.response.sample.message.SampleReceiver;
+import uk.gov.ons.ctp.response.sample.service.SampleReportService;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 import java.util.List;
@@ -25,6 +27,9 @@ public class BusinessSampleReceiverImpl implements SampleReceiver<BusinessSurvey
 
   @Autowired
   private SampleService sampleService;
+  
+  @Autowired
+  private SampleReportService sampleReportService;
 
   /**
    * To process BusinessSurveySample transformed from XML
@@ -44,6 +49,7 @@ public class BusinessSampleReceiverImpl implements SampleReceiver<BusinessSurvey
     String load = "";
     String fileName = (String) headerMap.get("file_name");
     final Message<String> message = MessageBuilder.withPayload(load).setHeader("file_name", fileName).build();
+    sampleReportService.createReport();
     return message;
   }
 

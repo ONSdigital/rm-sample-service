@@ -73,10 +73,11 @@ endpoints:
     sensitive: true
 
 spring:
+  output:
+    ansi:
+      enabled: never
   application:
     name: ONS SampleService
-
-
   datasource:
     url: jdbc:postgresql://localhost:6432/postgres
     username: samplesvc
@@ -87,6 +88,14 @@ spring:
       max-active: 10
       max-idle: 5
       min-idle: 3
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+    properties:
+      hibernate:
+        ddl-auto: update
+        default_schema: sample
 
 party-svc:
   sample-path: /events

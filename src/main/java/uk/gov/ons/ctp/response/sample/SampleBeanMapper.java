@@ -1,15 +1,16 @@
 package uk.gov.ons.ctp.response.sample;
 
-import org.springframework.stereotype.Component;
-
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.ConfigurableMapper;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.impl.generator.EclipseJdtCompilerStrategy;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
 
 /**
  * The bean mapper to go from Entity objects to Presentation objects.
  */
+@Primary
 @Component
 public class SampleBeanMapper extends ConfigurableMapper {
 
