@@ -18,4 +18,4 @@ applications:
     sftp_username: REPLACE_USER
     sftp_port: "22"
     sftp_password: REPLACE_PASSWORD
-    sftp_url: REAPLACE_URL
+    sftp_url: REPLACE_URL
