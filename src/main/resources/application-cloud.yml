@@ -109,7 +109,7 @@ sftp:
     business: BSD/
     census: CTP/
     root: .
-    local: /tmp/samplesvc
+    local: /tmp/samplesvc/
   cron: "0/5 * * * * ?"
   filepattern: "*.xml"
 
