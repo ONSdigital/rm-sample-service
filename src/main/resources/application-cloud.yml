@@ -105,9 +105,9 @@ party-svc:
 
 sftp:
   directory:
-    social: SSD/
-    business: BSD/
-    census: CTP/
+    social: SSD
+    business: BSD
+    census: CTP
     root: ./
     local: /tmp/samplesvc/
   cron: "0/5 * * * * ?"
