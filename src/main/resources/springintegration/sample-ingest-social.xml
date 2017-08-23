@@ -23,11 +23,11 @@
     <int-sftp:inbound-channel-adapter id="sftpInboundAdapterSocial"
             channel="sftpInboundSocial"
             session-factory="sftpSessionFactory"
-            local-directory="${sftp.directory.local}${sftp.directory.social}"
+            local-directory="${sftp.localdirectory}/SSD"
 			local-filter="socialFileListFilter"
             filter="socialCompositeFilter"
             remote-file-separator="/"
-            remote-directory="${sftp.directory.root}${sftp.directory.social}">
+            remote-directory="${sftp.directory.social}">
         <int:poller  cron="${sftp.cron}" max-messages-per-poll="1" error-channel="pollerErrorChannel"/>
     </int-sftp:inbound-channel-adapter>
 
@@ -55,8 +55,8 @@
                           auto-startup="true"
                           remote-file-separator="/"
                           command="mv"
-                          expression="'${sftp.directory.root}${sftp.directory.social}' + headers['file_name']"
-                          rename-expression="'${sftp.directory.root}${sftp.directory.social}' + headers['file_name'] + '.processed'"
+                          expression="'${sftp.directory.social}' + headers['file_name']"
+                          rename-expression="'${sftp.directory.social}' + headers['file_name'] + '.processed'"
                           order="1">
         <int-sftp:request-handler-advice-chain>
             <bean class="org.springframework.integration.handler.advice.ExpressionEvaluatingRequestHandlerAdvice">

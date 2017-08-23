@@ -105,11 +105,11 @@ party-svc:
 
 sftp:
   directory:
-    social: SSD
-    business: BSD
-    census: CTP
-    root: ./
-    local: /tmp/samplesvc/
+    social: SSD/
+    business: BSD/
+    census: CTP/
+    Documents: .
+  localdirectory: /tmp/samplesvc
   cron: "0/5 * * * * ?"
   filepattern: "*.xml"
 

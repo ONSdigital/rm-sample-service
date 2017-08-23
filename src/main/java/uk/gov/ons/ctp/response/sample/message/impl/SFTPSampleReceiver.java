@@ -53,6 +53,8 @@ public class SFTPSampleReceiver {
             .get("file_originalFile").toString().split("/");
         String shortFileName = fileName.replace(".xml", "");
         String errorFile = shortFileName + "_error.txt";
+        log.debug(""+ errorFile);
+        log.debug("" + fileName);
 
         log.info("There was an error processing " + fileName);
         log.info(error);

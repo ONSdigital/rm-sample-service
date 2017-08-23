@@ -23,11 +23,11 @@
     <int-sftp:inbound-channel-adapter id="sftpInboundAdapterBusiness"
             channel="sftpInboundBusiness"
             session-factory="sftpSessionFactory"
-            local-directory="${sftp.directory.local}${sftp.directory.business}"
+            local-directory="${sftp.localdirectory}/BSD"
             local-filter="businessFileListFilter"
             filter="businessCompositeFilter"
             remote-file-separator="/"
-            remote-directory="${sftp.directory.root}${sftp.directory.business}">
+            remote-directory="${sftp.directory.business}">
         <int:poller cron="${sftp.cron}"  max-messages-per-poll="1" error-channel="pollerErrorChannel"/>
     </int-sftp:inbound-channel-adapter>
 
@@ -55,8 +55,8 @@
                           auto-startup="true"
                           remote-file-separator="/"
                           command="mv"
-                          expression="'${sftp.directory.root}${sftp.directory.business}' + headers['file_name']"
-                          rename-expression="'${sftp.directory.root}${sftp.directory.business}' + headers['file_name'] + '.processed'"
+                          expression="'${sftp.directory.business}' + headers['file_name']"
+                          rename-expression="'${sftp.directory.business}' + headers['file_name'] + '.processed'"
                           order="1">
         <int-sftp:request-handler-advice-chain>
             <bean class="org.springframework.integration.handler.advice.ExpressionEvaluatingRequestHandlerAdvice">
