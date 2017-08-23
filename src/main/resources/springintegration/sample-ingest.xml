@@ -20,7 +20,7 @@
                                        auto-startup="true"
                                        charset="UTF-8"
                                        remote-file-separator="/"
-                                       remote-directory-expression="'${sftp.directory.Documents}/' + headers['directory'] + '/'"
+                                       remote-directory-expression="'${sftp.directory.root}' + headers['directory'] + '/'"
                                        auto-create-directory="true"
                                        remote-filename-generator-expression="headers['error_file_name']"
                                        order="1"
@@ -33,8 +33,8 @@
                                auto-startup="true"
                                remote-file-separator="/"
                                command="mv"
-                               expression="'${sftp.directory.Documents}/' + headers['directory'] + '/' + headers['file_name']"
-                               rename-expression="'${sftp.directory.Documents}/' + headers['directory'] + '/' + headers['short_file_name'] + '.error'"
+                               expression="'${sftp.directory.root}' + headers['directory'] + '/' + headers['file_name']"
+                               rename-expression="'${sftp.directory.root}' + headers['directory'] + '/' + headers['short_file_name'] + '.error'"
                                order="2"
     />
 

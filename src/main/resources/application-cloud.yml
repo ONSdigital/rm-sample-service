@@ -108,8 +108,8 @@ sftp:
     social: SSD/
     business: BSD/
     census: CTP/
-    Documents: .
-  localdirectory: /tmp/samplesvc
+    root: .
+    local: /tmp/samplesvc
   cron: "0/5 * * * * ?"
   filepattern: "*.xml"
 

@@ -48,9 +48,9 @@ public class SFTPSampleReceiver {
     public Message<String> processInvalidSample(GenericMessage errorMessage) {
         String error = ((Exception) errorMessage.getPayload()).getCause().toString();
         String fileName = ((MessagingException) errorMessage.getPayload()).getFailedMessage().getHeaders()
-                .get("file_name").toString();
-        String directory = ((MessagingException) errorMessage.getPayload()).getFailedMessage().getHeaders()
-                .get("sample_type").toString() + "-sftp";
+            .get("file_name").toString();
+        String[] directory = ((MessagingException) errorMessage.getPayload()).getFailedMessage().getHeaders()
+            .get("file_originalFile").toString().split("/");
         String shortFileName = fileName.replace(".xml", "");
         String errorFile = shortFileName + "_error.txt";
 
@@ -58,10 +58,11 @@ public class SFTPSampleReceiver {
         log.info(error);
 
         final Message<String> message = MessageBuilder.withPayload(error).setHeader("error_file_name",
-                errorFile).setHeader("file_name", fileName).setHeader("short_file_name",
-                shortFileName).setHeader("directory", directory).build();
+            errorFile).setHeader("file_name", fileName).setHeader("short_file_name",
+            shortFileName).setHeader("directory", directory[3]).build();
 
         return message;
     }
+
 
 }

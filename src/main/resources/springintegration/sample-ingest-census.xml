@@ -23,11 +23,11 @@
     <int-sftp:inbound-channel-adapter id="sftpInboundAdapterCensus"
             channel="sftpInboundCensus"
             session-factory="sftpSessionFactory"
-            local-directory="${sftp.localdirectory}/census-local"
+            local-directory="${sftp.directory.local}${sftp.directory.census}"
             local-filter="censusFileListFilter"
             filter="censusCompositeFilter"
             remote-file-separator="/"
-            remote-directory="${sftp.directory.census}">
+            remote-directory="${sftp.directory.root}${sftp.directory.census}">
         <int:poller cron="${sftp.cron}" max-messages-per-poll="1" error-channel="pollerErrorChannel"/>
     </int-sftp:inbound-channel-adapter>
 
@@ -55,8 +55,8 @@
                           auto-startup="true"
                           remote-file-separator="/"
                           command="mv"
-                          expression="'${sftp.directory.census}' + headers['file_name']"
-                          rename-expression="'${sftp.directory.census}' + headers['file_name'] + '.processed'"
+                          expression="'${sftp.directory.root}${sftp.directory.census}' + headers['file_name']"
+                          rename-expression="'${sftp.directory.root}${sftp.directory.census}' + headers['file_name'] + '.processed'"
                           order="1">
         <int-sftp:request-handler-advice-chain>
             <bean class="org.springframework.integration.handler.advice.ExpressionEvaluatingRequestHandlerAdvice">
