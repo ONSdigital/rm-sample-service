@@ -25,8 +25,8 @@ liquibase:
 
 security:
   basic:
-    enabled: false
-    realm: onsctpiac
+    enabled: true
+    realm: sdc
   user:
     name: admin
     password: secret
@@ -102,10 +102,10 @@ party-svc:
   post-party-path: /party-api/v1/parties
   connection-config:
     scheme: http
-    host: ras-party-service-test.apps.devtest.onsclofo.uk
-    port: 80
-#    host: localhost
-#    port: 9191
+    host: localhost
+    port: 5062
+    username: admin
+    password: secret
     retry-attempts: 1
     retry-pause-milli-seconds: 5000
     connect-timeout-milli-seconds: 5000

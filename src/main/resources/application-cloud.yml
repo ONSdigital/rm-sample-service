@@ -23,8 +23,8 @@ liquibase:
 
 security:
   basic:
-    enabled: false
-    realm: onsctpiac
+    enabled: true
+    realm: sdc
   user:
     name: admin
     password: secret
@@ -98,6 +98,8 @@ party-svc:
     scheme: http
     host: localhost
     port: 8125
+    username: admin
+    password: secret    
     retry-attempts: 10
     retry-pause-milli-seconds: 5000
     connect-timeout-milli-seconds: 5000

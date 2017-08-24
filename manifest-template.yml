@@ -14,6 +14,8 @@ applications:
     partySvc_connectionConfig_host: ras-party-service-SPACE.DOMAIN
     partySvc_connectionConfig_port: "REPLACE_PORT"
     partySvc_connectionConfig_scheme: REPLACE_PROTOCOL
+    partySvc_connectionConfig_username: REPLACE_BA_USERNAME
+    partySvc_connectionConfig_password: REPLACE_BA_PASSWORD
     exportSchedule_cronExpression: "REPLACE_CRON"
     sftp_username: REPLACE_USER
     sftp_port: "22"
@@ -21,3 +23,5 @@ applications:
     sftp_url: REPLACE_URL
     endpoints_enabled: ENDPOINT_ENABLED
     endpoints_info_enabled: true
+    security_user_name: REPLACE_BA_USERNAME
+    security_user_password: REPLACE_BA_PASSWORD
