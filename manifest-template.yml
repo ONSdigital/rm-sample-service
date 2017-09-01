@@ -18,6 +18,6 @@ applications:
     sftp_username: REPLACE_USER
     sftp_port: "22"
     sftp_password: REPLACE_PASSWORD
-    sftp_url: REPLACE_URL
+    sftp_host: REPLACE_URL
     endpoints_enabled: ENDPOINT_ENABLED
     endpoints_info_enabled: true
