@@ -78,8 +78,8 @@ party-svc:
     scheme: http
     host: ras-party-service-demo.apps.devtest.onsclofo.uk
     port: 80
-    username: sdc.demo
-    password: withy.carom.unread.cavalier.brooklyn.hydrou
+    username: user
+    password: random
     retry-attempts: 1
     retry-pause-milli-seconds: 5000
     connect-timeout-milli-seconds: 5000
