@@ -141,7 +141,7 @@ public class SampleUnitDistributor {
    * @throws CTPException if transition issue
    */
   @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
-  public void sendSampleUnitToCollectionExerciseQueue(SampleUnit sampleUnit,
+  private void sendSampleUnitToCollectionExerciseQueue(SampleUnit sampleUnit,
                                                        uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit) throws CTPException {
     transitionSampleUnitStateFromDeliveryEvent(sampleUnit.getSampleUnitPK());
     sampleUnitPublisher.send(mappedSampleUnit);
