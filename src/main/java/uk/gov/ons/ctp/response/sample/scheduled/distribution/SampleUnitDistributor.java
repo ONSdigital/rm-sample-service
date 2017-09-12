@@ -22,7 +22,6 @@ import uk.gov.ons.ctp.response.sample.message.SampleUnitPublisher;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -113,6 +112,7 @@ public class SampleUnitDistributor {
             // single case/questionnaire db changes rolled back
             log.error("Exception {} thrown processing sampleunit {}. Processing postponed", e.getMessage(),
                     sampleUnit.getSampleUnitPK());
+            log.error("Stack trace: " + e);
             failures++;
           }
         }
