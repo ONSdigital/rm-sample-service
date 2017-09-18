@@ -14,7 +14,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.rest.RestClient;
-import uk.gov.ons.ctp.response.party.representation.PartyCreationRequestDTO;
+import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.config.PartySvc;

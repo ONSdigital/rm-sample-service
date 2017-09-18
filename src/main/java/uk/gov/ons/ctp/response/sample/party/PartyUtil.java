@@ -1,9 +1,7 @@
 package uk.gov.ons.ctp.response.sample.party;
 
-import uk.gov.ons.ctp.response.party.definition.BusinessSampleUnit;
-import uk.gov.ons.ctp.response.party.definition.Party;
-import uk.gov.ons.ctp.response.party.representation.Attributes;
-import uk.gov.ons.ctp.response.party.representation.PartyCreationRequestDTO;
+import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestAttributesDTO;
+import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 
 /**
@@ -21,12 +19,12 @@ public class PartyUtil {
    * @return the created Party object
    * @throws Exception unlikely, but indicated something really wrong
    */
-  public static Party convertToParty(SampleUnitBase unit) throws Exception {
-    Party party = new Party();
+  public static PartyCreationRequestDTO convertToParty(SampleUnitBase unit) throws Exception {
+    PartyCreationRequestDTO party = new PartyCreationRequestDTO();
     party.setSampleUnitType(unit.getSampleUnitType());
     party.setSampleUnitRef(unit.getSampleUnitRef());
     if (unit instanceof uk.gov.ons.ctp.response.sample.definition.BusinessSampleUnit) {
-      BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();
+      PartyCreationRequestAttributesDTO businessSampleUnit = new PartyCreationRequestAttributesDTO();
       uk.gov.ons.ctp.response.sample.definition.BusinessSampleUnit bsu = (uk.gov.ons.ctp.response.sample.definition.BusinessSampleUnit) unit;
       businessSampleUnit.setCheckletter(bsu.getCheckletter());
       businessSampleUnit.setFrosic92(bsu.getFrosic92());
@@ -65,11 +63,11 @@ public class PartyUtil {
    * @param party the party object
    * @return the PartyCreationRequestDTO
    */
-  public static PartyCreationRequestDTO createPartyCreationRequestDTO(Party party) {
+/*  public static PartyCreationRequestDTO createPartyCreationRequestDTO(Party party) {
     PartyCreationRequestDTO partyCreationRequestDTO = new PartyCreationRequestDTO();
     partyCreationRequestDTO.setSampleUnitRef(party.getSampleUnitRef());
     partyCreationRequestDTO.setSampleUnitType(party.getSampleUnitType());
-    Attributes attributes = new Attributes();
+    PartyCreationRequestAttributesDTO attributes = new PartyCreationRequestAttributesDTO();
     attributes.setCheckletter(party.getAttributes().getCheckletter());
     attributes.setFrosic92(party.getAttributes().getFrosic92());
     attributes.setRusic92(party.getAttributes().getRusic92());
@@ -99,5 +97,5 @@ public class PartyUtil {
     partyCreationRequestDTO.setAttributes(attributes);
 
     return partyCreationRequestDTO;
-  }
+  }*/
 }

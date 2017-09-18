@@ -25,8 +25,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
-import uk.gov.ons.ctp.response.party.definition.Party;
-import uk.gov.ons.ctp.response.party.representation.PartyCreationRequestDTO;
+import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 import uk.gov.ons.ctp.response.sample.definition.BusinessSurveySample;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
@@ -85,7 +84,7 @@ public class SampleServiceImplTest {
   private SampleServiceImpl sampleServiceImpl;
 
   private List<BusinessSurveySample> surveySample;
-  private List<Party> party;
+  private List<PartyCreationRequestDTO> party;
   private List<PartyDTO> partyDTO;
   private List<SampleUnit> sampleUnit;
   private List<SampleSummary> sampleSummaryList;
@@ -100,7 +99,7 @@ public class SampleServiceImplTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     surveySample = FixtureHelper.loadClassFixtures(BusinessSurveySample[].class);
-    party = FixtureHelper.loadClassFixtures(Party[].class);
+    party = FixtureHelper.loadClassFixtures(PartyCreationRequestDTO[].class);
     partyDTO = FixtureHelper.loadClassFixtures(PartyDTO[].class);
     sampleUnit = FixtureHelper.loadClassFixtures(SampleUnit[].class);
     sampleSummaryList = FixtureHelper.loadClassFixtures(SampleSummary[].class);
@@ -140,7 +139,7 @@ public class SampleServiceImplTest {
 
     verify(sampleSummaryRepository).save(any(SampleSummary.class));
     verify(sampleUnitRepository, times(2)).save(any(SampleUnit.class));
-    verify(partyPublisher, times(2)).publish(any(Party.class));
+    verify(partyPublisher, times(2)).publish(any(PartyCreationRequestDTO.class));
   }
 
   /**

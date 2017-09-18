@@ -1,6 +1,6 @@
 package uk.gov.ons.ctp.response.sample.service;
 
-import uk.gov.ons.ctp.response.party.representation.PartyCreationRequestDTO;
+import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 
 /**

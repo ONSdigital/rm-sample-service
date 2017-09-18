@@ -12,8 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.common.time.DateTimeUtil;
-import uk.gov.ons.ctp.response.party.definition.Party;
-import uk.gov.ons.ctp.response.party.representation.PartyCreationRequestDTO;
+import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
@@ -102,7 +101,7 @@ public class SampleServiceImpl implements SampleService {
   private void publishToPartyQueue(List<? extends SampleUnitBase> samplingUnitList) {
     for (SampleUnitBase sampleUnitBase : samplingUnitList) {
       try {
-          Party party = PartyUtil.convertToParty(sampleUnitBase);
+          PartyCreationRequestDTO party = PartyUtil.convertToParty(sampleUnitBase);
           partyPublisher.publish(party);
       } catch (Exception e) {
         log.debug("publish exception", e);
@@ -127,14 +126,14 @@ public class SampleServiceImpl implements SampleService {
     return targetSampleSummary;
   }
 
-  public void sendToPartyService(Party party) throws Exception {
+  public void sendToPartyService(PartyCreationRequestDTO partyCreationRequest) throws Exception {
     log.debug("Send to party svc");
-    PartyCreationRequestDTO partyCreationRequestDTO = PartyUtil.createPartyCreationRequestDTO(party);
-    PartyDTO returnedParty = partySvcClient.postParty(partyCreationRequestDTO);
+   // PartyCreationRequestDTO partyCreationRequestDTO = PartyUtil.createPartyCreationRequestDTO(party);
+    PartyDTO returnedParty = partySvcClient.postParty(partyCreationRequest);
     log.info("Returned party is {}", returnedParty);
 
-    SampleUnit sampleUnit = sampleUnitRepository.findBySampleUnitRefAndType(party.getSampleUnitRef(),
-            party.getSampleUnitType());
+    SampleUnit sampleUnit = sampleUnitRepository.findBySampleUnitRefAndType(partyCreationRequest.getSampleUnitRef(),
+        partyCreationRequest.getSampleUnitType());
     changeSampleUnitState(sampleUnit);
     sampleSummaryStateCheck(sampleUnit);
   }

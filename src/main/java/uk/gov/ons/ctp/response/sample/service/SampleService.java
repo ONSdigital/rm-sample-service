@@ -1,7 +1,7 @@
 package uk.gov.ons.ctp.response.sample.service;
 
 import uk.gov.ons.ctp.common.error.CTPException;
-import uk.gov.ons.ctp.response.party.definition.Party;
+import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
@@ -52,5 +52,5 @@ public interface SampleService {
    * @param party party picked up from queue
    * @throws Exception exception thrown
    */
-  void sendToPartyService(Party party) throws Exception;
+  void sendToPartyService(PartyCreationRequestDTO party) throws Exception;
 }
