@@ -16,6 +16,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 
+/**
+ * Tests remarshalling for Census, Business and Social
+ */
 public class SampleServiceImplTest {
 
   /**
