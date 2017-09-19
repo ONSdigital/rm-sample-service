@@ -128,7 +128,6 @@ public class SampleServiceImpl implements SampleService {
 
   public void sendToPartyService(PartyCreationRequestDTO partyCreationRequest) throws Exception {
     log.debug("Send to party svc");
-   // PartyCreationRequestDTO partyCreationRequestDTO = PartyUtil.createPartyCreationRequestDTO(party);
     PartyDTO returnedParty = partySvcClient.postParty(partyCreationRequest);
     log.info("Returned party is {}", returnedParty);
 

@@ -57,45 +57,4 @@ public class PartyUtil {
     return party;
   }
 
-  /**
-   * Utility to go from Party to PartyCreationRequestDTO
-   *
-   * @param party the party object
-   * @return the PartyCreationRequestDTO
-   */
-/*  public static PartyCreationRequestDTO createPartyCreationRequestDTO(Party party) {
-    PartyCreationRequestDTO partyCreationRequestDTO = new PartyCreationRequestDTO();
-    partyCreationRequestDTO.setSampleUnitRef(party.getSampleUnitRef());
-    partyCreationRequestDTO.setSampleUnitType(party.getSampleUnitType());
-    PartyCreationRequestAttributesDTO attributes = new PartyCreationRequestAttributesDTO();
-    attributes.setCheckletter(party.getAttributes().getCheckletter());
-    attributes.setFrosic92(party.getAttributes().getFrosic92());
-    attributes.setRusic92(party.getAttributes().getRusic92());
-    attributes.setFrosic2007(party.getAttributes().getFrosic2007());
-    attributes.setRusic2007(party.getAttributes().getRusic2007());
-    attributes.setFroempment(party.getAttributes().getFroempment());
-    attributes.setFrotover(party.getAttributes().getFrotover());
-    attributes.setEntref(party.getAttributes().getEntref());
-    attributes.setLegalstatus(party.getAttributes().getLegalstatus());
-    attributes.setEntrepmkr(party.getAttributes().getEntrepmkr());
-    attributes.setRegion(party.getAttributes().getRegion());
-    attributes.setBirthdate(party.getAttributes().getBirthdate());
-    attributes.setEntname1(party.getAttributes().getEntname1());
-    attributes.setEntname2(party.getAttributes().getEntname2());
-    attributes.setEntname3(party.getAttributes().getEntname3());
-    attributes.setRuname1(party.getAttributes().getRuname1());
-    attributes.setRuname2(party.getAttributes().getRuname2());
-    attributes.setRuname3(party.getAttributes().getRuname3());
-    attributes.setTradstyle1(party.getAttributes().getTradstyle1());
-    attributes.setTradstyle2(party.getAttributes().getTradstyle2());
-    attributes.setTradstyle3(party.getAttributes().getTradstyle3());
-    attributes.setSeltype(party.getAttributes().getSeltype());
-    attributes.setInclexcl(party.getAttributes().getInclexcl());
-    attributes.setCellNo(party.getAttributes().getCellNo());
-    attributes.setFormtype(party.getAttributes().getFormtype());
-    attributes.setCurrency(party.getAttributes().getCurrency());
-    partyCreationRequestDTO.setAttributes(attributes);
-
-    return partyCreationRequestDTO;
-  }*/
 }
