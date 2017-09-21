@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.ons.ctp.common.endpoint.CTPEndpoint;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.InvalidRequestException;
@@ -61,6 +62,10 @@ public final class SampleEndpoint implements CTPEndpoint {
     Integer sampleUnitsTotal = sampleService.initialiseCollectionExerciseJob(cej);
     SampleUnitsRequestDTO sampleUnitsRequest = new SampleUnitsRequestDTO(sampleUnitsTotal);
 
-    return ResponseEntity.created(URI.create("TODO")).body(sampleUnitsRequest);
+    String newResourceUrl = ServletUriComponentsBuilder
+        .fromCurrentRequest().path("/{id}")
+        .buildAndExpand(cej.getCollectionExerciseId()).toUri().toString();
+
+    return ResponseEntity.created(URI.create(newResourceUrl)).body(sampleUnitsRequest);
   }
 }
