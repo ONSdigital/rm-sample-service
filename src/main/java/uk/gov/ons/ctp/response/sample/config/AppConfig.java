@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 import lombok.Data;
+import org.springframework.retry.annotation.EnableRetry;
 
 /**
  * The apps main holder for centralized config read from application.yml or env
@@ -15,6 +16,7 @@ import lombok.Data;
 @Configuration
 @ConfigurationProperties
 @Data
+@EnableRetry
 public class AppConfig {
 
   private PartySvc partySvc;
