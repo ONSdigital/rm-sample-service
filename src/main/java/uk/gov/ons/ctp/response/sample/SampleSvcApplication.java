@@ -1,7 +1,5 @@
 package uk.gov.ons.ctp.response.sample;
 
-//import io.pivotal.springcloud.ssl.CloudFoundryCertificateTruster;
-
 import net.sourceforge.cobertura.CoverageIgnore;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
@@ -24,7 +22,6 @@ import uk.gov.ons.ctp.common.distributed.DistributedListManager;
 import uk.gov.ons.ctp.common.distributed.DistributedListManagerRedissonImpl;
 import uk.gov.ons.ctp.common.error.RestExceptionHandler;
 import uk.gov.ons.ctp.common.jackson.CustomObjectMapper;
-import uk.gov.ons.ctp.common.rest.RestClient;
 import uk.gov.ons.ctp.common.rest.RestUtility;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.common.state.StateTransitionManagerFactory;
@@ -34,7 +31,6 @@ import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleStat
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
 import uk.gov.ons.ctp.response.sample.service.state.SampleSvcStateTransitionManagerFactory;
-
 
 /**
  * The main entry point into the Sample Service SpringBoot Application.

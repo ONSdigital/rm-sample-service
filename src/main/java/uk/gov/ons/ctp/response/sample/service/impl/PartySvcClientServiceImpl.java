@@ -50,7 +50,8 @@ public class PartySvcClientServiceImpl implements PartySvcClientService {
 
         HttpEntity<PartyCreationRequestDTO> httpEntity = restUtility.createHttpEntity(partyCreationRequestDTO);
 
-        ResponseEntity<String> responseEntity = restTemplate.exchange(uriComponents.toUri(), HttpMethod.POST, httpEntity, String.class);
+        ResponseEntity<String> responseEntity = restTemplate.exchange(uriComponents.toUri(), HttpMethod.POST,
+            httpEntity, String.class);
 
         PartyDTO party = null;
         if (responseEntity != null && responseEntity.getStatusCode().is2xxSuccessful()) {
