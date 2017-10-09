@@ -2,6 +2,7 @@ package uk.gov.ons.ctp.response.sample.endpoint;
 
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 
 import javax.validation.Valid;
 
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -86,6 +88,19 @@ public final class SampleEndpoint implements CTPEndpoint {
       List<SampleSummaryDTO> result = mapperFacade.mapAsList(sampleSummaries, SampleSummaryDTO.class);
       return ResponseEntity.ok(result);
     }
+
+  }
+  
+  @RequestMapping(value = "/samplesummary/{sampleSummaryId}", method = RequestMethod.GET)
+  public ResponseEntity<SampleSummaryDTO> findSampleSummary(@PathVariable("sampleSummaryId") final UUID sampleSummaryId) throws CTPException {
+    SampleSummary sampleSummary = sampleService.findSampleSummary(sampleSummaryId);
+    if (sampleSummary == null) {
+      throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND,
+          String.format("Sample Summary not found for sampleSummaryId %s", sampleSummaryId));
+    }
+    SampleSummaryDTO result = mapperFacade.map(sampleSummary, SampleSummaryDTO.class);
+    
+    return ResponseEntity.ok(result);
 
   }
 }

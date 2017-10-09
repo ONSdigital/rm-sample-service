@@ -66,6 +66,11 @@ public class SampleServiceImpl implements SampleService {
   public List<SampleSummary> findAllSampleSummaries() {
     return sampleSummaryRepository.findAll();
   }
+  
+  @Override
+  public SampleSummary findSampleSummary(UUID id) {
+    return sampleSummaryRepository.findById(id);
+  }
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
