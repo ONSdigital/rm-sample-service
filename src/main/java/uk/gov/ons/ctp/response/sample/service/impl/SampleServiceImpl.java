@@ -2,6 +2,7 @@ package uk.gov.ons.ctp.response.sample.service.impl;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -59,6 +60,11 @@ public class SampleServiceImpl implements SampleService {
 
   @Autowired
   private CollectionExerciseJobService collectionExerciseJobService;
+  
+  @Override
+  public List<SampleSummary> findAllSampleSummaries() {
+    return sampleSummaryRepository.findAll();
+  }
 
   @Override
   public void processSampleSummary(SurveyBase surveySample, List<? extends SampleUnitBase> samplingUnitList)
@@ -81,6 +87,7 @@ public class SampleServiceImpl implements SampleService {
     sampleSummary.setSurveyRef(surveySample.getSurveyRef());
     sampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
     sampleSummary.setState(SampleSummaryDTO.SampleState.INIT);
+    sampleSummary.setId(UUID.randomUUID());
     return sampleSummary;
   }
 
@@ -92,6 +99,7 @@ public class SampleServiceImpl implements SampleService {
       sampleUnit.setSampleUnitType(sampleUnitBase.getSampleUnitType());
       sampleUnit.setFormType(sampleUnitBase.getFormType());
       sampleUnit.setState(SampleUnitDTO.SampleUnitState.INIT);
+      sampleUnit.setId(UUID.randomUUID());
       sampleUnitRepository.save(sampleUnit);
     }
   }

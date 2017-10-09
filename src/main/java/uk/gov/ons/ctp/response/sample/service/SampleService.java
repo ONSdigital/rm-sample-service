@@ -13,6 +13,13 @@ import java.util.List;
  * The SampleService interface defines all business behaviours for operations on the Sample entity model.
  */
 public interface SampleService {
+  
+  /**
+   * find all sampleSummaries
+   * 
+   * @return list of SampleSummary
+   */
+  List<SampleSummary> findAllSampleSummaries();
 
   /**
    * Create and save a SampleSummary from the incoming SurveySample
