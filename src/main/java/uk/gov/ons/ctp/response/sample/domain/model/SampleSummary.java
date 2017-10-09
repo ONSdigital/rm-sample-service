@@ -2,6 +2,7 @@ package uk.gov.ons.ctp.response.sample.domain.model;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -46,6 +47,9 @@ public class SampleSummary implements Serializable {
   })
   @Column(name = "samplesummarypk")
   private Integer sampleSummaryPK;
+  
+  @Column(name = "id")
+  private UUID id;
 
   @Column(name = "surveyref")
   private String surveyRef;
