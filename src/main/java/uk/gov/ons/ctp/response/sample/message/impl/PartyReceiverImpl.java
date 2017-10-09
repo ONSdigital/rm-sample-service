@@ -4,7 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
-import uk.gov.ons.ctp.response.party.definition.Party;
+
+import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.message.PartyReceiver;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
@@ -16,7 +17,7 @@ public class PartyReceiverImpl implements PartyReceiver {
     private SampleService sampleService;
 
     @ServiceActivator(inputChannel = "partyTransformed", adviceChain = "partyRetryAdvice")
-    public void acceptParty(Party party) throws Exception {
+    public void acceptParty(PartyCreationRequestDTO party) throws Exception {
         log.debug("acceptParty {}", party);
         sampleService.sendToPartyService(party);
     }

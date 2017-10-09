@@ -1,7 +1,5 @@
 package uk.gov.ons.ctp.response.sample;
 
-//import io.pivotal.springcloud.ssl.CloudFoundryCertificateTruster;
-
 import net.sourceforge.cobertura.CoverageIgnore;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
@@ -19,11 +17,12 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.client.RestTemplate;
 import uk.gov.ons.ctp.common.distributed.DistributedListManager;
 import uk.gov.ons.ctp.common.distributed.DistributedListManagerRedissonImpl;
 import uk.gov.ons.ctp.common.error.RestExceptionHandler;
 import uk.gov.ons.ctp.common.jackson.CustomObjectMapper;
-import uk.gov.ons.ctp.common.rest.RestClient;
+import uk.gov.ons.ctp.common.rest.RestUtility;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.common.state.StateTransitionManagerFactory;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
@@ -32,7 +31,6 @@ import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleStat
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
 import uk.gov.ons.ctp.response.sample.service.state.SampleSvcStateTransitionManagerFactory;
-
 
 /**
  * The main entry point into the Sample Service SpringBoot Application.
@@ -84,16 +82,26 @@ public class SampleSvcApplication {
     return Redisson.create(config);
   }
 
-
   /**
-   * The SampleService client bean
-   * @return the RestClient for the SampleService
+   * The restTemplate bean injected in REST client classes
+   *
+   * @return the restTemplate used in REST calls
    */
   @Bean
-  @Qualifier("partySvcClient")
-  public RestClient partySvcClient() {
-    RestClient restHelper = new RestClient(appConfig.getPartySvc().getConnectionConfig());
-    return restHelper;
+  public RestTemplate restTemplate() {
+    return new RestTemplate();
+  }
+
+
+  /**
+   * The RestUtility bean for the Action service
+   * @return the RestUtility bean for the Action service
+   */
+  @Bean
+  @Qualifier("partyRestUtility")
+  public RestUtility partyServiceRestUtility() {
+    RestUtility restUtility = new RestUtility(appConfig.getPartySvc().getConnectionConfig());
+    return restUtility;
   }
 
   /**
