@@ -79,6 +79,11 @@ public final class SampleEndpoint implements CTPEndpoint {
     return ResponseEntity.created(URI.create(newResourceUrl)).body(sampleUnitsRequest);
   }
 
+  /**
+   * GET endpoint for retrieving a list of all existing SampleSummaries
+   * 
+   * @return a list of all existing SampleSummaries
+   */
   @RequestMapping(value = "/samplesummaries", method = RequestMethod.GET)
   public ResponseEntity<List<SampleSummaryDTO>> findSampleSummaries() {
     List<SampleSummary> sampleSummaries = sampleService.findAllSampleSummaries();
@@ -91,6 +96,13 @@ public final class SampleEndpoint implements CTPEndpoint {
 
   }
   
+  /**
+   * GET endpoint to return the SampleSummary info for the given sampleSummaryId
+   * 
+   * @param sampleSummaryId the id fo the SampleSummary to search for
+   * @return SampleSummaryDTO for the requested sampleSummaryId
+   * @throws CTPException if SampleSummary not found
+   */
   @RequestMapping(value = "/samplesummary/{sampleSummaryId}", method = RequestMethod.GET)
   public ResponseEntity<SampleSummaryDTO> findSampleSummary(@PathVariable("sampleSummaryId") final UUID sampleSummaryId) throws CTPException {
     SampleSummary sampleSummary = sampleService.findSampleSummary(sampleSummaryId);
