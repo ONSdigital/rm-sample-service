@@ -5,8 +5,8 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
-import validation.SampleUnitBaseVerify;
-import validation.SurveyBaseVerify;
+import validation.SampleUnitBase;
+import validation.SurveyBase;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ public interface SampleService {
    * @param surveySampleObject SurveySample to be used
    * @throws Exception exception thrown
    */
-  SampleSummary processSampleSummary(SurveyBaseVerify surveySampleObject, List<? extends SampleUnitBaseVerify> samplingUnitList)
+  SampleSummary processSampleSummary(SurveyBase surveySampleObject, List<? extends SampleUnitBase> samplingUnitList)
           throws Exception;
 
   /**

@@ -11,9 +11,10 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
-import validation.BusinessSampleUnitVerify;
-import validation.BusinessSampleUnitsVerify;
-import validation.BusinessSurveySampleVerify;
+import validation.BusinessSampleUnit;
+import validation.BusinessSampleUnit;
+import validation.BusinessSampleUnits;
+import validation.BusinessSurveySample;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class CsvIngester extends CsvToBean<BusinessSampleUnitVerify> {
+public class CsvIngester extends CsvToBean<BusinessSampleUnit> {
 
   private static final String SURVEYREF = "surveyRef";
   private static final String COLLECTIONEXERCISEREF = "collectionExerciseRef";
@@ -73,7 +74,7 @@ public class CsvIngester extends CsvToBean<BusinessSampleUnitVerify> {
   @Autowired
   private SampleService sampleService;
 
-  private ColumnPositionMappingStrategy<BusinessSampleUnitVerify> columnPositionMappingStrategy;
+  private ColumnPositionMappingStrategy<BusinessSampleUnit> columnPositionMappingStrategy;
 
   /**
    * Lazy create a reusable validator
@@ -88,7 +89,7 @@ public class CsvIngester extends CsvToBean<BusinessSampleUnitVerify> {
 
   public CsvIngester() {
     columnPositionMappingStrategy = new ColumnPositionMappingStrategy<>();
-    columnPositionMappingStrategy.setType(BusinessSampleUnitVerify.class);
+    columnPositionMappingStrategy.setType(BusinessSampleUnit.class);
     columnPositionMappingStrategy.setColumnMapping(COLUMNS);
   }
 
@@ -98,8 +99,8 @@ public class CsvIngester extends CsvToBean<BusinessSampleUnitVerify> {
     CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()));
     String[] nextLine;
     SampleSummary sampleSummary;
-    BusinessSurveySampleVerify businessSurveySample = new BusinessSurveySampleVerify(null);
-    List<BusinessSampleUnitVerify> samplingUnitList = new ArrayList<>();
+    BusinessSurveySample businessSurveySample = new BusinessSurveySample(null);
+    List<BusinessSampleUnit> samplingUnitList = new ArrayList<>();
     int lineNum = 0;
 
       while((nextLine = csvReader.readNext()) != null) {
@@ -112,8 +113,8 @@ public class CsvIngester extends CsvToBean<BusinessSampleUnitVerify> {
         }
 
         if (lineNum++ > 0) {
-          BusinessSampleUnitVerify businessSampleUnitVerify = processLine(columnPositionMappingStrategy, nextLine);
-          Optional<String> namesOfInvalidColumns = validateLine(businessSampleUnitVerify);
+          BusinessSampleUnit businessSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
+          Optional<String> namesOfInvalidColumns = validateLine(businessSampleUnit);
           if (namesOfInvalidColumns.isPresent()) {
             log.error("Problem parsing line {} due to {} - entire ingest aborted", Arrays.toString(nextLine),
                 namesOfInvalidColumns.get());
@@ -121,16 +122,16 @@ public class CsvIngester extends CsvToBean<BusinessSampleUnitVerify> {
                 namesOfInvalidColumns.get()));
           }
 
-          samplingUnitList.add(businessSampleUnitVerify);
+          samplingUnitList.add(businessSampleUnit);
 
         }
 
       }
 
-      BusinessSampleUnitsVerify businessSampleUnitsVerify = new BusinessSampleUnitsVerify();
-      businessSampleUnitsVerify.setBusinessSampleUnits(samplingUnitList);
+      BusinessSampleUnits businessSampleUnits = new BusinessSampleUnits();
+      businessSampleUnits.setBusinessSampleUnits(samplingUnitList);
 
-      businessSurveySample.setSampleUnits(businessSampleUnitsVerify);
+      businessSurveySample.setSampleUnits(businessSampleUnits);
 
       sampleSummary = sampleService.processSampleSummary(businessSurveySample, samplingUnitList);
 
@@ -144,8 +145,8 @@ public class CsvIngester extends CsvToBean<BusinessSampleUnitVerify> {
    * @param csvLine the line
    * @return the errored column names separated by '_'
    */
-  private Optional<String> validateLine(BusinessSampleUnitVerify csvLine) {
-    Set<ConstraintViolation<BusinessSampleUnitVerify>> violations = getValidator().validate(csvLine);
+  private Optional<String> validateLine(BusinessSampleUnit csvLine) {
+    Set<ConstraintViolation<BusinessSampleUnit>> violations = getValidator().validate(csvLine);
     String invalidColumns = violations.stream().map(v -> v.getPropertyPath().toString())
         .collect(Collectors.joining("_"));
     return (invalidColumns.length() == 0) ? Optional.empty() : Optional.ofNullable(invalidColumns);

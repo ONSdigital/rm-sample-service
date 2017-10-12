@@ -2,8 +2,8 @@ package uk.gov.ons.ctp.response.sample.party;
 
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestAttributesDTO;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
-import validation.BusinessSampleUnitVerify;
-import validation.SampleUnitBaseVerify;
+import validation.BusinessSampleUnit;
+import validation.SampleUnitBase;
 
 /**
  * Util for the Party Service
@@ -20,13 +20,13 @@ public class PartyUtil {
    * @return the created Party object
    * @throws Exception unlikely, but indicated something really wrong
    */
-  public static PartyCreationRequestDTO convertToParty(SampleUnitBaseVerify unit) throws Exception {
+  public static PartyCreationRequestDTO convertToParty(SampleUnitBase unit) throws Exception {
     PartyCreationRequestDTO party = new PartyCreationRequestDTO();
     party.setSampleUnitType(unit.getSampleUnitType());
     party.setSampleUnitRef(unit.getSampleUnitRef());
-    if (unit instanceof BusinessSampleUnitVerify) {
+    if (unit instanceof BusinessSampleUnit) {
       PartyCreationRequestAttributesDTO businessSampleUnit = new PartyCreationRequestAttributesDTO();
-      BusinessSampleUnitVerify bsu = (BusinessSampleUnitVerify) unit;
+      BusinessSampleUnit bsu = (BusinessSampleUnit) unit;
       businessSampleUnit.setCheckletter(bsu.getCheckletter());
       businessSampleUnit.setFrosic92(bsu.getFrosic92());
       businessSampleUnit.setRusic92(bsu.getRusic92());

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -22,7 +23,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
-import validation.BusinessSampleUnitVerify;
+import validation.BusinessSampleUnit;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -34,7 +35,7 @@ import java.net.URI;
 @RestController
 @RequestMapping(value = "/samples", produces = "application/json")
 @Slf4j
-public final class SampleEndpoint extends CsvToBean<BusinessSampleUnitVerify> {
+public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
 
   @Autowired
   private SampleService sampleService;
@@ -74,7 +75,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnitVerify> {
   }
 
   @RequestMapping(value = "/{type}/fileupload", method = RequestMethod.POST, consumes = "multipart/form-data")
-  public final ResponseEntity<SampleSummary> uploadSampleFile(@PathVariable("type") final String type, @RequestParam("file") MultipartFile file) throws CTPException {
+  public final @ResponseBody ResponseEntity<SampleSummary> uploadSampleFile(@PathVariable("type") final String type, @RequestParam("file") MultipartFile file) throws CTPException {
     log.debug("Entering Sample file upload for Type {}", type);
 
     SampleSummary sampleSummary;

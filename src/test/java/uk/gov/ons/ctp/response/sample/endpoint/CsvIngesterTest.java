@@ -10,23 +10,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.ons.ctp.common.error.CTPException;
-import uk.gov.ons.ctp.common.error.RestExceptionHandler;
-import uk.gov.ons.ctp.common.jackson.CustomObjectMapper;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
-import validation.BusinessSampleUnitVerify;
-import validation.BusinessSurveySampleVerify;
+import validation.BusinessSampleUnit;
+import validation.BusinessSurveySample;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,9 +25,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.ons.ctp.common.utility.MockMvcControllerAdviceHelper.mockAdviceFor;
 
 /**
  * Test the CsvIngester distributor
@@ -90,19 +77,9 @@ public class CsvIngesterTest {
   private static final String FORMTYPE = "15";
   private static final String CURRENCY = "S";
 
-  private MockMvc mockMvc;
-
-  private static final String SERVER_URL = "/samples/bres/fileupload";
-
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-
-    this.mockMvc = MockMvcBuilders
-        .standaloneSetup(sampleEndpoint)
-        .setHandlerExceptionResolvers(mockAdviceFor(RestExceptionHandler.class))
-        .setMessageConverters(new MappingJackson2HttpMessageConverter(new CustomObjectMapper()))
-        .build();
   }
 
   /**
@@ -123,135 +100,24 @@ public class CsvIngesterTest {
   @Test
   public void testBlueSky() throws Exception {
     csvIngester.ingest(getTestFile("business-survey-sample.csv"));
-    verify(sampleService, times(1)).processSampleSummary(any(BusinessSurveySampleVerify.class),
-        anyListOf(BusinessSampleUnitVerify.class));
-
-    /*BusinessSampleUnitVerify businessSampleUnitVerify = samplingUnitList.get(0);
-    assertEquals(businessSampleUnitVerify.getCheckletter(), CHECKLETTER);
-    assertEquals(businessSampleUnitVerify.getFrosic92(), FROSIC92);
-    assertEquals(businessSampleUnitVerify.getRusic92(), RUSIC92);
-    assertEquals(businessSampleUnitVerify.getFrosic2007(), FROSIC2007);
-    assertEquals(businessSampleUnitVerify.getRusic2007(), RUSIC2007);
-    assertEquals(businessSampleUnitVerify.getFroempment(), FROEMPMENT);
-    assertEquals(businessSampleUnitVerify.getFrotover(), FROTOVER);
-    assertEquals(businessSampleUnitVerify.getEntref(), ENTREF);
-    assertEquals(businessSampleUnitVerify.getLegalstatus(), LEGALSTATUS);
-    assertEquals(businessSampleUnitVerify.getEntrepmkr(), ENTREPMKR);
-    assertEquals(businessSampleUnitVerify.getRegion(), REGION);
-    assertEquals(businessSampleUnitVerify.getBirthdate(), BIRTHDATE);
-    assertEquals(businessSampleUnitVerify.getEntname1(), ENTNAME1);
-    assertEquals(businessSampleUnitVerify.getEntname2(), ENTNAME2);
-    assertEquals(businessSampleUnitVerify.getEntname3(), ENTNAME3);
-    assertEquals(businessSampleUnitVerify.getRuname1(), RUNAME1);
-    assertEquals(businessSampleUnitVerify.getRuname2(), RUNAME2);
-    assertEquals(businessSampleUnitVerify.getRuname3(), RUNAME3);
-    assertEquals(businessSampleUnitVerify.getTradstyle1(), TRADSTYLE1);
-    assertEquals(businessSampleUnitVerify.getTradstyle2(), TRADSTYLE2);
-    assertEquals(businessSampleUnitVerify.getTradstyle3(), TRADSTYLE3);
-    assertEquals(businessSampleUnitVerify.getSeltype(), SELTYPE);
-    assertEquals(businessSampleUnitVerify.getInclexcl(), INCLEXCL);
-    assertEquals(businessSampleUnitVerify.getCell_no(), CELLNO);
-    assertEquals(businessSampleUnitVerify.getFormtype(), FORMTYPE);
-    assertEquals(businessSampleUnitVerify.getCurrency(), CURRENCY);*/
-  }
-
-  @Test
-  public void correctCSV() throws Exception {
-    MockMultipartFile mockMultipartFile = getTestFile("business-survey-sample.csv");
-
-    ResultActions actions = mockMvc.perform(fileUpload(SERVER_URL).file(mockMultipartFile));
-
-    actions.andExpect(status().is2xxSuccessful());
-  }
-
-  @Test
-  public void incorrectCheckletter() throws Exception {
-    MockMultipartFile mockMultipartFile = getTestFile("business-survey-sample-incorrect-checkletter.csv");
-
-    System.out.println(getStringFromInputStream(mockMultipartFile.getInputStream()));
-
-    ResultActions actions = mockMvc.perform(fileUpload(SERVER_URL).file(mockMultipartFile));
-
-/*    actions.andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.error.code", is(CTPException.Fault.VALIDATION_FAILED.name())))
-        .andExpect(jsonPath("$.error.timestamp", isA(String.class)))
-        .andExpect(jsonPath("$.error.message", is("Error ingesting file business-survey-sample-incorrect-checkletter.csv")));*/
-  }
-
-  @Test(expected = CTPException.class)
-  public void incorrectData() throws Exception {
-    csvIngester.ingest(getTestFile("business-survey-sample-incorrect-data.csv"));
-    verify(sampleService, times(0)).processSampleSummary(any(BusinessSurveySampleVerify.class),
-        anyListOf(BusinessSampleUnitVerify.class));
-    /*List<BusinessSampleUnitVerify> samplingUnitList = csvIngester.ingest(getTestFile("business-survey-sample-incorrect-data.csv"));
-
-    BusinessSampleUnitVerify businessSampleUnitVerify = samplingUnitList.get(0);
-    assertEquals(businessSampleUnitVerify.getCheckletter(), CHECKLETTER);
-    assertEquals(businessSampleUnitVerify.getFrosic92(), FROSIC92);
-    assertEquals(businessSampleUnitVerify.getRusic92(), RUSIC92);
-    assertEquals(businessSampleUnitVerify.getFrosic2007(), FROSIC2007);
-    assertEquals(businessSampleUnitVerify.getRusic2007(), RUSIC2007);
-    assertEquals(businessSampleUnitVerify.getFroempment(), FROEMPMENT);
-    assertEquals(businessSampleUnitVerify.getFrotover(), FROTOVER);
-    assertEquals(businessSampleUnitVerify.getEntref(), ENTREF);
-    assertEquals(businessSampleUnitVerify.getLegalstatus(), LEGALSTATUS);
-    assertEquals(businessSampleUnitVerify.getEntrepmkr(), ENTREPMKR);
-    assertEquals(businessSampleUnitVerify.getRegion(), REGION);
-    assertEquals(businessSampleUnitVerify.getBirthdate(), BIRTHDATE);
-    assertEquals(businessSampleUnitVerify.getEntname1(), ENTNAME1);
-    assertEquals(businessSampleUnitVerify.getEntname2(), ENTNAME2);
-    assertEquals(businessSampleUnitVerify.getEntname3(), ENTNAME3);
-    assertEquals(businessSampleUnitVerify.getRuname1(), RUNAME1);
-    assertEquals(businessSampleUnitVerify.getRuname2(), RUNAME2);
-    assertEquals(businessSampleUnitVerify.getRuname3(), RUNAME3);
-    assertEquals(businessSampleUnitVerify.getTradstyle1(), TRADSTYLE1);
-    assertEquals(businessSampleUnitVerify.getTradstyle2(), TRADSTYLE2);
-    assertEquals(businessSampleUnitVerify.getTradstyle3(), TRADSTYLE3);
-    assertEquals(businessSampleUnitVerify.getSeltype(), SELTYPE);
-    assertEquals(businessSampleUnitVerify.getInclexcl(), INCLEXCL);
-    assertEquals(businessSampleUnitVerify.getCell_no(), CELLNO);
-    assertEquals(businessSampleUnitVerify.getFormtype(), FORMTYPE);
-    assertEquals(businessSampleUnitVerify.getCurrency(), CURRENCY);*/
-
-    //thrown.expect(Exception.class);
+    verify(sampleService, times(1)).processSampleSummary(any(BusinessSurveySample.class),
+        anyListOf(BusinessSampleUnit.class));
   }
 
   @Test(expected = CTPException.class)
   public void missingColumns() throws Exception {
     csvIngester.ingest(getTestFile("business-survey-sample-missing-columns.csv"));
-    verify(sampleService, times(0)).processSampleSummary(any(BusinessSurveySampleVerify.class),
-        anyListOf(BusinessSampleUnitVerify.class));
+    verify(sampleService, times(0)).processSampleSummary(any(BusinessSurveySample.class),
+        anyListOf(BusinessSampleUnit.class));
     thrown.expect(CTPException.class);
   }
 
-  // convert InputStream to String
-  private static String getStringFromInputStream(InputStream is) {
-
-    BufferedReader br = null;
-    StringBuilder sb = new StringBuilder();
-
-    String line;
-    try {
-
-      br = new BufferedReader(new InputStreamReader(is));
-      while ((line = br.readLine()) != null) {
-        sb.append(line);
-      }
-
-    } catch (IOException e) {
-      e.printStackTrace();
-    } finally {
-      if (br != null) {
-        try {
-          br.close();
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-      }
-    }
-
-    return sb.toString();
-
+  @Test(expected = CTPException.class)
+  public void incorrectData() throws Exception {
+    csvIngester.ingest(getTestFile("business-survey-sample-incorrect-data.csv"));
+    verify(sampleService, times(0)).processSampleSummary(any(BusinessSurveySample.class),
+        anyListOf(BusinessSampleUnit.class));
+    thrown.expect(CTPException.class);
   }
 
 }

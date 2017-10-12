@@ -26,8 +26,8 @@ import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.service.CollectionExerciseJobService;
 import uk.gov.ons.ctp.response.sample.service.PartySvcClientService;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
-import validation.SampleUnitBaseVerify;
-import validation.SurveyBaseVerify;
+import validation.SampleUnitBase;
+import validation.SurveyBase;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -69,7 +69,7 @@ public class SampleServiceImpl implements SampleService {
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
-  public SampleSummary processSampleSummary(SurveyBaseVerify surveySample, List<? extends SampleUnitBaseVerify> samplingUnitList)
+  public SampleSummary processSampleSummary(SurveyBase surveySample, List<? extends SampleUnitBase> samplingUnitList)
           throws Exception {
     SampleSummary sampleSummary = createSampleSummary(surveySample);
     SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
@@ -78,7 +78,7 @@ public class SampleServiceImpl implements SampleService {
     return savedSampleSummary;
   }
 
-  protected SampleSummary createSampleSummary(SurveyBaseVerify surveySample) throws ParseException {
+  protected SampleSummary createSampleSummary(SurveyBase surveySample) throws ParseException {
     SampleSummary sampleSummary = new SampleSummary();
 
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
@@ -94,8 +94,8 @@ public class SampleServiceImpl implements SampleService {
     return sampleSummary;
   }
 
-  private void saveSampleUnits(List<? extends SampleUnitBaseVerify> samplingUnitList, SampleSummary sampleSummary) {
-    for (SampleUnitBaseVerify sampleUnitBase : samplingUnitList) {
+  private void saveSampleUnits(List<? extends SampleUnitBase> samplingUnitList, SampleSummary sampleSummary) {
+    for (SampleUnitBase sampleUnitBase : samplingUnitList) {
       SampleUnit sampleUnit = new SampleUnit();
       sampleUnit.setSampleSummaryFK(sampleSummary.getSampleSummaryPK());
       sampleUnit.setSampleUnitRef(sampleUnitBase.getSampleUnitRef());
@@ -110,8 +110,8 @@ public class SampleServiceImpl implements SampleService {
    * create sampleUnits, save them to the Database and post to internal queue
    * @throws Exception 
    * */
-  private void publishToPartyQueue(List<? extends SampleUnitBaseVerify> samplingUnitList) throws Exception {
-    for (SampleUnitBaseVerify sampleUnitBase : samplingUnitList) {
+  private void publishToPartyQueue(List<? extends SampleUnitBase> samplingUnitList) throws Exception {
+    for (SampleUnitBase sampleUnitBase : samplingUnitList) {
           PartyCreationRequestDTO party = PartyUtil.convertToParty(sampleUnitBase);
           partyPublisher.publish(party);
     }

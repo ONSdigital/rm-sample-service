@@ -2,7 +2,7 @@ package uk.gov.ons.ctp.response.sample.message;
 
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.Headers;
-import validation.SurveyBaseVerify;
+import validation.SurveyBase;
 
 import java.util.Map;
 
@@ -11,7 +11,7 @@ import java.util.Map;
 * the Sample entity model.
 * @param <T> Survey Sample object extended from SurveyBase
 */
-public interface SampleReceiver<T extends SurveyBaseVerify> {
+public interface SampleReceiver<T extends SurveyBase> {
 
   /**
    * Processes CensusSurveySample transformed from XML

@@ -25,7 +25,7 @@ import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEve
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
 import uk.gov.ons.ctp.response.sample.service.CollectionExerciseJobService;
 import uk.gov.ons.ctp.response.sample.service.PartySvcClientService;
-import validation.BusinessSurveySampleVerify;
+import validation.BusinessSurveySample;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -79,7 +79,7 @@ public class SampleServiceImplTest {
   @InjectMocks
   private SampleServiceImpl sampleServiceImpl;
 
-  private List<BusinessSurveySampleVerify> surveySample;
+  private List<BusinessSurveySample> surveySample;
   private List<PartyCreationRequestDTO> party;
   private List<PartyDTO> partyDTO;
   private List<SampleUnit> sampleUnit;
@@ -94,7 +94,7 @@ public class SampleServiceImplTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-    surveySample = FixtureHelper.loadClassFixtures(BusinessSurveySampleVerify[].class);
+    surveySample = FixtureHelper.loadClassFixtures(BusinessSurveySample[].class);
     party = FixtureHelper.loadClassFixtures(PartyCreationRequestDTO[].class);
     partyDTO = FixtureHelper.loadClassFixtures(PartyDTO[].class);
     sampleUnit = FixtureHelper.loadClassFixtures(SampleUnit[].class);
@@ -103,7 +103,7 @@ public class SampleServiceImplTest {
   }
 
   /**
-   * Verify that a SampleSummary is correctly created when a SurveySample is
+   *  that a SampleSummary is correctly created when a SurveySample is
    * passed into the method.
    *
    * @throws Exception oops
@@ -120,7 +120,7 @@ public class SampleServiceImplTest {
   }*/
 
   /**
-   * Verify that a SampleSummary containing two SampleUnits is created and then saved to the database. Also
+   *  that a SampleSummary containing two SampleUnits is created and then saved to the database. Also
    * verifies that both SampleUnits are saved to the database and then published to
    * the internal queue.
    *
