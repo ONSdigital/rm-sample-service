@@ -2,7 +2,8 @@ package uk.gov.ons.ctp.response.sample.party;
 
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestAttributesDTO;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
-import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
+import validation.BusinessSampleUnitVerify;
+import validation.SampleUnitBaseVerify;
 
 /**
  * Util for the Party Service
@@ -19,20 +20,20 @@ public class PartyUtil {
    * @return the created Party object
    * @throws Exception unlikely, but indicated something really wrong
    */
-  public static PartyCreationRequestDTO convertToParty(SampleUnitBase unit) throws Exception {
+  public static PartyCreationRequestDTO convertToParty(SampleUnitBaseVerify unit) throws Exception {
     PartyCreationRequestDTO party = new PartyCreationRequestDTO();
     party.setSampleUnitType(unit.getSampleUnitType());
     party.setSampleUnitRef(unit.getSampleUnitRef());
-    if (unit instanceof uk.gov.ons.ctp.response.sample.definition.BusinessSampleUnit) {
+    if (unit instanceof BusinessSampleUnitVerify) {
       PartyCreationRequestAttributesDTO businessSampleUnit = new PartyCreationRequestAttributesDTO();
-      uk.gov.ons.ctp.response.sample.definition.BusinessSampleUnit bsu = (uk.gov.ons.ctp.response.sample.definition.BusinessSampleUnit) unit;
+      BusinessSampleUnitVerify bsu = (BusinessSampleUnitVerify) unit;
       businessSampleUnit.setCheckletter(bsu.getCheckletter());
       businessSampleUnit.setFrosic92(bsu.getFrosic92());
       businessSampleUnit.setRusic92(bsu.getRusic92());
       businessSampleUnit.setFrosic2007(bsu.getFrosic2007());
       businessSampleUnit.setRusic2007(bsu.getRusic2007());
-      businessSampleUnit.setFroempment(bsu.getFroempment());
-      businessSampleUnit.setFrotover(bsu.getFrotover());
+      businessSampleUnit.setFroempment(Integer.valueOf(bsu.getFroempment()));
+      businessSampleUnit.setFrotover(Integer.valueOf(bsu.getFrotover()));
       businessSampleUnit.setEntref(bsu.getEntref());
       businessSampleUnit.setLegalstatus(bsu.getLegalstatus());
       businessSampleUnit.setEntrepmkr(bsu.getEntrepmkr());
@@ -49,8 +50,8 @@ public class PartyUtil {
       businessSampleUnit.setTradstyle3(bsu.getTradstyle3());
       businessSampleUnit.setSeltype(bsu.getSeltype());
       businessSampleUnit.setInclexcl(bsu.getInclexcl());
-      businessSampleUnit.setCellNo(bsu.getCellNo());
-      businessSampleUnit.setFormtype(bsu.getFormtype());
+      businessSampleUnit.setCellNo(Integer.valueOf(bsu.getCell_no()));
+      businessSampleUnit.setFormtype(bsu.getFormtype2());
       businessSampleUnit.setCurrency(bsu.getCurrency());
       party.setAttributes(businessSampleUnit);
     }

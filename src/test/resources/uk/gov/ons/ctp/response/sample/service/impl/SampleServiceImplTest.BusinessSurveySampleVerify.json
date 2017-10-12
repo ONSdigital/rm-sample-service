@@ -27,8 +27,8 @@
 		   "tradstyle1": "TOTAL UK ACTIVITY",
 		   "seltype": "C",
 		   "inclexcl": "D",
-		   "cellNo": 7,
-		   "formtype": "0015",
+		   "cell_no": 7,
+		   "formtype2": "0015",
 		   "currency": "S"
 	},
 	{	  "sampleUnitRef": "0987654321",
@@ -53,8 +53,8 @@
 		  "tradstyle1": "TOTAL UK ACTIVITY",
 		  "seltype": "C",
 		  "inclexcl": "D",
-		  "cellNo": 7,
-		  "formtype": "0015",
+		  "cell_no": 7,
+		  "formtype2": "0015",
 		  "currency": "S"
 	  }]
   }

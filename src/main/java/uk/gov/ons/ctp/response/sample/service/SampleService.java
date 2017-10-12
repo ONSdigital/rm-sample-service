@@ -1,11 +1,12 @@
 package uk.gov.ons.ctp.response.sample.service;
 
+import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
-import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
-import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
+import validation.SampleUnitBaseVerify;
+import validation.SurveyBaseVerify;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public interface SampleService {
    * @param surveySampleObject SurveySample to be used
    * @throws Exception exception thrown
    */
-  void processSampleSummary(SurveyBase surveySampleObject, List<? extends SampleUnitBase> samplingUnitList)
+  SampleSummary processSampleSummary(SurveyBaseVerify surveySampleObject, List<? extends SampleUnitBaseVerify> samplingUnitList)
           throws Exception;
 
   /**
@@ -53,4 +54,14 @@ public interface SampleService {
    * @throws Exception exception thrown
    */
   void sendToPartyService(PartyCreationRequestDTO party) throws Exception;
+
+  /**
+   * Ingest Survey Sample
+   *
+   * @param file Multipart File of SurveySample to be used
+   * @throws Exception exception thrown
+   */
+  SampleSummary ingest(MultipartFile file) throws Exception;
+
+
 }

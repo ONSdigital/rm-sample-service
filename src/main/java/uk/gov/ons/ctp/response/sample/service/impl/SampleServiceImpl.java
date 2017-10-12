@@ -1,28 +1,24 @@
 package uk.gov.ons.ctp.response.sample.service.impl;
 
-import java.sql.Timestamp;
-import java.util.List;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.common.time.DateTimeUtil;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
-import uk.gov.ons.ctp.response.sample.definition.SampleUnitBase;
-import uk.gov.ons.ctp.response.sample.definition.SurveyBase;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
+import uk.gov.ons.ctp.response.sample.endpoint.CsvIngester;
 import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
 import uk.gov.ons.ctp.response.sample.party.PartyUtil;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
@@ -30,6 +26,13 @@ import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.service.CollectionExerciseJobService;
 import uk.gov.ons.ctp.response.sample.service.PartySvcClientService;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
+import validation.SampleUnitBaseVerify;
+import validation.SurveyBaseVerify;
+
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -61,33 +64,38 @@ public class SampleServiceImpl implements SampleService {
   @Autowired
   private CollectionExerciseJobService collectionExerciseJobService;
 
+  @Autowired
+  private CsvIngester csvIngester;
+
   @Override
   @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
-  public void processSampleSummary(SurveyBase surveySample, List<? extends SampleUnitBase> samplingUnitList)
+  public SampleSummary processSampleSummary(SurveyBaseVerify surveySample, List<? extends SampleUnitBaseVerify> samplingUnitList)
           throws Exception {
     SampleSummary sampleSummary = createSampleSummary(surveySample);
     SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
     saveSampleUnits(samplingUnitList, savedSampleSummary);
     publishToPartyQueue(samplingUnitList);
+    return savedSampleSummary;
   }
 
-  protected SampleSummary createSampleSummary(SurveyBase surveySample) {
-    Timestamp effectiveStartDateTime = new Timestamp(surveySample.getEffectiveStartDateTime()
-            .toGregorianCalendar().getTimeInMillis());
-    Timestamp effectiveEndDateTime = new Timestamp(surveySample.getEffectiveEndDateTime()
-            .toGregorianCalendar().getTimeInMillis());
-
+  protected SampleSummary createSampleSummary(SurveyBaseVerify surveySample) throws ParseException {
     SampleSummary sampleSummary = new SampleSummary();
-    sampleSummary.setEffectiveStartDateTime(effectiveStartDateTime);
-    sampleSummary.setEffectiveEndDateTime(effectiveEndDateTime);
+
+    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    Timestamp timestampEffectiveStartDateTime = new Timestamp(sdf.parse(surveySample.getEffectiveStartDateTime()).getTime());
+    Timestamp timestampEffectiveEndDateTime = new Timestamp(sdf.parse(surveySample.getEffectiveEndDateTime()).getTime());
+
+    sampleSummary.setEffectiveStartDateTime(timestampEffectiveStartDateTime);
+    sampleSummary.setEffectiveEndDateTime(timestampEffectiveEndDateTime);
     sampleSummary.setSurveyRef(surveySample.getSurveyRef());
     sampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
     sampleSummary.setState(SampleSummaryDTO.SampleState.INIT);
+
     return sampleSummary;
   }
 
-  private void saveSampleUnits(List<? extends SampleUnitBase> samplingUnitList, SampleSummary sampleSummary) {
-    for (SampleUnitBase sampleUnitBase : samplingUnitList) {
+  private void saveSampleUnits(List<? extends SampleUnitBaseVerify> samplingUnitList, SampleSummary sampleSummary) {
+    for (SampleUnitBaseVerify sampleUnitBase : samplingUnitList) {
       SampleUnit sampleUnit = new SampleUnit();
       sampleUnit.setSampleSummaryFK(sampleSummary.getSampleSummaryPK());
       sampleUnit.setSampleUnitRef(sampleUnitBase.getSampleUnitRef());
@@ -102,8 +110,8 @@ public class SampleServiceImpl implements SampleService {
    * create sampleUnits, save them to the Database and post to internal queue
    * @throws Exception 
    * */
-  private void publishToPartyQueue(List<? extends SampleUnitBase> samplingUnitList) throws Exception {
-    for (SampleUnitBase sampleUnitBase : samplingUnitList) {
+  private void publishToPartyQueue(List<? extends SampleUnitBaseVerify> samplingUnitList) throws Exception {
+    for (SampleUnitBaseVerify sampleUnitBase : samplingUnitList) {
           PartyCreationRequestDTO party = PartyUtil.convertToParty(sampleUnitBase);
           partyPublisher.publish(party);
     }
@@ -196,6 +204,10 @@ public class SampleServiceImpl implements SampleService {
     }
     log.debug("sampleUnits found for surveyref : {} {}", surveyRef, sampleUnitsTotal);
     return sampleUnitsTotal;
+  }
+
+  @Override public SampleSummary ingest(MultipartFile file) throws Exception {
+    return csvIngester.ingest(file);
   }
 
 }

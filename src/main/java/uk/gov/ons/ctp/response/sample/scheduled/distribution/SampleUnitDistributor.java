@@ -142,7 +142,7 @@ public class SampleUnitDistributor {
    */
   @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
   private void sendSampleUnitToCollectionExerciseQueue(SampleUnit sampleUnit,
-                                                       uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit) throws CTPException {
+      uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit) throws CTPException {
     transitionSampleUnitStateFromDeliveryEvent(sampleUnit.getSampleUnitPK());
     sampleUnitPublisher.send(mappedSampleUnit);
   }
