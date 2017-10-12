@@ -12,8 +12,6 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.BusinessSampleUnit;
-import validation.BusinessSampleUnit;
-import validation.BusinessSampleUnits;
 import validation.BusinessSurveySample;
 
 import javax.validation.ConstraintViolation;
@@ -99,7 +97,7 @@ public class CsvIngester extends CsvToBean<BusinessSampleUnit> {
     CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()));
     String[] nextLine;
     SampleSummary sampleSummary;
-    BusinessSurveySample businessSurveySample = new BusinessSurveySample(null);
+    BusinessSurveySample businessSurveySample = new BusinessSurveySample();
     List<BusinessSampleUnit> samplingUnitList = new ArrayList<>();
     int lineNum = 0;
 
@@ -128,10 +126,7 @@ public class CsvIngester extends CsvToBean<BusinessSampleUnit> {
 
       }
 
-      BusinessSampleUnits businessSampleUnits = new BusinessSampleUnits();
-      businessSampleUnits.setBusinessSampleUnits(samplingUnitList);
-
-      businessSurveySample.setSampleUnits(businessSampleUnits);
+      businessSurveySample.setSampleUnits(samplingUnitList);
 
       sampleSummary = sampleService.processSampleSummary(businessSurveySample, samplingUnitList);
 

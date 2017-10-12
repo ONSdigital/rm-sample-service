@@ -3,8 +3,7 @@
   "collectionExerciseRef":"def",
   "effectiveStartDateTime":"1483743600000",
   "effectiveEndDateTime":"1583743600000",
-  "sampleUnits":{
-  	"businessSampleUnits":[{
+  	"sampleUnits":[{
   		   "sampleUnitRef": "1234567890",
 		   "sampleUnitType": "B",
 		   "formType": "0015",
@@ -57,6 +56,5 @@
 		  "formtype2": "0015",
 		  "currency": "S"
 	  }]
-  }
 }
 ]
