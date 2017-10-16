@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>uk.gov.ons.ctp.product</groupId>
   <artifactId>samplesvc</artifactId>
-  <version>10.49.0-SNAPSHOT</version>
+  <version>10.49.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>CTP : SampleService</name>
@@ -32,7 +32,7 @@
     <dependency>
       <groupId>uk.gov.ons.ctp.product</groupId>
       <artifactId>partysvc-api</artifactId>
-      <version>10.49.0-SNAPSHOT</version>
+      <version>10.49.1-SNAPSHOT</version>
     </dependency>
 
     <dependency>
