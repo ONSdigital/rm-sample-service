@@ -1,5 +1,21 @@
 package uk.gov.ons.ctp.response.sample.service.impl;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.UUID;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -103,12 +119,12 @@ public class SampleServiceImplTest {
   }
 
   /**
-   *  that a SampleSummary is correctly created when a SurveySample is
+   * Verify that a SampleSummary is correctly created when a SurveySample is
    * passed into the method.
    *
    * @throws Exception oops
    */
-/*  @Test
+  @Test
   public void verifySampleSummaryCreatedCorrectly() throws Exception {
     SampleSummary sampleSummary = sampleServiceImpl.createSampleSummary(surveySample.get(0));
 
@@ -117,16 +133,16 @@ public class SampleServiceImplTest {
     assertTrue(sampleSummary.getEffectiveEndDateTime().getTime() == EFFECTIVEENDDATETIME);
     assertTrue(sampleSummary.getEffectiveStartDateTime().getTime() == EFFECTIVESTARTDATETIME);
     assertTrue(sampleSummary.getState() == SampleSummaryDTO.SampleState.INIT);
-  }*/
+  }
 
   /**
-   *  that a SampleSummary containing two SampleUnits is created and then saved to the database. Also
+   * Verify that a SampleSummary containing two SampleUnits is created and then saved to the database. Also
    * verifies that both SampleUnits are saved to the database and then published to
    * the internal queue.
    *
    * @throws Exception oops
    */
-/*  @Test
+  @Test
   public void testSampleSummaryAndSampleUnitsAreSavedAndThenSampleUnitsPublishedToQueue() throws Exception {
     BusinessSurveySample businessSample = surveySample.get(0);
     when(sampleSummaryRepository.save(any(SampleSummary.class))).then(returnsFirstArg());
@@ -136,7 +152,7 @@ public class SampleServiceImplTest {
     verify(sampleSummaryRepository).save(any(SampleSummary.class));
     verify(sampleUnitRepository, times(2)).save(any(SampleUnit.class));
     verify(partyPublisher, times(2)).publish(any(PartyCreationRequestDTO.class));
-  }*/
+  }
 
   /**
    * Test that when a Party is posted to Party Service the appropriate states
@@ -206,8 +222,7 @@ public class SampleServiceImplTest {
    */
   @Test
   public void testOneCollectionExerciseJobIsStoredWhenSampleUnitsAreFound() throws Exception {
-    when(sampleSummaryRepository.findBySurveyRefAndEffectiveStartDateTimeAndState(eq(SURVEYREF), any(Timestamp.class),
-        eq(SampleState.ACTIVE))).thenReturn(sampleSummaryList);
+    when(sampleSummaryRepository.findById(UUID.fromString("14fb3e68-4dca-46db-bf49-04b84e07e77f"))).thenReturn(sampleSummaryList.get(0));
     when(sampleUnitRepository.findBySampleSummaryFK(1)).thenReturn(sampleUnit);
     Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(1)).storeCollectionExerciseJob(any());

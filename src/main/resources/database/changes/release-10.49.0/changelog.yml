@@ -9,3 +9,12 @@ databaseChangeLog:
             path: sample_add_uuids.sql
             relativeToChangelogFile: true
             splitStatements: false
+  - changeSet:
+      id: 10.49.0-2
+      author: Kieran Wardle
+      changes:
+        - sqlFile:
+            comment: Add samplesummaryid column to collectionexercisejob table
+            path: add_samplesummaryid_to_collectionexercisejob.sql
+            relativeToChangelogFile: true
+            splitStatements: false

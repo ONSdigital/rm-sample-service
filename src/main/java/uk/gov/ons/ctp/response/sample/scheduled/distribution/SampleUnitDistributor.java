@@ -91,15 +91,16 @@ public class SampleUnitDistributor {
           excludedCases.add(E);
         }
 
-        sampleUnits = sampleUnitRepository.getSampleUnitBatch(job.getSurveyRef(),
-            job.getExerciseDateTime(), SampleSummaryDTO.SampleState.ACTIVE.toString(),
-            appConfig.getSampleUnitDistribution().getRetrievalMax(), excludedCases);
+        sampleUnits = sampleUnitRepository.getSampleUnits(job.getSampleSummaryId()
+            , SampleSummaryDTO.SampleState.ACTIVE.toString()
+            , appConfig.getSampleUnitDistribution().getRetrievalMax(), excludedCases);
 
         if (sampleUnits.size() > 0) {
           sampleUnitDistributionListManager.saveList(SAMPLEUNIT_DISTRIBUTOR_LIST_ID, sampleUnits.stream()
               .map(su -> su.getSampleUnitPK())
               .collect(Collectors.toList()), true);
         }
+
 
         for (SampleUnit sampleUnit : sampleUnits) {
           try {

@@ -4,6 +4,7 @@ import liquibase.util.csv.opencsv.bean.CsvToBean;
 import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -68,18 +69,25 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     if (bindingResult.hasErrors()) {
       throw new InvalidRequestException("Binding errors for create action: ", bindingResult);
     }
+    CollectionExerciseJob cej = new CollectionExerciseJob();
+    Integer sampleUnitsTotal = 0;
+    List<UUID> sampleSummaryIds = collectionExerciseJobCreationRequestDTO.getSampleSummaryUUIDList();
+    for(UUID sampleSummaryID : sampleSummaryIds) {
+      cej = mapperFacade
+          .map(collectionExerciseJobCreationRequestDTO, CollectionExerciseJob.class);
+      cej.setCreatedDateTime(DateTimeUtil.nowUTC());
+      cej.setSampleSummaryId(sampleSummaryID);
 
-    CollectionExerciseJob cej = mapperFacade.map(collectionExerciseJobCreationRequestDTO, CollectionExerciseJob.class);
-    cej.setCreatedDateTime(DateTimeUtil.nowUTC());
+      sampleUnitsTotal += sampleService.initialiseCollectionExerciseJob(cej);
+    }
+      SampleUnitsRequestDTO sampleUnitsRequest = new SampleUnitsRequestDTO(sampleUnitsTotal);
 
-    Integer sampleUnitsTotal = sampleService.initialiseCollectionExerciseJob(cej);
-    SampleUnitsRequestDTO sampleUnitsRequest = new SampleUnitsRequestDTO(sampleUnitsTotal);
+      String newResourceUrl = ServletUriComponentsBuilder
+          .fromCurrentRequest().path("/{id}")
+          .buildAndExpand(cej.getCollectionExerciseId()).toUri().toString();
 
-    String newResourceUrl = ServletUriComponentsBuilder
-        .fromCurrentRequest().path("/{id}")
-        .buildAndExpand(cej.getCollectionExerciseId()).toUri().toString();
+      return ResponseEntity.created(URI.create(newResourceUrl)).body(sampleUnitsRequest);
 
-    return ResponseEntity.created(URI.create(newResourceUrl)).body(sampleUnitsRequest);
   }
 
   @RequestMapping(value = "/{type}/fileupload", method = RequestMethod.POST, consumes = "multipart/form-data")

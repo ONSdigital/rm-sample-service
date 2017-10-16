@@ -70,17 +70,16 @@ public class SendToCollExQueueTest {
       MockitoAnnotations.initMocks(this);
     }
 
-    
     @Test
     public void verifyRetrievedSampleUnitsAreDeliveredToTheQueue() throws Exception{
         UUID cEId = UUID.randomUUID();
-        when(collectionExerciseJobRepository.findAll()).thenReturn(Collections.singletonList(new CollectionExerciseJob(1,cEId,"str1234",new Timestamp(0),new Timestamp(0))));
+        when(collectionExerciseJobRepository.findAll()).thenReturn(Collections.singletonList(new CollectionExerciseJob(1,cEId,"str1234",new Timestamp(0),new Timestamp(0),UUID.randomUUID())));
         SampleUnit su1 = SampleUnit.builder().sampleSummaryFK(1).sampleUnitPK(2).sampleUnitRef("str1234").sampleUnitType("H").state(SampleUnitDTO.SampleUnitState.INIT).build();
         SampleUnit su2 = SampleUnit.builder().sampleUnitPK(3).build();
         List<SampleUnit> suList = new ArrayList<>();
         suList.add(su1);
         suList.add(su2);
-        when(sampleUnitRepository.getSampleUnitBatch(any(),any(),any(),any(),any())).thenReturn(suList);
+        when(sampleUnitRepository.getSampleUnits(any(),any(),any(),any())).thenReturn(suList);
         when(sampleUnitRepository.findOne(2)).thenReturn(su1);
         when(sampleUnitRepository.findOne(3)).thenReturn(su2);
         SampleUnitDistribution sud = new SampleUnitDistribution();

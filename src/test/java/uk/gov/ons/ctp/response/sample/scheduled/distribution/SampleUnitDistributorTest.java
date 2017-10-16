@@ -27,6 +27,7 @@ import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Matchers.any;
@@ -87,7 +88,7 @@ public class SampleUnitDistributorTest {
   public void testHappyPath() throws LockingException, CTPException {
     when(collectionExerciseJobRepository.findAll()).thenReturn(collectionExerciseJobsList);
 
-    when(sampleUnitRepo.getSampleUnitBatch(any(String.class), any(Timestamp.class), any(String.class),
+    when(sampleUnitRepo.getSampleUnits(any(UUID.class), any(String.class),
             any(Integer.class), any(List.class))).thenReturn(sampleUnitList);
 
     when(sampleUnitRepo.findOne(any(Integer.class))).thenReturn(sampleUnitList.get(0));
@@ -119,7 +120,7 @@ public class SampleUnitDistributorTest {
     when(collectionExerciseJobRepository.findAll())
             .thenThrow(new RuntimeException("Database access failed"));
 
-    when(sampleUnitRepo.getSampleUnitBatch(any(String.class), any(Timestamp.class), any(String.class),
+    when(sampleUnitRepo.getSampleUnits(any(UUID.class), any(String.class),
             any(Integer.class), any(List.class))).thenReturn(sampleUnitList);
 
     when(sampleUnitRepo.findOne(any(Integer.class))).thenReturn(sampleUnitList.get(0));
@@ -143,7 +144,7 @@ public class SampleUnitDistributorTest {
     when(collectionExerciseJobRepository.findAll())
             .thenReturn(collectionExerciseJobs);
 
-    when(sampleUnitRepo.getSampleUnitBatch(any(String.class), any(Timestamp.class), any(String.class),
+    when(sampleUnitRepo.getSampleUnits(any(UUID.class),  any(String.class),
             any(Integer.class),
             any(List.class))).thenReturn(sampleUnitList);
 
@@ -164,7 +165,7 @@ public class SampleUnitDistributorTest {
 
     List<SampleUnit> sampleUnits = new ArrayList<>();
 
-    when(sampleUnitRepo.getSampleUnitBatch(any(String.class), any(Timestamp.class), any(String.class),
+    when(sampleUnitRepo.getSampleUnits(any(UUID.class), any(String.class),
             any(Integer.class),
             any(List.class))).thenReturn(sampleUnits);
 
@@ -188,7 +189,7 @@ public class SampleUnitDistributorTest {
     when(collectionExerciseJobRepository.findAll())
             .thenReturn(collectionExerciseJobsList);
 
-    when(sampleUnitRepo.getSampleUnitBatch(any(String.class), any(Timestamp.class), any(String.class),
+    when(sampleUnitRepo.getSampleUnits(any(UUID.class), any(String.class),
             any(Integer.class),
             any(List.class))).thenThrow(new RuntimeException("Database access failed"));
 
@@ -208,7 +209,7 @@ public class SampleUnitDistributorTest {
     when(collectionExerciseJobRepository.findAll())
             .thenReturn(collectionExerciseJobsList);
 
-    when(sampleUnitRepo.getSampleUnitBatch(any(String.class), any(Timestamp.class), any(String.class),
+    when(sampleUnitRepo.getSampleUnits(any(UUID.class),any(String.class),
             any(Integer.class),
             any(List.class))).thenReturn(sampleUnitList);
 

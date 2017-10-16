@@ -26,7 +26,7 @@ public interface SampleSummaryRepository extends JpaRepository<SampleSummary, In
    */
   List<SampleSummary> findBySurveyRefAndEffectiveStartDateTimeAndState(String surveyRef, Timestamp exerciseDateTime,
       SampleSummaryDTO.SampleState state);
-  
+
   /**
    * Find SampleSummary by UUID 
    * 
