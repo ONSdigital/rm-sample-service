@@ -30,12 +30,7 @@ import java.util.stream.Collectors;
 @Service
 public class CsvIngester extends CsvToBean<BusinessSampleUnit> {
 
-  private static final String SURVEYREF = "surveyRef";
-  private static final String COLLECTIONEXERCISEREF = "collectionExerciseRef";
-  private static final String EFFECTIVESTARTDATETIME = "effectiveStartDateTime";
-  private static final String EFFECTIVEENDDATETIME = "effectiveEndDateTime";
   private static final String SAMPLEUNITREF = "sampleUnitRef";
-  private static final String SAMPLEUNITTYPE = "sampleUnitType";
   private static final String FORMTYPE = "formType";
   private static final String CHECKLETTER = "checkletter";
   private static final String FROSIC92 = "frosic92";
@@ -64,7 +59,7 @@ public class CsvIngester extends CsvToBean<BusinessSampleUnit> {
   private static final String FORMTYPE2 = "formtype2";
   private static final String CURRENCY = "currency";
 
-  private static final String[] COLUMNS = new String[] {SURVEYREF, COLLECTIONEXERCISEREF, EFFECTIVESTARTDATETIME, EFFECTIVEENDDATETIME, SAMPLEUNITREF, SAMPLEUNITTYPE, FORMTYPE, CHECKLETTER, FROSIC92, RUSIC92, FROSIC2007, RUSIC2007,
+  private static final String[] COLUMNS = new String[] {SAMPLEUNITREF, FORMTYPE, CHECKLETTER, FROSIC92, RUSIC92, FROSIC2007, RUSIC2007,
       FROEMPMENT, FROTOVER, ENTREF, LEGALSTATUS, ENTREPMKR, REGION, BIRTHDATE, ENTNAME1, ENTNAME2, ENTNAME3,
       RUNAME1, RUNAME2, RUNAME3, TRADSTYLE1, TRADSTYLE2, TRADSTYLE3, SELTYPE, INCLEXCL, CELLNO, FORMTYPE2,
       CURRENCY};
@@ -94,23 +89,14 @@ public class CsvIngester extends CsvToBean<BusinessSampleUnit> {
   public SampleSummary ingest(MultipartFile file)
       throws Exception {
 
-    CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()));
+    CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()), ':');
     String[] nextLine;
     SampleSummary sampleSummary;
     BusinessSurveySample businessSurveySample = new BusinessSurveySample();
     List<BusinessSampleUnit> samplingUnitList = new ArrayList<>();
-    int lineNum = 0;
 
       while((nextLine = csvReader.readNext()) != null) {
 
-        if (lineNum == 1) {
-          businessSurveySample.setSurveyRef(nextLine[0]);
-          businessSurveySample.setCollectionExerciseRef(nextLine[1]);
-          businessSurveySample.setEffectiveStartDateTime(nextLine[2]);
-          businessSurveySample.setEffectiveEndDateTime(nextLine[3]);
-        }
-
-        if (lineNum++ > 0) {
           BusinessSampleUnit businessSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
           Optional<String> namesOfInvalidColumns = validateLine(businessSampleUnit);
           if (namesOfInvalidColumns.isPresent()) {
@@ -121,8 +107,6 @@ public class CsvIngester extends CsvToBean<BusinessSampleUnit> {
           }
 
           samplingUnitList.add(businessSampleUnit);
-
-        }
 
       }
 

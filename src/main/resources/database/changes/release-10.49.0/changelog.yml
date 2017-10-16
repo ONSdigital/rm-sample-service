@@ -18,3 +18,12 @@ databaseChangeLog:
             path: add_samplesummaryid_to_collectionexercisejob.sql
             relativeToChangelogFile: true
             splitStatements: false
+  - changeSet:
+      id: 10.49.0-3
+      author: Edward Stevens
+      changes:
+        - sqlFile:
+            comment: Remove samplesummary columns and add description column
+            path: remove_samplesummary_columns.sql
+            relativeToChangelogFile: true
+            splitStatements: false

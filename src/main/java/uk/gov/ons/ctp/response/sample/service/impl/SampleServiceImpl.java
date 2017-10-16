@@ -29,9 +29,7 @@ import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.SampleUnitBase;
 import validation.SurveyBase;
 
-import java.sql.Timestamp;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.UUID;
 
@@ -91,14 +89,6 @@ public class SampleServiceImpl implements SampleService {
 
   protected SampleSummary createSampleSummary(SurveyBase surveySample) throws ParseException {
     SampleSummary sampleSummary = new SampleSummary();
-
-    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-    Timestamp timestampEffectiveStartDateTime = new Timestamp(sdf.parse(surveySample.getEffectiveStartDateTime()).getTime());
-    Timestamp timestampEffectiveEndDateTime = new Timestamp(sdf.parse(surveySample.getEffectiveEndDateTime()).getTime());
-
-    sampleSummary.setEffectiveStartDateTime(timestampEffectiveStartDateTime);
-    sampleSummary.setEffectiveEndDateTime(timestampEffectiveEndDateTime);
-    sampleSummary.setSurveyRef(surveySample.getSurveyRef());
     sampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
     sampleSummary.setState(SampleSummaryDTO.SampleState.INIT);
 
@@ -194,8 +184,7 @@ public class SampleServiceImpl implements SampleService {
    * Find sampleUnits associated to SampleSummary surveyRef and
    * exerciseDateTime, initialises them and returns the number of sample units
    *
-   * @param surveyRef surveyRef to which SampleUnits are related
-   * @param exerciseDateTime exerciseDateTime to which SampleUnits are related
+   * @param sampleSummaryId Sample Summary ID to which SampleUnits are related
    * @return Integer Returns sampleUnitsTotal value
    */
   //TODO: Should we use JPA Batch save to increase performance/limit network traffic?

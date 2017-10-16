@@ -99,7 +99,7 @@ public class CsvIngesterTest {
 
   @Test
   public void testBlueSky() throws Exception {
-    csvIngester.ingest(getTestFile("business-survey-sample.csv"));
+    csvIngester.ingest(getTestFile("new-business-survey-sample.csv"));
     verify(sampleService, times(1)).processSampleSummary(any(BusinessSurveySample.class),
         anyListOf(BusinessSampleUnit.class));
   }

@@ -1,8 +1,14 @@
 package uk.gov.ons.ctp.response.sample.domain.model;
 
-import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import net.sourceforge.cobertura.CoverageIgnore;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,17 +18,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import net.sourceforge.cobertura.CoverageIgnore;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.UUID;
 
 /**
  * Domain model object.
@@ -50,15 +48,6 @@ public class SampleSummary implements Serializable {
   
   @Column(name = "id")
   private UUID id;
-
-  @Column(name = "surveyref")
-  private String surveyRef;
-
-  @Column(name = "effectivestartdatetime")
-  private Timestamp effectiveStartDateTime;
-
-  @Column(name = "effectiveenddatetime")
-  private Timestamp effectiveEndDateTime;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "statefk")
