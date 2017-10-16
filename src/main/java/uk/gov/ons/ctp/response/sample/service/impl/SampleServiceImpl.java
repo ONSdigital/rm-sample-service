@@ -175,8 +175,7 @@ public class SampleServiceImpl implements SampleService {
    */
   @Override
   public Integer initialiseCollectionExerciseJob(CollectionExerciseJob job) throws CTPException {
-    Integer sampleUnitsTotal = initialiseSampleUnitsForCollectionExcerciseCollection(job.getSurveyRef(),
-            job.getExerciseDateTime());
+    Integer sampleUnitsTotal = initialiseSampleUnitsForCollectionExcerciseCollection(job.getSampleSummaryId());
     if (sampleUnitsTotal != 0) {
       collectionExerciseJobService.storeCollectionExerciseJob(job);
     }
@@ -193,21 +192,20 @@ public class SampleServiceImpl implements SampleService {
    */
   //TODO: Should we use JPA Batch save to increase performance/limit network traffic?
   //or use an update query. Let Performance Testing prove this first.
-  public Integer initialiseSampleUnitsForCollectionExcerciseCollection(String surveyRef, Timestamp exerciseDateTime) {
-    List<SampleSummary> listOfSampleSummaries = sampleSummaryRepository
-        .findBySurveyRefAndEffectiveStartDateTimeAndState(surveyRef, exerciseDateTime,
-                SampleSummaryDTO.SampleState.ACTIVE);
+  public Integer initialiseSampleUnitsForCollectionExcerciseCollection(UUID sampleSummaryId) {
+    SampleSummary sampleSummary = sampleSummaryRepository.findById(sampleSummaryId);
 
     Integer sampleUnitsTotal = 0;
-    for (SampleSummary ss : listOfSampleSummaries) {
-      List<SampleUnit> sampleUnitList = sampleUnitRepository.findBySampleSummaryFK(ss.getSampleSummaryPK());
+    if(sampleSummary != null) {
+      List<SampleUnit> sampleUnitList = sampleUnitRepository.findBySampleSummaryFK(sampleSummary.getSampleSummaryPK());
       for (SampleUnit su : sampleUnitList) {
         su.setState(SampleUnitDTO.SampleUnitState.PERSISTED);
         sampleUnitRepository.saveAndFlush(su);
       }
       sampleUnitsTotal = sampleUnitsTotal + sampleUnitList.size();
     }
-    log.debug("sampleUnits found for surveyref : {} {}", surveyRef, sampleUnitsTotal);
+
+    log.debug("sampleUnits found for sampleSummaryID : {} {}", sampleSummaryId, sampleUnitsTotal);
     return sampleUnitsTotal;
   }
 

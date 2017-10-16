@@ -78,8 +78,8 @@ party-svc:
     scheme: http
     host: localhost
     port: 5062
-    username: dummy_user
-    password: dummy_password
+    username: admin
+    password: secret
 
 sftp:
   host: localhost

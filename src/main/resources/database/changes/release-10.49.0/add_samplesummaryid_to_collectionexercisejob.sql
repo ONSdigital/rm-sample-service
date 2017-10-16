@@ -1,0 +1,1 @@
+ALTER TABLE sample.collectionexercisejob ADD COLUMN samplesummaryid uuid;

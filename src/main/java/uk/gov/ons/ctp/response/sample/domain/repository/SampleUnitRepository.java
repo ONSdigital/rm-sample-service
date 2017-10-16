@@ -9,6 +9,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * JPA Data Repository needed to persist Survey Sample Units
@@ -41,6 +42,7 @@ public interface SampleUnitRepository extends JpaRepository<SampleUnit, Integer>
    * @param excludedCases Cases excluded
    * @return SampleUnit list of mathcing sample units or null if not found
    */
+  @Deprecated
   @Query(value = "SELECT su.* FROM sample.sampleunit su ,sample.samplesummary ss WHERE "
           + "su.samplesummaryfk = ss.samplesummarypk AND ss.effectivestartdatetime = :exercisedatetime "
           + "AND ss.statefk = :state AND su.statefk = 'PERSISTED' AND ss.surveyref = :surveyref AND "
@@ -51,6 +53,23 @@ public interface SampleUnitRepository extends JpaRepository<SampleUnit, Integer>
                                       @Param("state") String state,
                                       @Param("count") Integer count,
                                       @Param("excludedcases") List<Integer> excludedCases);
+
+  /**
+   * find list of samples by sampleSummaryFK, surveyref, exerciseDateTime, and state limited by count
+   * @param state state to search by
+   * @return SampleUnit list of mathcing sample units or null if not found
+   */
+  @Query(value = "SELECT su.* FROM sample.sampleunit su ,sample.samplesummary ss WHERE "
+      + "ss.samplesummarypk = su.samplesummaryfk "
+      + "AND ss.id = :samplesummary "
+      + "AND ss.statefk = :state "
+      + "AND su.statefk = 'PERSISTED' "
+      + "AND su.sampleunitpk NOT IN ( :excludedcases ) order by ss.ingestdatetime ASC limit :count  ;",
+      nativeQuery = true)
+  List<SampleUnit> getSampleUnits(@Param("samplesummary") UUID sampleSummaryFK,
+      @Param("state") String state,
+      @Param("count") Integer count,
+      @Param("excludedcases") List<Integer> excludedCases);
 
   /**
    * find SampleUnit by sampleUnitRef and sampleUnitType from Party object

@@ -4,3 +4,6 @@ curl http://localhost:8125/info -v -X GET
 
 curl -H "Accept: application/json" -H "Content-Type: application/json" http://localhost:8125/samples/sampleunitrequests -v -X POST -d "{\"collectionExerciseId\":\"14fb3e68-4dca-46db-bf49-04b84e07e77c\", \"surveyRef\":\"221\", \"exerciseDateTime\":\"2017-08-29T23:00:00.000+0000\"}"
 201 {"sampleUnitsTotal":0}
+
+
+curl -H "Accept: application/json" -H "Content-Type: application/json" http://localhost:8145/collectionexercises/link/14fb3e68-4dca-46db-bf49-04b84e07e77c -u admin:secret -X PUT -d "[\"38e7d6d8-21ee-4c43-a66b-6f376e0de654\"]"
