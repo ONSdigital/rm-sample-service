@@ -33,6 +33,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -64,6 +65,16 @@ public class SampleServiceImpl implements SampleService {
   @Autowired
   private CollectionExerciseJobService collectionExerciseJobService;
 
+  @Override
+  public List<SampleSummary> findAllSampleSummaries() {
+    return sampleSummaryRepository.findAll();
+  }
+
+  @Override
+  public SampleSummary findSampleSummary(UUID id) {
+    return sampleSummaryRepository.findById(id);
+  }
+
   @Autowired
   private CsvIngester csvIngester;
 
@@ -91,6 +102,7 @@ public class SampleServiceImpl implements SampleService {
     sampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
     sampleSummary.setState(SampleSummaryDTO.SampleState.INIT);
 
+    sampleSummary.setId(UUID.randomUUID());
     return sampleSummary;
   }
 
@@ -102,6 +114,7 @@ public class SampleServiceImpl implements SampleService {
       sampleUnit.setSampleUnitType(sampleUnitBase.getSampleUnitType());
       sampleUnit.setFormType(sampleUnitBase.getFormType());
       sampleUnit.setState(SampleUnitDTO.SampleUnitState.INIT);
+      sampleUnit.setId(UUID.randomUUID());
       sampleUnitRepository.save(sampleUnit);
     }
   }

@@ -4,17 +4,17 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>uk.gov.ons.ctp.product</groupId>
   <artifactId>samplesvc</artifactId>
-  <version>10.47.3-SNAPSHOT</version>
+  <version>10.49.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>CTP : SampleService</name>
   <description>CTP : SampleService</description>
 
-  <!-- Section below required to inherit plugins version & config -->
+  <!-- Inherit parent BOM to control versions of dependencies and plugin version & config -->
   <parent>
     <groupId>uk.gov.ons.ctp.product</groupId>
     <artifactId>rm-common-config</artifactId>
-    <version>10.45.3-SNAPSHOT</version>
+    <version>10.49.0-SNAPSHOT</version>
   </parent>
 
   <scm>
@@ -24,28 +24,15 @@
   </scm>
 
   <properties>
-    <commonbom.version>10.45.3-SNAPSHOT</commonbom.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>uk.gov.ons.ctp.product</groupId>
-        <artifactId>rm-common-config</artifactId>
-        <version>${commonbom.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <dependencies>
     <dependency>
       <groupId>uk.gov.ons.ctp.product</groupId>
       <artifactId>partysvc-api</artifactId>
-      <version>10.47.2</version>
+      <version>10.49.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -57,7 +44,7 @@
     <dependency>
       <groupId>uk.gov.ons.ctp.product</groupId>
       <artifactId>reportmodule</artifactId>
-      <version>10.45.2</version>
+      <version>10.49.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -190,6 +177,10 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-solr</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -250,27 +241,6 @@
       </resource>
     </resources>
   </build>
-
-  <profiles>
-    <profile>
-      <id>artifactory</id>
-      <distributionManagement>
-        <repository>
-          <id>central</id>
-          <name>libs-release</name>
-          <url>http://artifactory.rmdev.onsdigital.uk/artifactory/libs-release-local</url>
-        </repository>
-        <snapshotRepository>
-          <id>snapshots</id>
-          <name>libs-snapshots</name>
-          <url>http://artifactory.rmdev.onsdigital.uk/artifactory/libs-snapshot-local</url>
-        </snapshotRepository>
-      </distributionManagement>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-    </profile>
-  </profiles>
 
 </project>
 
