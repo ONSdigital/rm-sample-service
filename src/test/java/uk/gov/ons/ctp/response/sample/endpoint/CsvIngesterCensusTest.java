@@ -75,17 +75,17 @@ public class CsvIngesterCensusTest {
         anyListOf(CensusSampleUnit.class));
   }
 
-  @Test(expected = CTPException.class)
+  @Test(expected = Exception.class)
   public void missingColumns() throws Exception {
-    csvIngester.ingest(getTestFile("business-survey-sample-missing-columns.csv"));
+    csvIngester.ingest(getTestFile("census-survey-sample-missing-columns.csv"));
     verify(sampleService, times(0)).processSampleSummary(any(CensusSurveySample.class),
         anyListOf(CensusSampleUnit.class));
     thrown.expect(CTPException.class);
   }
 
-  @Test(expected = CTPException.class)
+  @Test(expected = Exception.class)
   public void incorrectData() throws Exception {
-    csvIngester.ingest(getTestFile("business-survey-sample-incorrect-data.csv"));
+    csvIngester.ingest(getTestFile("census-survey-sample-incorrect-data.csv"));
     verify(sampleService, times(0)).processSampleSummary(any(CensusSurveySample.class),
         anyListOf(CensusSampleUnit.class));
     thrown.expect(CTPException.class);
