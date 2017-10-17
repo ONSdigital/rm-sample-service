@@ -93,6 +93,11 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   public final @ResponseBody ResponseEntity<SampleSummary> uploadSampleFile(@PathVariable("type") final String type, @RequestParam("file") MultipartFile file) throws CTPException {
     log.debug("Entering Sample file upload for Type {}", type);
 
+    String contentType = file.getContentType();
+    if (!contentType.equals("text/csv")) {
+      throw new CTPException(CTPException.Fault.VALIDATION_FAILED, "Error ingesting file %s, incorrect file type: %s", file.getOriginalFilename(), contentType);
+    }
+
     SampleSummary sampleSummary;
     try {
       sampleSummary = sampleService.ingest(file);
