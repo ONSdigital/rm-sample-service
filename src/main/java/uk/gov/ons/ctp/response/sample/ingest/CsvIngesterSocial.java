@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.response.sample.endpoint;
+package uk.gov.ons.ctp.response.sample.ingest;
 
 import liquibase.util.csv.opencsv.CSVReader;
 import liquibase.util.csv.opencsv.bean.ColumnPositionMappingStrategy;
@@ -11,8 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
-import validation.BusinessSampleUnit;
-import validation.BusinessSurveySample;
+import validation.SocialSampleUnit;
+import validation.SocialSurveySample;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -28,9 +28,14 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class CsvIngester extends CsvToBean<BusinessSampleUnit> {
+public class CsvIngesterSocial extends CsvToBean<SocialSampleUnit> {
 
+  private static final String SURVEYREF = "surveyRef";
+  private static final String COLLECTIONEXERCISEREF = "collectionExerciseRef";
+  private static final String EFFECTIVESTARTDATETIME = "effectiveStartDateTime";
+  private static final String EFFECTIVEENDDATETIME = "effectiveEndDateTime";
   private static final String SAMPLEUNITREF = "sampleUnitRef";
+  private static final String SAMPLEUNITTYPE = "sampleUnitType";
   private static final String FORMTYPE = "formType";
   private static final String CHECKLETTER = "checkletter";
   private static final String FROSIC92 = "frosic92";
@@ -59,7 +64,7 @@ public class CsvIngester extends CsvToBean<BusinessSampleUnit> {
   private static final String FORMTYPE2 = "formtype2";
   private static final String CURRENCY = "currency";
 
-  private static final String[] COLUMNS = new String[] {SAMPLEUNITREF, FORMTYPE, CHECKLETTER, FROSIC92, RUSIC92, FROSIC2007, RUSIC2007,
+  private static final String[] COLUMNS = new String[] {SURVEYREF, COLLECTIONEXERCISEREF, EFFECTIVESTARTDATETIME, EFFECTIVEENDDATETIME, SAMPLEUNITREF, SAMPLEUNITTYPE, FORMTYPE, CHECKLETTER, FROSIC92, RUSIC92, FROSIC2007, RUSIC2007,
       FROEMPMENT, FROTOVER, ENTREF, LEGALSTATUS, ENTREPMKR, REGION, BIRTHDATE, ENTNAME1, ENTNAME2, ENTNAME3,
       RUNAME1, RUNAME2, RUNAME3, TRADSTYLE1, TRADSTYLE2, TRADSTYLE3, SELTYPE, INCLEXCL, CELLNO, FORMTYPE2,
       CURRENCY};
@@ -67,7 +72,7 @@ public class CsvIngester extends CsvToBean<BusinessSampleUnit> {
   @Autowired
   private SampleService sampleService;
 
-  private ColumnPositionMappingStrategy<BusinessSampleUnit> columnPositionMappingStrategy;
+  private ColumnPositionMappingStrategy<SocialSampleUnit> columnPositionMappingStrategy;
 
   /**
    * Lazy create a reusable validator
@@ -80,9 +85,9 @@ public class CsvIngester extends CsvToBean<BusinessSampleUnit> {
     return factory.getValidator();
   }
 
-  public CsvIngester() {
+  public CsvIngesterSocial() {
     columnPositionMappingStrategy = new ColumnPositionMappingStrategy<>();
-    columnPositionMappingStrategy.setType(BusinessSampleUnit.class);
+    columnPositionMappingStrategy.setType(SocialSampleUnit.class);
     columnPositionMappingStrategy.setColumnMapping(COLUMNS);
   }
 
@@ -92,12 +97,21 @@ public class CsvIngester extends CsvToBean<BusinessSampleUnit> {
     CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()), ':');
     String[] nextLine;
     SampleSummary sampleSummary;
-    BusinessSurveySample businessSurveySample = new BusinessSurveySample();
-    List<BusinessSampleUnit> samplingUnitList = new ArrayList<>();
+    SocialSurveySample businessSurveySample = new SocialSurveySample();
+    List<SocialSampleUnit> samplingUnitList = new ArrayList<>();
+    int lineNum = 0;
 
       while((nextLine = csvReader.readNext()) != null) {
 
-          BusinessSampleUnit businessSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
+        if (lineNum == 1) {
+          businessSurveySample.setSurveyRef(nextLine[0]);
+          businessSurveySample.setCollectionExerciseRef(nextLine[1]);
+          businessSurveySample.setEffectiveStartDateTime(nextLine[2]);
+          businessSurveySample.setEffectiveEndDateTime(nextLine[3]);
+        }
+
+        if (lineNum++ > 0) {
+          SocialSampleUnit businessSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
           Optional<String> namesOfInvalidColumns = validateLine(businessSampleUnit);
           if (namesOfInvalidColumns.isPresent()) {
             log.error("Problem parsing line {} due to {} - entire ingest aborted", Arrays.toString(nextLine),
@@ -107,6 +121,8 @@ public class CsvIngester extends CsvToBean<BusinessSampleUnit> {
           }
 
           samplingUnitList.add(businessSampleUnit);
+
+        }
 
       }
 
@@ -124,8 +140,8 @@ public class CsvIngester extends CsvToBean<BusinessSampleUnit> {
    * @param csvLine the line
    * @return the errored column names separated by '_'
    */
-  private Optional<String> validateLine(BusinessSampleUnit csvLine) {
-    Set<ConstraintViolation<BusinessSampleUnit>> violations = getValidator().validate(csvLine);
+  private Optional<String> validateLine(SocialSampleUnit csvLine) {
+    Set<ConstraintViolation<SocialSampleUnit>> violations = getValidator().validate(csvLine);
     String invalidColumns = violations.stream().map(v -> v.getPropertyPath().toString())
         .collect(Collectors.joining("_"));
     return (invalidColumns.length() == 0) ? Optional.empty() : Optional.ofNullable(invalidColumns);

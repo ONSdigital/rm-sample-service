@@ -9,11 +9,26 @@ import validation.SampleUnitBase;
 import validation.SurveyBase;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * The SampleService interface defines all business behaviours for operations on the Sample entity model.
  */
 public interface SampleService {
+
+  /**
+   * find all sampleSummaries
+   *
+   * @return list of SampleSummary
+   */
+  List<SampleSummary> findAllSampleSummaries();
+
+  /**
+   * find sampleSummary
+   *
+   * @return SampleSummary
+   */
+  SampleSummary findSampleSummary(UUID id);
 
   /**
    * Create and save a SampleSummary from the incoming SurveySample
@@ -59,9 +74,10 @@ public interface SampleService {
    * Ingest Survey Sample
    *
    * @param file Multipart File of SurveySample to be used
+   * @param type Type of Survey to be used
    * @throws Exception exception thrown
    */
-  SampleSummary ingest(MultipartFile file) throws Exception;
+  SampleSummary ingest(MultipartFile file, String type) throws Exception;
 
 
 }

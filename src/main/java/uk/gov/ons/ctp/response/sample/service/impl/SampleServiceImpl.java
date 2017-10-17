@@ -18,7 +18,9 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
-import uk.gov.ons.ctp.response.sample.endpoint.CsvIngester;
+import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
+import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterCensus;
+import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterSocial;
 import uk.gov.ons.ctp.response.sample.message.EventPublisher;
 import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
 import uk.gov.ons.ctp.response.sample.party.PartyUtil;
@@ -30,10 +32,9 @@ import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.SampleUnitBase;
 import validation.SurveyBase;
 
-import java.sql.Timestamp;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -66,7 +67,23 @@ public class SampleServiceImpl implements SampleService {
   private CollectionExerciseJobService collectionExerciseJobService;
 
   @Autowired
-  private CsvIngester csvIngester;
+  private CsvIngesterBusiness csvIngesterBusiness;
+
+  @Autowired
+  private CsvIngesterCensus csvIngesterCensus;
+
+  @Autowired
+  private CsvIngesterSocial csvIngesterSocial;
+
+  @Override
+  public List<SampleSummary> findAllSampleSummaries() {
+    return sampleSummaryRepository.findAll();
+  }
+
+  @Override
+  public SampleSummary findSampleSummary(UUID id) {
+    return sampleSummaryRepository.findById(id);
+  }
   
   @Autowired
   private EventPublisher eventPublisher;
@@ -84,17 +101,10 @@ public class SampleServiceImpl implements SampleService {
 
   protected SampleSummary createSampleSummary(SurveyBase surveySample) throws ParseException {
     SampleSummary sampleSummary = new SampleSummary();
-
-    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-    Timestamp timestampEffectiveStartDateTime = new Timestamp(sdf.parse(surveySample.getEffectiveStartDateTime()).getTime());
-    Timestamp timestampEffectiveEndDateTime = new Timestamp(sdf.parse(surveySample.getEffectiveEndDateTime()).getTime());
-
-    sampleSummary.setEffectiveStartDateTime(timestampEffectiveStartDateTime);
-    sampleSummary.setEffectiveEndDateTime(timestampEffectiveEndDateTime);
-    sampleSummary.setSurveyRef(surveySample.getSurveyRef());
     sampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
     sampleSummary.setState(SampleSummaryDTO.SampleState.INIT);
 
+    sampleSummary.setId(UUID.randomUUID());
     return sampleSummary;
   }
 
@@ -106,6 +116,7 @@ public class SampleServiceImpl implements SampleService {
       sampleUnit.setSampleUnitType(sampleUnitBase.getSampleUnitType());
       sampleUnit.setFormType(sampleUnitBase.getFormType());
       sampleUnit.setState(SampleUnitDTO.SampleUnitState.INIT);
+      sampleUnit.setId(UUID.randomUUID());
       eventPublisher.publishEvent("Sample Init");
       sampleUnitRepository.save(sampleUnit);
     }
@@ -175,8 +186,7 @@ public class SampleServiceImpl implements SampleService {
    */
   @Override
   public Integer initialiseCollectionExerciseJob(CollectionExerciseJob job) throws CTPException {
-    Integer sampleUnitsTotal = initialiseSampleUnitsForCollectionExcerciseCollection(job.getSurveyRef(),
-            job.getExerciseDateTime());
+    Integer sampleUnitsTotal = initialiseSampleUnitsForCollectionExcerciseCollection(job.getSampleSummaryId());
     if (sampleUnitsTotal != 0) {
       collectionExerciseJobService.storeCollectionExerciseJob(job);
     }
@@ -187,32 +197,45 @@ public class SampleServiceImpl implements SampleService {
    * Find sampleUnits associated to SampleSummary surveyRef and
    * exerciseDateTime, initialises them and returns the number of sample units
    *
-   * @param surveyRef surveyRef to which SampleUnits are related
-   * @param exerciseDateTime exerciseDateTime to which SampleUnits are related
+   * @param sampleSummaryId Sample Summary ID to which SampleUnits are related
    * @return Integer Returns sampleUnitsTotal value
    */
   //TODO: Should we use JPA Batch save to increase performance/limit network traffic?
   //or use an update query. Let Performance Testing prove this first.
-  public Integer initialiseSampleUnitsForCollectionExcerciseCollection(String surveyRef, Timestamp exerciseDateTime) {
-    List<SampleSummary> listOfSampleSummaries = sampleSummaryRepository
-        .findBySurveyRefAndEffectiveStartDateTimeAndState(surveyRef, exerciseDateTime,
-                SampleSummaryDTO.SampleState.ACTIVE);
+  public Integer initialiseSampleUnitsForCollectionExcerciseCollection(UUID sampleSummaryId) {
+    SampleSummary sampleSummary = sampleSummaryRepository.findById(sampleSummaryId);
 
     Integer sampleUnitsTotal = 0;
-    for (SampleSummary ss : listOfSampleSummaries) {
-      List<SampleUnit> sampleUnitList = sampleUnitRepository.findBySampleSummaryFK(ss.getSampleSummaryPK());
+    if(sampleSummary != null) {
+      List<SampleUnit> sampleUnitList = sampleUnitRepository.findBySampleSummaryFK(sampleSummary.getSampleSummaryPK());
       for (SampleUnit su : sampleUnitList) {
         su.setState(SampleUnitDTO.SampleUnitState.PERSISTED);
         sampleUnitRepository.saveAndFlush(su);
       }
       sampleUnitsTotal = sampleUnitsTotal + sampleUnitList.size();
     }
-    log.debug("sampleUnits found for surveyref : {} {}", surveyRef, sampleUnitsTotal);
+
+    log.debug("sampleUnits found for sampleSummaryID : {} {}", sampleSummaryId, sampleUnitsTotal);
     return sampleUnitsTotal;
   }
 
-  @Override public SampleSummary ingest(MultipartFile file) throws Exception {
-    return csvIngester.ingest(file);
+  @Override public SampleSummary ingest(MultipartFile file, String type) throws Exception {
+
+    SampleSummary sampleSummary = new SampleSummary();
+
+    switch (type) {
+    case "bres":
+      sampleSummary = csvIngesterBusiness.ingest(file);
+      break;
+    case "census":
+      sampleSummary = csvIngesterCensus.ingest(file);
+      break;
+    case "social":
+      sampleSummary = csvIngesterSocial.ingest(file);
+      break;
+    }
+
+    return sampleSummary;
   }
 
 }

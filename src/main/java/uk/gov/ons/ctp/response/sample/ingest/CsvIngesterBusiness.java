@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.response.sample.endpoint;
+package uk.gov.ons.ctp.response.sample.ingest;
 
 import liquibase.util.csv.opencsv.CSVReader;
 import liquibase.util.csv.opencsv.bean.ColumnPositionMappingStrategy;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class CsvIngester extends CsvToBean<BusinessSampleUnit> {
+public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
 
   private static final String SAMPLEUNITREF = "sampleUnitRef";
   private static final String FORMTYPE = "formType";
@@ -80,7 +80,7 @@ public class CsvIngester extends CsvToBean<BusinessSampleUnit> {
     return factory.getValidator();
   }
 
-  public CsvIngester() {
+  public CsvIngesterBusiness() {
     columnPositionMappingStrategy = new ColumnPositionMappingStrategy<>();
     columnPositionMappingStrategy.setType(BusinessSampleUnit.class);
     columnPositionMappingStrategy.setColumnMapping(COLUMNS);
@@ -97,16 +97,16 @@ public class CsvIngester extends CsvToBean<BusinessSampleUnit> {
 
       while((nextLine = csvReader.readNext()) != null) {
 
-          BusinessSampleUnit businessSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
-          Optional<String> namesOfInvalidColumns = validateLine(businessSampleUnit);
-          if (namesOfInvalidColumns.isPresent()) {
-            log.error("Problem parsing line {} due to {} - entire ingest aborted", Arrays.toString(nextLine),
-                namesOfInvalidColumns.get());
-            throw new CTPException(CTPException.Fault.VALIDATION_FAILED, String.format("Problem parsing line %s due to %s", Arrays.toString(nextLine),
-                namesOfInvalidColumns.get()));
-          }
+        BusinessSampleUnit businessSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
+        Optional<String> namesOfInvalidColumns = validateLine(businessSampleUnit);
+        if (namesOfInvalidColumns.isPresent()) {
+          log.error("Problem parsing line {} due to {} - entire ingest aborted", Arrays.toString(nextLine),
+              namesOfInvalidColumns.get());
+          throw new CTPException(CTPException.Fault.VALIDATION_FAILED, String.format("Problem parsing line %s due to %s", Arrays.toString(nextLine),
+              namesOfInvalidColumns.get()));
+        }
 
-          samplingUnitList.add(businessSampleUnit);
+        samplingUnitList.add(businessSampleUnit);
 
       }
 

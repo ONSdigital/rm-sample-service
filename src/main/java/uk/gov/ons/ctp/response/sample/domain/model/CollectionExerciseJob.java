@@ -56,4 +56,7 @@ public class CollectionExerciseJob implements Serializable {
   @Column(name = "createddatetime")
   private Timestamp createdDateTime;
 
+  @Column(name = "samplesummaryid")
+  private UUID sampleSummaryId;
+
 }

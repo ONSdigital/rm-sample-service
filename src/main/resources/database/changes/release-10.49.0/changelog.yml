@@ -1,0 +1,29 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 10.49.0-1
+      author: Sarah Radford
+      changes:
+        - sqlFile:
+            comment: Add uuids to sample tables
+            path: sample_add_uuids.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+  - changeSet:
+      id: 10.49.0-2
+      author: Kieran Wardle
+      changes:
+        - sqlFile:
+            comment: Add samplesummaryid column to collectionexercisejob table
+            path: add_samplesummaryid_to_collectionexercisejob.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+  - changeSet:
+      id: 10.49.0-3
+      author: Edward Stevens
+      changes:
+        - sqlFile:
+            comment: Remove samplesummary columns and add description column
+            path: remove_samplesummary_columns.sql
+            relativeToChangelogFile: true
+            splitStatements: false

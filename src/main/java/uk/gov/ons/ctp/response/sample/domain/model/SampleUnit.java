@@ -1,6 +1,7 @@
 package uk.gov.ons.ctp.response.sample.domain.model;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -45,6 +46,9 @@ public class SampleUnit implements Serializable {
   })
   @Column(name = "sampleunitpk")
   private Integer sampleUnitPK;
+  
+  @Column(name = "id")
+  private UUID id;
 
   @Column(name = "samplesummaryfk")
   private Integer sampleSummaryFK;
