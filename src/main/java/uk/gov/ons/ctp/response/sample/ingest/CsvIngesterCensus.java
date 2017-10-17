@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 @Service
 public class CsvIngesterCensus extends CsvToBean<CensusSampleUnit> {
 
+  private static final String SAMPLEUNITREF = "sampleUnitRef";
   private static final String FORMTYPE = "formType";
   private static final String LINE1 = "line1";
   private static final String LINE2 = "line2";
@@ -56,7 +57,7 @@ public class CsvIngesterCensus extends CsvToBean<CensusSampleUnit> {
   private static final String LSOA = "lsoa";
   private static final String CENSUSREGION = "censusRegion";
 
-  private static final String[] COLUMNS = new String[] {FORMTYPE, LINE1, LINE2, LINE3, LINE4, LINE5,
+  private static final String[] COLUMNS = new String[] {SAMPLEUNITREF, FORMTYPE, LINE1, LINE2, LINE3, LINE4, LINE5,
       POSTCODE, TITLE, FORENAME, SURNAME, PHONENUMBER, EMAILADDRESS, ADDRESSTYPE, ESTABTYPE, ORGANISATIONNAME, CATEGORY,
       LADCODE, LATITUDE, LONGITUDE, HTC, LOCALITY, OA, MSOA, LSOA, CENSUSREGION};
 
