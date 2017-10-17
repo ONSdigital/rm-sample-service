@@ -1,15 +1,15 @@
 package uk.gov.ons.ctp.response.sample.service;
 
 import org.springframework.web.multipart.MultipartFile;
-import java.util.List;
-import java.util.UUID;
-
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import validation.SampleUnitBase;
 import validation.SurveyBase;
+
+import java.util.List;
+import java.util.UUID;
 
 /**
  * The SampleService interface defines all business behaviours for operations on the Sample entity model.
@@ -74,9 +74,10 @@ public interface SampleService {
    * Ingest Survey Sample
    *
    * @param file Multipart File of SurveySample to be used
+   * @param type Type of Survey to be used
    * @throws Exception exception thrown
    */
-  SampleSummary ingest(MultipartFile file) throws Exception;
+  SampleSummary ingest(MultipartFile file, String type) throws Exception;
 
 
 }

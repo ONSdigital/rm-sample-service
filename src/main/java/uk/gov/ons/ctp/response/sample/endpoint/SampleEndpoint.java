@@ -100,7 +100,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
 
     SampleSummary sampleSummary;
     try {
-      sampleSummary = sampleService.ingest(file);
+      sampleSummary = sampleService.ingest(file, type.toLowerCase());
     } catch (Exception e) {
       throw new CTPException(CTPException.Fault.VALIDATION_FAILED, e, "Error ingesting file %s", file.getOriginalFilename());
     }

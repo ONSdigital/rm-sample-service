@@ -18,7 +18,9 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
-import uk.gov.ons.ctp.response.sample.endpoint.CsvIngester;
+import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
+import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterCensus;
+import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterSocial;
 import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
 import uk.gov.ons.ctp.response.sample.party.PartyUtil;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
@@ -63,6 +65,15 @@ public class SampleServiceImpl implements SampleService {
   @Autowired
   private CollectionExerciseJobService collectionExerciseJobService;
 
+  @Autowired
+  private CsvIngesterBusiness csvIngesterBusiness;
+
+  @Autowired
+  private CsvIngesterCensus csvIngesterCensus;
+
+  @Autowired
+  private CsvIngesterSocial csvIngesterSocial;
+
   @Override
   public List<SampleSummary> findAllSampleSummaries() {
     return sampleSummaryRepository.findAll();
@@ -72,9 +83,6 @@ public class SampleServiceImpl implements SampleService {
   public SampleSummary findSampleSummary(UUID id) {
     return sampleSummaryRepository.findById(id);
   }
-
-  @Autowired
-  private CsvIngester csvIngester;
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
@@ -206,8 +214,23 @@ public class SampleServiceImpl implements SampleService {
     return sampleUnitsTotal;
   }
 
-  @Override public SampleSummary ingest(MultipartFile file) throws Exception {
-    return csvIngester.ingest(file);
+  @Override public SampleSummary ingest(MultipartFile file, String type) throws Exception {
+
+    SampleSummary sampleSummary = new SampleSummary();
+
+    switch (type) {
+    case "bres":
+      sampleSummary = csvIngesterBusiness.ingest(file);
+      break;
+    case "census":
+      sampleSummary = csvIngesterCensus.ingest(file);
+      break;
+    case "social":
+      sampleSummary = csvIngesterSocial.ingest(file);
+      break;
+    }
+
+    return sampleSummary;
   }
 
 }
