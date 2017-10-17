@@ -18,6 +18,7 @@ import uk.gov.ons.ctp.common.rest.RestUtility;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
+import uk.gov.ons.ctp.response.sample.message.EventPublisher;
 import uk.gov.ons.ctp.response.sample.service.PartySvcClientService;
 
 import java.io.IOException;
@@ -38,6 +39,9 @@ public class PartySvcClientServiceImpl implements PartySvcClientService {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private EventPublisher eventPublisher;
 
     @Retryable(value = {RestClientException.class}, maxAttemptsExpression = "#{${retries.maxAttempts}}",
         backoff = @Backoff(delayExpression = "#{${retries.backoff}}"))
@@ -63,7 +67,9 @@ public class PartySvcClientServiceImpl implements PartySvcClientService {
             }
         }
         log.debug("PARTY GOTTEN: {}", party);
+        eventPublisher.publishEvent("Sample PERSISTED");
         return party;
+        
     }
 }
 

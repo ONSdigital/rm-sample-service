@@ -19,6 +19,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.endpoint.CsvIngester;
+import uk.gov.ons.ctp.response.sample.message.EventPublisher;
 import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
 import uk.gov.ons.ctp.response.sample.party.PartyUtil;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
@@ -66,6 +67,9 @@ public class SampleServiceImpl implements SampleService {
 
   @Autowired
   private CsvIngester csvIngester;
+  
+  @Autowired
+  private EventPublisher eventPublisher;
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
@@ -102,6 +106,7 @@ public class SampleServiceImpl implements SampleService {
       sampleUnit.setSampleUnitType(sampleUnitBase.getSampleUnitType());
       sampleUnit.setFormType(sampleUnitBase.getFormType());
       sampleUnit.setState(SampleUnitDTO.SampleUnitState.INIT);
+      eventPublisher.publishEvent("Sample Init");
       sampleUnitRepository.save(sampleUnit);
     }
   }
