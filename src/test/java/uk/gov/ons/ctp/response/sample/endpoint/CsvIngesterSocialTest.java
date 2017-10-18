@@ -13,10 +13,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.mock.web.MockMultipartFile;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
-import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterCensus;
+import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterSocial;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
-import validation.CensusSampleUnit;
-import validation.CensusSurveySample;
+import validation.SocialSampleUnit;
+import validation.SocialSurveySample;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,13 +31,13 @@ import static org.mockito.Mockito.verify;
  * Test the CsvIngester distributor
  */
 @RunWith(MockitoJUnitRunner.class)
-public class CsvIngesterCensusTest {
+public class CsvIngesterSocialTest {
 
   @Spy
   private AppConfig appConfig = new AppConfig();
 
   @InjectMocks
-  private CsvIngesterCensus csvIngester;
+  private CsvIngesterSocial csvIngester;
 
   @InjectMocks
   private SampleEndpoint sampleEndpoint;
@@ -70,24 +70,16 @@ public class CsvIngesterCensusTest {
 
   @Test
   public void testBlueSky() throws Exception {
-    csvIngester.ingest(getTestFile("census-survey-sample.csv"));
-    verify(sampleService, times(1)).processSampleSummary(any(CensusSurveySample.class),
-        anyListOf(CensusSampleUnit.class));
+    csvIngester.ingest(getTestFile("social-survey-sample.csv"));
+    verify(sampleService, times(1)).processSampleSummary(any(SocialSurveySample.class),
+        anyListOf(SocialSampleUnit.class));
   }
 
-  @Test(expected = Exception.class)
+  @Test(expected = CTPException.class)
   public void missingColumns() throws Exception {
-    csvIngester.ingest(getTestFile("census-survey-sample-missing-columns.csv"));
-    verify(sampleService, times(0)).processSampleSummary(any(CensusSurveySample.class),
-        anyListOf(CensusSampleUnit.class));
-    thrown.expect(CTPException.class);
-  }
-
-  @Test(expected = Exception.class)
-  public void incorrectData() throws Exception {
-    csvIngester.ingest(getTestFile("census-survey-sample-incorrect-data.csv"));
-    verify(sampleService, times(0)).processSampleSummary(any(CensusSurveySample.class),
-        anyListOf(CensusSampleUnit.class));
+    csvIngester.ingest(getTestFile("social-survey-sample-missing-columns.csv"));
+    verify(sampleService, times(0)).processSampleSummary(any(SocialSurveySample.class),
+        anyListOf(SocialSampleUnit.class));
     thrown.expect(CTPException.class);
   }
 

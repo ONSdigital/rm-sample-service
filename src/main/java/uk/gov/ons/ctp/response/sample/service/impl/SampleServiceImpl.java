@@ -113,6 +113,7 @@ public class SampleServiceImpl implements SampleService {
       SampleUnit sampleUnit = new SampleUnit();
       sampleUnit.setSampleSummaryFK(sampleSummary.getSampleSummaryPK());
       sampleUnit.setSampleUnitRef(sampleUnitBase.getSampleUnitRef());
+      //TODO: sampleUnitType is currently not set during ingest. Where else can this be set?
       sampleUnit.setSampleUnitType(sampleUnitBase.getSampleUnitType());
       sampleUnit.setFormType(sampleUnitBase.getFormType());
       sampleUnit.setState(SampleUnitDTO.SampleUnitState.INIT);

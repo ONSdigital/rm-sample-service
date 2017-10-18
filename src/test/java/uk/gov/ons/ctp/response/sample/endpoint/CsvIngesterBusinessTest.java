@@ -31,7 +31,7 @@ import static org.mockito.Mockito.verify;
  * Test the CsvIngester distributor
  */
 @RunWith(MockitoJUnitRunner.class)
-public class CsvIngesterTest {
+public class CsvIngesterBusinessTest {
 
   @Spy
   private AppConfig appConfig = new AppConfig();
@@ -100,22 +100,21 @@ public class CsvIngesterTest {
 
   @Test
   public void testBlueSky() throws Exception {
-    csvIngester.ingest(getTestFile("new-business-survey-sample.csv"));
+    csvIngester.ingest(getTestFile("business-survey-sample.csv"));
     verify(sampleService, times(1)).processSampleSummary(any(BusinessSurveySample.class),
+        anyListOf(BusinessSampleUnit.class));
+  }
+
+  @Test(expected = CTPException.class)
+  public void testDate() throws Exception {
+    csvIngester.ingest(getTestFile("business-survey-sample-date.csv"));
+    verify(sampleService, times(0)).processSampleSummary(any(BusinessSurveySample.class),
         anyListOf(BusinessSampleUnit.class));
   }
 
   @Test(expected = CTPException.class)
   public void missingColumns() throws Exception {
     csvIngester.ingest(getTestFile("business-survey-sample-missing-columns.csv"));
-    verify(sampleService, times(0)).processSampleSummary(any(BusinessSurveySample.class),
-        anyListOf(BusinessSampleUnit.class));
-    thrown.expect(CTPException.class);
-  }
-
-  @Test(expected = CTPException.class)
-  public void incorrectData() throws Exception {
-    csvIngester.ingest(getTestFile("business-survey-sample-incorrect-data.csv"));
     verify(sampleService, times(0)).processSampleSummary(any(BusinessSurveySample.class),
         anyListOf(BusinessSampleUnit.class));
     thrown.expect(CTPException.class);
