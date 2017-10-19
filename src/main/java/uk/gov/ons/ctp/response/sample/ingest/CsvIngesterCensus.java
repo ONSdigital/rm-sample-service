@@ -103,6 +103,8 @@ public class CsvIngesterCensus extends CsvToBean<CensusSampleUnit> {
                 namesOfInvalidColumns.get()));
           }
 
+          censusSampleUnit.setSampleUnitType("H");
+          
           samplingUnitList.add(censusSampleUnit);
 
       }

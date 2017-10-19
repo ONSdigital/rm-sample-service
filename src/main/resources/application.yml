@@ -76,10 +76,10 @@ party-svc:
   post-party-path: /party-api/v1/parties
   connection-config:
     scheme: http
-    host: ras-party-service-demo.apps.devtest.onsclofo.uk
-    port: 80
-    username: sdc.demo
-    password: infant.learn.notify.jupiter.rays.bern
+    host: 
+    port: 
+    username: 
+    password: 
 
 sftp:
   host: localhost

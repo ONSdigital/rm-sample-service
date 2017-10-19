@@ -76,7 +76,7 @@ public class CsvIngesterSocial extends CsvToBean<SocialSampleUnit> {
             throw new CTPException(CTPException.Fault.VALIDATION_FAILED, String.format("Problem parsing line %s due to %s", Arrays.toString(nextLine),
                 namesOfInvalidColumns.get()));
           }
-
+          
           samplingUnitList.add(businessSampleUnit);
 
       }

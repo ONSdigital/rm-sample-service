@@ -105,6 +105,7 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
           throw new CTPException(CTPException.Fault.VALIDATION_FAILED, String.format("Problem parsing line %s due to %s", Arrays.toString(nextLine),
               namesOfInvalidColumns.get()));
         }
+        businessSampleUnit.setSampleUnitType("B");
 
         samplingUnitList.add(businessSampleUnit);
 
