@@ -76,10 +76,10 @@ party-svc:
   post-party-path: /party-api/v1/parties
   connection-config:
     scheme: http
-    host: 
-    port: 
-    username: 
-    password: 
+    host: ras-party-service-sit.apps.devtest.onsclofo.uk
+    port: 80
+    username: admin
+    password: secret
 
 sftp:
   host: localhost
