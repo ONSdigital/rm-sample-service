@@ -29,11 +29,14 @@ import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.service.CollectionExerciseJobService;
 import uk.gov.ons.ctp.response.sample.service.PartySvcClientService;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
+import validation.BusinessSampleUnit;
 import validation.SampleUnitBase;
 import validation.SurveyBase;
 
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -94,8 +97,8 @@ public class SampleServiceImpl implements SampleService {
           throws Exception {
     SampleSummary sampleSummary = createSampleSummary(surveySample);
     SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
-    saveSampleUnits(samplingUnitList, savedSampleSummary);
-    publishToPartyQueue(samplingUnitList);
+    Map<String, UUID> sampleUnitIds = saveSampleUnits(samplingUnitList, savedSampleSummary);
+    publishToPartyQueue(samplingUnitList, sampleUnitIds);
     return savedSampleSummary;
   }
 
@@ -108,28 +111,32 @@ public class SampleServiceImpl implements SampleService {
     return sampleSummary;
   }
 
-  private void saveSampleUnits(List<? extends SampleUnitBase> samplingUnitList, SampleSummary sampleSummary) {
+  private Map<String, UUID> saveSampleUnits(List<? extends SampleUnitBase> samplingUnitList, SampleSummary sampleSummary) {
+    Map<String, UUID> ids = new HashMap<>();
     for (SampleUnitBase sampleUnitBase : samplingUnitList) {
       SampleUnit sampleUnit = new SampleUnit();
       sampleUnit.setSampleSummaryFK(sampleSummary.getSampleSummaryPK());
       sampleUnit.setSampleUnitRef(sampleUnitBase.getSampleUnitRef());
-      //TODO: sampleUnitType is currently not set during ingest. Where else can this be set?
       sampleUnit.setSampleUnitType(sampleUnitBase.getSampleUnitType());
       sampleUnit.setFormType(sampleUnitBase.getFormType());
       sampleUnit.setState(SampleUnitDTO.SampleUnitState.INIT);
       sampleUnit.setId(UUID.randomUUID());
+      ids.put(sampleUnit.getSampleUnitRef(), sampleUnit.getId());
       eventPublisher.publishEvent("Sample Init");
       sampleUnitRepository.save(sampleUnit);
     }
+    return ids;
   }
 
   /**
    * create sampleUnits, save them to the Database and post to internal queue
+   * @param sampleUnitIds 
    * @throws Exception 
    * */
-  private void publishToPartyQueue(List<? extends SampleUnitBase> samplingUnitList) throws Exception {
+  private void publishToPartyQueue(List<? extends SampleUnitBase> samplingUnitList, Map<String, UUID> sampleUnitIds) throws Exception {
     for (SampleUnitBase sampleUnitBase : samplingUnitList) {
           PartyCreationRequestDTO party = PartyUtil.convertToParty(sampleUnitBase);
+          party.getAttributes().setSampleUnitId(sampleUnitIds.get(sampleUnitBase.getSampleUnitRef()).toString());
           partyPublisher.publish(party);
     }
   }
@@ -156,8 +163,7 @@ public class SampleServiceImpl implements SampleService {
     PartyDTO returnedParty = partySvcClient.postParty(partyCreationRequest);
     log.info("Returned party is {}", returnedParty);
 
-    SampleUnit sampleUnit = sampleUnitRepository.findBySampleUnitRefAndType(partyCreationRequest.getSampleUnitRef(),
-        partyCreationRequest.getSampleUnitType());
+    SampleUnit sampleUnit = sampleUnitRepository.findById(UUID.fromString(partyCreationRequest.getAttributes().getSampleUnitId()));
     changeSampleUnitState(sampleUnit);
     sampleSummaryStateCheck(sampleUnit);
   }
@@ -237,6 +243,12 @@ public class SampleServiceImpl implements SampleService {
     }
 
     return sampleSummary;
+  }
+
+  @Override
+  public SampleUnit findSampleUnit(UUID id) {
+    SampleUnit sampleUnit = sampleUnitRepository.findById(id);
+    return sampleUnit;
   }
 
 }

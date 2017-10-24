@@ -21,8 +21,10 @@ import uk.gov.ons.ctp.common.error.InvalidRequestException;
 import uk.gov.ons.ctp.common.time.DateTimeUtil;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
+import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.BusinessSampleUnit;
@@ -140,4 +142,17 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     return ResponseEntity.ok(result);
 
   }
+  
+  @RequestMapping(value = "{id}", method = RequestMethod.GET)
+  public ResponseEntity<SampleUnitDTO> requestSampleUnit(@PathVariable("id") final UUID sampleUnitId) throws CTPException {
+    SampleUnit sampleUnit = sampleService.findSampleUnit(sampleUnitId);
+    if (sampleUnit == null) {
+      throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND,
+          String.format("Sample Unit not found for sampleUnitId %s", sampleUnitId));
+    }
+    SampleUnitDTO result = mapperFacade.map(sampleUnit, SampleUnitDTO.class);
+
+    return ResponseEntity.ok(result);
+  }
+
 }

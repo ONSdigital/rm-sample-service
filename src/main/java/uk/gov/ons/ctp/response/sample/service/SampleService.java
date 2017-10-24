@@ -5,6 +5,7 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
+import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import validation.SampleUnitBase;
 import validation.SurveyBase;
 
@@ -79,5 +80,10 @@ public interface SampleService {
    */
   SampleSummary ingest(MultipartFile file, String type) throws Exception;
 
-
+  /**
+   * find sampleUnit
+   *
+   * @return SampleUnit
+   */
+  SampleUnit findSampleUnit(UUID id);
 }

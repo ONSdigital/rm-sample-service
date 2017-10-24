@@ -76,8 +76,8 @@ party-svc:
   post-party-path: /party-api/v1/parties
   connection-config:
     scheme: http
-    host: ras-party-service-sit.apps.devtest.onsclofo.uk
-    port: 80
+    host: localhost
+    port: 5062
     username: admin
     password: secret
 

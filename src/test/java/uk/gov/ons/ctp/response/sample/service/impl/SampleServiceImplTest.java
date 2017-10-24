@@ -57,6 +57,8 @@ public class SampleServiceImplTest {
   private static final String SAMPLEUNITREF = "222";
 
   private static final String SURVEYREF = "ref";
+  
+  private static final String SAMPLEUNIT_ID = "4ef7326b-4143-43f7-ba67-65056d4e20b8";
 
   @Mock
   private SampleSummaryRepository sampleSummaryRepository;
@@ -154,7 +156,7 @@ public class SampleServiceImplTest {
   @Test
   public void postPartyDTOToPartyServiceAndUpdateStatesTest() throws Exception {
     when(partySvcClient.postParty(any())).thenReturn(partyDTO.get(0));
-    when(sampleUnitRepository.findBySampleUnitRefAndType(SAMPLEUNITREF, SAMPLEUNITTYPE)).thenReturn(sampleUnit.get(0));
+    when(sampleUnitRepository.findById(UUID.fromString(SAMPLEUNIT_ID))).thenReturn(sampleUnit.get(0));
     when(sampleSvcUnitStateTransitionManager.transition(SampleUnitState.INIT, SampleUnitEvent.PERSISTING))
         .thenReturn(SampleUnitState.PERSISTED);
     when(sampleSummaryRepository.findOne(1)).thenReturn(sampleSummaryList.get(0));
@@ -177,7 +179,7 @@ public class SampleServiceImplTest {
   @Test
   public void sendToPartyServiceTestNotAllSampleUnitsPosted() throws Exception {
     when(partySvcClient.postParty(any())).thenReturn(partyDTO.get(0));
-    when(sampleUnitRepository.findBySampleUnitRefAndType(SAMPLEUNITREF, SAMPLEUNITTYPE)).thenReturn(sampleUnit.get(0));
+    when(sampleUnitRepository.findById(UUID.fromString(SAMPLEUNIT_ID))).thenReturn(sampleUnit.get(0));
     when(sampleSvcUnitStateTransitionManager.transition(SampleUnitState.INIT, SampleUnitEvent.PERSISTING))
         .thenReturn(SampleUnitState.PERSISTED);
     when(sampleSummaryRepository.findOne(1)).thenReturn(sampleSummaryList.get(0));

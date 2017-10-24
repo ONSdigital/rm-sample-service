@@ -3,6 +3,7 @@
 		"sampleUnitType":"H",
 		"sampleUnitRef": "222",
 		"attributes": {
+			"sampleUnitId": "4ef7326b-4143-43f7-ba67-65056d4e20b8",
 			"region": "bob",
 			"entname1": "hhh",
 			"entname2": "hhhhh"

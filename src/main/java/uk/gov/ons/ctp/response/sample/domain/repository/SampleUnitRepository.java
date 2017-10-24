@@ -102,4 +102,5 @@ public interface SampleUnitRepository extends JpaRepository<SampleUnit, Integer>
           nativeQuery = true)
   int getTotalForSampleSummary(@Param("samplesummaryfk") int sampleSummaryFK);
 
+  SampleUnit findById(UUID id);
 }
