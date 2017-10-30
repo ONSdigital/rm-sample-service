@@ -1,21 +1,17 @@
 @startuml
 actor user
 user -> IDBR: export sample
-user -> user: load into provided spreadsheet\n and export sample xml
-user -> sftp: upload sample XML
-loop poll for new sample files
-  Sample --> Redis: get list of processed sample files
-  Sample --> sftp: Download new sample XML
-  Sample --> Redis: write downloaded file name/timestamp
-end
-
-Sample -> Sample: validate sample against XSD
+user -> ResponseOpsUI: upload sample CSV
+ResponseOpsUI -> Sample:POST CSV
+Sample -> Sample: validate sample against ruleset
 Sample -> Sample: unmarshal to object tree (sample type specific)
 Sample -> DB: persist sample
 loop for each sample unit
   Sample -> RabbitMQ: enqueue
-  Sample -> PartyAPI: POST Sample Unit
+  Party -> RabbitMQ: Read Sample Unit
+  Party -> DB: Process and Store
+  Party -> RabbitMQ: enqueue recept (SampleUnitUUID)
+  Sample -> update Sample Unit to DELIVERED
 end
 Sample -> DB: update Sample Summary state to ACTIVE
-Sample -> sftp: Rename Sample XML file to *.processed
 @enduml
