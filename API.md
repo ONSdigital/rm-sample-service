@@ -42,7 +42,7 @@ An `HTTP 201 Created` status code is returned if the sample unit request creatio
 ## Upload Sample File
 * `POST /{type}/fileupload` uploads a sample csv file.
 
-**Required parameters:** `type` as the survey type of the sample csv.
+**Required parameters:** `type` as the survey type of the sample csv, `file` colon-delimited csv sample file.
 
 ### Example JSON Response
 ```json
@@ -55,3 +55,38 @@ An `HTTP 201 Created` status code is returned if the sample unit request creatio
 ```
 
 A `HTTP 201 Created` status code is returned if the sample csv is successfully uploaded. A `HTTP 400 Bad Request` is returned if there are any errors with validation of the csv.
+
+## Find Sample Summaries
+* `GET /samplesummaries` get list of all existing Sample Summaries
+
+### Example JSON Response
+```json
+[
+  {
+    "id": "d7d13200-34a1-4a66-9f3b-ea0af4bc023d",
+    "effectiveStartDateTime": null,
+    "effectiveEndDateTime": null,
+    "surveyRef": null,
+    "ingestDateTime": "2017-11-06T14:02:24.203+0000",
+    "state": "INIT"
+  }
+]
+```
+
+## Find Sample Summary by Id
+* `GET /samplesummaries/{sampleSummaryId}` get Sample Summary by Id
+
+**Required parameters:** `sampleSummaryId` as the id of the sample summary
+
+### Example JSON Response
+```json
+{
+  "id": "d7d13200-34a1-4a66-9f3b-ea0af4bc023d",
+  "effectiveStartDateTime": null,
+  "effectiveEndDateTime": null,
+  "surveyRef": null,
+  "ingestDateTime": "2017-11-06T14:02:24.203+0000",
+  "state": "INIT"
+}
+```
+
