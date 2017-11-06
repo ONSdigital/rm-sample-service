@@ -38,3 +38,20 @@ This page documents the Sample service API endpoints. Apart from the Service Inf
 ```
 
 An `HTTP 201 Created` status code is returned if the sample unit request creation was a success. An `HTTP 400 Bad Request` is returned if any of the required parameters are missing, or if a sample unit request already exists for the same criteria.
+
+## Upload Sample File
+* `POST /{type}/fileupload` uploads a sample csv file.
+
+**Required parameters:** `type` as the survey type of the sample csv.
+
+### Example JSON Response
+```json
+{
+  "sampleSummaryPK": 1,
+  "id": "d7d13200-34a1-4a66-9f3b-ea0af4bc023d",
+  "state": "INIT",
+  "ingestDateTime": "2017-11-06T14:02:24.203+0000"
+}
+```
+
+A `HTTP 201 Created` status code is returned if the sample csv is successfully uploaded. A `HTTP 400 Bad Request` is returned if there are any errors with validation of the csv.
