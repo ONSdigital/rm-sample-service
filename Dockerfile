@@ -1,7 +1,6 @@
-FROM openjdk:8u121-jre
-MAINTAINER Kieran Wardle <kieran.wardle@ons.gov.uk>
-ARG jar
+FROM openjdk:8-jre
+
 VOLUME /tmp
-COPY $jar samplesvc.jar
-ENV JAVA_OPTS=""
-ENTRYPOINT [ "sh", "-c", "java -jar /samplesvc.jar" ]
+COPY target/samplesvc*.jar /opt/samplesvc.jar
+
+ENTRYPOINT [ "java", "-jar", "/opt/samplesvc.jar" ]
