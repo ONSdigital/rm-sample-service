@@ -3,5 +3,11 @@ jdk: openjdk8
 
 before_install: "cp .travis.settings.xml $HOME/.m2/settings.xml"
 
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+    docker login -u "$DOCKER_SDCPLATFORM_USERNAME" -p "$DOCKER_SDCPLATFORM_PASSWORD";
+    docker push sdcplatform/samplesvc;
+    fi
+
 notifications:
   slack: surveydatacollection:da6uVlmyrFhqINdm25bkLDiu
