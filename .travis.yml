@@ -15,6 +15,8 @@ after_success:
     fi
 
 notifications:
-  slack: surveydatacollection:da6uVlmyrFhqINdm25bkLDiu
+  slack:
+    rooms:
+      - surveydatacollection:da6uVlmyrFhqINdm25bkLDiu
     on_failure: always
     on_success: change
