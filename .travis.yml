@@ -9,9 +9,9 @@ jdk: openjdk8
 before_install: "cp .travis.settings.xml $HOME/.m2/settings.xml"
 
 after_success:
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then
-    docker login -u "$DOCKER_SDCPLATFORM_USERNAME" -p "$DOCKER_SDCPLATFORM_PASSWORD";
-    docker push sdcplatform/samplesvc;
+  - if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+    docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
+    docker push sdcplatform/actionexportersvc;
     fi
 
 notifications:
@@ -19,4 +19,12 @@ notifications:
     rooms:
       - surveydatacollection:da6uVlmyrFhqINdm25bkLDiu
     on_failure: always
-    on_success: change
+    on_success: never
+
+cache:
+  directories:
+  - $HOME/.m2
+
+branches:
+    only:
+        - master
