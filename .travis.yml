@@ -1,0 +1,30 @@
+sudo: required
+
+services:
+  - docker
+
+language: java
+jdk: openjdk8
+
+before_install: cp .travis.settings.xml $HOME/.m2/settings.xml
+
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+    docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
+    docker push sdcplatform/samplesvc;
+    fi
+
+notifications:
+  slack:
+    rooms:
+      secure: V+Uvej5O5wvnrDwpD41Dj4f/EGUlVqHX3UaW99njf//gl8yCezXcnHS0G8Wkdhi2SE2ss0I2TwQpDkQzCVtR5/RL+J8oXpyOJFFiZnhCworNHQniwMigHY5eoSIQCwiKe6wJeccsdQB67XPlhI4Q0tWgh/sDvwOs3X8sptvHpTdtBBs8oVkpqMYIg/PDPTrYpbPDxiUB0eGws41eTplR7H08Lp9Gzz1rEMak4zHCuae4idJWTpcUga/LnreKpisBHnvNA7Iadyv6LRP2AP5O7gZaL27f1KL5kewk0KZndJ1qyTZv4r5CyI20V1C7ja4wV7zm11s7MFxmGHidYtKUsMx5G53kjZNsoYMgFjnbmt1LfOFiMh8Me7WN7TsmiKePGHrCDf9LQTFhzgE5OFx8dzPKMrikKlzZ0eoVKPPbKm4/WQLErBeb9MkITEsYy5ATw/Mpx2eCIuQdM+E91nz8HYVJn1Pud/duIMlQOiQKVTgvz0c2LDLCaIEK7/dzwNsVvE7IEaXOzz7BQ2P3583CP0PV9SqrnaOswcIR1QJ6w4SeIJ1FvmaFhOE/ClaUnHdq0J4KY2/HXELSSa9HlV3l73d+XY3TP9m6vjEYz+esp8zevA33CUn8D6hl7+/ds7OdxLP9AiXrTHcP1vu/bAcEBEHgqz2YRjteOdCvVtT5MLU=
+    on_failure: always
+    on_success: never
+
+cache:
+  directories:
+  - "$HOME/.m2"
+
+branches:
+  only:
+  - master
