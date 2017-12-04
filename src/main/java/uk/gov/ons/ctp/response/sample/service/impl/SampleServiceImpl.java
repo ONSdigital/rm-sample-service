@@ -98,7 +98,7 @@ public class SampleServiceImpl implements SampleService {
     SampleSummary sampleSummary = createSampleSummary(surveySample);
     SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
     Map<String, UUID> sampleUnitIds = saveSampleUnits(samplingUnitList, savedSampleSummary);
-    publishToPartyQueue(samplingUnitList, sampleUnitIds);
+    publishToPartyQueue(samplingUnitList, sampleUnitIds, sampleSummary.getId().toString());
     return savedSampleSummary;
   }
 
@@ -133,10 +133,11 @@ public class SampleServiceImpl implements SampleService {
    * @param sampleUnitIds 
    * @throws Exception 
    * */
-  private void publishToPartyQueue(List<? extends SampleUnitBase> samplingUnitList, Map<String, UUID> sampleUnitIds) throws Exception {
+  private void publishToPartyQueue(List<? extends SampleUnitBase> samplingUnitList, Map<String, UUID> sampleUnitIds, String sampleSummaryId) throws Exception {
     for (SampleUnitBase sampleUnitBase : samplingUnitList) {
           PartyCreationRequestDTO party = PartyUtil.convertToParty(sampleUnitBase);
           party.getAttributes().setSampleUnitId(sampleUnitIds.get(sampleUnitBase.getSampleUnitRef()).toString());
+          party.setSampleSummaryId(sampleSummaryId);
           partyPublisher.publish(party);
     }
   }

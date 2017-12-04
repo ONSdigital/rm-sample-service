@@ -1,10 +1,6 @@
 package uk.gov.ons.ctp.response.sample.domain.model;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import net.sourceforge.cobertura.CoverageIgnore;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -47,6 +43,7 @@ public class SampleSummary implements Serializable {
   private Integer sampleSummaryPK;
   
   @Column(name = "id")
+  @Getter
   private UUID id;
 
   @Enumerated(EnumType.STRING)
