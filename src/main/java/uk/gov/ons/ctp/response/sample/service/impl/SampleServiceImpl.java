@@ -159,14 +159,13 @@ public class SampleServiceImpl implements SampleService {
     return targetSampleSummary;
   }
 
-  public void sendToPartyService(PartyCreationRequestDTO partyCreationRequest) throws Exception {
-    log.debug("Send to party svc");
+  @Override
+  public PartyDTO sendToPartyService(PartyCreationRequestDTO partyCreationRequest) throws Exception {
     PartyDTO returnedParty = partySvcClient.postParty(partyCreationRequest);
-    log.info("Returned party is {}", returnedParty);
-
     SampleUnit sampleUnit = sampleUnitRepository.findById(UUID.fromString(partyCreationRequest.getAttributes().getSampleUnitId()));
     changeSampleUnitState(sampleUnit);
     sampleSummaryStateCheck(sampleUnit);
+    return returnedParty;
   }
 
   private void changeSampleUnitState(SampleUnit sampleUnit) throws CTPException {

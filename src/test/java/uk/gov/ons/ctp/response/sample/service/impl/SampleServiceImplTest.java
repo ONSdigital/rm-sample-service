@@ -33,9 +33,7 @@ import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
@@ -163,8 +161,8 @@ public class SampleServiceImplTest {
     when(sampleSvcStateTransitionManager.transition(SampleState.INIT, SampleEvent.ACTIVATED))
         .thenReturn(SampleState.ACTIVE);
 
-    sampleServiceImpl.sendToPartyService(party.get(0));
-
+    PartyDTO testParty = sampleServiceImpl.sendToPartyService(party.get(0));
+    assertNotNull(testParty.getSampleSummaryId());
     verify(partySvcClient).postParty(any(PartyCreationRequestDTO.class));
     assertThat(sampleUnit.get(0).getState(), is(SampleUnitState.PERSISTED));
     assertThat(sampleSummaryList.get(0).getState(), is(SampleState.ACTIVE));
@@ -187,8 +185,8 @@ public class SampleServiceImplTest {
         .thenReturn(SampleState.ACTIVE);
     when(sampleUnitRepository.getTotalForSampleSummary(1)).thenReturn(1);
 
-    sampleServiceImpl.sendToPartyService(party.get(0));
-
+    PartyDTO testParty = sampleServiceImpl.sendToPartyService(party.get(0));
+    assertNotNull(testParty.getSampleSummaryId());
     verify(partySvcClient).postParty(any(PartyCreationRequestDTO.class));
     assertThat(sampleUnit.get(0).getState(), is(SampleUnitState.PERSISTED));
     assertThat(sampleSummaryList.get(0).getState(), not(SampleState.ACTIVE));
