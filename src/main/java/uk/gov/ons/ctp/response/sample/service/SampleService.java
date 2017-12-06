@@ -68,6 +68,7 @@ public interface SampleService {
    * SampleSummary if one is required.
    *
    * @param party party picked up from queue
+   * @return the Party representation data
    * @throws Exception exception thrown
    */
   PartyDTO sendToPartyService(PartyCreationRequestDTO party) throws Exception;
