@@ -1,0 +1,41 @@
+version: '2'
+services:
+ postgres:
+  container_name: postgres
+  image: sdcplatform/postgres
+  ports:
+   - "6432:5432"
+ redis:
+  container_name: redis
+  image: redis:3.2.9
+  ports:
+   - "7379:6379"
+ rabbitmq:
+  container_name: rabbitmq
+  image: rabbitmq:3.6.10-management
+  ports:
+    - "5369:4369"
+    - "45672:25672"
+    - "6671:5671"
+    - "6672:5672"
+    - "16671:15671"
+    - "16672:15672"
+ sftp:
+    container_name: sftp
+    image: atmoz/sftp
+    volumes:
+        - ~/Documents/sftp:/home/centos/Documents/sftp
+    ports:
+        - "122:22"
+    command: centos:JLibV2&XD,:1001
+ party-service:
+  container_name: party-service
+  image: sdcplatform/ras-party
+  links:
+        - "postgres:postgres"
+  ports:
+    - "5062:5062"
+  environment:
+    - ras-party-db.uri=postgresql://postgres:postgres@postgres:5432/postgres
+    - SECURITY_USER_NAME=admin
+    - SECURITY_USER_PASSWORD=secret
