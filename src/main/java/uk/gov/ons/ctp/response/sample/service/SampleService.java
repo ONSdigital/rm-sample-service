@@ -6,6 +6,7 @@ import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
+import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 import validation.SampleUnitBase;
 import validation.SurveyBase;
 
@@ -67,9 +68,10 @@ public interface SampleService {
    * SampleSummary if one is required.
    *
    * @param party party picked up from queue
+   * @return the Party representation data
    * @throws Exception exception thrown
    */
-  void sendToPartyService(PartyCreationRequestDTO party) throws Exception;
+  PartyDTO sendToPartyService(PartyCreationRequestDTO party) throws Exception;
 
   /**
    * Ingest Survey Sample

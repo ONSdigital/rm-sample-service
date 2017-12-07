@@ -1,10 +1,5 @@
 package uk.gov.ons.ctp.response.sample.domain.model;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import net.sourceforge.cobertura.CoverageIgnore;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -21,6 +16,14 @@ import javax.persistence.Table;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.UUID;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 
 /**
  * Domain model object.
@@ -47,6 +50,7 @@ public class SampleSummary implements Serializable {
   private Integer sampleSummaryPK;
   
   @Column(name = "id")
+  @Getter
   private UUID id;
 
   @Enumerated(EnumType.STRING)
