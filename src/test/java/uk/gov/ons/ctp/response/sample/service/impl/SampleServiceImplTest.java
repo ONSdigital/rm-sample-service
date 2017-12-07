@@ -50,6 +50,8 @@ public class SampleServiceImplTest {
 
   private static final long EFFECTIVEENDDATETIME = 1583743600000L;
 
+  private static final String SAMPLE_SUMMARY_ID = "c6ea7ae3-468d-4b7d-847c-af54874baa46";
+
   private static final String SAMPLEUNITTYPE = "H";
 
   private static final String SAMPLEUNITREF = "222";
@@ -162,7 +164,7 @@ public class SampleServiceImplTest {
         .thenReturn(SampleState.ACTIVE);
 
     PartyDTO testParty = sampleServiceImpl.sendToPartyService(party.get(0));
-    assertNotNull(testParty.getSampleSummaryId());
+    assertEquals(SAMPLE_SUMMARY_ID, testParty.getSampleSummaryId());
     verify(partySvcClient).postParty(any(PartyCreationRequestDTO.class));
     assertThat(sampleUnit.get(0).getState(), is(SampleUnitState.PERSISTED));
     assertThat(sampleSummaryList.get(0).getState(), is(SampleState.ACTIVE));
@@ -186,7 +188,7 @@ public class SampleServiceImplTest {
     when(sampleUnitRepository.getTotalForSampleSummary(1)).thenReturn(1);
 
     PartyDTO testParty = sampleServiceImpl.sendToPartyService(party.get(0));
-    assertNotNull(testParty.getSampleSummaryId());
+    assertEquals(SAMPLE_SUMMARY_ID, testParty.getSampleSummaryId());
     verify(partySvcClient).postParty(any(PartyCreationRequestDTO.class));
     assertThat(sampleUnit.get(0).getState(), is(SampleUnitState.PERSISTED));
     assertThat(sampleSummaryList.get(0).getState(), not(SampleState.ACTIVE));
