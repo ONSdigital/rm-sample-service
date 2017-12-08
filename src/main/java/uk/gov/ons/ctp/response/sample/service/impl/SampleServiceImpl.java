@@ -98,7 +98,7 @@ public class SampleServiceImpl implements SampleService {
     SampleSummary sampleSummary = createSampleSummary(surveySample);
     SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
     Map<String, UUID> sampleUnitIds = saveSampleUnits(samplingUnitList, savedSampleSummary);
-    publishToPartyQueue(samplingUnitList, sampleUnitIds);
+    publishToPartyQueue(samplingUnitList, sampleUnitIds, sampleSummary.getId().toString());
     return savedSampleSummary;
   }
 
@@ -133,10 +133,11 @@ public class SampleServiceImpl implements SampleService {
    * @param sampleUnitIds 
    * @throws Exception 
    * */
-  private void publishToPartyQueue(List<? extends SampleUnitBase> samplingUnitList, Map<String, UUID> sampleUnitIds) throws Exception {
+  private void publishToPartyQueue(List<? extends SampleUnitBase> samplingUnitList, Map<String, UUID> sampleUnitIds, String sampleSummaryId) throws Exception {
     for (SampleUnitBase sampleUnitBase : samplingUnitList) {
           PartyCreationRequestDTO party = PartyUtil.convertToParty(sampleUnitBase);
           party.getAttributes().setSampleUnitId(sampleUnitIds.get(sampleUnitBase.getSampleUnitRef()).toString());
+          party.setSampleSummaryId(sampleSummaryId);
           partyPublisher.publish(party);
     }
   }
@@ -158,14 +159,13 @@ public class SampleServiceImpl implements SampleService {
     return targetSampleSummary;
   }
 
-  public void sendToPartyService(PartyCreationRequestDTO partyCreationRequest) throws Exception {
-    log.debug("Send to party svc");
+  @Override
+  public PartyDTO sendToPartyService(PartyCreationRequestDTO partyCreationRequest) throws Exception {
     PartyDTO returnedParty = partySvcClient.postParty(partyCreationRequest);
-    log.info("Returned party is {}", returnedParty);
-
     SampleUnit sampleUnit = sampleUnitRepository.findById(UUID.fromString(partyCreationRequest.getAttributes().getSampleUnitId()));
     changeSampleUnitState(sampleUnit);
     sampleSummaryStateCheck(sampleUnit);
+    return returnedParty;
   }
 
   private void changeSampleUnitState(SampleUnit sampleUnit) throws CTPException {
