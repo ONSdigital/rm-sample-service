@@ -31,7 +31,15 @@ This repository contains the Sample service. This microservice is a RESTful web 
 
   and build them using
 
-      mvn clean install
+```bash
+mvn clean install
+```
+
+Note. If you need to skip the integration tests due to port clashes run
+
+```bash
+mvn clean install -Ddocker.skip -DskipITs
+```
 
 * In Documents create the following directory structure:
 
