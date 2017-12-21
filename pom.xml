@@ -1,7 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>uk.gov.ons.ctp.product</groupId>
   <artifactId>samplesvc</artifactId>
   <version>10.49.4-SNAPSHOT</version>
   <packaging>jar</packaging>
@@ -9,7 +8,6 @@
   <name>CTP : SampleService</name>
   <description>CTP : SampleService</description>
 
-  <!-- Inherit parent BOM to control versions of dependencies and plugin version & config -->
   <parent>
     <groupId>uk.gov.ons.ctp.product</groupId>
     <artifactId>rm-common-config</artifactId>
@@ -17,9 +15,9 @@
   </parent>
 
   <scm>
-    <connection>scm:git:git@github.com:ONSdigital/rm-sample-service.git</connection>
-    <developerConnection>scm:git:git@github.com:ONSdigital/rm-sample-service.git</developerConnection>
-    <url>git@github.com:ONSdigital/rm-sample-service.git</url>
+    <connection>scm:git:https://github.com/ONSdigital/rm-sample-service</connection>
+    <developerConnection>scm:git:https://github.com/ONSdigital/rm-sample-service</developerConnection>
+    <url>https://github.com/ONSdigital/rm-sample-service</url>
   </scm>
 
   <properties>
