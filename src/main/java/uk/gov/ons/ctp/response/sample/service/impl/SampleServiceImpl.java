@@ -227,28 +227,21 @@ public class SampleServiceImpl implements SampleService {
   }
 
   @Override public SampleSummary ingest(MultipartFile file, String type) throws Exception {
-
-    SampleSummary sampleSummary = new SampleSummary();
-
-    switch (type) {
-    case "bres":
-      sampleSummary = csvIngesterBusiness.ingest(file);
-      break;
-    case "census":
-      sampleSummary = csvIngesterCensus.ingest(file);
-      break;
-    case "social":
-      sampleSummary = csvIngesterSocial.ingest(file);
-      break;
+    switch (type.toUpperCase()) {
+      case "B":
+        return csvIngesterBusiness.ingest(file);
+      case "CENSUS":
+        return csvIngesterCensus.ingest(file);
+      case "SOCIAL":
+        return csvIngesterSocial.ingest(file);
+      default:
+        throw new UnsupportedOperationException(String.format("Type %s not implemented", type));
     }
-
-    return sampleSummary;
   }
 
   @Override
   public SampleUnit findSampleUnit(UUID id) {
-    SampleUnit sampleUnit = sampleUnitRepository.findById(id);
-    return sampleUnit;
+    return sampleUnitRepository.findById(id);
   }
 
 }

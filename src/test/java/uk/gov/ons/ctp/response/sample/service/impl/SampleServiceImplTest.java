@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.mock.web.MockMultipartFile;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
@@ -16,6 +17,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
+import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
 import uk.gov.ons.ctp.response.sample.message.EventPublisher;
 import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
@@ -46,18 +48,8 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class SampleServiceImplTest {
 
-  private static final long EFFECTIVESTARTDATETIME = 1483743600000L;
-
-  private static final long EFFECTIVEENDDATETIME = 1583743600000L;
-
   private static final String SAMPLE_SUMMARY_ID = "c6ea7ae3-468d-4b7d-847c-af54874baa46";
 
-  private static final String SAMPLEUNITTYPE = "H";
-
-  private static final String SAMPLEUNITREF = "222";
-
-  private static final String SURVEYREF = "ref";
-  
   private static final String SAMPLEUNIT_ID = "4ef7326b-4143-43f7-ba67-65056d4e20b8";
 
   @Mock
@@ -80,10 +72,12 @@ public class SampleServiceImplTest {
 
   @Mock
   private CollectionExerciseJobService collectionExerciseJobService;
-  
-  
+
   @Mock
   private EventPublisher eventPublisher;
+
+  @Mock
+  private CsvIngesterBusiness csvIngesterBusiness;
 
   @InjectMocks
   private SampleServiceImpl sampleServiceImpl;
@@ -220,6 +214,41 @@ public class SampleServiceImplTest {
     Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(1)).storeCollectionExerciseJob(any());
     assertThat(sampleUnitsTotal, is(1));
+  }
+
+  @Test
+  public void testIngestBTypeSample() throws Exception {
+    // Given
+    MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
+
+    // When
+    SampleSummary sampleSummary = sampleServiceImpl.ingest(file, "B");
+
+    // Then
+    verify(csvIngesterBusiness, times(1)).ingest(file);
+  }
+
+  @Test
+  public void testIngestTypeSampleIsCaseInsensitive() throws Exception {
+    // Given
+    MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
+
+    // When
+    SampleSummary sampleSummary = sampleServiceImpl.ingest(file, "b");
+
+    // Then
+    verify(csvIngesterBusiness, times(1)).ingest(file);
+  }
+
+  @Test(expected = UnsupportedOperationException.class)
+  public void testUploadInvalidTypeSample() throws Exception {
+    // Given
+    MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
+
+    // When
+    sampleServiceImpl.ingest(file, "invalid-type");
+
+    // Then expect exception
   }
 
 }
