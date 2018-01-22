@@ -100,7 +100,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   @RequestMapping(value = "/{type}/fileupload", method = RequestMethod.POST, consumes = "multipart/form-data")
   public final @ResponseBody ResponseEntity<SampleSummary> uploadSampleFile(@PathVariable("type") final String type, @RequestParam("file") MultipartFile file) throws CTPException {
     log.debug("Entering Sample file upload for Type {}", type);
-    if (!Arrays.asList("B", "census", "social").contains(type)) {
+    if (!Arrays.asList("B", "CENSUS", "SOCIAL").contains(type.toUpperCase())) {
       return ResponseEntity.badRequest().build();
     }
 
