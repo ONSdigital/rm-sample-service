@@ -46,5 +46,7 @@ public class SampleEndpointIT {
         assertThat(sampleSummaryResponse.getStatus()).isEqualTo(201);
         SampleSummary sampleSummary = mapper.readValue(sampleSummaryResponse.getBody(), new TypeReference<SampleSummary>() {});
         assertThat(sampleSummary.getState()).isEqualTo(SampleSummaryDTO.SampleState.INIT);
+        assertThat(sampleSummary.getExpectedCollectionInstruments()).isEqualTo(1);
+        assertThat(sampleSummary.getTotalSampleUnits()).isEqualTo(1);
     }
 }
