@@ -217,12 +217,24 @@ public class SampleServiceImplTest {
   }
 
   @Test
-  public void testUploadBTypeSample() throws Exception {
+  public void testIngestBTypeSample() throws Exception {
     // Given
     MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
 
     // When
     SampleSummary sampleSummary = sampleServiceImpl.ingest(file, "B");
+
+    // Then
+    verify(csvIngesterBusiness, times(1)).ingest(file);
+  }
+
+  @Test
+  public void testIngestTypeSampleIsCaseInsensitive() throws Exception {
+    // Given
+    MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
+
+    // When
+    SampleSummary sampleSummary = sampleServiceImpl.ingest(file, "b");
 
     // Then
     verify(csvIngesterBusiness, times(1)).ingest(file);

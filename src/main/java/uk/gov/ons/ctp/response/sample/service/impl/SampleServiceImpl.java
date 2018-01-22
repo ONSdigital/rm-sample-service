@@ -227,12 +227,12 @@ public class SampleServiceImpl implements SampleService {
   }
 
   @Override public SampleSummary ingest(MultipartFile file, String type) throws Exception {
-    switch (type) {
+    switch (type.toUpperCase()) {
       case "B":
         return csvIngesterBusiness.ingest(file);
-      case "census":
+      case "CENSUS":
         return csvIngesterCensus.ingest(file);
-      case "social":
+      case "SOCIAL":
         return csvIngesterSocial.ingest(file);
       default:
         throw new UnsupportedOperationException(String.format("Type %s not implemented", type));
