@@ -60,4 +60,10 @@ public class SampleSummary implements Serializable {
   @Column(name = "ingestdatetime")
   private Timestamp ingestDateTime;
 
+  @Column(name = "totalsampleunits")
+  private Integer totalSampleUnits;
+
+  @Column(name = "expectedcollectioninstruments")
+  private Integer expectedCollectionInstruments;
+
 }

@@ -94,6 +94,7 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
     SampleSummary sampleSummary;
     BusinessSurveySample businessSurveySample = new BusinessSurveySample();
     List<BusinessSampleUnit> samplingUnitList = new ArrayList<>();
+    Integer expectedCI;
 
       while((nextLine = csvReader.readNext()) != null) {
 
@@ -110,12 +111,22 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
         samplingUnitList.add(businessSampleUnit);
 
       }
+      expectedCI = calculateExpectedCollectionInstruments(samplingUnitList);
 
       businessSurveySample.setSampleUnits(samplingUnitList);
 
-      sampleSummary = sampleService.processSampleSummary(businessSurveySample, samplingUnitList);
+      sampleSummary = sampleService.processSampleSummary(businessSurveySample, samplingUnitList, expectedCI);
 
     return sampleSummary;
+  }
+
+  private Integer calculateExpectedCollectionInstruments(List<BusinessSampleUnit> samplingUnitList) {
+    //TODO: get survey classifiers from survey service, currently using formtype for all business surveys
+    List<String> formTypes = new ArrayList<>();
+    for (BusinessSampleUnit businessSampleUnit : samplingUnitList) {
+      if(!formTypes.contains(businessSampleUnit.getFormtype2())) formTypes.add(businessSampleUnit.getFormtype2());
+    }
+    return formTypes.size();
   }
 
   /**

@@ -65,6 +65,7 @@ public class CsvIngesterSocial extends CsvToBean<SocialSampleUnit> {
     SampleSummary sampleSummary;
     SocialSurveySample businessSurveySample = new SocialSurveySample();
     List<SocialSampleUnit> samplingUnitList = new ArrayList<>();
+    Integer expectedCI = 1;
 
       while((nextLine = csvReader.readNext()) != null) {
 
@@ -83,7 +84,7 @@ public class CsvIngesterSocial extends CsvToBean<SocialSampleUnit> {
 
       businessSurveySample.setSampleUnits(samplingUnitList);
 
-      sampleSummary = sampleService.processSampleSummary(businessSurveySample, samplingUnitList);
+      sampleSummary = sampleService.processSampleSummary(businessSurveySample, samplingUnitList, expectedCI);
 
     return sampleSummary;
   }

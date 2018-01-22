@@ -51,6 +51,7 @@ tools/addend/target/classes/
 .idea/
 out/
 tools/addend/target/classes/
+.DS_Store
 
 target
 *.log

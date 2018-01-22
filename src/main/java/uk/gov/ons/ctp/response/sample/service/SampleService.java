@@ -39,7 +39,7 @@ public interface SampleService {
    * @param surveySampleObject SurveySample to be used
    * @throws Exception exception thrown
    */
-  SampleSummary processSampleSummary(SurveyBase surveySampleObject, List<? extends SampleUnitBase> samplingUnitList)
+  SampleSummary processSampleSummary(SurveyBase surveySampleObject, List<? extends SampleUnitBase> samplingUnitList, Integer expectedCollectionInstruments)
           throws Exception;
 
   /**
