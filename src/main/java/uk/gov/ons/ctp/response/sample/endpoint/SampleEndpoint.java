@@ -1,5 +1,6 @@
 package uk.gov.ons.ctp.response.sample.endpoint;
 
+import com.google.common.collect.Lists;
 import liquibase.util.csv.opencsv.bean.CsvToBean;
 import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
@@ -31,6 +32,7 @@ import validation.BusinessSampleUnit;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,11 +46,15 @@ import java.util.UUID;
 @Slf4j
 public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
 
-  @Autowired
   private SampleService sampleService;
 
-  @Autowired
   private MapperFacade mapperFacade;
+
+  @Autowired
+  public SampleEndpoint(SampleService sampleService, MapperFacade mapperFacade) {
+      this.sampleService = sampleService;
+      this.mapperFacade = mapperFacade;
+  }
 
   /**
    * POST CollectionExerciseJob associated to SampleSummary surveyRef and
@@ -94,10 +100,13 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   @RequestMapping(value = "/{type}/fileupload", method = RequestMethod.POST, consumes = "multipart/form-data")
   public final @ResponseBody ResponseEntity<SampleSummary> uploadSampleFile(@PathVariable("type") final String type, @RequestParam("file") MultipartFile file) throws CTPException {
     log.debug("Entering Sample file upload for Type {}", type);
+    if (!Arrays.asList("B", "census", "social").contains(type)) {
+      return ResponseEntity.badRequest().build();
+    }
 
     SampleSummary sampleSummary;
     try {
-      sampleSummary = sampleService.ingest(file, type.toLowerCase());
+      sampleSummary = sampleService.ingest(file, type);
     } catch (Exception e) {
       throw new CTPException(CTPException.Fault.VALIDATION_FAILED, e, "Error ingesting file %s", file.getOriginalFilename());
     }
