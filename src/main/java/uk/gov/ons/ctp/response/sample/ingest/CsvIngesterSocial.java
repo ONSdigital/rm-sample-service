@@ -65,7 +65,7 @@ public class CsvIngesterSocial extends CsvToBean<SocialSampleUnit> {
     SampleSummary sampleSummary;
     SocialSurveySample businessSurveySample = new SocialSurveySample();
     List<SocialSampleUnit> samplingUnitList = new ArrayList<>();
-    Integer expectedCI = 1;
+    Integer expectedCI = 1; //TODO: when social surveys are onboarded expectedCI should be calculated
 
       while((nextLine = csvReader.readNext()) != null) {
 
