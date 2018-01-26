@@ -27,3 +27,12 @@ databaseChangeLog:
             path: remove_samplesummary_columns.sql
             relativeToChangelogFile: true
             splitStatements: false
+  - changeSet:
+      id: 10.49.0-4
+      author: Tejas Patel
+      changes:
+        - sqlFile:
+            comment: Add total sample units and expected collection instruments column
+            path: add_samplesummary_columns.sql
+            relativeToChangelogFile: true
+            splitStatements: false

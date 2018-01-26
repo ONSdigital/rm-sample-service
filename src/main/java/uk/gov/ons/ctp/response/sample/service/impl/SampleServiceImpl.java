@@ -93,20 +93,22 @@ public class SampleServiceImpl implements SampleService {
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
-  public SampleSummary processSampleSummary(SurveyBase surveySample, List<? extends SampleUnitBase> samplingUnitList)
+  public SampleSummary processSampleSummary(SurveyBase surveySample, List<? extends SampleUnitBase> samplingUnitList, Integer expectedCollectionInstruments)
           throws Exception {
-    SampleSummary sampleSummary = createSampleSummary(surveySample);
+    SampleSummary sampleSummary = createSampleSummary(surveySample, samplingUnitList.size(), expectedCollectionInstruments);
     SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
     Map<String, UUID> sampleUnitIds = saveSampleUnits(samplingUnitList, savedSampleSummary);
     publishToPartyQueue(samplingUnitList, sampleUnitIds, sampleSummary.getId().toString());
     return savedSampleSummary;
   }
 
-  protected SampleSummary createSampleSummary(SurveyBase surveySample) throws ParseException {
+  protected SampleSummary createSampleSummary(SurveyBase surveySample, Integer totalSampleUnits, Integer expectedCollectionInstruments)
+          throws ParseException {
     SampleSummary sampleSummary = new SampleSummary();
     sampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
     sampleSummary.setState(SampleSummaryDTO.SampleState.INIT);
-
+    sampleSummary.setTotalSampleUnits(totalSampleUnits);
+    sampleSummary.setExpectedCollectionInstruments(expectedCollectionInstruments);
     sampleSummary.setId(UUID.randomUUID());
     return sampleSummary;
   }

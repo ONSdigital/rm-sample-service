@@ -113,13 +113,15 @@ public class SampleServiceImplTest {
    */
   @Test
   public void verifySampleSummaryCreatedCorrectly() throws Exception {
-    SampleSummary sampleSummary = sampleServiceImpl.createSampleSummary(surveySample.get(0));
+    SampleSummary sampleSummary = sampleServiceImpl.createSampleSummary(surveySample.get(0), 5, 2);
 
     //assertTrue(sampleSummary.getSurveyRef().equals("abc"));
     assertNotNull(sampleSummary.getIngestDateTime());
     //assertTrue(sampleSummary.getEffectiveEndDateTime().getTime() == EFFECTIVEENDDATETIME);
     //assertTrue(sampleSummary.getEffectiveStartDateTime().getTime() == EFFECTIVESTARTDATETIME);
     assertTrue(sampleSummary.getState() == SampleSummaryDTO.SampleState.INIT);
+    assertTrue(sampleSummary.getTotalSampleUnits() == 5);
+    assertTrue(sampleSummary.getExpectedCollectionInstruments() == 2);
   }
 
   /**
@@ -134,7 +136,7 @@ public class SampleServiceImplTest {
     BusinessSurveySample businessSample = surveySample.get(0);
     when(sampleSummaryRepository.save(any(SampleSummary.class))).then(returnsFirstArg());
 
-    sampleServiceImpl.processSampleSummary(businessSample, businessSample.getSampleUnits());
+    sampleServiceImpl.processSampleSummary(businessSample, businessSample.getSampleUnits(), 2);
 
     verify(sampleSummaryRepository).save(any(SampleSummary.class));
     verify(sampleUnitRepository, times(2)).save(any(SampleUnit.class));

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.HashSet;
 
 @Slf4j
 @Service
@@ -94,6 +95,7 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
     SampleSummary sampleSummary;
     BusinessSurveySample businessSurveySample = new BusinessSurveySample();
     List<BusinessSampleUnit> samplingUnitList = new ArrayList<>();
+    Integer expectedCI;
 
       while((nextLine = csvReader.readNext()) != null) {
 
@@ -110,12 +112,22 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
         samplingUnitList.add(businessSampleUnit);
 
       }
+      expectedCI = calculateExpectedCollectionInstruments(samplingUnitList);
 
       businessSurveySample.setSampleUnits(samplingUnitList);
 
-      sampleSummary = sampleService.processSampleSummary(businessSurveySample, samplingUnitList);
+      sampleSummary = sampleService.processSampleSummary(businessSurveySample, samplingUnitList, expectedCI);
 
     return sampleSummary;
+  }
+
+  private Integer calculateExpectedCollectionInstruments(List<BusinessSampleUnit> samplingUnitList) {
+    //TODO: get survey classifiers from survey service, currently using formtype for all business surveys
+    Set<String> formTypes = new HashSet<>();
+    for (BusinessSampleUnit businessSampleUnit : samplingUnitList) {
+      formTypes.add(businessSampleUnit.getFormtype2());
+    }
+    return formTypes.size();
   }
 
   /**

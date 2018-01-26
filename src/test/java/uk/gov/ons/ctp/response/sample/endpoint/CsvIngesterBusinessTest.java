@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -102,21 +103,28 @@ public class CsvIngesterBusinessTest {
   public void testBlueSky() throws Exception {
     csvIngester.ingest(getTestFile("business-survey-sample.csv"));
     verify(sampleService, times(1)).processSampleSummary(any(BusinessSurveySample.class),
-        anyListOf(BusinessSampleUnit.class));
+        anyListOf(BusinessSampleUnit.class), eq(1));
+  }
+
+  @Test
+  public void testMultipleLines() throws Exception {
+    csvIngester.ingest(getTestFile("business-survey-sample-multiple.csv"));
+    verify(sampleService, times(1)).processSampleSummary(any(BusinessSurveySample.class),
+            anyListOf(BusinessSampleUnit.class), eq(3));
   }
 
   @Test(expected = CTPException.class)
   public void testDate() throws Exception {
     csvIngester.ingest(getTestFile("business-survey-sample-date.csv"));
     verify(sampleService, times(0)).processSampleSummary(any(BusinessSurveySample.class),
-        anyListOf(BusinessSampleUnit.class));
+        anyListOf(BusinessSampleUnit.class), eq(1));
   }
 
   @Test(expected = CTPException.class)
   public void missingColumns() throws Exception {
     csvIngester.ingest(getTestFile("business-survey-sample-missing-columns.csv"));
     verify(sampleService, times(0)).processSampleSummary(any(BusinessSurveySample.class),
-        anyListOf(BusinessSampleUnit.class));
+        anyListOf(BusinessSampleUnit.class), eq(1));
     thrown.expect(CTPException.class);
   }
 

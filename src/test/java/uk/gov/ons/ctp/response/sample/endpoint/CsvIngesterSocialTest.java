@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -72,14 +73,14 @@ public class CsvIngesterSocialTest {
   public void testBlueSky() throws Exception {
     csvIngester.ingest(getTestFile("social-survey-sample.csv"));
     verify(sampleService, times(1)).processSampleSummary(any(SocialSurveySample.class),
-        anyListOf(SocialSampleUnit.class));
+        anyListOf(SocialSampleUnit.class), eq(1));
   }
 
   @Test(expected = CTPException.class)
   public void missingColumns() throws Exception {
     csvIngester.ingest(getTestFile("social-survey-sample-missing-columns.csv"));
     verify(sampleService, times(0)).processSampleSummary(any(SocialSurveySample.class),
-        anyListOf(SocialSampleUnit.class));
+        anyListOf(SocialSampleUnit.class), eq(1));
     thrown.expect(CTPException.class);
   }
 
