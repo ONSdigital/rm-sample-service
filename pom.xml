@@ -45,6 +45,12 @@
     </dependency>
 
     <dependency>
+      <groupId>uk.gov.ons.ctp.common</groupId>
+      <artifactId>framework</artifactId>
+      <version>10.49.8</version>
+    </dependency>
+
+    <dependency>
       <groupId>net.logstash.logback</groupId>
       <artifactId>logstash-logback-encoder</artifactId>
     </dependency>
