@@ -74,9 +74,9 @@ A `HTTP 201 Created` status code is returned if the sample csv is successfully u
 ```
 
 ## Find Sample Summary by Id
-* `GET /samples/samplesummaries/{sampleSummaryId}` get Sample Summary by Id
+* `GET /samples/samplesummaries/{sampleSummaryId}` get Sample Summary by ID
 
-**Required parameters:** `sampleSummaryId` as the id of the sample summary
+**Required parameters:** `sampleSummaryId` as the ID of the sample summary
 
 ### Example JSON Response
 ```json
@@ -90,8 +90,8 @@ A `HTTP 201 Created` status code is returned if the sample csv is successfully u
 }
 ```
 
-## Find Sample by Id
-*`GET /samples/{id}` get sample by id.
+## Find Sample by ID
+*`GET /samples/{id}` get sample by ID.
 
 ### Example JSON Response
 ```json
