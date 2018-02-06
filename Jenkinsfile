@@ -50,7 +50,6 @@ pipeline {
                 CF_USER = credentials('CF_USER')
             }
             steps {
-                echo env.CLOUDFOUNDRY_API
                 sh "find . -type f -name '*samplesvc*.jar' -not -name '*docker-info*' -exec mv {} target/samplesvc.jar \\;"
                 sh "sed -i -- 's/SPACE/dev/g' *template.yml"
                 sh "sed -i -- 's/INSTANCES/1/g' *template.yml"
@@ -111,7 +110,6 @@ pipeline {
                 CF_USER = credentials('CF_USER')
             }
             steps {
-                echo env.CLOUDFOUNDRY_API
                 sh "find . -type f -name '*samplesvc*.jar' -not -name '*docker-info*' -exec mv {} target/samplesvc.jar \\;"
                 sh "sed -i -- 's/SPACE/ci/g' *template.yml"
                 sh "sed -i -- 's/INSTANCES/1/g' *template.yml"
@@ -194,7 +192,6 @@ pipeline {
                 CF_USER = credentials('CF_USER')
             }
             steps {
-                echo env.CLOUDFOUNDRY_API
                 sh 'git reset --hard'
                 sh 'rm -r target && mkdir target'
                 sh 'wget https://gist.githubusercontent.com/benjefferies/106d53e3178e1627bcad4784f6fe7fe1/raw/832c07c0f3e31933e634a9e0a2398d2845943090/artifactory-get.sh'
