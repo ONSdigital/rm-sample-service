@@ -14,7 +14,6 @@ pipeline {
 
             }
             steps {
-                git(url: 'https://github.com/ONSdigital/rm-sample-service.git')
                 sh 'mvn --settings .travis.settings.xml clean install -Ddockerfile.skip -Ddocker.skip -DskipITs'
             }
         }
