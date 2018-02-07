@@ -104,6 +104,3 @@ A `HTTP 201 Created` status code is returned if the sample csv is successfully u
     "state": "DELIVERED",
     "sampleUnitId": null
 }
-
-
-
