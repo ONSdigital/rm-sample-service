@@ -17,7 +17,7 @@ This page documents the Sample service API endpoints. Apart from the Service Inf
 ```
 
 ## Create Sample Unit Request
-* `POST /sampleunitrequests` creates a sample unit request.
+* `POST /samples/sampleunitrequests` creates a sample unit request.
 
 **Required parameters:** `collectionExerciseId` as the ID of the collection exercise, `exerciseDateTime` as the date/time of the collection exercise and `surveyRef` as the ID of the survey.
 
@@ -40,7 +40,7 @@ This page documents the Sample service API endpoints. Apart from the Service Inf
 An `HTTP 201 Created` status code is returned if the sample unit request creation was a success. An `HTTP 400 Bad Request` is returned if any of the required parameters are missing, or if a sample unit request already exists for the same criteria.
 
 ## Upload Sample File
-* `POST /{type}/fileupload` uploads a sample csv file.
+* `POST /samples/{type}/fileupload` uploads a sample csv file.
 
 **Required parameters:** `type` as the survey type of the sample csv, `file` colon-delimited csv sample file.
 
@@ -57,7 +57,7 @@ An `HTTP 201 Created` status code is returned if the sample unit request creatio
 A `HTTP 201 Created` status code is returned if the sample csv is successfully uploaded. A `HTTP 400 Bad Request` is returned if there are any errors with validation of the csv.
 
 ## Find Sample Summaries
-* `GET /samplesummaries` get list of all existing Sample Summaries
+* `GET /samples/samplesummaries` get list of all existing Sample Summaries
 
 ### Example JSON Response
 ```json
@@ -74,9 +74,9 @@ A `HTTP 201 Created` status code is returned if the sample csv is successfully u
 ```
 
 ## Find Sample Summary by Id
-* `GET /samplesummaries/{sampleSummaryId}` get Sample Summary by Id
+* `GET /samples/samplesummaries/{sampleSummaryId}` get Sample Summary by ID
 
-**Required parameters:** `sampleSummaryId` as the id of the sample summary
+**Required parameters:** `sampleSummaryId` as the ID of the sample summary
 
 ### Example JSON Response
 ```json
@@ -90,3 +90,17 @@ A `HTTP 201 Created` status code is returned if the sample csv is successfully u
 }
 ```
 
+## Find Sample by ID
+*`GET /samples/{id}` get sample by ID.
+
+### Example JSON Response
+```json
+{
+    "sampleUnitPK": 1,
+    "sampleSummaryFK": 1,
+    "sampleUnitRef": "49900000001",
+    "sampleUnitType": "B",
+    "formType": "15",
+    "state": "DELIVERED",
+    "sampleUnitId": null
+}
