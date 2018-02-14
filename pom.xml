@@ -15,9 +15,9 @@
   </parent>
 
   <scm>
-    <connection>scm:git:https://github.com/ONSdigital/rm-sample-service</connection>
-    <developerConnection>scm:git:https://github.com/ONSdigital/rm-sample-service</developerConnection>
-    <url>https://github.com/ONSdigital/rm-sample-service</url>
+    <connection>scm:git:https://github.com/ONSdigital/rm-sample-service.git</connection>
+    <developerConnection>scm:git:https://github.com/ONSdigital/rm-sample-service.git</developerConnection>
+    <url>https://github.com/ONSdigital/rm-sample-service.git</url>
   </scm>
 
   <properties>

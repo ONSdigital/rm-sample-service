@@ -35,7 +35,7 @@ management:
     enabled: false
 
 server:
-  port: 8125
+  port: 80
   servlet-path: /
 
 spring:
