@@ -57,13 +57,11 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
   private static final String SELTYPE = "seltype";
   private static final String INCLEXCL = "inclexcl";
   private static final String CELLNO = "cell_no";
-  private static final String FORMTYPE2 = "formtype2";
   private static final String CURRENCY = "currency";
 
-  private static final String[] COLUMNS = new String[] {SAMPLEUNITREF, FORMTYPE, CHECKLETTER, FROSIC92, RUSIC92, FROSIC2007, RUSIC2007,
-      FROEMPMENT, FROTOVER, ENTREF, LEGALSTATUS, ENTREPMKR, REGION, BIRTHDATE, ENTNAME1, ENTNAME2, ENTNAME3,
-      RUNAME1, RUNAME2, RUNAME3, TRADSTYLE1, TRADSTYLE2, TRADSTYLE3, SELTYPE, INCLEXCL, CELLNO, FORMTYPE2,
-      CURRENCY};
+  private static final String[] COLUMNS = new String[] {SAMPLEUNITREF, CHECKLETTER, FROSIC92, RUSIC92, FROSIC2007,
+      RUSIC2007, FROEMPMENT, FROTOVER, ENTREF, LEGALSTATUS, ENTREPMKR, REGION, BIRTHDATE, ENTNAME1, ENTNAME2, ENTNAME3,
+      RUNAME1, RUNAME2, RUNAME3, TRADSTYLE1, TRADSTYLE2, TRADSTYLE3, SELTYPE, INCLEXCL, CELLNO, FORMTYPE, CURRENCY};
 
   @Autowired
   private SampleService sampleService;
@@ -125,7 +123,7 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
     //TODO: get survey classifiers from survey service, currently using formtype for all business surveys
     Set<String> formTypes = new HashSet<>();
     for (BusinessSampleUnit businessSampleUnit : samplingUnitList) {
-      formTypes.add(businessSampleUnit.getFormtype2());
+      formTypes.add(businessSampleUnit.getFormType());
     }
     return formTypes.size();
   }
