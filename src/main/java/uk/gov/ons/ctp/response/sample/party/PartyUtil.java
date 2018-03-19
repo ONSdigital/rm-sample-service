@@ -59,7 +59,7 @@ public class PartyUtil {
       businessSampleUnit.setSeltype(bsu.getSeltype());
       businessSampleUnit.setInclexcl(bsu.getInclexcl());
       try {
-        businessSampleUnit.setCellNo(Integer.valueOf(bsu.getFrotover()));
+        businessSampleUnit.setCellNo(Integer.valueOf(bsu.getCell_no()));
       } catch (NumberFormatException nfe) {
         businessSampleUnit.setCellNo(0);
       }
