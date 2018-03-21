@@ -30,7 +30,7 @@
     <dependency>
       <groupId>uk.gov.ons.ctp.product</groupId>
       <artifactId>partysvc-api</artifactId>
-      <version>10.50.2</version>
+      <version>10.50.5-SNAPSHOT</version>
     </dependency>
 
     <dependency>

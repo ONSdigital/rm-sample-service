@@ -98,15 +98,18 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   }
 
   @RequestMapping(value = "/{type}/fileupload", method = RequestMethod.POST, consumes = "multipart/form-data")
-  public final @ResponseBody ResponseEntity<SampleSummary> uploadSampleFile(@PathVariable("type") final String type, @RequestParam("file") MultipartFile file) throws CTPException {
-    log.debug("Entering Sample file upload for Type {}", type);
-    if (!Arrays.asList("B", "CENSUS", "SOCIAL").contains(type.toUpperCase())) {
-      return ResponseEntity.badRequest().build();
+  public final @ResponseBody ResponseEntity<SampleSummary> uploadSampleFile(@PathVariable("type") final String type,
+                                                                            @RequestParam("file") MultipartFile file,
+                                                                            @RequestParam("collectionExerciseId") String collectionExerciseId)
+          throws CTPException {
+      log.debug("Entering Sample file upload for Type {}", type);
+      if (!Arrays.asList("B", "CENSUS", "SOCIAL").contains(type.toUpperCase())) {
+        return ResponseEntity.badRequest().build();
     }
 
     SampleSummary sampleSummary;
     try {
-      sampleSummary = sampleService.ingest(file, type);
+      sampleSummary = sampleService.ingest(file, type, collectionExerciseId);
     } catch (Exception e) {
       throw new CTPException(CTPException.Fault.VALIDATION_FAILED, e, "Error ingesting file %s", file.getOriginalFilename());
     }

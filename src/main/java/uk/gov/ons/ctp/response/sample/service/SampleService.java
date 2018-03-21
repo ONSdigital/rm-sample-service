@@ -39,8 +39,10 @@ public interface SampleService {
    * @param surveySampleObject SurveySample to be used
    * @throws Exception exception thrown
    */
-  SampleSummary processSampleSummary(SurveyBase surveySampleObject, List<? extends SampleUnitBase> samplingUnitList, Integer expectedCollectionInstruments)
-          throws Exception;
+  SampleSummary processSampleSummary(SurveyBase surveySampleObject,
+                                     List<? extends SampleUnitBase> samplingUnitList,
+                                     Integer expectedCollectionInstruments,
+                                     String collectionExerciseId) throws Exception;
 
   /**
    * Update the SampleSummary state
@@ -80,7 +82,7 @@ public interface SampleService {
    * @param type Type of Survey to be used
    * @throws Exception exception thrown
    */
-  SampleSummary ingest(MultipartFile file, String type) throws Exception;
+  SampleSummary ingest(MultipartFile file, String type, String collectionExerciseId) throws Exception;
 
   /**
    * find sampleUnit

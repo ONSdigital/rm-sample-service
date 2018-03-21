@@ -93,12 +93,15 @@ public class SampleServiceImpl implements SampleService {
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
-  public SampleSummary processSampleSummary(SurveyBase surveySample, List<? extends SampleUnitBase> samplingUnitList, Integer expectedCollectionInstruments)
+  public SampleSummary processSampleSummary(SurveyBase surveySample,
+                                            List<? extends SampleUnitBase> samplingUnitList,
+                                            Integer expectedCollectionInstruments,
+                                            String collectionExerciseId)
           throws Exception {
     SampleSummary sampleSummary = createSampleSummary(surveySample, samplingUnitList.size(), expectedCollectionInstruments);
     SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
     Map<String, UUID> sampleUnitIds = saveSampleUnits(samplingUnitList, savedSampleSummary);
-    publishToPartyQueue(samplingUnitList, sampleUnitIds, sampleSummary.getId().toString());
+    publishToPartyQueue(samplingUnitList, sampleUnitIds, sampleSummary.getId().toString(), collectionExerciseId);
     return savedSampleSummary;
   }
 
@@ -135,11 +138,15 @@ public class SampleServiceImpl implements SampleService {
    * @param sampleUnitIds 
    * @throws Exception 
    * */
-  private void publishToPartyQueue(List<? extends SampleUnitBase> samplingUnitList, Map<String, UUID> sampleUnitIds, String sampleSummaryId) throws Exception {
+  private void publishToPartyQueue(List<? extends SampleUnitBase> samplingUnitList,
+                                   Map<String, UUID> sampleUnitIds,
+                                   String sampleSummaryId,
+                                   String collectionExerciseId) throws Exception {
     for (SampleUnitBase sampleUnitBase : samplingUnitList) {
           PartyCreationRequestDTO party = PartyUtil.convertToParty(sampleUnitBase);
           party.getAttributes().setSampleUnitId(sampleUnitIds.get(sampleUnitBase.getSampleUnitRef()).toString());
           party.setSampleSummaryId(sampleSummaryId);
+          party.setCollectionExerciseId(collectionExerciseId);
           partyPublisher.publish(party);
     }
   }
@@ -228,10 +235,10 @@ public class SampleServiceImpl implements SampleService {
     return sampleUnitsTotal;
   }
 
-  @Override public SampleSummary ingest(MultipartFile file, String type) throws Exception {
+  @Override public SampleSummary ingest(MultipartFile file, String type, String collectionExerciseId) throws Exception {
     switch (type.toUpperCase()) {
       case "B":
-        return csvIngesterBusiness.ingest(file);
+        return csvIngesterBusiness.ingest(file, collectionExerciseId);
       case "CENSUS":
         return csvIngesterCensus.ingest(file);
       case "SOCIAL":
