@@ -37,7 +37,7 @@ public class SampleEndpointIT {
         final String sampleFile = "/csv/business-survey-sample.csv";
 
         // When
-        HttpResponse<String> sampleSummaryResponse = Unirest.post("http://localhost:" + port + "/samples/B/fileupload")
+        HttpResponse<String> sampleSummaryResponse = Unirest.post("http://localhost:" + port + "/samples/B/fileupload?collectionExerciseId=test")
                 .basicAuth("admin", "secret")
                 .field("file", getClass().getResourceAsStream(sampleFile), ContentType.MULTIPART_FORM_DATA, "file")
                 .asString();

@@ -71,24 +71,24 @@ public class CsvIngesterCensusTest {
 
   @Test
   public void testBlueSky() throws Exception {
-    csvIngester.ingest(getTestFile("census-survey-sample.csv"));
+    csvIngester.ingest(getTestFile("census-survey-sample.csv"), "test");
     verify(sampleService, times(1)).processSampleSummary(any(CensusSurveySample.class),
-            anyListOf(CensusSampleUnit.class), eq(1));
+            anyListOf(CensusSampleUnit.class), eq(1), any(String.class));
   }
 
   @Test(expected = Exception.class)
   public void missingColumns() throws Exception {
-    csvIngester.ingest(getTestFile("census-survey-sample-missing-columns.csv"));
+    csvIngester.ingest(getTestFile("census-survey-sample-missing-columns.csv"), "test");
     verify(sampleService, times(0)).processSampleSummary(any(CensusSurveySample.class),
-        anyListOf(CensusSampleUnit.class), eq(1));
+        anyListOf(CensusSampleUnit.class), eq(1), "test");
     thrown.expect(CTPException.class);
   }
 
   @Test(expected = Exception.class)
   public void incorrectData() throws Exception {
-    csvIngester.ingest(getTestFile("census-survey-sample-incorrect-data.csv"));
+    csvIngester.ingest(getTestFile("census-survey-sample-incorrect-data.csv"), "test");
     verify(sampleService, times(0)).processSampleSummary(any(CensusSurveySample.class),
-        anyListOf(CensusSampleUnit.class), eq(1));
+        anyListOf(CensusSampleUnit.class), eq(1), "test");
     thrown.expect(CTPException.class);
   }
 

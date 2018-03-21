@@ -101,30 +101,30 @@ public class CsvIngesterBusinessTest {
 
   @Test
   public void testBlueSky() throws Exception {
-    csvIngester.ingest(getTestFile("business-survey-sample.csv"));
+    csvIngester.ingest(getTestFile("business-survey-sample.csv"), "test");
     verify(sampleService, times(1)).processSampleSummary(any(BusinessSurveySample.class),
-        anyListOf(BusinessSampleUnit.class), eq(1));
+        anyListOf(BusinessSampleUnit.class), eq(1), any(String.class));
   }
 
   @Test
   public void testMultipleLines() throws Exception {
-    csvIngester.ingest(getTestFile("business-survey-sample-multiple.csv"));
+    csvIngester.ingest(getTestFile("business-survey-sample-multiple.csv"), "test");
     verify(sampleService, times(1)).processSampleSummary(any(BusinessSurveySample.class),
-            anyListOf(BusinessSampleUnit.class), eq(3));
+            anyListOf(BusinessSampleUnit.class), eq(3), any(String.class));
   }
 
   @Test(expected = CTPException.class)
   public void testDate() throws Exception {
-    csvIngester.ingest(getTestFile("business-survey-sample-date.csv"));
+    csvIngester.ingest(getTestFile("business-survey-sample-date.csv"), "test");
     verify(sampleService, times(0)).processSampleSummary(any(BusinessSurveySample.class),
-        anyListOf(BusinessSampleUnit.class), eq(1));
+        anyListOf(BusinessSampleUnit.class), eq(1), "test");
   }
 
   @Test(expected = CTPException.class)
   public void missingColumns() throws Exception {
-    csvIngester.ingest(getTestFile("business-survey-sample-missing-columns.csv"));
+    csvIngester.ingest(getTestFile("business-survey-sample-missing-columns.csv"), "test");
     verify(sampleService, times(0)).processSampleSummary(any(BusinessSurveySample.class),
-        anyListOf(BusinessSampleUnit.class), eq(1));
+        anyListOf(BusinessSampleUnit.class), eq(1), "test");
     thrown.expect(CTPException.class);
   }
 

@@ -71,16 +71,16 @@ public class CsvIngesterSocialTest {
 
   @Test
   public void testBlueSky() throws Exception {
-    csvIngester.ingest(getTestFile("social-survey-sample.csv"));
+    csvIngester.ingest(getTestFile("social-survey-sample.csv"), "test");
     verify(sampleService, times(1)).processSampleSummary(any(SocialSurveySample.class),
-        anyListOf(SocialSampleUnit.class), eq(1));
+        anyListOf(SocialSampleUnit.class), eq(1), any(String.class));
   }
 
   @Test(expected = CTPException.class)
   public void missingColumns() throws Exception {
-    csvIngester.ingest(getTestFile("social-survey-sample-missing-columns.csv"));
+    csvIngester.ingest(getTestFile("social-survey-sample-missing-columns.csv"), "test");
     verify(sampleService, times(0)).processSampleSummary(any(SocialSurveySample.class),
-        anyListOf(SocialSampleUnit.class), eq(1));
+        anyListOf(SocialSampleUnit.class), eq(1), "test");
     thrown.expect(CTPException.class);
   }
 

@@ -240,9 +240,9 @@ public class SampleServiceImpl implements SampleService {
       case "B":
         return csvIngesterBusiness.ingest(file, collectionExerciseId);
       case "CENSUS":
-        return csvIngesterCensus.ingest(file);
+        return csvIngesterCensus.ingest(file, collectionExerciseId);
       case "SOCIAL":
-        return csvIngesterSocial.ingest(file);
+        return csvIngesterSocial.ingest(file, collectionExerciseId);
       default:
         throw new UnsupportedOperationException(String.format("Type %s not implemented", type));
     }
