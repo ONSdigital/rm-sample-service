@@ -51,7 +51,6 @@ public class PartyUtil {
       businessSampleUnit.setSeltype(bsu.getSeltype());
       businessSampleUnit.setInclexcl(bsu.getInclexcl());
       businessSampleUnit.setCellNo(Integer.valueOf(bsu.getCell_no()));
-      businessSampleUnit.setFrotover(Integer.valueOf(bsu.getFrotover()));
       businessSampleUnit.setFormtype(bsu.getFormType());
       businessSampleUnit.setCurrency(bsu.getCurrency());
       party.setAttributes(businessSampleUnit);
