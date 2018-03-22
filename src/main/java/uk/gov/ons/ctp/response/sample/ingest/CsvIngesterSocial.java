@@ -57,7 +57,7 @@ public class CsvIngesterSocial extends CsvToBean<SocialSampleUnit> {
     columnPositionMappingStrategy.setColumnMapping(COLUMNS);
   }
 
-  public SampleSummary ingest(MultipartFile file)
+  public SampleSummary ingest(MultipartFile file, String collectionExerciseId)
       throws Exception {
 
     CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()), ':');
@@ -84,7 +84,7 @@ public class CsvIngesterSocial extends CsvToBean<SocialSampleUnit> {
 
       businessSurveySample.setSampleUnits(samplingUnitList);
 
-      sampleSummary = sampleService.processSampleSummary(businessSurveySample, samplingUnitList, expectedCI);
+      sampleSummary = sampleService.processSampleSummary(businessSurveySample, samplingUnitList, expectedCI, collectionExerciseId);
 
     return sampleSummary;
   }

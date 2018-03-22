@@ -78,7 +78,7 @@ public class SampleEndpointUnitTest {
         MockMultipartFile file = new MockMultipartFile("file", "filename.txt".getBytes());
 
         // When
-        ResultActions actions = mockMvc.perform(fileUpload(String.format("/samples/%s/fileupload", type)).file(file));
+        ResultActions actions = mockMvc.perform(fileUpload(String.format("/samples/%s/fileupload?collectionExerciseId=test", type)).file(file));
 
         // Then
         actions.andExpect(status().isCreated());
@@ -91,7 +91,7 @@ public class SampleEndpointUnitTest {
         MockMultipartFile file = new MockMultipartFile("file", "filename.txt".getBytes());
 
         // When
-        ResultActions actions = mockMvc.perform(fileUpload(String.format("/samples/%s/fileupload", type)).file(file));
+        ResultActions actions = mockMvc.perform(fileUpload(String.format("/samples/%s/fileupload?collectionExerciseId=test", type)).file(file));
 
         // Then
         actions.andExpect(status().isBadRequest());

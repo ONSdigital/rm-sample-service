@@ -136,7 +136,7 @@ public class SampleServiceImplTest {
     BusinessSurveySample businessSample = surveySample.get(0);
     when(sampleSummaryRepository.save(any(SampleSummary.class))).then(returnsFirstArg());
 
-    sampleServiceImpl.processSampleSummary(businessSample, businessSample.getSampleUnits(), 2);
+    sampleServiceImpl.processSampleSummary(businessSample, businessSample.getSampleUnits(), 2, "test");
 
     verify(sampleSummaryRepository).save(any(SampleSummary.class));
     verify(sampleUnitRepository, times(2)).save(any(SampleUnit.class));
@@ -224,10 +224,10 @@ public class SampleServiceImplTest {
     MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
 
     // When
-    SampleSummary sampleSummary = sampleServiceImpl.ingest(file, "B");
+    SampleSummary sampleSummary = sampleServiceImpl.ingest(file, "B", "test");
 
     // Then
-    verify(csvIngesterBusiness, times(1)).ingest(file);
+    verify(csvIngesterBusiness, times(1)).ingest(file, "test");
   }
 
   @Test
@@ -236,10 +236,10 @@ public class SampleServiceImplTest {
     MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
 
     // When
-    SampleSummary sampleSummary = sampleServiceImpl.ingest(file, "b");
+    SampleSummary sampleSummary = sampleServiceImpl.ingest(file, "b", "test");
 
     // Then
-    verify(csvIngesterBusiness, times(1)).ingest(file);
+    verify(csvIngesterBusiness, times(1)).ingest(file, "test");
   }
 
   @Test(expected = UnsupportedOperationException.class)
@@ -248,7 +248,7 @@ public class SampleServiceImplTest {
     MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
 
     // When
-    sampleServiceImpl.ingest(file, "invalid-type");
+    sampleServiceImpl.ingest(file, "invalid-type", "test");
 
     // Then expect exception
   }
