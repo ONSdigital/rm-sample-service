@@ -50,7 +50,8 @@ public class PartyUtil {
       businessSampleUnit.setTradstyle3(bsu.getTradstyle3());
       businessSampleUnit.setSeltype(bsu.getSeltype());
       businessSampleUnit.setInclexcl(bsu.getInclexcl());
-      businessSampleUnit.setFrotover(Integer.valueOf(bsu.getCell_no()));
+      businessSampleUnit.setCellNo(Integer.valueOf(bsu.getCell_no()));
+      businessSampleUnit.setFrotover(Integer.valueOf(bsu.getFrotover()));
       businessSampleUnit.setFormtype(bsu.getFormType());
       businessSampleUnit.setCurrency(bsu.getCurrency());
       party.setAttributes(businessSampleUnit);
