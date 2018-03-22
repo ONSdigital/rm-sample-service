@@ -27,7 +27,6 @@
 		   "seltype": "C",
 		   "inclexcl": "D",
 		   "cell_no": 7,
-		   "formtype2": "0015",
 		   "currency": "S"
 	},
 	{	  "sampleUnitRef": "0987654321",
@@ -53,7 +52,6 @@
 		  "seltype": "C",
 		  "inclexcl": "D",
 		  "cell_no": 7,
-		  "formtype2": "0015",
 		  "currency": "S"
 	  }]
 }
