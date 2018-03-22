@@ -32,12 +32,8 @@ public class PartyUtil {
       businessSampleUnit.setRusic92(bsu.getRusic92());
       businessSampleUnit.setFrosic2007(bsu.getFrosic2007());
       businessSampleUnit.setRusic2007(bsu.getRusic2007());
-      if (!bsu.getFroempment().equals("")) {
-        businessSampleUnit.setFroempment(Integer.valueOf(bsu.getFroempment()));
-      }
-      if (!bsu.getFrotover().equals("")) {
-        businessSampleUnit.setFrotover(Integer.valueOf(bsu.getFrotover()));
-      }
+      businessSampleUnit.setFroempment(Integer.valueOf(bsu.getFroempment()));
+      businessSampleUnit.setFrotover(Integer.valueOf(bsu.getFrotover()));
       businessSampleUnit.setEntref(bsu.getEntref());
       businessSampleUnit.setLegalstatus(bsu.getLegalstatus());
       businessSampleUnit.setEntrepmkr(bsu.getEntrepmkr());
@@ -54,9 +50,7 @@ public class PartyUtil {
       businessSampleUnit.setTradstyle3(bsu.getTradstyle3());
       businessSampleUnit.setSeltype(bsu.getSeltype());
       businessSampleUnit.setInclexcl(bsu.getInclexcl());
-      if (!bsu.getCell_no().equals("")) {
-        businessSampleUnit.setFrotover(Integer.valueOf(bsu.getCell_no()));
-      }
+      businessSampleUnit.setFrotover(Integer.valueOf(bsu.getCell_no()));
       businessSampleUnit.setFormtype(bsu.getFormType());
       businessSampleUnit.setCurrency(bsu.getCurrency());
       party.setAttributes(businessSampleUnit);
