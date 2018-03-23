@@ -5,6 +5,8 @@ import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import validation.BusinessSampleUnit;
 import validation.SampleUnitBase;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * Util for the Party Service
  */
@@ -32,8 +34,12 @@ public class PartyUtil {
       businessSampleUnit.setRusic92(bsu.getRusic92());
       businessSampleUnit.setFrosic2007(bsu.getFrosic2007());
       businessSampleUnit.setRusic2007(bsu.getRusic2007());
-      businessSampleUnit.setFroempment(Integer.valueOf(bsu.getFroempment()));
-      businessSampleUnit.setFrotover(Integer.valueOf(bsu.getFrotover()));
+      if (StringUtils.isNumeric(bsu.getFroempment())) {
+        businessSampleUnit.setFroempment(Integer.valueOf(bsu.getFroempment()));
+      }
+      if (StringUtils.isNumeric(bsu.getFrotover())) {
+        businessSampleUnit.setFrotover(Integer.valueOf(bsu.getFrotover()));
+      }
       businessSampleUnit.setEntref(bsu.getEntref());
       businessSampleUnit.setLegalstatus(bsu.getLegalstatus());
       businessSampleUnit.setEntrepmkr(bsu.getEntrepmkr());
@@ -50,7 +56,9 @@ public class PartyUtil {
       businessSampleUnit.setTradstyle3(bsu.getTradstyle3());
       businessSampleUnit.setSeltype(bsu.getSeltype());
       businessSampleUnit.setInclexcl(bsu.getInclexcl());
-      businessSampleUnit.setCellNo(Integer.valueOf(bsu.getCell_no()));
+      if (StringUtils.isNumeric(bsu.getCell_no())) {
+        businessSampleUnit.setFrotover(Integer.valueOf(bsu.getCell_no()));
+      }
       businessSampleUnit.setFormtype(bsu.getFormType());
       businessSampleUnit.setCurrency(bsu.getCurrency());
       party.setAttributes(businessSampleUnit);
