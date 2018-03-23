@@ -57,6 +57,7 @@ spring:
     username: samplesvc
     password: samplesvc
     driverClassName: org.postgresql.Driver
+    continue-on-error: true
     tomcat:
       initial-size: 5
       max-active: 10
