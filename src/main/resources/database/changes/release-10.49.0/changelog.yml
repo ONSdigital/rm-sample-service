@@ -3,6 +3,9 @@ databaseChangeLog:
   - changeSet:
       id: 10.49.0-1
       author: Sarah Radford
+      validCheckSum:
+        - 7:b8f0c2df73584e8ed4e5bda477f592af
+        - 7:71c68a1a6b2db4d84c6901b471198930
       changes:
         - sqlFile:
             comment: Add uuids to sample tables
