@@ -63,6 +63,11 @@ spring:
       max-active: 10
       max-idle: 5
       min-idle: 3
+  http:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
+      file-size-threshold: 0
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect

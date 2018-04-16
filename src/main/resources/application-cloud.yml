@@ -41,6 +41,11 @@ server:
 spring:
   application:
     name: ONS SampleService
+  http:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
+      file-size-threshold: 0
 
   datasource:
     driverClassName: org.postgresql.Driver
