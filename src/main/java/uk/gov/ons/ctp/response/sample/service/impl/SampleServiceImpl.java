@@ -195,9 +195,12 @@ public class SampleServiceImpl implements SampleService {
    */
   @Override
   public Integer initialiseCollectionExerciseJob(CollectionExerciseJob job) throws CTPException {
-    Integer sampleUnitsTotal = initialiseSampleUnitsForCollectionExcerciseCollection(job.getSampleSummaryId());
-    if (sampleUnitsTotal != 0) {
-      collectionExerciseJobService.storeCollectionExerciseJob(job);
+    //Integer sampleUnitsTotal = initialiseSampleUnitsForCollectionExcerciseCollection(job.getSampleSummaryId());
+	  Integer sampleUnitsTotal = 0;
+	  SampleSummary sampleSummary = sampleSummaryRepository.findById(job.getSampleSummaryId());
+	  if (sampleSummary != null && sampleSummary.getTotalSampleUnits() != 0) {
+		  sampleUnitsTotal = sampleSummary.getTotalSampleUnits();
+		  collectionExerciseJobService.storeCollectionExerciseJob(job);
     }
     return sampleUnitsTotal;
   }
