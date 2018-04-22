@@ -1,6 +1,5 @@
 package uk.gov.ons.ctp.response.sample.endpoint;
 
-import com.google.common.collect.Lists;
 import liquibase.util.csv.opencsv.bean.CsvToBean;
 import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
@@ -99,7 +98,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
 
   @RequestMapping(value = "/{type}/fileupload", method = RequestMethod.POST, consumes = "multipart/form-data")
   public final @ResponseBody ResponseEntity<SampleSummary> uploadSampleFile(@PathVariable("type") final String type, @RequestParam("file") MultipartFile file) throws CTPException {
-    log.debug("Entering Sample file upload for Type {}", type);
+    log.info("Entering Sample file upload for Type {}", type);
     if (!Arrays.asList("B", "CENSUS", "SOCIAL").contains(type.toUpperCase())) {
       return ResponseEntity.badRequest().build();
     }

@@ -57,7 +57,7 @@ public class SampleServiceImplTest {
 
   @Mock
   private SampleUnitRepository sampleUnitRepository;
-
+  
   @Mock
   private StateTransitionManager<SampleSummaryDTO.SampleState, SampleSummaryDTO.SampleEvent> sampleSvcStateTransitionManager;
 
@@ -211,11 +211,11 @@ public class SampleServiceImplTest {
    */
   @Test
   public void testOneCollectionExerciseJobIsStoredWhenSampleUnitsAreFound() throws Exception {
-    when(sampleSummaryRepository.findById(UUID.fromString("14fb3e68-4dca-46db-bf49-04b84e07e77f"))).thenReturn(sampleSummaryList.get(0));
-    when(sampleUnitRepository.findBySampleSummaryFK(1)).thenReturn(sampleUnit);
+	SampleSummary sampleSummary = sampleServiceImpl.createSampleSummary(surveySample.get(0), 5, 2);
+    when(sampleSummaryRepository.findById(any())).thenReturn(sampleSummary);
     Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(1)).storeCollectionExerciseJob(any());
-    assertThat(sampleUnitsTotal, is(1));
+    assertThat(sampleUnitsTotal, is(5));
   }
 
   @Test
