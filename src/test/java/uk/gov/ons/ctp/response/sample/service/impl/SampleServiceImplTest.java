@@ -218,6 +218,36 @@ public class SampleServiceImplTest {
     assertThat(sampleUnitsTotal, is(5));
   }
 
+  /**
+   * Test that a CollectionExerciseJob is NOT stored if there are No SampleUnits
+   * found for the surveyRef that have not been previously sent to CollectionExercise
+   *
+   * @throws Exception oops
+   */
+  @Test
+  public void testNoCollectionExerciseJobIsStoredWhenNoSampleUnitsAreFound() throws Exception {
+	SampleSummary sampleSummary = sampleServiceImpl.createSampleSummary(surveySample.get(0), 0, 2);
+    when(sampleSummaryRepository.findById(any())).thenReturn(sampleSummary);
+    Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
+    verify(collectionExerciseJobService, times(0)).storeCollectionExerciseJob(any());
+    assertThat(sampleUnitsTotal, is(0));
+  }
+  
+  /**
+   * Test that a CollectionExerciseJob is NOT stored if there are No SampleSummaries
+   * found for the surveyRef that have not been previously sent to CollectionExercise
+   *
+   * @throws Exception oops
+   */
+  @Test
+  public void testNoCollectionExerciseJobIsStoredWhenNoSampleSummaryIsFound() throws Exception {
+	SampleSummary sampleSummary = null;
+    when(sampleSummaryRepository.findById(any())).thenReturn(sampleSummary);
+    Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
+    verify(collectionExerciseJobService, times(0)).storeCollectionExerciseJob(any());
+    assertThat(sampleUnitsTotal, is(0));
+  }
+  
   @Test
   public void testIngestBTypeSample() throws Exception {
     // Given
