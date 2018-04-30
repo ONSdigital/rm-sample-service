@@ -1,0 +1,11 @@
+---
+applications:
+- name: samplesvc
+  instances: 1
+  memory: 1024M
+  path: target/samplesvc.jar
+  timeout: 180
+  services:
+    - rm-pg-db
+    - rm-redis
+    - rm-rabbitmq
