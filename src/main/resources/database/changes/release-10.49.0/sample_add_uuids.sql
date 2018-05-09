@@ -8,10 +8,10 @@ ALTER TABLE sample.sampleunit    ADD COLUMN id uuid;
 
 -- Add uuids 
 UPDATE  sample.samplesummary
-SET id = public.gen_random_uuid();
+SET id = gen_random_uuid();
 
 UPDATE sample.sampleunit
-SET id = public.gen_random_uuid();
+SET id = gen_random_uuid();
 
 -- Set id columns to not null
 ALTER TABLE sample.samplesummary ALTER COLUMN id SET NOT NULL;
