@@ -6,7 +6,6 @@ databaseChangeLog:
       validCheckSum:
         - 7:b8f0c2df73584e8ed4e5bda477f592af
         - 7:71c68a1a6b2db4d84c6901b471198930
-        - 7:19d3c49acc2155ca710da5ac2e1fe036
       changes:
         - sqlFile:
             comment: Add uuids to sample tables
