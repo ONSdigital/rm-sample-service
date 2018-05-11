@@ -39,3 +39,12 @@ databaseChangeLog:
             path: add_samplesummary_columns.sql
             relativeToChangelogFile: true
             splitStatements: false
+  - changeSet:
+      id: 10.49.0-5
+      author: Matt Innes
+      changes:
+        - sqlFile:
+            comment: Adds a FAILED state to the samplesummarystate table
+            path: add_failed_state_to_sample_summary.sql
+            relativeToChangelogFile: true
+            splitStatements: false

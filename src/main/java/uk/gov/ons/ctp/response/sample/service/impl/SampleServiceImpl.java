@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import springfox.documentation.annotations.ApiIgnore;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.common.time.DateTimeUtil;
@@ -23,6 +24,7 @@ import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterCensus;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterSocial;
 import uk.gov.ons.ctp.response.sample.message.EventPublisher;
 import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
+import uk.gov.ons.ctp.response.sample.message.SampleOutboundPublisher;
 import uk.gov.ons.ctp.response.sample.party.PartyUtil;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
@@ -65,6 +67,9 @@ public class SampleServiceImpl implements SampleService {
 
   @Autowired
   private PartyPublisher partyPublisher;
+
+  @Autowired
+  private SampleOutboundPublisher sampleOutboundPublisher;
 
   @Autowired
   private CollectionExerciseJobService collectionExerciseJobService;
@@ -232,16 +237,27 @@ public class SampleServiceImpl implements SampleService {
   }
 
   @Override public SampleSummary ingest(MultipartFile file, String type) throws Exception {
+    SampleSummary result = new SampleSummary();
+
+    this.sampleOutboundPublisher.sampleUploadStarted(result);
+
     switch (type.toUpperCase()) {
       case "B":
-        return csvIngesterBusiness.ingest(file);
+        result = csvIngesterBusiness.ingest(file);
+        break;
       case "CENSUS":
-        return csvIngesterCensus.ingest(file);
+        result = csvIngesterCensus.ingest(file);
+        break;
       case "SOCIAL":
-        return csvIngesterSocial.ingest(file);
+        result = csvIngesterSocial.ingest(file);
+        break;
       default:
         throw new UnsupportedOperationException(String.format("Type %s not implemented", type));
     }
+
+    this.sampleOutboundPublisher.sampleUploadFinished(result);
+
+    return result;
   }
 
   @Override

@@ -1,5 +1,6 @@
 package uk.gov.ons.ctp.response.sample.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.sourceforge.cobertura.CoverageIgnore;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -66,4 +67,8 @@ public class SampleSummary implements Serializable {
   @Column(name = "expectedcollectioninstruments")
   private Integer expectedCollectionInstruments;
 
+  @JsonIgnore
+  public Integer getSampleSummaryPK() {
+    return sampleSummaryPK;
+  }
 }

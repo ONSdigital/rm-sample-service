@@ -20,6 +20,7 @@ import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
 import uk.gov.ons.ctp.response.sample.message.EventPublisher;
 import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
+import uk.gov.ons.ctp.response.sample.message.SampleOutboundPublisher;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
@@ -69,6 +70,9 @@ public class SampleServiceImplTest {
 
   @Mock
   private PartyPublisher partyPublisher;
+
+  @Mock
+  private SampleOutboundPublisher sampleOutboundPublisher;
 
   @Mock
   private CollectionExerciseJobService collectionExerciseJobService;
@@ -281,6 +285,19 @@ public class SampleServiceImplTest {
     sampleServiceImpl.ingest(file, "invalid-type");
 
     // Then expect exception
+  }
+
+  @Test
+  public void testIngestMessagesSent() throws Exception {
+    // Given
+    MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
+
+    // When
+    SampleSummary sampleSummary = sampleServiceImpl.ingest(file, "B");
+
+    // Then
+    verify(sampleOutboundPublisher, times(1)).sampleUploadStarted(any());
+    verify(sampleOutboundPublisher, times(1)).sampleUploadFinished(any());
   }
 
 }
