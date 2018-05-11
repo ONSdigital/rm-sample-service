@@ -1,11 +1,11 @@
 package uk.gov.ons.ctp.response.sample.service.impl;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.mock.web.MockMultipartFile;
 import uk.gov.ons.ctp.common.FixtureHelper;
@@ -32,7 +32,9 @@ import uk.gov.ons.ctp.response.sample.service.PartySvcClientService;
 import validation.BusinessSurveySample;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.Future;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -106,6 +108,9 @@ public class SampleServiceImplTest {
     sampleUnit = FixtureHelper.loadClassFixtures(SampleUnit[].class);
     sampleSummaryList = FixtureHelper.loadClassFixtures(SampleSummary[].class);
     collectionExerciseJobs = FixtureHelper.loadClassFixtures(CollectionExerciseJob[].class);
+
+    // This is required for pretty much all tests that create a sample summary
+    when(this.sampleSummaryRepository.save(any(SampleSummary.class))).then(returnsFirstArg());
   }
 
   /**
@@ -116,7 +121,6 @@ public class SampleServiceImplTest {
    */
   @Test
   public void verifySampleSummaryCreatedCorrectly() {
-    when(sampleSummaryRepository.save(any(SampleSummary.class))).then(returnsFirstArg());
     SampleSummary sampleSummary = sampleServiceImpl.createAndSaveSampleSummary();
 
     assertNotNull(sampleSummary.getIngestDateTime());
@@ -135,7 +139,6 @@ public class SampleServiceImplTest {
    */
   @Test
   public void testSampleSummaryAndSampleUnitsAreSavedAndThenSampleUnitsPublishedToQueue() {
-    when(sampleSummaryRepository.save(any(SampleSummary.class))).then(returnsFirstArg());
     SampleSummary newSummary = sampleServiceImpl.createAndSaveSampleSummary();
     BusinessSurveySample businessSample = surveySample.get(0);
 
@@ -222,7 +225,6 @@ public class SampleServiceImplTest {
   }
 
   private SampleSummary createSampleSummary(int numSamples, int expectedInstruments){
-    when(sampleSummaryRepository.save(any(SampleSummary.class))).then(returnsFirstArg());
     SampleSummary newSummary = sampleServiceImpl.createAndSaveSampleSummary();
 
     newSummary.setTotalSampleUnits(numSamples);
@@ -267,10 +269,13 @@ public class SampleServiceImplTest {
     MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
 
     // When
-    SampleSummary sampleSummary = sampleServiceImpl.ingest(file, "B");
+    Pair<SampleSummary, Future<Optional<SampleSummary>>> result = sampleServiceImpl.ingest(file, "B");
+
+    // Forces wait for completion
+    result.getRight().get();
 
     // Then
-    verify(csvIngesterBusiness, times(1)).ingest(sampleSummary, file);
+    verify(csvIngesterBusiness, times(1)).ingest(result.getLeft(), file);
   }
 
   @Test
@@ -279,21 +284,31 @@ public class SampleServiceImplTest {
     MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
 
     // When
-    SampleSummary sampleSummary = sampleServiceImpl.ingest(file, "b");
+    Pair<SampleSummary, Future<Optional<SampleSummary>>> result = sampleServiceImpl.ingest(file, "b");
+
+    // Forces wait for completion
+    result.getRight().get();
 
     // Then
-    verify(csvIngesterBusiness, times(1)).ingest(sampleSummary, file);
+    verify(csvIngesterBusiness, times(1)).ingest(result.getLeft(), file);
   }
 
-  @Test(expected = UnsupportedOperationException.class)
+  @Test
   public void testUploadInvalidTypeSample() throws Exception {
+    when(this.sampleSvcStateTransitionManager.transition(SampleState.INIT, SampleEvent.FAIL_VALIDATION))
+            .thenReturn(SampleState.FAILED);
     // Given
     MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
 
     // When
-    sampleServiceImpl.ingest(file, "invalid-type");
+    Pair<SampleSummary, Future<Optional<SampleSummary>>> result = sampleServiceImpl.ingest(file, "invalid-type");
+
+    // Forces wait for completion
+    SampleSummary finalSummary = result.getRight().get().get();
 
     // Then expect exception
+    assertEquals(SampleState.FAILED, finalSummary.getState());
+    assertTrue(finalSummary.getNotes().contains("UnsupportedOperationException"));
   }
 
   @Test
@@ -302,7 +317,10 @@ public class SampleServiceImplTest {
     MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
 
     // When
-    SampleSummary sampleSummary = sampleServiceImpl.ingest(file, "B");
+    Pair<SampleSummary, Future<Optional<SampleSummary>>> result = sampleServiceImpl.ingest(file, "B");
+
+    // Forces wait for completion
+    result.getRight().get();
 
     // Then
     verify(sampleOutboundPublisher, times(1)).sampleUploadStarted(any());

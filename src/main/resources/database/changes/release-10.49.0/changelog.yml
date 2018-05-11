@@ -48,3 +48,12 @@ databaseChangeLog:
             path: add_failed_state_to_sample_summary.sql
             relativeToChangelogFile: true
             splitStatements: false
+  - changeSet:
+      id: 10.49.0-6
+      author: Matt Innes
+      changes:
+        - sqlFile:
+            comment: Adds a notes column to the sample summary to hold an error message
+            path: add_notes_to_sample_summary.sql
+            relativeToChangelogFile: true
+            splitStatements: false

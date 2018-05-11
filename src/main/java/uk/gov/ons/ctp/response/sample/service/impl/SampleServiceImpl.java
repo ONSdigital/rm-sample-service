@@ -1,6 +1,7 @@
 package uk.gov.ons.ctp.response.sample.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
@@ -8,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import springfox.documentation.annotations.ApiIgnore;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.common.time.DateTimeUtil;
@@ -31,22 +31,29 @@ import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.service.CollectionExerciseJobService;
 import uk.gov.ons.ctp.response.sample.service.PartySvcClientService;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
-import validation.BusinessSampleUnit;
 import validation.SampleUnitBase;
-import validation.SurveyBase;
 
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 @Slf4j
 @Service
 @Configuration
 public class SampleServiceImpl implements SampleService {
+
+  private static final int NUM_UPLOAD_THREADS = 5;
+  private static final int MAX_DESCRIPTION_LENGTH = 5;
+
+  private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(NUM_UPLOAD_THREADS);
 
   @Autowired
   private SampleSummaryRepository sampleSummaryRepository;
@@ -250,21 +257,17 @@ public class SampleServiceImpl implements SampleService {
     return sampleUnitsTotal;
   }
 
-  @Override public SampleSummary ingest(MultipartFile file, String type) throws Exception {
-    final SampleSummary newSummary = createAndSaveSampleSummary();
-    final SampleSummary result;
-
-    this.sampleOutboundPublisher.sampleUploadStarted(newSummary);
-
+  public SampleSummary initiateIngest(final SampleSummary sampleSummary, final MultipartFile file, final String type) throws Exception {
+    SampleSummary result;
     switch (type.toUpperCase()) {
       case "B":
-        result = csvIngesterBusiness.ingest(newSummary, file);
+        result = csvIngesterBusiness.ingest(sampleSummary, file);
         break;
       case "CENSUS":
-        result = csvIngesterCensus.ingest(newSummary, file);
+        result = csvIngesterCensus.ingest(sampleSummary, file);
         break;
       case "SOCIAL":
-        result = csvIngesterSocial.ingest(newSummary, file);
+        result = csvIngesterSocial.ingest(sampleSummary, file);
         break;
       default:
         throw new UnsupportedOperationException(String.format("Type %s not implemented", type));
@@ -273,6 +276,52 @@ public class SampleServiceImpl implements SampleService {
     this.sampleOutboundPublisher.sampleUploadFinished(result);
 
     return result;
+  }
+
+  @Override
+  public Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, String message){
+    try {
+      SampleSummaryDTO.SampleState newState = sampleSvcStateTransitionManager.transition(sampleSummary.getState(),
+              SampleSummaryDTO.SampleEvent.FAIL_VALIDATION);
+      sampleSummary.setState(newState);
+      sampleSummary.setNotes(message);
+      return Optional.of(this.sampleSummaryRepository.save(sampleSummary));
+    } catch (CTPException e) {
+        log.error("Failed to put sample summary {} into FAILED state - {}", sampleSummary.getId(), e);
+
+        return Optional.empty();
+    }
+  }
+
+  @Override
+  public Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, Exception exception){
+      return failSampleSummary(sampleSummary, exception.toString());
+  }
+
+  /**
+   * Method to kick off a task to ingest a job
+   * @param file Multipart File of SurveySample to be used
+   * @param type Type of Survey to be used
+   * @return a pair containing the newly created SampleSummary and a Future for the long running task
+   * @throws CTPException thrown if upload started message cannot be sent
+   */
+  @Override
+  public Pair<SampleSummary, Future<Optional<SampleSummary>>> ingest(final MultipartFile file, final String type) throws CTPException {
+    final SampleSummary newSummary = createAndSaveSampleSummary();
+
+    this.sampleOutboundPublisher.sampleUploadStarted(newSummary);
+
+    Callable<Optional<SampleSummary>> callable =() -> {
+      try {
+        return Optional.of(initiateIngest(newSummary, file, type));
+      } catch (Exception e) {
+        return failSampleSummary(newSummary, e);
+      }
+    };
+
+    Future<Optional<SampleSummary>> future = EXECUTOR_SERVICE.submit(callable);
+
+    return Pair.of(newSummary, future);
   }
 
   @Override

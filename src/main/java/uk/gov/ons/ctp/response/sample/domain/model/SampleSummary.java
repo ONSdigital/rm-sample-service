@@ -14,6 +14,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.UUID;
@@ -71,4 +72,12 @@ public class SampleSummary implements Serializable {
   public Integer getSampleSummaryPK() {
     return sampleSummaryPK;
   }
+
+  @Column(name = "notes")
+  @Size(max=255)
+  private String notes;
+
+  @Column(name = "description")
+  @Size(max=250)
+  private String description;
 }
