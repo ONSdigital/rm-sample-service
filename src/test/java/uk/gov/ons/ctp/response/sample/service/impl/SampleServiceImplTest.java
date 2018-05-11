@@ -100,7 +100,6 @@ public class SampleServiceImplTest {
    */
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
     surveySample = FixtureHelper.loadClassFixtures(BusinessSurveySample[].class);
     party = FixtureHelper.loadClassFixtures(PartyCreationRequestDTO[].class);
     partyDTO = FixtureHelper.loadClassFixtures(PartyDTO[].class);
@@ -116,16 +115,15 @@ public class SampleServiceImplTest {
    * @throws Exception oops
    */
   @Test
-  public void verifySampleSummaryCreatedCorrectly() throws Exception {
-    SampleSummary sampleSummary = sampleServiceImpl.createSampleSummary(surveySample.get(0), 5, 2);
+  public void verifySampleSummaryCreatedCorrectly() {
+    when(sampleSummaryRepository.save(any(SampleSummary.class))).then(returnsFirstArg());
+    SampleSummary sampleSummary = sampleServiceImpl.createAndSaveSampleSummary();
 
-    //assertTrue(sampleSummary.getSurveyRef().equals("abc"));
     assertNotNull(sampleSummary.getIngestDateTime());
-    //assertTrue(sampleSummary.getEffectiveEndDateTime().getTime() == EFFECTIVEENDDATETIME);
-    //assertTrue(sampleSummary.getEffectiveStartDateTime().getTime() == EFFECTIVESTARTDATETIME);
     assertTrue(sampleSummary.getState() == SampleSummaryDTO.SampleState.INIT);
-    assertTrue(sampleSummary.getTotalSampleUnits() == 5);
-    assertTrue(sampleSummary.getExpectedCollectionInstruments() == 2);
+    assertNotNull(sampleSummary.getId());
+
+    verify(sampleSummaryRepository).save(sampleSummary);
   }
 
   /**
@@ -136,13 +134,14 @@ public class SampleServiceImplTest {
    * @throws Exception oops
    */
   @Test
-  public void testSampleSummaryAndSampleUnitsAreSavedAndThenSampleUnitsPublishedToQueue() throws Exception {
-    BusinessSurveySample businessSample = surveySample.get(0);
+  public void testSampleSummaryAndSampleUnitsAreSavedAndThenSampleUnitsPublishedToQueue() {
     when(sampleSummaryRepository.save(any(SampleSummary.class))).then(returnsFirstArg());
+    SampleSummary newSummary = sampleServiceImpl.createAndSaveSampleSummary();
+    BusinessSurveySample businessSample = surveySample.get(0);
 
-    sampleServiceImpl.processSampleSummary(businessSample, businessSample.getSampleUnits(), 2);
+    sampleServiceImpl.processSampleSummary(newSummary, businessSample.getSampleUnits());
 
-    verify(sampleSummaryRepository).save(any(SampleSummary.class));
+    verify(sampleSummaryRepository, times(2)).save(any(SampleSummary.class));
     verify(sampleUnitRepository, times(2)).save(any(SampleUnit.class));
     verify(partyPublisher, times(2)).publish(any(PartyCreationRequestDTO.class));
   }
@@ -215,11 +214,21 @@ public class SampleServiceImplTest {
    */
   @Test
   public void testOneCollectionExerciseJobIsStoredWhenSampleUnitsAreFound() throws Exception {
-	SampleSummary sampleSummary = sampleServiceImpl.createSampleSummary(surveySample.get(0), 5, 2);
-    when(sampleSummaryRepository.findById(any())).thenReturn(sampleSummary);
+    SampleSummary newSummary = createSampleSummary(5, 2);
+    when(sampleSummaryRepository.findById(any())).thenReturn(newSummary);
     Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(1)).storeCollectionExerciseJob(any());
     assertThat(sampleUnitsTotal, is(5));
+  }
+
+  private SampleSummary createSampleSummary(int numSamples, int expectedInstruments){
+    when(sampleSummaryRepository.save(any(SampleSummary.class))).then(returnsFirstArg());
+    SampleSummary newSummary = sampleServiceImpl.createAndSaveSampleSummary();
+
+    newSummary.setTotalSampleUnits(numSamples);
+    newSummary.setExpectedCollectionInstruments(expectedInstruments);
+
+    return newSummary;
   }
 
   /**
@@ -230,8 +239,8 @@ public class SampleServiceImplTest {
    */
   @Test
   public void testNoCollectionExerciseJobIsStoredWhenNoSampleUnitsAreFound() throws Exception {
-	SampleSummary sampleSummary = sampleServiceImpl.createSampleSummary(surveySample.get(0), 0, 2);
-    when(sampleSummaryRepository.findById(any())).thenReturn(sampleSummary);
+    SampleSummary newSummary = createSampleSummary(0, 2);
+    when(sampleSummaryRepository.findById(any())).thenReturn(newSummary);
     Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(0)).storeCollectionExerciseJob(any());
     assertThat(sampleUnitsTotal, is(0));
@@ -261,7 +270,7 @@ public class SampleServiceImplTest {
     SampleSummary sampleSummary = sampleServiceImpl.ingest(file, "B");
 
     // Then
-    verify(csvIngesterBusiness, times(1)).ingest(file);
+    verify(csvIngesterBusiness, times(1)).ingest(sampleSummary, file);
   }
 
   @Test
@@ -273,7 +282,7 @@ public class SampleServiceImplTest {
     SampleSummary sampleSummary = sampleServiceImpl.ingest(file, "b");
 
     // Then
-    verify(csvIngesterBusiness, times(1)).ingest(file);
+    verify(csvIngesterBusiness, times(1)).ingest(sampleSummary, file);
   }
 
   @Test(expected = UnsupportedOperationException.class)

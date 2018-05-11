@@ -85,15 +85,12 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
     columnPositionMappingStrategy.setColumnMapping(COLUMNS);
   }
 
-  public SampleSummary ingest(MultipartFile file)
+  public SampleSummary ingest(final SampleSummary sampleSummary, final MultipartFile file)
       throws Exception {
 
     CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()), ':');
     String[] nextLine;
-    SampleSummary sampleSummary;
-    BusinessSurveySample businessSurveySample = new BusinessSurveySample();
     List<BusinessSampleUnit> samplingUnitList = new ArrayList<>();
-    Integer expectedCI;
 
       while((nextLine = csvReader.readNext()) != null) {
 
@@ -110,22 +107,8 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
         samplingUnitList.add(businessSampleUnit);
 
       }
-      expectedCI = calculateExpectedCollectionInstruments(samplingUnitList);
 
-      businessSurveySample.setSampleUnits(samplingUnitList);
-
-      sampleSummary = sampleService.processSampleSummary(businessSurveySample, samplingUnitList, expectedCI);
-
-    return sampleSummary;
-  }
-
-  private Integer calculateExpectedCollectionInstruments(List<BusinessSampleUnit> samplingUnitList) {
-    //TODO: get survey classifiers from survey service, currently using formtype for all business surveys
-    Set<String> formTypes = new HashSet<>();
-    for (BusinessSampleUnit businessSampleUnit : samplingUnitList) {
-      formTypes.add(businessSampleUnit.getFormType());
-    }
-    return formTypes.size();
+      return sampleService.processSampleSummary(sampleSummary, samplingUnitList);
   }
 
   /**

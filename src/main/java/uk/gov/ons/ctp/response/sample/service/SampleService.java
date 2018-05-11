@@ -1,5 +1,7 @@
 package uk.gov.ons.ctp.response.sample.service;
 
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
@@ -35,12 +37,16 @@ public interface SampleService {
   /**
    * Create and save a SampleSummary from the incoming SurveySample
    *
+   * @param sampleSummary the sample summary being processed
    * @param samplingUnitList list of sampling units.
-   * @param surveySampleObject SurveySample to be used
-   * @throws Exception exception thrown
    */
-  SampleSummary processSampleSummary(SurveyBase surveySampleObject, List<? extends SampleUnitBase> samplingUnitList, Integer expectedCollectionInstruments)
-          throws Exception;
+  SampleSummary processSampleSummary(SampleSummary sampleSummary, List<? extends SampleUnitBase> samplingUnitList);
+
+  /**
+   * Create a new sample summary and persist to the database
+   * @return the newly created sample summary
+   */
+  SampleSummary createAndSaveSampleSummary();
 
   /**
    * Update the SampleSummary state

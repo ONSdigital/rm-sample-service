@@ -1,5 +1,6 @@
 package uk.gov.ons.ctp.response.sample.endpoint;
 
+import javassist.tools.rmi.Sample;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,6 +14,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.mock.web.MockMultipartFile;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
+import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.BusinessSampleUnit;
@@ -79,11 +81,6 @@ public class CsvIngesterBusinessTest {
   private static final String FORMTYPE = "15";
   private static final String CURRENCY = "S";
 
-  @Before
-  public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-  }
-
   /**
    * take a named test file and create a copy of it - is because the ingester
    * will delete the source csv file after ingest
@@ -101,30 +98,34 @@ public class CsvIngesterBusinessTest {
 
   @Test
   public void testBlueSky() throws Exception {
-    csvIngester.ingest(getTestFile("business-survey-sample.csv"));
-    verify(sampleService, times(1)).processSampleSummary(any(BusinessSurveySample.class),
-        anyListOf(BusinessSampleUnit.class), eq(1));
+    SampleSummary sampleSummary = new SampleSummary();
+    csvIngester.ingest(sampleSummary, getTestFile("business-survey-sample.csv"));
+    verify(sampleService, times(1)).processSampleSummary(eq(sampleSummary),
+        anyListOf(BusinessSampleUnit.class));
   }
 
   @Test
   public void testMultipleLines() throws Exception {
-    csvIngester.ingest(getTestFile("business-survey-sample-multiple.csv"));
-    verify(sampleService, times(1)).processSampleSummary(any(BusinessSurveySample.class),
-            anyListOf(BusinessSampleUnit.class), eq(3));
+    SampleSummary sampleSummary = new SampleSummary();
+    csvIngester.ingest(sampleSummary, getTestFile("business-survey-sample-multiple.csv"));
+    verify(sampleService, times(1)).processSampleSummary(eq(sampleSummary),
+            anyListOf(BusinessSampleUnit.class));
   }
 
   @Test(expected = CTPException.class)
   public void testDate() throws Exception {
-    csvIngester.ingest(getTestFile("business-survey-sample-date.csv"));
-    verify(sampleService, times(0)).processSampleSummary(any(BusinessSurveySample.class),
-        anyListOf(BusinessSampleUnit.class), eq(1));
+    SampleSummary sampleSummary = new SampleSummary();
+    csvIngester.ingest(sampleSummary, getTestFile("business-survey-sample-date.csv"));
+    verify(sampleService, times(0)).processSampleSummary(eq(sampleSummary),
+        anyListOf(BusinessSampleUnit.class));
   }
 
   @Test(expected = CTPException.class)
   public void missingColumns() throws Exception {
-    csvIngester.ingest(getTestFile("business-survey-sample-missing-columns.csv"));
-    verify(sampleService, times(0)).processSampleSummary(any(BusinessSurveySample.class),
-        anyListOf(BusinessSampleUnit.class), eq(1));
+    SampleSummary sampleSummary = new SampleSummary();
+    csvIngester.ingest(sampleSummary, getTestFile("business-survey-sample-missing-columns.csv"));
+    verify(sampleService, times(0)).processSampleSummary(eq(sampleSummary),
+        anyListOf(BusinessSampleUnit.class));
     thrown.expect(CTPException.class);
   }
 

@@ -37,8 +37,10 @@ import validation.SurveyBase;
 
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
@@ -98,24 +100,36 @@ public class SampleServiceImpl implements SampleService {
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
-  public SampleSummary processSampleSummary(SurveyBase surveySample, List<? extends SampleUnitBase> samplingUnitList, Integer expectedCollectionInstruments)
-          throws Exception {
-    SampleSummary sampleSummary = createSampleSummary(surveySample, samplingUnitList.size(), expectedCollectionInstruments);
+  public SampleSummary processSampleSummary(SampleSummary sampleSummary, List<? extends SampleUnitBase> samplingUnitList) {
+    int expectedCI = calculateExpectedCollectionInstruments(samplingUnitList);
+
+    sampleSummary.setTotalSampleUnits(samplingUnitList.size());
+    sampleSummary.setExpectedCollectionInstruments(expectedCI);
     SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
     Map<String, UUID> sampleUnitIds = saveSampleUnits(samplingUnitList, savedSampleSummary);
     publishToPartyQueue(samplingUnitList, sampleUnitIds, sampleSummary.getId().toString());
     return savedSampleSummary;
   }
 
-  protected SampleSummary createSampleSummary(SurveyBase surveySample, Integer totalSampleUnits, Integer expectedCollectionInstruments)
-          throws ParseException {
+  private Integer calculateExpectedCollectionInstruments(List<? extends SampleUnitBase> samplingUnitList) {
+    //TODO: get survey classifiers from survey service, currently using formtype for all business surveys
+    Set<String> formTypes = new HashSet<>();
+    for (SampleUnitBase businessSampleUnit : samplingUnitList) {
+      formTypes.add(businessSampleUnit.getFormType());
+    }
+    return formTypes.size();
+  }
+
+  @Override
+  @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+  public SampleSummary createAndSaveSampleSummary(){
     SampleSummary sampleSummary = new SampleSummary();
+
     sampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
     sampleSummary.setState(SampleSummaryDTO.SampleState.INIT);
-    sampleSummary.setTotalSampleUnits(totalSampleUnits);
-    sampleSummary.setExpectedCollectionInstruments(expectedCollectionInstruments);
     sampleSummary.setId(UUID.randomUUID());
-    return sampleSummary;
+
+    return sampleSummaryRepository.save(sampleSummary);
   }
 
   private Map<String, UUID> saveSampleUnits(List<? extends SampleUnitBase> samplingUnitList, SampleSummary sampleSummary) {
@@ -140,7 +154,7 @@ public class SampleServiceImpl implements SampleService {
    * @param sampleUnitIds 
    * @throws Exception 
    * */
-  private void publishToPartyQueue(List<? extends SampleUnitBase> samplingUnitList, Map<String, UUID> sampleUnitIds, String sampleSummaryId) throws Exception {
+  private void publishToPartyQueue(List<? extends SampleUnitBase> samplingUnitList, Map<String, UUID> sampleUnitIds, String sampleSummaryId){
     for (SampleUnitBase sampleUnitBase : samplingUnitList) {
           PartyCreationRequestDTO party = PartyUtil.convertToParty(sampleUnitBase);
           party.getAttributes().setSampleUnitId(sampleUnitIds.get(sampleUnitBase.getSampleUnitRef()).toString());
@@ -237,19 +251,20 @@ public class SampleServiceImpl implements SampleService {
   }
 
   @Override public SampleSummary ingest(MultipartFile file, String type) throws Exception {
-    SampleSummary result = new SampleSummary();
+    final SampleSummary newSummary = createAndSaveSampleSummary();
+    final SampleSummary result;
 
-    this.sampleOutboundPublisher.sampleUploadStarted(result);
+    this.sampleOutboundPublisher.sampleUploadStarted(newSummary);
 
     switch (type.toUpperCase()) {
       case "B":
-        result = csvIngesterBusiness.ingest(file);
+        result = csvIngesterBusiness.ingest(newSummary, file);
         break;
       case "CENSUS":
-        result = csvIngesterCensus.ingest(file);
+        result = csvIngesterCensus.ingest(newSummary, file);
         break;
       case "SOCIAL":
-        result = csvIngesterSocial.ingest(file);
+        result = csvIngesterSocial.ingest(newSummary, file);
         break;
       default:
         throw new UnsupportedOperationException(String.format("Type %s not implemented", type));

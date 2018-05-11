@@ -83,13 +83,11 @@ public class CsvIngesterCensus extends CsvToBean<CensusSampleUnit> {
     columnPositionMappingStrategy.setColumnMapping(COLUMNS);
   }
 
-  public SampleSummary ingest(MultipartFile file)
+  public SampleSummary ingest(final SampleSummary sampleSummary, final MultipartFile file)
       throws Exception {
 
     CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()), ':');
     String[] nextLine;
-    SampleSummary sampleSummary;
-    CensusSurveySample censusSurveySample = new CensusSurveySample();
     List<CensusSampleUnit> samplingUnitList = new ArrayList<>();
     Integer expectedCI = 1; //TODO: Census should only have one collection instrument if this is not the case when census is onboarded expectedCI should be calculated
 
@@ -110,11 +108,7 @@ public class CsvIngesterCensus extends CsvToBean<CensusSampleUnit> {
 
       }
 
-      censusSurveySample.setSampleUnits(samplingUnitList);
-
-      sampleSummary = sampleService.processSampleSummary(censusSurveySample, samplingUnitList, expectedCI);
-
-    return sampleSummary;
+      return sampleService.processSampleSummary(sampleSummary, samplingUnitList);
   }
 
   /**

@@ -13,6 +13,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.mock.web.MockMultipartFile;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
+import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterSocial;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.SocialSampleUnit;
@@ -49,11 +50,6 @@ public class CsvIngesterSocialTest {
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
-  @Before
-  public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-  }
-
   /**
    * take a named test file and create a copy of it - is because the ingester
    * will delete the source csv file after ingest
@@ -71,16 +67,18 @@ public class CsvIngesterSocialTest {
 
   @Test
   public void testBlueSky() throws Exception {
-    csvIngester.ingest(getTestFile("social-survey-sample.csv"));
-    verify(sampleService, times(1)).processSampleSummary(any(SocialSurveySample.class),
-        anyListOf(SocialSampleUnit.class), eq(1));
+    SampleSummary newSummary = new SampleSummary();
+    csvIngester.ingest(newSummary, getTestFile("social-survey-sample.csv"));
+    verify(sampleService, times(1)).processSampleSummary(eq(newSummary),
+        anyListOf(SocialSampleUnit.class));
   }
 
   @Test(expected = CTPException.class)
   public void missingColumns() throws Exception {
-    csvIngester.ingest(getTestFile("social-survey-sample-missing-columns.csv"));
-    verify(sampleService, times(0)).processSampleSummary(any(SocialSurveySample.class),
-        anyListOf(SocialSampleUnit.class), eq(1));
+    SampleSummary newSummary = new SampleSummary();
+    csvIngester.ingest(newSummary, getTestFile("social-survey-sample-missing-columns.csv"));
+    verify(sampleService, times(0)).processSampleSummary(eq(newSummary),
+        anyListOf(SocialSampleUnit.class));
     thrown.expect(CTPException.class);
   }
 
