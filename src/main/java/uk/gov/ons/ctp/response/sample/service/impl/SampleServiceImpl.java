@@ -184,6 +184,9 @@ public class SampleServiceImpl implements SampleService {
             SampleSummaryDTO.SampleEvent.ACTIVATED);
     targetSampleSummary.setState(newState);
     sampleSummaryRepository.saveAndFlush(targetSampleSummary);
+    // Notify the outside world the sample upload has finished
+    this.sampleOutboundPublisher.sampleUploadFinished(targetSampleSummary);
+
     return targetSampleSummary;
   }
 
@@ -272,8 +275,6 @@ public class SampleServiceImpl implements SampleService {
       default:
         throw new UnsupportedOperationException(String.format("Type %s not implemented", type));
     }
-
-    this.sampleOutboundPublisher.sampleUploadFinished(result);
 
     return result;
   }

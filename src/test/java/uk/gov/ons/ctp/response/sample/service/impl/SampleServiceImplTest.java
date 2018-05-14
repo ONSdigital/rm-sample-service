@@ -324,7 +324,6 @@ public class SampleServiceImplTest {
 
     // Then
     verify(sampleOutboundPublisher, times(1)).sampleUploadStarted(any());
-    verify(sampleOutboundPublisher, times(1)).sampleUploadFinished(any());
   }
 
 }
