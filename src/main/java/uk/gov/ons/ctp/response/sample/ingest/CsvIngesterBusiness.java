@@ -91,21 +91,29 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
     CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()), ':');
     String[] nextLine;
     List<BusinessSampleUnit> samplingUnitList = new ArrayList<>();
+    int lineNumber = 0;
 
       while((nextLine = csvReader.readNext()) != null) {
+        lineNumber++;
 
-        BusinessSampleUnit businessSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
-        Optional<String> namesOfInvalidColumns = validateLine(businessSampleUnit);
-        if (namesOfInvalidColumns.isPresent()) {
-          log.error("Problem parsing line {} due to {} - entire ingest aborted", Arrays.toString(nextLine),
-              namesOfInvalidColumns.get());
-          throw new CTPException(CTPException.Fault.VALIDATION_FAILED, String.format("Problem parsing line %s due to %s", Arrays.toString(nextLine),
-              namesOfInvalidColumns.get()));
+        try {
+          BusinessSampleUnit businessSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
+          Optional<String> namesOfInvalidColumns = validateLine(businessSampleUnit);
+          if (namesOfInvalidColumns.isPresent()) {
+            log.error("Problem parsing line {} due to {} - entire ingest aborted", Arrays.toString(nextLine),
+                    namesOfInvalidColumns.get());
+            throw new CTPException(CTPException.Fault.VALIDATION_FAILED, String.format("Error in %s due to field(s) %s", Arrays.toString(nextLine),
+                    namesOfInvalidColumns.get()));
+          }
+          businessSampleUnit.setSampleUnitType("B");
+
+          samplingUnitList.add(businessSampleUnit);
+        } catch(CTPException e){
+          String oldMessage = e.getMessage();
+          String newMessage = String.format("Line %d: %s", lineNumber, oldMessage);
+
+          throw new CTPException(e.getFault(), newMessage);
         }
-        businessSampleUnit.setSampleUnitType("B");
-
-        samplingUnitList.add(businessSampleUnit);
-
       }
 
       return sampleService.processSampleSummary(sampleSummary, samplingUnitList);

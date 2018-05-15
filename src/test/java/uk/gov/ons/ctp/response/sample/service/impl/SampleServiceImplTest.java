@@ -300,15 +300,18 @@ public class SampleServiceImplTest {
     // Given
     MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
 
+    final String invalidType = "invalid-type";
+
     // When
-    Pair<SampleSummary, Future<Optional<SampleSummary>>> result = sampleServiceImpl.ingest(file, "invalid-type");
+    Pair<SampleSummary, Future<Optional<SampleSummary>>> result = sampleServiceImpl.ingest(file, invalidType);
 
     // Forces wait for completion
     SampleSummary finalSummary = result.getRight().get().get();
 
     // Then expect exception
     assertEquals(SampleState.FAILED, finalSummary.getState());
-    assertTrue(finalSummary.getNotes().contains("UnsupportedOperationException"));
+    assertTrue(finalSummary.getNotes().contains(invalidType));
+    assertTrue(finalSummary.getNotes().contains("not implemented"));
   }
 
   @Test

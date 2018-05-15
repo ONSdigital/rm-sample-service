@@ -296,7 +296,7 @@ public class SampleServiceImpl implements SampleService {
 
   @Override
   public Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, Exception exception){
-      return failSampleSummary(sampleSummary, exception.toString());
+      return failSampleSummary(sampleSummary, exception.getMessage());
   }
 
   /**
