@@ -74,7 +74,7 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
    * @return the cached validator
    */
   @Cacheable(cacheNames = "csvIngestValidator")
-  private Validator getValidator() {
+  public Validator getValidator() {
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     return factory.getValidator();
   }
@@ -109,8 +109,7 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
 
           samplingUnitList.add(businessSampleUnit);
         } catch(CTPException e){
-          String oldMessage = e.getMessage();
-          String newMessage = String.format("Line %d: %s", lineNumber, oldMessage);
+          String newMessage = String.format("Line %d: %s", lineNumber, e.getMessage());
 
           throw new CTPException(e.getFault(), newMessage);
         }

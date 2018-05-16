@@ -74,7 +74,7 @@ public class SampleSummary implements Serializable {
   }
 
   @Column(name = "notes")
-  @Size(max=255)
+  @Size(max=250)
   private String notes;
 
   @Column(name = "description")

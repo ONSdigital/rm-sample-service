@@ -116,8 +116,6 @@ public class SampleServiceImplTest {
   /**
    * Verify that a SampleSummary is correctly created when a SurveySample is
    * passed into the method.
-   *
-   * @throws Exception oops
    */
   @Test
   public void verifySampleSummaryCreatedCorrectly() {

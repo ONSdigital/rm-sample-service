@@ -79,7 +79,7 @@ public interface SampleService {
    */
   PartyDTO sendToPartyService(PartyCreationRequestDTO party) throws Exception;
 
-    Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, String message);
+  Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, String message);
 
   Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, Exception exception);
 
