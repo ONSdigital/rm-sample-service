@@ -123,7 +123,6 @@ public class SampleServiceImplTest {
   public void verifySampleSummaryCreatedCorrectly() {
     SampleSummary sampleSummary = sampleServiceImpl.createAndSaveSampleSummary();
 
-    assertNotNull(sampleSummary.getIngestDateTime());
     assertTrue(sampleSummary.getState() == SampleSummaryDTO.SampleState.INIT);
     assertNotNull(sampleSummary.getId());
 

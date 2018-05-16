@@ -132,7 +132,6 @@ public class SampleServiceImpl implements SampleService {
   public SampleSummary createAndSaveSampleSummary(){
     SampleSummary sampleSummary = new SampleSummary();
 
-    sampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
     sampleSummary.setState(SampleSummaryDTO.SampleState.INIT);
     sampleSummary.setId(UUID.randomUUID());
 
@@ -183,6 +182,7 @@ public class SampleServiceImpl implements SampleService {
     SampleSummaryDTO.SampleState newState = sampleSvcStateTransitionManager.transition(targetSampleSummary.getState(),
             SampleSummaryDTO.SampleEvent.ACTIVATED);
     targetSampleSummary.setState(newState);
+    targetSampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
     sampleSummaryRepository.saveAndFlush(targetSampleSummary);
     // Notify the outside world the sample upload has finished
     this.sampleOutboundPublisher.sampleUploadFinished(targetSampleSummary);
