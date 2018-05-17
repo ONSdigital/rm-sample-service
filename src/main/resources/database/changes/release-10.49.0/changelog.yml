@@ -57,3 +57,12 @@ databaseChangeLog:
             path: add_notes_to_sample_summary.sql
             relativeToChangelogFile: true
             splitStatements: false
+  - changeSet:
+      id: 10.49.0-7
+      author: Matt Innes
+      changes:
+        - sqlFile:
+            comment: Made notes field text field to handle long errors
+            path: alter_notes_column_to_text.sql
+            relativeToChangelogFile: true
+            splitStatements: false

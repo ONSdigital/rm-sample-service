@@ -286,11 +286,19 @@ public class SampleServiceImpl implements SampleService {
               SampleSummaryDTO.SampleEvent.FAIL_VALIDATION);
       sampleSummary.setState(newState);
       sampleSummary.setNotes(message);
-      return Optional.of(this.sampleSummaryRepository.save(sampleSummary));
+      SampleSummary persisted = this.sampleSummaryRepository.save(sampleSummary);
+
+      return Optional.of(persisted);
     } catch (CTPException e) {
         log.error("Failed to put sample summary {} into FAILED state - {}", sampleSummary.getId(), e);
 
         return Optional.empty();
+    } catch(RuntimeException e){
+      // Hibernate throws RuntimeException if any issue persisting the SampleSummary.  This is to ensure it is logged
+      // (otherwise they just disappear).
+      log.error("Failed to persist sample summary - {}", e);
+
+      throw e;
     }
   }
 
