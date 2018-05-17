@@ -92,6 +92,7 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
     String[] nextLine;
     List<BusinessSampleUnit> samplingUnitList = new ArrayList<>();
     int lineNumber = 0;
+    Set<String> unitRefs = new HashSet<>();
 
       while((nextLine = csvReader.readNext()) != null) {
         lineNumber++;
@@ -99,6 +100,15 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
         try {
           BusinessSampleUnit businessSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
           Optional<String> namesOfInvalidColumns = validateLine(businessSampleUnit);
+
+          // If a unit ref is already registered
+          if (unitRefs.contains(businessSampleUnit.getSampleUnitRef())) {
+            log.error("This sample unit ref {} is duplicated in the file.", businessSampleUnit.getSampleUnitRef());
+            throw new CTPException(CTPException.Fault.VALIDATION_FAILED,
+                    String.format("This sample unit ref %s is duplicated in the file.", businessSampleUnit.getSampleUnitRef()));
+          }
+          unitRefs.add(businessSampleUnit.getSampleUnitRef());
+
           if (namesOfInvalidColumns.isPresent()) {
             log.error("Problem parsing line {} due to {} - entire ingest aborted", Arrays.toString(nextLine),
                     namesOfInvalidColumns.get());

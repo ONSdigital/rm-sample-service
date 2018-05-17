@@ -129,4 +129,12 @@ public class CsvIngesterBusinessTest {
     thrown.expect(CTPException.class);
   }
 
+  @Test(expected = CTPException.class)
+  public void ensureNoDuplicateUnitRef() throws Exception {
+    SampleSummary sampleSummary = new SampleSummary();
+    MockMultipartFile f = getTestFile("business-survey-duplicate-unitrefs.csv");
+
+    csvIngester.ingest(sampleSummary, f);
+  }
+
 }
