@@ -1,0 +1,1 @@
+ALTER TABLE sample.samplesummary ALTER COLUMN notes SET DATA TYPE text;

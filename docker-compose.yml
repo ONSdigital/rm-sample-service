@@ -2,7 +2,7 @@ version: '2'
 services:
  postgres:
   container_name: postgres
-  image: sdcplatform/postgres
+  image: sdcplatform/ras-rm-docker-postgres
   ports:
    - "6432:5432"
  redis:
@@ -34,8 +34,8 @@ services:
   links:
         - "postgres:postgres"
   ports:
-    - "5062:5062"
+    - "8081:8081"
   environment:
-    - ras-party-db.uri=postgresql://postgres:postgres@postgres:5432/postgres
+    - DATABASE_URI=postgresql://postgres:postgres@postgres:5432/postgres
     - SECURITY_USER_NAME=admin
     - SECURITY_USER_PASSWORD=secret

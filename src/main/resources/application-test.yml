@@ -1,0 +1,10 @@
+liquibase:
+  user: postgres
+  password: postgres
+
+spring:
+  datasource:
+    schema: classpath:/schema.sql
+    username: postgres
+    password: postgres
+

@@ -1,6 +1,7 @@
 package uk.gov.ons.ctp.response.sample.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
@@ -23,26 +24,36 @@ import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterCensus;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterSocial;
 import uk.gov.ons.ctp.response.sample.message.EventPublisher;
 import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
+import uk.gov.ons.ctp.response.sample.message.SampleOutboundPublisher;
 import uk.gov.ons.ctp.response.sample.party.PartyUtil;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.service.CollectionExerciseJobService;
 import uk.gov.ons.ctp.response.sample.service.PartySvcClientService;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
-import validation.BusinessSampleUnit;
 import validation.SampleUnitBase;
-import validation.SurveyBase;
 
-import java.text.ParseException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 @Slf4j
 @Service
 @Configuration
 public class SampleServiceImpl implements SampleService {
+
+  private static final int NUM_UPLOAD_THREADS = 5;
+  private static final int MAX_DESCRIPTION_LENGTH = 5;
+
+  private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(NUM_UPLOAD_THREADS);
 
   @Autowired
   private SampleSummaryRepository sampleSummaryRepository;
@@ -65,6 +76,9 @@ public class SampleServiceImpl implements SampleService {
 
   @Autowired
   private PartyPublisher partyPublisher;
+
+  @Autowired
+  private SampleOutboundPublisher sampleOutboundPublisher;
 
   @Autowired
   private CollectionExerciseJobService collectionExerciseJobService;
@@ -93,24 +107,35 @@ public class SampleServiceImpl implements SampleService {
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
-  public SampleSummary processSampleSummary(SurveyBase surveySample, List<? extends SampleUnitBase> samplingUnitList, Integer expectedCollectionInstruments)
-          throws Exception {
-    SampleSummary sampleSummary = createSampleSummary(surveySample, samplingUnitList.size(), expectedCollectionInstruments);
+  public SampleSummary processSampleSummary(SampleSummary sampleSummary, List<? extends SampleUnitBase> samplingUnitList) {
+    int expectedCI = calculateExpectedCollectionInstruments(samplingUnitList);
+
+    sampleSummary.setTotalSampleUnits(samplingUnitList.size());
+    sampleSummary.setExpectedCollectionInstruments(expectedCI);
     SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
     Map<String, UUID> sampleUnitIds = saveSampleUnits(samplingUnitList, savedSampleSummary);
     publishToPartyQueue(samplingUnitList, sampleUnitIds, sampleSummary.getId().toString());
     return savedSampleSummary;
   }
 
-  protected SampleSummary createSampleSummary(SurveyBase surveySample, Integer totalSampleUnits, Integer expectedCollectionInstruments)
-          throws ParseException {
+  private Integer calculateExpectedCollectionInstruments(List<? extends SampleUnitBase> samplingUnitList) {
+    //TODO: get survey classifiers from survey service, currently using formtype for all business surveys
+    Set<String> formTypes = new HashSet<>();
+    for (SampleUnitBase businessSampleUnit : samplingUnitList) {
+      formTypes.add(businessSampleUnit.getFormType());
+    }
+    return formTypes.size();
+  }
+
+  @Override
+  @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+  public SampleSummary createAndSaveSampleSummary(){
     SampleSummary sampleSummary = new SampleSummary();
-    sampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
+
     sampleSummary.setState(SampleSummaryDTO.SampleState.INIT);
-    sampleSummary.setTotalSampleUnits(totalSampleUnits);
-    sampleSummary.setExpectedCollectionInstruments(expectedCollectionInstruments);
     sampleSummary.setId(UUID.randomUUID());
-    return sampleSummary;
+
+    return sampleSummaryRepository.save(sampleSummary);
   }
 
   private Map<String, UUID> saveSampleUnits(List<? extends SampleUnitBase> samplingUnitList, SampleSummary sampleSummary) {
@@ -135,7 +160,7 @@ public class SampleServiceImpl implements SampleService {
    * @param sampleUnitIds 
    * @throws Exception 
    * */
-  private void publishToPartyQueue(List<? extends SampleUnitBase> samplingUnitList, Map<String, UUID> sampleUnitIds, String sampleSummaryId) throws Exception {
+  private void publishToPartyQueue(List<? extends SampleUnitBase> samplingUnitList, Map<String, UUID> sampleUnitIds, String sampleSummaryId){
     for (SampleUnitBase sampleUnitBase : samplingUnitList) {
           PartyCreationRequestDTO party = PartyUtil.convertToParty(sampleUnitBase);
           party.getAttributes().setSampleUnitId(sampleUnitIds.get(sampleUnitBase.getSampleUnitRef()).toString());
@@ -157,7 +182,11 @@ public class SampleServiceImpl implements SampleService {
     SampleSummaryDTO.SampleState newState = sampleSvcStateTransitionManager.transition(targetSampleSummary.getState(),
             SampleSummaryDTO.SampleEvent.ACTIVATED);
     targetSampleSummary.setState(newState);
+    targetSampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
     sampleSummaryRepository.saveAndFlush(targetSampleSummary);
+    // Notify the outside world the sample upload has finished
+    this.sampleOutboundPublisher.sampleUploadFinished(targetSampleSummary);
+
     return targetSampleSummary;
   }
 
@@ -231,17 +260,77 @@ public class SampleServiceImpl implements SampleService {
     return sampleUnitsTotal;
   }
 
-  @Override public SampleSummary ingest(MultipartFile file, String type) throws Exception {
+  public SampleSummary initiateIngest(final SampleSummary sampleSummary, final MultipartFile file, final String type) throws Exception {
+    SampleSummary result;
     switch (type.toUpperCase()) {
       case "B":
-        return csvIngesterBusiness.ingest(file);
+        result = csvIngesterBusiness.ingest(sampleSummary, file);
+        break;
       case "CENSUS":
-        return csvIngesterCensus.ingest(file);
+        result = csvIngesterCensus.ingest(sampleSummary, file);
+        break;
       case "SOCIAL":
-        return csvIngesterSocial.ingest(file);
+        result = csvIngesterSocial.ingest(sampleSummary, file);
+        break;
       default:
         throw new UnsupportedOperationException(String.format("Type %s not implemented", type));
     }
+
+    return result;
+  }
+
+  @Override
+  public Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, String message){
+    try {
+      SampleSummaryDTO.SampleState newState = sampleSvcStateTransitionManager.transition(sampleSummary.getState(),
+              SampleSummaryDTO.SampleEvent.FAIL_VALIDATION);
+      sampleSummary.setState(newState);
+      sampleSummary.setNotes(message);
+      SampleSummary persisted = this.sampleSummaryRepository.save(sampleSummary);
+
+      return Optional.of(persisted);
+    } catch (CTPException e) {
+        log.error("Failed to put sample summary {} into FAILED state - {}", sampleSummary.getId(), e);
+
+        return Optional.empty();
+    } catch(RuntimeException e){
+      // Hibernate throws RuntimeException if any issue persisting the SampleSummary.  This is to ensure it is logged
+      // (otherwise they just disappear).
+      log.error("Failed to persist sample summary - {}", e);
+
+      throw e;
+    }
+  }
+
+  @Override
+  public Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, Exception exception){
+      return failSampleSummary(sampleSummary, exception.getMessage());
+  }
+
+  /**
+   * Method to kick off a task to ingest a job
+   * @param file Multipart File of SurveySample to be used
+   * @param type Type of Survey to be used
+   * @return a pair containing the newly created SampleSummary and a Future for the long running task
+   * @throws CTPException thrown if upload started message cannot be sent
+   */
+  @Override
+  public Pair<SampleSummary, Future<Optional<SampleSummary>>> ingest(final MultipartFile file, final String type) throws CTPException {
+    final SampleSummary newSummary = createAndSaveSampleSummary();
+
+    this.sampleOutboundPublisher.sampleUploadStarted(newSummary);
+
+    Callable<Optional<SampleSummary>> callable =() -> {
+      try {
+        return Optional.of(initiateIngest(newSummary, file, type));
+      } catch (Exception e) {
+        return failSampleSummary(newSummary, e);
+      }
+    };
+
+    Future<Optional<SampleSummary>> future = EXECUTOR_SERVICE.submit(callable);
+
+    return Pair.of(newSummary, future);
   }
 
   @Override

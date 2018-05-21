@@ -3,6 +3,7 @@ package uk.gov.ons.ctp.response.sample.endpoint;
 import liquibase.util.csv.opencsv.bean.CsvToBean;
 import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
@@ -33,7 +34,9 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.Future;
 
 
 /**
@@ -103,14 +106,14 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       return ResponseEntity.badRequest().build();
     }
 
-    SampleSummary sampleSummary;
     try {
-      sampleSummary = sampleService.ingest(file, type);
+      Pair<SampleSummary, Future<Optional<SampleSummary>>> result = sampleService.ingest(file, type);
+
+      return ResponseEntity.created(URI.create("TODO")).body(result.getLeft());
     } catch (Exception e) {
       throw new CTPException(CTPException.Fault.VALIDATION_FAILED, e, "Error ingesting file %s", file.getOriginalFilename());
     }
 
-    return ResponseEntity.created(URI.create("TODO")).body(sampleSummary);
   }
 
 

@@ -2,6 +2,7 @@ package uk.gov.ons.ctp.response.sample.endpoint;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ma.glasnost.orika.MapperFacade;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -13,18 +14,21 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.InvalidRequestException;
 import uk.gov.ons.ctp.common.error.RestExceptionHandler;
 import uk.gov.ons.ctp.common.jackson.CustomObjectMapper;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
+import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.isA;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
@@ -76,6 +80,8 @@ public class SampleEndpointUnitTest {
         // Given
         String type = "B";
         MockMultipartFile file = new MockMultipartFile("file", "filename.txt".getBytes());
+
+        when(this.sampleService.ingest(any(MultipartFile.class), anyString())).thenReturn(Pair.of(new SampleSummary(), null));
 
         // When
         ResultActions actions = mockMvc.perform(fileUpload(String.format("/samples/%s/fileupload", type)).file(file));

@@ -20,9 +20,8 @@ public class PartyUtil {
    * @param unit the SampleUnitBase subtype for a Census, Business or Social
    *          SampleUnit
    * @return the created Party object
-   * @throws Exception unlikely, but indicated something really wrong
    */
-  public static PartyCreationRequestDTO convertToParty(SampleUnitBase unit) throws Exception {
+  public static PartyCreationRequestDTO convertToParty(SampleUnitBase unit) {
     PartyCreationRequestDTO party = new PartyCreationRequestDTO();
     party.setSampleUnitType(unit.getSampleUnitType());
     party.setSampleUnitRef(unit.getSampleUnitRef());

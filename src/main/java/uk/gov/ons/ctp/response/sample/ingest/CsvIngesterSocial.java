@@ -57,15 +57,12 @@ public class CsvIngesterSocial extends CsvToBean<SocialSampleUnit> {
     columnPositionMappingStrategy.setColumnMapping(COLUMNS);
   }
 
-  public SampleSummary ingest(MultipartFile file)
+  public SampleSummary ingest(final SampleSummary sampleSummary, final MultipartFile file)
       throws Exception {
 
     CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()), ':');
     String[] nextLine;
-    SampleSummary sampleSummary;
-    SocialSurveySample businessSurveySample = new SocialSurveySample();
     List<SocialSampleUnit> samplingUnitList = new ArrayList<>();
-    Integer expectedCI = 1; //TODO: when social surveys are onboarded expectedCI should be calculated
 
       while((nextLine = csvReader.readNext()) != null) {
 
@@ -82,11 +79,7 @@ public class CsvIngesterSocial extends CsvToBean<SocialSampleUnit> {
 
       }
 
-      businessSurveySample.setSampleUnits(samplingUnitList);
-
-      sampleSummary = sampleService.processSampleSummary(businessSurveySample, samplingUnitList, expectedCI);
-
-    return sampleSummary;
+      return sampleService.processSampleSummary(sampleSummary, samplingUnitList);
   }
 
   /**

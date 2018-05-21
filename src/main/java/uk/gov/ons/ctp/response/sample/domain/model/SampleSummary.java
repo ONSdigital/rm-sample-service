@@ -1,5 +1,6 @@
 package uk.gov.ons.ctp.response.sample.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.sourceforge.cobertura.CoverageIgnore;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -13,6 +14,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.UUID;
@@ -66,4 +68,15 @@ public class SampleSummary implements Serializable {
   @Column(name = "expectedcollectioninstruments")
   private Integer expectedCollectionInstruments;
 
+  @JsonIgnore
+  public Integer getSampleSummaryPK() {
+    return sampleSummaryPK;
+  }
+
+  @Column(name = "notes")
+  private String notes;
+
+  @Column(name = "description")
+  @Size(max=250)
+  private String description;
 }

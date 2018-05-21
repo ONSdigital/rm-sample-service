@@ -13,6 +13,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.mock.web.MockMultipartFile;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
+import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterCensus;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.CensusSampleUnit;
@@ -49,11 +50,6 @@ public class CsvIngesterCensusTest {
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
-  @Before
-  public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-  }
-
   /**
    * take a named test file and create a copy of it - is because the ingester
    * will delete the source csv file after ingest
@@ -71,24 +67,27 @@ public class CsvIngesterCensusTest {
 
   @Test
   public void testBlueSky() throws Exception {
-    csvIngester.ingest(getTestFile("census-survey-sample.csv"));
-    verify(sampleService, times(1)).processSampleSummary(any(CensusSurveySample.class),
-            anyListOf(CensusSampleUnit.class), eq(1));
+    SampleSummary newSummary = new SampleSummary();
+    csvIngester.ingest(newSummary, getTestFile("census-survey-sample.csv"));
+    verify(sampleService, times(1)).processSampleSummary(eq(newSummary),
+            anyListOf(CensusSampleUnit.class));
   }
 
   @Test(expected = Exception.class)
   public void missingColumns() throws Exception {
-    csvIngester.ingest(getTestFile("census-survey-sample-missing-columns.csv"));
-    verify(sampleService, times(0)).processSampleSummary(any(CensusSurveySample.class),
-        anyListOf(CensusSampleUnit.class), eq(1));
+    SampleSummary newSummary = new SampleSummary();
+    csvIngester.ingest(newSummary, getTestFile("census-survey-sample-missing-columns.csv"));
+    verify(sampleService, times(0)).processSampleSummary(eq(newSummary),
+        anyListOf(CensusSampleUnit.class));
     thrown.expect(CTPException.class);
   }
 
   @Test(expected = Exception.class)
   public void incorrectData() throws Exception {
-    csvIngester.ingest(getTestFile("census-survey-sample-incorrect-data.csv"));
-    verify(sampleService, times(0)).processSampleSummary(any(CensusSurveySample.class),
-        anyListOf(CensusSampleUnit.class), eq(1));
+    SampleSummary newSummary = new SampleSummary();
+    csvIngester.ingest(newSummary, getTestFile("census-survey-sample-incorrect-data.csv"));
+    verify(sampleService, times(0)).processSampleSummary(eq(newSummary),
+        anyListOf(CensusSampleUnit.class));
     thrown.expect(CTPException.class);
   }
 

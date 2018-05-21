@@ -74,7 +74,7 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
    * @return the cached validator
    */
   @Cacheable(cacheNames = "csvIngestValidator")
-  private Validator getValidator() {
+  public Validator getValidator() {
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     return factory.getValidator();
   }
@@ -85,57 +85,47 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
     columnPositionMappingStrategy.setColumnMapping(COLUMNS);
   }
 
-  public SampleSummary ingest(MultipartFile file)
+  public SampleSummary ingest(final SampleSummary sampleSummary, final MultipartFile file)
       throws Exception {
 
     CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()), ':');
     String[] nextLine;
-    SampleSummary sampleSummary;
-    BusinessSurveySample businessSurveySample = new BusinessSurveySample();
     List<BusinessSampleUnit> samplingUnitList = new ArrayList<>();
-    Integer expectedCI;
+    int lineNumber = 0;
     Set<String> unitRefs = new HashSet<>();
 
       while((nextLine = csvReader.readNext()) != null) {
+        lineNumber++;
 
-        BusinessSampleUnit businessSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
-        Optional<String> namesOfInvalidColumns = validateLine(businessSampleUnit);
+        try {
+          BusinessSampleUnit businessSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
+          Optional<String> namesOfInvalidColumns = validateLine(businessSampleUnit);
 
-        // If a unit ref is already registered
-        if (unitRefs.contains(businessSampleUnit.getSampleUnitRef())) {
-          log.error("This sample unit ref {} is duplicated in the file.", businessSampleUnit.getSampleUnitRef());
-          throw new CTPException(CTPException.Fault.VALIDATION_FAILED,
-                  String.format("This sample unit ref %s is duplicated in the file.", businessSampleUnit.getSampleUnitRef()));
+          // If a unit ref is already registered
+          if (unitRefs.contains(businessSampleUnit.getSampleUnitRef())) {
+            log.error("This sample unit ref {} is duplicated in the file.", businessSampleUnit.getSampleUnitRef());
+            throw new CTPException(CTPException.Fault.VALIDATION_FAILED,
+                    String.format("This sample unit ref %s is duplicated in the file.", businessSampleUnit.getSampleUnitRef()));
+          }
+          unitRefs.add(businessSampleUnit.getSampleUnitRef());
+
+          if (namesOfInvalidColumns.isPresent()) {
+            log.error("Problem parsing line {} due to {} - entire ingest aborted", Arrays.toString(nextLine),
+                    namesOfInvalidColumns.get());
+            throw new CTPException(CTPException.Fault.VALIDATION_FAILED, String.format("Error in %s due to field(s) %s", Arrays.toString(nextLine),
+                    namesOfInvalidColumns.get()));
+          }
+          businessSampleUnit.setSampleUnitType("B");
+
+          samplingUnitList.add(businessSampleUnit);
+        } catch(CTPException e){
+          String newMessage = String.format("Line %d: %s", lineNumber, e.getMessage());
+
+          throw new CTPException(e.getFault(), newMessage);
         }
-        unitRefs.add(businessSampleUnit.getSampleUnitRef());
-
-        if (namesOfInvalidColumns.isPresent()) {
-          log.error("Problem parsing line {} due to {} - entire ingest aborted", Arrays.toString(nextLine),
-              namesOfInvalidColumns.get());
-          throw new CTPException(CTPException.Fault.VALIDATION_FAILED, String.format("Problem parsing line %s due to %s", Arrays.toString(nextLine),
-              namesOfInvalidColumns.get()));
-        }
-        businessSampleUnit.setSampleUnitType("B");
-
-        samplingUnitList.add(businessSampleUnit);
-
       }
-      expectedCI = calculateExpectedCollectionInstruments(samplingUnitList);
 
-      businessSurveySample.setSampleUnits(samplingUnitList);
-
-      sampleSummary = sampleService.processSampleSummary(businessSurveySample, samplingUnitList, expectedCI);
-
-    return sampleSummary;
-  }
-
-  private Integer calculateExpectedCollectionInstruments(List<BusinessSampleUnit> samplingUnitList) {
-    //TODO: get survey classifiers from survey service, currently using formtype for all business surveys
-    Set<String> formTypes = new HashSet<>();
-    for (BusinessSampleUnit businessSampleUnit : samplingUnitList) {
-      formTypes.add(businessSampleUnit.getFormType());
-    }
-    return formTypes.size();
+      return sampleService.processSampleSummary(sampleSummary, samplingUnitList);
   }
 
   /**

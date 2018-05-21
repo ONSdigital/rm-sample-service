@@ -1,11 +1,11 @@
 package uk.gov.ons.ctp.response.sample.service.impl;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.mock.web.MockMultipartFile;
 import uk.gov.ons.ctp.common.FixtureHelper;
@@ -20,6 +20,7 @@ import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
 import uk.gov.ons.ctp.response.sample.message.EventPublisher;
 import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
+import uk.gov.ons.ctp.response.sample.message.SampleOutboundPublisher;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
@@ -31,7 +32,9 @@ import uk.gov.ons.ctp.response.sample.service.PartySvcClientService;
 import validation.BusinessSurveySample;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.Future;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -71,6 +74,9 @@ public class SampleServiceImplTest {
   private PartyPublisher partyPublisher;
 
   @Mock
+  private SampleOutboundPublisher sampleOutboundPublisher;
+
+  @Mock
   private CollectionExerciseJobService collectionExerciseJobService;
 
   @Mock
@@ -96,32 +102,29 @@ public class SampleServiceImplTest {
    */
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
     surveySample = FixtureHelper.loadClassFixtures(BusinessSurveySample[].class);
     party = FixtureHelper.loadClassFixtures(PartyCreationRequestDTO[].class);
     partyDTO = FixtureHelper.loadClassFixtures(PartyDTO[].class);
     sampleUnit = FixtureHelper.loadClassFixtures(SampleUnit[].class);
     sampleSummaryList = FixtureHelper.loadClassFixtures(SampleSummary[].class);
     collectionExerciseJobs = FixtureHelper.loadClassFixtures(CollectionExerciseJob[].class);
+
+    // This is required for pretty much all tests that create a sample summary
+    when(this.sampleSummaryRepository.save(any(SampleSummary.class))).then(returnsFirstArg());
   }
 
   /**
    * Verify that a SampleSummary is correctly created when a SurveySample is
    * passed into the method.
-   *
-   * @throws Exception oops
    */
   @Test
-  public void verifySampleSummaryCreatedCorrectly() throws Exception {
-    SampleSummary sampleSummary = sampleServiceImpl.createSampleSummary(surveySample.get(0), 5, 2);
+  public void verifySampleSummaryCreatedCorrectly() {
+    SampleSummary sampleSummary = sampleServiceImpl.createAndSaveSampleSummary();
 
-    //assertTrue(sampleSummary.getSurveyRef().equals("abc"));
-    assertNotNull(sampleSummary.getIngestDateTime());
-    //assertTrue(sampleSummary.getEffectiveEndDateTime().getTime() == EFFECTIVEENDDATETIME);
-    //assertTrue(sampleSummary.getEffectiveStartDateTime().getTime() == EFFECTIVESTARTDATETIME);
     assertTrue(sampleSummary.getState() == SampleSummaryDTO.SampleState.INIT);
-    assertTrue(sampleSummary.getTotalSampleUnits() == 5);
-    assertTrue(sampleSummary.getExpectedCollectionInstruments() == 2);
+    assertNotNull(sampleSummary.getId());
+
+    verify(sampleSummaryRepository).save(sampleSummary);
   }
 
   /**
@@ -132,13 +135,13 @@ public class SampleServiceImplTest {
    * @throws Exception oops
    */
   @Test
-  public void testSampleSummaryAndSampleUnitsAreSavedAndThenSampleUnitsPublishedToQueue() throws Exception {
+  public void testSampleSummaryAndSampleUnitsAreSavedAndThenSampleUnitsPublishedToQueue() {
+    SampleSummary newSummary = sampleServiceImpl.createAndSaveSampleSummary();
     BusinessSurveySample businessSample = surveySample.get(0);
-    when(sampleSummaryRepository.save(any(SampleSummary.class))).then(returnsFirstArg());
 
-    sampleServiceImpl.processSampleSummary(businessSample, businessSample.getSampleUnits(), 2);
+    sampleServiceImpl.processSampleSummary(newSummary, businessSample.getSampleUnits());
 
-    verify(sampleSummaryRepository).save(any(SampleSummary.class));
+    verify(sampleSummaryRepository, times(2)).save(any(SampleSummary.class));
     verify(sampleUnitRepository, times(2)).save(any(SampleUnit.class));
     verify(partyPublisher, times(2)).publish(any(PartyCreationRequestDTO.class));
   }
@@ -211,11 +214,20 @@ public class SampleServiceImplTest {
    */
   @Test
   public void testOneCollectionExerciseJobIsStoredWhenSampleUnitsAreFound() throws Exception {
-	SampleSummary sampleSummary = sampleServiceImpl.createSampleSummary(surveySample.get(0), 5, 2);
-    when(sampleSummaryRepository.findById(any())).thenReturn(sampleSummary);
+    SampleSummary newSummary = createSampleSummary(5, 2);
+    when(sampleSummaryRepository.findById(any())).thenReturn(newSummary);
     Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(1)).storeCollectionExerciseJob(any());
     assertThat(sampleUnitsTotal, is(5));
+  }
+
+  private SampleSummary createSampleSummary(int numSamples, int expectedInstruments){
+    SampleSummary newSummary = sampleServiceImpl.createAndSaveSampleSummary();
+
+    newSummary.setTotalSampleUnits(numSamples);
+    newSummary.setExpectedCollectionInstruments(expectedInstruments);
+
+    return newSummary;
   }
 
   /**
@@ -226,8 +238,8 @@ public class SampleServiceImplTest {
    */
   @Test
   public void testNoCollectionExerciseJobIsStoredWhenNoSampleUnitsAreFound() throws Exception {
-	SampleSummary sampleSummary = sampleServiceImpl.createSampleSummary(surveySample.get(0), 0, 2);
-    when(sampleSummaryRepository.findById(any())).thenReturn(sampleSummary);
+    SampleSummary newSummary = createSampleSummary(0, 2);
+    when(sampleSummaryRepository.findById(any())).thenReturn(newSummary);
     Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(0)).storeCollectionExerciseJob(any());
     assertThat(sampleUnitsTotal, is(0));
@@ -254,10 +266,13 @@ public class SampleServiceImplTest {
     MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
 
     // When
-    SampleSummary sampleSummary = sampleServiceImpl.ingest(file, "B");
+    Pair<SampleSummary, Future<Optional<SampleSummary>>> result = sampleServiceImpl.ingest(file, "B");
+
+    // Forces wait for completion
+    result.getRight().get();
 
     // Then
-    verify(csvIngesterBusiness, times(1)).ingest(file);
+    verify(csvIngesterBusiness, times(1)).ingest(result.getLeft(), file);
   }
 
   @Test
@@ -266,21 +281,49 @@ public class SampleServiceImplTest {
     MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
 
     // When
-    SampleSummary sampleSummary = sampleServiceImpl.ingest(file, "b");
+    Pair<SampleSummary, Future<Optional<SampleSummary>>> result = sampleServiceImpl.ingest(file, "b");
+
+    // Forces wait for completion
+    result.getRight().get();
 
     // Then
-    verify(csvIngesterBusiness, times(1)).ingest(file);
+    verify(csvIngesterBusiness, times(1)).ingest(result.getLeft(), file);
   }
 
-  @Test(expected = UnsupportedOperationException.class)
+  @Test
   public void testUploadInvalidTypeSample() throws Exception {
+    when(this.sampleSvcStateTransitionManager.transition(SampleState.INIT, SampleEvent.FAIL_VALIDATION))
+            .thenReturn(SampleState.FAILED);
+    // Given
+    MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
+
+    final String invalidType = "invalid-type";
+
+    // When
+    Pair<SampleSummary, Future<Optional<SampleSummary>>> result = sampleServiceImpl.ingest(file, invalidType);
+
+    // Forces wait for completion
+    SampleSummary finalSummary = result.getRight().get().get();
+
+    // Then expect exception
+    assertEquals(SampleState.FAILED, finalSummary.getState());
+    assertTrue(finalSummary.getNotes().contains(invalidType));
+    assertTrue(finalSummary.getNotes().contains("not implemented"));
+  }
+
+  @Test
+  public void testIngestMessagesSent() throws Exception {
     // Given
     MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
 
     // When
-    sampleServiceImpl.ingest(file, "invalid-type");
+    Pair<SampleSummary, Future<Optional<SampleSummary>>> result = sampleServiceImpl.ingest(file, "B");
 
-    // Then expect exception
+    // Forces wait for completion
+    result.getRight().get();
+
+    // Then
+    verify(sampleOutboundPublisher, times(1)).sampleUploadStarted(any());
   }
 
 }
