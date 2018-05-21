@@ -12,29 +12,17 @@ This repository contains the Sample service. This microservice is a RESTful web 
 * Receiving confirmation from the Party service once it has consumed/stored the sample units sent above, and marking the sample summary as ready for collection
 * Providing on request the sample summaries matching a given criteria to the Collection Exercise service
 
-## Prerequisites
+## Running
 
-* To run this project you must have the following running:
+There are two ways of running this service
 
-    - rabbitMQ
-    - redis
-    - postgres
-    - an sftp server
-
-  You can get all of this using the following Docker project:
-
-    https://github.com/ONSdigital/rm-docker-dev
-
-* You must first clone and build the following projects:
-
-    - https://github.com/ONSdigital/rm-common-service
-    - https://github.com/ONSdigital/rm-party-service-api
-
-  and build them using
-
-```bash
-mvn clean install
-```
+* The easiest way is via docker (https://github.com/ONSdigital/ras-rm-docker-dev)
+* Alternatively running the service up in isolation
+    ```bash
+    cp .maven.settings.xml ~/.m2/settings.xml  # This only needs to be done once to set up mavens settings file
+    mvn clean install
+    mvn spring-boot:run
+    ```
 
 Note. If you need to skip the integration tests due to port clashes run
 
@@ -42,6 +30,7 @@ Note. If you need to skip the integration tests due to port clashes run
 mvn clean install -Ddocker.skip -DskipITs
 ```
 
+## Testing
 * In Documents create the following directory structure:
 
         sftp/business-sftp/
@@ -51,13 +40,6 @@ mvn clean install -Ddocker.skip -DskipITs
   These will act as a mock remote file store
 
 * Add the xml files found in rm-sample-service/samplesvc-api/src/test/resources/xml to the corresponding sftp directories
-
-* to run samplesvc
-
-      cd code/rm-sample-service
-      mvn clean install
-      cd samplesvc
-      ./mvnw spring-boot:run
 
 * to add a collectionExerciseJob to the postgres database
 
