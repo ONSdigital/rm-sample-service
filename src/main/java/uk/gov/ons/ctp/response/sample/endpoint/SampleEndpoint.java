@@ -107,10 +107,10 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   }
 
   /**
-   * Method to kick off a task to ingest a job
+   * Method to kick off a task to ingest a sample file
    * @param file Multipart File of SurveySample to be used
    * @param type Type of Survey to be used
-   * @return a pair containing the newly created SampleSummary and a Future for the long running task
+   * @return a newly created sample summary that won't have samples or collection instruments populated
    * @throws CTPException thrown if upload started message cannot be sent
    */
   public SampleSummary ingest(final MultipartFile file, final String type) throws CTPException {
@@ -124,7 +124,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       }
     };
 
-    Future<Optional<SampleSummary>> future = EXECUTOR_SERVICE.submit(callable);
+    EXECUTOR_SERVICE.submit(callable);
 
     return newSummary;
   }

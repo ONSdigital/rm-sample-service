@@ -85,7 +85,7 @@ public interface SampleService {
    * @param file Multipart File of SurveySample to be used
    * @param type Type of Survey to be used
    * @return an updated samplesummary
-   * @throws Exception
+   * @throws Exception thrown if issue reading CSV
    */
   SampleSummary ingest(SampleSummary sampleSummary, MultipartFile file, String type) throws Exception;
 

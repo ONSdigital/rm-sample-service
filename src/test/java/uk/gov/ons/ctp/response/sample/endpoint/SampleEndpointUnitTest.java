@@ -83,8 +83,7 @@ public class SampleEndpointUnitTest {
         String type = "B";
         MockMultipartFile file = new MockMultipartFile("file", "filename.txt".getBytes());
         SampleSummary summary = new SampleSummary();
-        UUID summaryId = UUID.randomUUID();
-        summary.setId(summaryId);
+        summary.setId(UUID.randomUUID());
 
         // when(this.sampleService.ingest(any(SampleSummary.class), any(MultipartFile.class), anyString())).thenReturn(new SampleSummary());
         when(this.sampleService.createAndSaveSampleSummary()).thenReturn(summary);
