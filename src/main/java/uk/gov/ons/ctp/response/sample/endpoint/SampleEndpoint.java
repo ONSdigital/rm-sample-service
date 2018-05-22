@@ -140,7 +140,8 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       SampleSummary result = ingest(file, type);
 
       URI location = ServletUriComponentsBuilder
-              .fromCurrentRequest().path("/{id}")
+              .fromCurrentServletMapping()
+              .path("/samples/samplesummary/{id}")
               .buildAndExpand(result.getId()).toUri();
 
       return ResponseEntity.created(location).body(result);
