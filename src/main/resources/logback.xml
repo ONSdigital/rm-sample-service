@@ -65,7 +65,7 @@
   </appender>
 
   <root level="WARN">
-    <appender-ref ref="CLOUD" />
+    <appender-ref ref="${profile}" />
   </root>
 
 </configuration>
