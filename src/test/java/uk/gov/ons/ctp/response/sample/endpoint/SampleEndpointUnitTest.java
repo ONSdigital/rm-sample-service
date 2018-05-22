@@ -25,6 +25,8 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
+import java.util.UUID;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.isA;
 import static org.mockito.Matchers.any;
@@ -80,8 +82,12 @@ public class SampleEndpointUnitTest {
         // Given
         String type = "B";
         MockMultipartFile file = new MockMultipartFile("file", "filename.txt".getBytes());
+        SampleSummary summary = new SampleSummary();
+        UUID summaryId = UUID.randomUUID();
+        summary.setId(summaryId);
 
-        when(this.sampleService.ingest(any(MultipartFile.class), anyString())).thenReturn(Pair.of(new SampleSummary(), null));
+        // when(this.sampleService.ingest(any(SampleSummary.class), any(MultipartFile.class), anyString())).thenReturn(new SampleSummary());
+        when(this.sampleService.createAndSaveSampleSummary()).thenReturn(summary);
 
         // When
         ResultActions actions = mockMvc.perform(fileUpload(String.format("/samples/%s/fileupload", type)).file(file));

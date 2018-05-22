@@ -36,6 +36,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 
@@ -51,6 +54,10 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   private SampleService sampleService;
 
   private MapperFacade mapperFacade;
+
+  private static final int NUM_UPLOAD_THREADS = 5;
+
+  private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(NUM_UPLOAD_THREADS);
 
   @Autowired
   public SampleEndpoint(SampleService sampleService, MapperFacade mapperFacade) {
@@ -99,6 +106,29 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
 
   }
 
+  /**
+   * Method to kick off a task to ingest a job
+   * @param file Multipart File of SurveySample to be used
+   * @param type Type of Survey to be used
+   * @return a pair containing the newly created SampleSummary and a Future for the long running task
+   * @throws CTPException thrown if upload started message cannot be sent
+   */
+  public SampleSummary ingest(final MultipartFile file, final String type) throws CTPException {
+    final SampleSummary newSummary = this.sampleService.createAndSaveSampleSummary();
+
+    Callable<Optional<SampleSummary>> callable =() -> {
+      try {
+        return Optional.of(this.sampleService.ingest(newSummary, file, type));
+      } catch (Exception e) {
+        return this.sampleService.failSampleSummary(newSummary, e);
+      }
+    };
+
+    Future<Optional<SampleSummary>> future = EXECUTOR_SERVICE.submit(callable);
+
+    return newSummary;
+  }
+
   @RequestMapping(value = "/{type}/fileupload", method = RequestMethod.POST, consumes = "multipart/form-data")
   public final @ResponseBody ResponseEntity<SampleSummary> uploadSampleFile(@PathVariable("type") final String type, @RequestParam("file") MultipartFile file) throws CTPException {
     log.info("Entering Sample file upload for Type {}", type);
@@ -107,15 +137,18 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     }
 
     try {
-      Pair<SampleSummary, Future<Optional<SampleSummary>>> result = sampleService.ingest(file, type);
+      SampleSummary result = ingest(file, type);
 
-      return ResponseEntity.created(URI.create("TODO")).body(result.getLeft());
+      URI location = ServletUriComponentsBuilder
+              .fromCurrentRequest().path("/{id}")
+              .buildAndExpand(result.getId()).toUri();
+
+      return ResponseEntity.created(location).body(result);
     } catch (Exception e) {
       throw new CTPException(CTPException.Fault.VALIDATION_FAILED, e, "Error ingesting file %s", file.getOriginalFilename());
     }
 
   }
-
 
   /**
    * GET endpoint for retrieving a list of all existing SampleSummaries

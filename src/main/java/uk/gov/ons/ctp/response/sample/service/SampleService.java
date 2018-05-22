@@ -79,18 +79,19 @@ public interface SampleService {
    */
   PartyDTO sendToPartyService(PartyCreationRequestDTO party) throws Exception;
 
+  /**
+   * Ingest survey sample
+   * @param sampleSummary a newly created samplesummary
+   * @param file Multipart File of SurveySample to be used
+   * @param type Type of Survey to be used
+   * @return an updated samplesummary
+   * @throws Exception
+   */
+  SampleSummary ingest(SampleSummary sampleSummary, MultipartFile file, String type) throws Exception;
+
   Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, String message);
 
   Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, Exception exception);
-
-  /**
-   * Ingest Survey Sample
-   *
-   * @param file Multipart File of SurveySample to be used
-   * @param type Type of Survey to be used
-   * @throws Exception exception thrown
-   */
-  Pair<SampleSummary, Future<Optional<SampleSummary>>> ingest(MultipartFile file, String type) throws Exception;
 
   /**
    * find sampleUnit
