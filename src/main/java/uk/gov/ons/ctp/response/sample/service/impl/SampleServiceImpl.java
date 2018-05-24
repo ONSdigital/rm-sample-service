@@ -50,10 +50,7 @@ import java.util.concurrent.Future;
 @Configuration
 public class SampleServiceImpl implements SampleService {
 
-  private static final int NUM_UPLOAD_THREADS = 5;
   private static final int MAX_DESCRIPTION_LENGTH = 5;
-
-  private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(NUM_UPLOAD_THREADS);
 
   @Autowired
   private SampleSummaryRepository sampleSummaryRepository;
@@ -260,7 +257,10 @@ public class SampleServiceImpl implements SampleService {
     return sampleUnitsTotal;
   }
 
-  public SampleSummary initiateIngest(final SampleSummary sampleSummary, final MultipartFile file, final String type) throws Exception {
+  @Override
+  public SampleSummary ingest(final SampleSummary sampleSummary, final MultipartFile file, final String type) throws Exception {
+    this.sampleOutboundPublisher.sampleUploadStarted(sampleSummary);
+
     SampleSummary result;
     switch (type.toUpperCase()) {
       case "B":
@@ -305,32 +305,6 @@ public class SampleServiceImpl implements SampleService {
   @Override
   public Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, Exception exception){
       return failSampleSummary(sampleSummary, exception.getMessage());
-  }
-
-  /**
-   * Method to kick off a task to ingest a job
-   * @param file Multipart File of SurveySample to be used
-   * @param type Type of Survey to be used
-   * @return a pair containing the newly created SampleSummary and a Future for the long running task
-   * @throws CTPException thrown if upload started message cannot be sent
-   */
-  @Override
-  public Pair<SampleSummary, Future<Optional<SampleSummary>>> ingest(final MultipartFile file, final String type) throws CTPException {
-    final SampleSummary newSummary = createAndSaveSampleSummary();
-
-    this.sampleOutboundPublisher.sampleUploadStarted(newSummary);
-
-    Callable<Optional<SampleSummary>> callable =() -> {
-      try {
-        return Optional.of(initiateIngest(newSummary, file, type));
-      } catch (Exception e) {
-        return failSampleSummary(newSummary, e);
-      }
-    };
-
-    Future<Optional<SampleSummary>> future = EXECUTOR_SERVICE.submit(callable);
-
-    return Pair.of(newSummary, future);
   }
 
   @Override
