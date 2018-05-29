@@ -92,8 +92,13 @@ public class CsvIngesterBusinessTest {
   private MockMultipartFile getTestFile(String fileName) throws Exception {
     Path csvFileLocation = Paths.get(getClass().getClassLoader().getResource("csv/" + fileName).toURI());
     MockMultipartFile multipartFile = new MockMultipartFile("file", fileName, "csv",
-        Files.readAllBytes(csvFileLocation));
+            Files.readAllBytes(csvFileLocation));
     return multipartFile;
+  }
+
+  private MockMultipartFile getTestFileFromString(String content) throws Exception {
+    return new MockMultipartFile("file", "fileName", "csv",
+            content.getBytes());
   }
 
   @Test
@@ -121,11 +126,45 @@ public class CsvIngesterBusinessTest {
   }
 
   @Test(expected = CTPException.class)
-  public void missingColumns() throws Exception {
+  public void testMissingColumns() throws Exception {
     SampleSummary sampleSummary = new SampleSummary();
     csvIngester.ingest(sampleSummary, getTestFile("business-survey-sample-missing-columns.csv"));
     verify(sampleService, times(0)).processSampleSummary(eq(sampleSummary),
-        anyListOf(BusinessSampleUnit.class));
+            anyListOf(BusinessSampleUnit.class));
+    thrown.expect(CTPException.class);
+  }
+
+  @Test(expected = CTPException.class)
+  public void testMissingFormTypeColumn() throws Exception {
+    // Given
+    SampleSummary sampleSummary = new SampleSummary();
+    String missingFormType = "49900000001:F:50300:50300:45320:45320:8478:801325:" +
+            "9900000576:1:E:FE:01/09/1993:ENTNAME1_COMPANY1:ENTNAME2_COMPANY1:" +
+            ":RUNAME1_COMPANY1:RUNNAME2_COMPANY1::TOTAL UK ACTIVITY:::C:D:7::S";
+
+    // When
+    csvIngester.ingest(sampleSummary, getTestFileFromString(missingFormType));
+
+    // Then
+    verify(sampleService, times(0)).processSampleSummary(eq(sampleSummary),
+            anyListOf(BusinessSampleUnit.class));
+    thrown.expect(CTPException.class);
+  }
+
+  @Test(expected = CTPException.class)
+  public void testMissingSampleUnitRefColumn() throws Exception {
+    // Given
+    SampleSummary sampleSummary = new SampleSummary();
+    String missingSampleUnitRef = ":F:50300:50300:45320:45320:8478:801325:" +
+            "9900000576:1:E:FE:01/09/1993:ENTNAME1_COMPANY1:ENTNAME2_COMPANY1:" +
+            ":RUNAME1_COMPANY1:RUNNAME2_COMPANY1::TOTAL UK ACTIVITY:::C:D:7:15:S";
+
+    // When
+    csvIngester.ingest(sampleSummary, getTestFileFromString(missingSampleUnitRef));
+
+    // Then
+    verify(sampleService, times(0)).processSampleSummary(eq(sampleSummary),
+            anyListOf(BusinessSampleUnit.class));
     thrown.expect(CTPException.class);
   }
 
