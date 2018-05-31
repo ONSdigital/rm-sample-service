@@ -3,12 +3,15 @@ package uk.gov.ons.ctp.response.sample.ingest;
 import liquibase.util.csv.opencsv.CSVReader;
 import liquibase.util.csv.opencsv.bean.ColumnPositionMappingStrategy;
 import liquibase.util.csv.opencsv.bean.CsvToBean;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.common.error.CTPException;
+import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.BusinessSampleUnit;
@@ -21,6 +24,7 @@ import javax.validation.ValidatorFactory;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -63,8 +67,23 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
       RUSIC2007, FROEMPMENT, FROTOVER, ENTREF, LEGALSTATUS, ENTREPMKR, REGION, BIRTHDATE, ENTNAME1, ENTNAME2, ENTNAME3,
       RUNAME1, RUNAME2, RUNAME3, TRADSTYLE1, TRADSTYLE2, TRADSTYLE3, SELTYPE, INCLEXCL, CELLNO, FORMTYPE, CURRENCY};
 
+  private enum ValidationErrorType {
+    InvalidColumns, DuplicateRU
+  }
+
+  @Data
+  @AllArgsConstructor
+  private static class ValidationError {
+      private int lineNumber;
+      private ValidationErrorType errorType;
+      private String errorDetail;
+  }
+
   @Autowired
   private SampleService sampleService;
+
+  @Autowired
+  private AppConfig appConfig;
 
   private ColumnPositionMappingStrategy<BusinessSampleUnit> columnPositionMappingStrategy;
 
@@ -85,44 +104,59 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
     columnPositionMappingStrategy.setColumnMapping(COLUMNS);
   }
 
+  private String generateErrorReport(int maxErrors, List<BusinessSampleUnit> sampleUnitList, List<ValidationError> errors){
+    StringBuffer report = new StringBuffer();
+
+    report.append(String.format("timestamp: %s, valid samples: %d, errors: %d (fail at %d errors)\n",
+            new Date().toString(), sampleUnitList.size(), errors.size(), maxErrors));
+    report.append(errors
+        .stream()
+        .map(ve -> String.format("%d: %s -> %s", ve.getLineNumber(), ve.getErrorType().name(), ve.getErrorDetail()))
+        .collect(Collectors.joining("\n")));
+
+    return report.toString();
+  }
+
   public SampleSummary ingest(final SampleSummary sampleSummary, final MultipartFile file)
       throws Exception {
 
-    CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()), ':');
-    String[] nextLine;
-    List<BusinessSampleUnit> samplingUnitList = new ArrayList<>();
-    int lineNumber = 0;
-    Set<String> unitRefs = new HashSet<>();
+      int maxErrors = this.appConfig.getSampleIngest().getMaxErrors();
+      CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()), ':');
+      String[] nextLine;
+      List<BusinessSampleUnit> samplingUnitList = new ArrayList<>();
+      int lineNumber = 0;
+      Set<String> unitRefs = new HashSet<>();
+      List<ValidationError> errors = new ArrayList<>();
 
-      while((nextLine = csvReader.readNext()) != null) {
+      while((nextLine = csvReader.readNext()) != null && errors.size() < maxErrors) {
         lineNumber++;
 
-        try {
-          BusinessSampleUnit businessSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
-          Optional<String> namesOfInvalidColumns = validateLine(businessSampleUnit);
+        BusinessSampleUnit businessSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
+        Optional<String> namesOfInvalidColumns = validateLine(businessSampleUnit);
 
-          // If a unit ref is already registered
+        if (namesOfInvalidColumns.isPresent() || unitRefs.contains(businessSampleUnit.getSampleUnitRef())) {
+          if (namesOfInvalidColumns.isPresent()) {
+            log.error("Problem parsing line {} due to {}", Arrays.toString(nextLine), namesOfInvalidColumns.get());
+            errors.add(new ValidationError(lineNumber, ValidationErrorType.InvalidColumns, namesOfInvalidColumns.get()));
+          }
           if (unitRefs.contains(businessSampleUnit.getSampleUnitRef())) {
             log.error("This sample unit ref {} is duplicated in the file.", businessSampleUnit.getSampleUnitRef());
-            throw new CTPException(CTPException.Fault.VALIDATION_FAILED,
-                    String.format("This sample unit ref %s is duplicated in the file.", businessSampleUnit.getSampleUnitRef()));
+            errors.add(new ValidationError(lineNumber, ValidationErrorType.DuplicateRU,
+                    businessSampleUnit.getSampleUnitRef()));
           }
-          unitRefs.add(businessSampleUnit.getSampleUnitRef());
-
-          if (namesOfInvalidColumns.isPresent()) {
-            log.error("Problem parsing line {} due to {} - entire ingest aborted", Arrays.toString(nextLine),
-                    namesOfInvalidColumns.get());
-            throw new CTPException(CTPException.Fault.VALIDATION_FAILED, String.format("Error in %s due to field(s) %s", Arrays.toString(nextLine),
-                    namesOfInvalidColumns.get()));
-          }
+        } else {
           businessSampleUnit.setSampleUnitType("B");
 
           samplingUnitList.add(businessSampleUnit);
-        } catch(CTPException e){
-          String newMessage = String.format("Line %d: %s", lineNumber, e.getMessage());
-
-          throw new CTPException(e.getFault(), newMessage);
         }
+
+        unitRefs.add(businessSampleUnit.getSampleUnitRef());
+      }
+
+      if (errors.size() > 0){
+          String errorReport = generateErrorReport(maxErrors, samplingUnitList, errors);
+
+          throw new CTPException(CTPException.Fault.VALIDATION_FAILED, errorReport);
       }
 
       return sampleService.processSampleSummary(sampleSummary, samplingUnitList);

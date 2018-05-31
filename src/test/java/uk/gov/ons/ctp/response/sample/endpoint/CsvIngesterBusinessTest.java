@@ -1,6 +1,5 @@
 package uk.gov.ons.ctp.response.sample.endpoint;
 
-import javassist.tools.rmi.Sample;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -8,27 +7,26 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.mock.web.MockMultipartFile;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
+import uk.gov.ons.ctp.response.sample.config.SampleIngest;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.BusinessSampleUnit;
-import validation.BusinessSurveySample;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Test the CsvIngester distributor
@@ -80,6 +78,15 @@ public class CsvIngesterBusinessTest {
   private static final String CELLNO = "7";
   private static final String FORMTYPE = "15";
   private static final String CURRENCY = "S";
+
+  private static final int TEST_MAX_ERRORS = 50;
+
+  @Before
+  public void setUp(){
+    SampleIngest sampleIngest = new SampleIngest();
+    sampleIngest.setMaxErrors(TEST_MAX_ERRORS);
+    when(this.appConfig.getSampleIngest()).thenReturn(sampleIngest);
+  }
 
   /**
    * take a named test file and create a copy of it - is because the ingester

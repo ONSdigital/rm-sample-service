@@ -24,4 +24,5 @@ public class AppConfig {
   private Rabbitmq rabbitmq;
   private DataGrid dataGrid;
   private SwaggerSettings swaggerSettings;
+  private SampleIngest sampleIngest;
 }
