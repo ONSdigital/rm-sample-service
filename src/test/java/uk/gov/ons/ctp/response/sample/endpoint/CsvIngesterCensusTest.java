@@ -1,13 +1,11 @@
 package uk.gov.ons.ctp.response.sample.endpoint;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.mock.web.MockMultipartFile;
@@ -17,7 +15,6 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterCensus;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.CensusSampleUnit;
-import validation.CensusSurveySample;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -69,7 +66,7 @@ public class CsvIngesterCensusTest {
   public void testBlueSky() throws Exception {
     SampleSummary newSummary = new SampleSummary();
     csvIngester.ingest(newSummary, getTestFile("census-survey-sample.csv"));
-    verify(sampleService, times(1)).processSampleSummary(eq(newSummary),
+    verify(sampleService, times(1)).saveSample(eq(newSummary),
             anyListOf(CensusSampleUnit.class));
   }
 
@@ -77,7 +74,7 @@ public class CsvIngesterCensusTest {
   public void missingColumns() throws Exception {
     SampleSummary newSummary = new SampleSummary();
     csvIngester.ingest(newSummary, getTestFile("census-survey-sample-missing-columns.csv"));
-    verify(sampleService, times(0)).processSampleSummary(eq(newSummary),
+    verify(sampleService, times(0)).saveSample(eq(newSummary),
         anyListOf(CensusSampleUnit.class));
     thrown.expect(CTPException.class);
   }
@@ -86,7 +83,7 @@ public class CsvIngesterCensusTest {
   public void incorrectData() throws Exception {
     SampleSummary newSummary = new SampleSummary();
     csvIngester.ingest(newSummary, getTestFile("census-survey-sample-incorrect-data.csv"));
-    verify(sampleService, times(0)).processSampleSummary(eq(newSummary),
+    verify(sampleService, times(0)).saveSample(eq(newSummary),
         anyListOf(CensusSampleUnit.class));
     thrown.expect(CTPException.class);
   }

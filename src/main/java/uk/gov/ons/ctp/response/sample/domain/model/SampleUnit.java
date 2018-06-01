@@ -1,19 +1,14 @@
 package uk.gov.ons.ctp.response.sample.domain.model;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import net.sourceforge.cobertura.CoverageIgnore;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.Parameter;
 
 import lombok.AccessLevel;
@@ -48,6 +43,7 @@ public class SampleUnit implements Serializable {
   private Integer sampleUnitPK;
   
   @Column(name = "id")
+  @NaturalId
   private UUID id;
 
   @Column(name = "samplesummaryfk")
@@ -65,5 +61,8 @@ public class SampleUnit implements Serializable {
   @Enumerated(EnumType.STRING)
   @Column(name = "statefk")
   private SampleUnitDTO.SampleUnitState state;
+
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "sampleUnit")
+  private List<SampleAttributes> sampleAttributes;
 
 }

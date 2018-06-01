@@ -22,6 +22,8 @@ import uk.gov.ons.ctp.response.sample.message.SampleUnitPublisher;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 
+import javax.transaction.Transactional;
+
 /**
  * Distributes SampleUnits
  */
@@ -58,6 +60,7 @@ public class SampleUnitDistributor {
   /**
    * @return SampleUnitDistributionInfo Information for SampelUnit Distribution
    */
+  @Transactional
   public final SampleUnitDistributionInfo distribute() {
     log.info("SampleUnitDistributor is in the house");
     SampleUnitDistributionInfo distInfo = new SampleUnitDistributionInfo();

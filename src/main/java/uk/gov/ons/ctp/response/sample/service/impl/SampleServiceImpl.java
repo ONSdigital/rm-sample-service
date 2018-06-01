@@ -1,7 +1,6 @@
 package uk.gov.ons.ctp.response.sample.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
@@ -15,17 +14,17 @@ import uk.gov.ons.ctp.common.time.DateTimeUtil;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
+import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
+import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterCensus;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterSocial;
 import uk.gov.ons.ctp.response.sample.message.EventPublisher;
-import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
 import uk.gov.ons.ctp.response.sample.message.SampleOutboundPublisher;
-import uk.gov.ons.ctp.response.sample.party.PartyUtil;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.service.CollectionExerciseJobService;
@@ -33,24 +32,16 @@ import uk.gov.ons.ctp.response.sample.service.PartySvcClientService;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.SampleUnitBase;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 @Slf4j
 @Service
 @Configuration
 public class SampleServiceImpl implements SampleService {
-
-  private static final int MAX_DESCRIPTION_LENGTH = 5;
 
   @Autowired
   private SampleSummaryRepository sampleSummaryRepository;
@@ -70,9 +61,6 @@ public class SampleServiceImpl implements SampleService {
 
   @Autowired
   private PartySvcClientService partySvcClient;
-
-  @Autowired
-  private PartyPublisher partyPublisher;
 
   @Autowired
   private SampleOutboundPublisher sampleOutboundPublisher;
@@ -102,16 +90,19 @@ public class SampleServiceImpl implements SampleService {
   @Autowired
   private EventPublisher eventPublisher;
 
+  @Autowired
+  private SampleAttributesRepository sampleAttributesRepository;
+
   @Override
-  @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
-  public SampleSummary processSampleSummary(SampleSummary sampleSummary, List<? extends SampleUnitBase> samplingUnitList) {
+  @Transactional(propagation = Propagation.REQUIRED)
+  public SampleSummary saveSample(SampleSummary sampleSummary, List<? extends SampleUnitBase> samplingUnitList) {
     int expectedCI = calculateExpectedCollectionInstruments(samplingUnitList);
 
     sampleSummary.setTotalSampleUnits(samplingUnitList.size());
     sampleSummary.setExpectedCollectionInstruments(expectedCI);
     SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
-    Map<String, UUID> sampleUnitIds = saveSampleUnits(samplingUnitList, savedSampleSummary);
-    publishToPartyQueue(samplingUnitList, sampleUnitIds, sampleSummary.getId().toString());
+    saveSampleUnits(samplingUnitList, savedSampleSummary);
+
     return savedSampleSummary;
   }
 
@@ -135,8 +126,7 @@ public class SampleServiceImpl implements SampleService {
     return sampleSummaryRepository.save(sampleSummary);
   }
 
-  private Map<String, UUID> saveSampleUnits(List<? extends SampleUnitBase> samplingUnitList, SampleSummary sampleSummary) {
-    Map<String, UUID> ids = new HashMap<>();
+  private void saveSampleUnits(List<? extends SampleUnitBase> samplingUnitList, SampleSummary sampleSummary) {
     for (SampleUnitBase sampleUnitBase : samplingUnitList) {
       SampleUnit sampleUnit = new SampleUnit();
       sampleUnit.setSampleSummaryFK(sampleSummary.getSampleSummaryPK());
@@ -144,25 +134,9 @@ public class SampleServiceImpl implements SampleService {
       sampleUnit.setSampleUnitType(sampleUnitBase.getSampleUnitType());
       sampleUnit.setFormType(sampleUnitBase.getFormType());
       sampleUnit.setState(SampleUnitDTO.SampleUnitState.INIT);
-      sampleUnit.setId(UUID.randomUUID());
-      ids.put(sampleUnit.getSampleUnitRef(), sampleUnit.getId());
+      sampleUnit.setId(sampleUnitBase.getSampleUnitId());
       eventPublisher.publishEvent("Sample Init");
       sampleUnitRepository.save(sampleUnit);
-    }
-    return ids;
-  }
-
-  /**
-   * create sampleUnits, save them to the Database and post to internal queue
-   * @param sampleUnitIds 
-   * @throws Exception 
-   * */
-  private void publishToPartyQueue(List<? extends SampleUnitBase> samplingUnitList, Map<String, UUID> sampleUnitIds, String sampleSummaryId){
-    for (SampleUnitBase sampleUnitBase : samplingUnitList) {
-          PartyCreationRequestDTO party = PartyUtil.convertToParty(sampleUnitBase);
-          party.getAttributes().setSampleUnitId(sampleUnitIds.get(sampleUnitBase.getSampleUnitRef()).toString());
-          party.setSampleSummaryId(sampleSummaryId);
-          partyPublisher.publish(party);
     }
   }
 

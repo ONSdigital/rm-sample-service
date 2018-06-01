@@ -7,4 +7,3 @@ spring:
     schema: classpath:/schema.sql
     username: postgres
     password: postgres
-

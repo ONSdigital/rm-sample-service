@@ -12,7 +12,6 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.CensusSampleUnit;
-import validation.CensusSurveySample;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -108,7 +107,7 @@ public class CsvIngesterCensus extends CsvToBean<CensusSampleUnit> {
 
       }
 
-      return sampleService.processSampleSummary(sampleSummary, samplingUnitList);
+      return sampleService.saveSample(sampleSummary, samplingUnitList);
   }
 
   /**
