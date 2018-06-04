@@ -280,12 +280,14 @@ public class SampleServiceImpl implements SampleService {
   }
 
   @Override
-  public Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, String message){
+  public Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, SampleSummaryDTO.ErrorCode errorCode,
+                                                   String message){
     try {
       SampleSummaryDTO.SampleState newState = sampleSvcStateTransitionManager.transition(sampleSummary.getState(),
               SampleSummaryDTO.SampleEvent.FAIL_VALIDATION);
       sampleSummary.setState(newState);
       sampleSummary.setNotes(message);
+      sampleSummary.setErrorCode(errorCode);
       SampleSummary persisted = this.sampleSummaryRepository.save(sampleSummary);
 
       return Optional.of(persisted);
@@ -303,8 +305,9 @@ public class SampleServiceImpl implements SampleService {
   }
 
   @Override
-  public Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, Exception exception){
-      return failSampleSummary(sampleSummary, exception.getMessage());
+  public Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, SampleSummaryDTO.ErrorCode errorCode,
+                                                   Exception exception){
+      return failSampleSummary(sampleSummary, errorCode, exception.getMessage());
   }
 
   @Override

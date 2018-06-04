@@ -23,6 +23,7 @@ import uk.gov.ons.ctp.common.time.DateTimeUtil;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
+import uk.gov.ons.ctp.response.sample.ingest.IngesterCTPException;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
@@ -113,14 +114,16 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
    * @return a newly created sample summary that won't have samples or collection instruments populated
    * @throws CTPException thrown if upload started message cannot be sent
    */
-  public SampleSummary ingest(final MultipartFile file, final String type) throws CTPException {
+  public SampleSummary ingest(final MultipartFile file, final String type, String filename) throws CTPException {
     final SampleSummary newSummary = this.sampleService.createAndSaveSampleSummary();
 
     Callable<Optional<SampleSummary>> callable =() -> {
       try {
         return Optional.of(this.sampleService.ingest(newSummary, file, type));
+      } catch (IngesterCTPException e){
+        return this.sampleService.failSampleSummary(newSummary, e.getErrorCode(), e);
       } catch (Exception e) {
-        return this.sampleService.failSampleSummary(newSummary, e);
+        return this.sampleService.failSampleSummary(newSummary, SampleSummaryDTO.ErrorCode.NotSpecified, e);
       }
     };
 
@@ -130,14 +133,17 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   }
 
   @RequestMapping(value = "/{type}/fileupload", method = RequestMethod.POST, consumes = "multipart/form-data")
-  public final @ResponseBody ResponseEntity<SampleSummary> uploadSampleFile(@PathVariable("type") final String type, @RequestParam("file") MultipartFile file) throws CTPException {
+  public final @ResponseBody ResponseEntity<SampleSummary> uploadSampleFile(
+          @PathVariable("type") final String type,
+          @RequestParam("file") MultipartFile file) throws CTPException {
     log.info("Entering Sample file upload for Type {}", type);
     if (!Arrays.asList("B", "CENSUS", "SOCIAL").contains(type.toUpperCase())) {
       return ResponseEntity.badRequest().build();
     }
 
     try {
-      SampleSummary result = ingest(file, type);
+      String filename = file.getOriginalFilename();
+      SampleSummary result = ingest(file, type, filename);
 
       URI location = ServletUriComponentsBuilder
               .fromCurrentServletMapping()

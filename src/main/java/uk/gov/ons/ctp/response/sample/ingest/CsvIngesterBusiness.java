@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.BusinessSampleUnit;
 import validation.BusinessSurveySample;
@@ -111,14 +112,23 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
             new Date().toString(), sampleUnitList.size(), errors.size(), maxErrors));
     report.append(errors
         .stream()
-        .map(ve -> String.format("%d: %s -> %s", ve.getLineNumber(), ve.getErrorType().name(), ve.getErrorDetail()))
+        .map(ve -> String.format("Line %d: %s -> %s", ve.getLineNumber(), ve.getErrorType().name(), ve.getErrorDetail()))
         .collect(Collectors.joining("\n")));
 
     return report.toString();
   }
 
+  private void validateFilename(String filename) throws IngesterCTPException {
+    if (!filename.toLowerCase().endsWith(".csv")){
+      throw new IngesterCTPException(CTPException.Fault.VALIDATION_FAILED, SampleSummaryDTO.ErrorCode.NotCsv,
+              String.format("%s is not a valid CSV file (must have .csv extension)", filename));
+    }
+  }
+
   public SampleSummary ingest(final SampleSummary sampleSummary, final MultipartFile file)
       throws Exception {
+
+      validateFilename(file.getOriginalFilename());
 
       int maxErrors = this.appConfig.getSampleIngest().getMaxErrors();
       CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()), ':');
@@ -156,7 +166,7 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
       if (errors.size() > 0){
           String errorReport = generateErrorReport(maxErrors, samplingUnitList, errors);
 
-          throw new CTPException(CTPException.Fault.VALIDATION_FAILED, errorReport);
+          throw new IngesterCTPException(CTPException.Fault.VALIDATION_FAILED, SampleSummaryDTO.ErrorCode.DataError, errorReport);
       }
 
       return sampleService.processSampleSummary(sampleSummary, samplingUnitList);
