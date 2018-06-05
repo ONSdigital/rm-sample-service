@@ -14,7 +14,6 @@ import uk.gov.ons.ctp.common.time.DateTimeUtil;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
-import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesRepository;
@@ -95,13 +94,13 @@ public class SampleServiceImpl implements SampleService {
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED)
-  public SampleSummary saveSample(SampleSummary sampleSummary, List<? extends SampleUnitBase> samplingUnitList) {
+  public SampleSummary saveSample(SampleSummary sampleSummary, List<? extends SampleUnitBase> samplingUnitList, SampleUnitDTO.SampleUnitState sampleUnitState) {
     int expectedCI = calculateExpectedCollectionInstruments(samplingUnitList);
 
     sampleSummary.setTotalSampleUnits(samplingUnitList.size());
     sampleSummary.setExpectedCollectionInstruments(expectedCI);
     SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
-    saveSampleUnits(samplingUnitList, savedSampleSummary);
+    saveSampleUnits(samplingUnitList, savedSampleSummary, sampleUnitState);
 
     return savedSampleSummary;
   }
@@ -126,14 +125,14 @@ public class SampleServiceImpl implements SampleService {
     return sampleSummaryRepository.save(sampleSummary);
   }
 
-  private void saveSampleUnits(List<? extends SampleUnitBase> samplingUnitList, SampleSummary sampleSummary) {
+  private void saveSampleUnits(List<? extends SampleUnitBase> samplingUnitList, SampleSummary sampleSummary, SampleUnitDTO.SampleUnitState sampleUnitState) {
     for (SampleUnitBase sampleUnitBase : samplingUnitList) {
       SampleUnit sampleUnit = new SampleUnit();
       sampleUnit.setSampleSummaryFK(sampleSummary.getSampleSummaryPK());
       sampleUnit.setSampleUnitRef(sampleUnitBase.getSampleUnitRef());
       sampleUnit.setSampleUnitType(sampleUnitBase.getSampleUnitType());
       sampleUnit.setFormType(sampleUnitBase.getFormType());
-      sampleUnit.setState(SampleUnitDTO.SampleUnitState.INIT);
+      sampleUnit.setState(sampleUnitState);
       sampleUnit.setId(sampleUnitBase.getSampleUnitId());
       eventPublisher.publishEvent("Sample Init");
       sampleUnitRepository.save(sampleUnit);

@@ -18,18 +18,23 @@ import uk.gov.ons.ctp.response.sample.SampleBeanMapper;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.config.SampleUnitDistribution;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
+import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.CollectionExerciseJobRepository;
+import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.message.SampleUnitPublisher;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
@@ -59,6 +64,9 @@ public class SampleUnitDistributorTest {
 
   @Mock
   private SampleUnitPublisher sampleUnitPublisher;
+
+  @Mock
+  private SampleAttributesRepository sampleAttributesRepository;
 
   @Spy
   private MapperFacade mapperFacade = new SampleBeanMapper();
@@ -102,10 +110,8 @@ public class SampleUnitDistributorTest {
             any(Boolean.class));
     verify(sampleUnitDistributionListManager, times(1)).saveList(any(String.class),
             any(List.class), any(Boolean.class));
-    verify(sampleUnitRepo, times(2)).findOne(any(Integer.class));
-
-    verify(sampleUnitStateTransitionManager, times(1)).transition(
-            sampleUnitList.get(0).getState(), SampleUnitDTO.SampleUnitEvent.DELIVERING);
+    verify(sampleUnitStateTransitionManager, times(2)).transition(
+            SampleUnitDTO.SampleUnitState.INIT, SampleUnitDTO.SampleUnitEvent.DELIVERING);
     verify(sampleUnitRepo, times(2)).saveAndFlush(any(SampleUnit.class));
 
     verify(sampleUnitPublisher, times(2)).send(
@@ -224,10 +230,8 @@ public class SampleUnitDistributorTest {
             any(Boolean.class));
     verify(sampleUnitDistributionListManager, times(1)).saveList(any(String.class),
             any(List.class), any(Boolean.class));
-    verify(sampleUnitRepo, times(2)).findOne(any(Integer.class));
-
-    verify(sampleUnitStateTransitionManager, times(1)).transition(
-            sampleUnitList.get(0).getState(), SampleUnitDTO.SampleUnitEvent.DELIVERING);
+    verify(sampleUnitStateTransitionManager, times(2)).transition(
+            SampleUnitDTO.SampleUnitState.INIT, SampleUnitDTO.SampleUnitEvent.DELIVERING);
     verify(sampleUnitRepo, times(2)).saveAndFlush(any(SampleUnit.class));
 
     verify(sampleUnitPublisher, times(2)).send(
@@ -235,5 +239,66 @@ public class SampleUnitDistributorTest {
     verify(sampleUnitDistributionListManager, times(1)).deleteList(any(String.class),
             any(Boolean.class));
     verify(sampleUnitDistributionListManager, times(1)).unlockContainer();
+  }
+
+  @Test
+  public void testShouldSendSampleUnitWithAttributesWhenPresent() {
+    // Given
+    CollectionExerciseJob collectionExerciseJob = new CollectionExerciseJob();
+    collectionExerciseJob.setCollectionExerciseId(UUID.randomUUID());
+    collectionExerciseJob.setSampleSummaryId(UUID.randomUUID());
+    given(collectionExerciseJobRepository.findAll()).willReturn(Collections.singletonList(collectionExerciseJob));
+
+    SampleUnit sampleUnit = new SampleUnit();
+    sampleUnit.setId(UUID.randomUUID());
+    SampleAttributes sampleAttributes = new SampleAttributes();
+    sampleAttributes.setAttributes(Collections.singletonMap("Prem1","14 ASHMEAD VIEW"));
+    given(sampleAttributesRepository.findOne(sampleUnit.getId())).willReturn(sampleAttributes);
+
+    given(sampleUnitRepo.getSampleUnits(
+            collectionExerciseJob.getSampleSummaryId(),
+            SampleSummaryDTO.SampleState.ACTIVE.toString(),
+            10,
+            Collections.singletonList(-9999)
+            )).willReturn(Collections.singletonList(sampleUnit));
+
+    // When
+    sampleUnitDistributor.distribute();
+
+    // Then
+    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit sentSampleUnit = new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit();
+    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.SampleAttributes.Builder<Void> builder = new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.SampleAttributes().newCopyBuilder();
+    builder.addEntries().withKey("Prem1").withValue("14 ASHMEAD VIEW");
+    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.SampleAttributes attributes = builder.build();
+    sentSampleUnit.setSampleAttributes(attributes);
+    sentSampleUnit.setCollectionExerciseId(collectionExerciseJob.getCollectionExerciseId().toString());
+    verify(sampleUnitPublisher).send(sentSampleUnit);
+  }
+
+  @Test
+  public void testShouldSendSampleUnitWithoutAttributesWhenNotPresent() {
+    // Given
+    CollectionExerciseJob collectionExerciseJob = new CollectionExerciseJob();
+    collectionExerciseJob.setCollectionExerciseId(UUID.randomUUID());
+    collectionExerciseJob.setSampleSummaryId(UUID.randomUUID());
+    given(collectionExerciseJobRepository.findAll()).willReturn(Collections.singletonList(collectionExerciseJob));
+
+    SampleUnit sampleUnit = new SampleUnit();
+    sampleUnit.setId(UUID.randomUUID());
+
+    given(sampleUnitRepo.getSampleUnits(
+            collectionExerciseJob.getSampleSummaryId(),
+            SampleSummaryDTO.SampleState.ACTIVE.toString(),
+            10,
+            Collections.singletonList(-9999)
+    )).willReturn(Collections.singletonList(sampleUnit));
+
+    // When
+    sampleUnitDistributor.distribute();
+
+    // Then
+    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit sentSampleUnit = new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit();
+    sentSampleUnit.setCollectionExerciseId(collectionExerciseJob.getCollectionExerciseId().toString());
+    verify(sampleUnitPublisher).send(sentSampleUnit);
   }
 }

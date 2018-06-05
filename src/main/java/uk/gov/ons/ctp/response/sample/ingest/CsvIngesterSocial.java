@@ -17,6 +17,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.SocialSampleUnit;
 
@@ -56,7 +57,7 @@ public class CsvIngesterSocial extends CsvToBean<SocialSampleUnit> {
         }
 
         // TODO social sample units need to have state set to PERSISTED
-        sampleService.saveSample(sampleSummary, socialSamples);
+        sampleService.saveSample(sampleSummary, socialSamples, SampleUnitDTO.SampleUnitState.PERSISTED);
         sampleAttributesRepository.save(sampleAttributes);
         sampleService.activateSampleSummaryState(sampleSummary.getSampleSummaryPK());
 

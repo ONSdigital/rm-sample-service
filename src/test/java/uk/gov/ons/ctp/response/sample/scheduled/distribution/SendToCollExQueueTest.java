@@ -29,6 +29,7 @@ import uk.gov.ons.ctp.response.sample.config.SampleUnitDistribution;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.CollectionExerciseJobRepository;
+import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.message.SampleUnitPublisher;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
@@ -63,7 +64,9 @@ public class SendToCollExQueueTest {
     
     @Mock
     private DistributedListManager<Integer> sampleUnitDistributionListManager;
-    
+
+    @Mock
+    private SampleAttributesRepository sampleAttributesRepository;
     
     @Before
     public void setUp() throws Exception {

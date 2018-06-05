@@ -26,7 +26,7 @@ public class SampleUnitMapperTest {
 
         Map<String, String> attributesMap = Collections.singletonMap("test_attribute_key", "test_attribute_value");
         SampleAttributes sampleAttributes = new SampleAttributes(sampleUnit.getId(), attributesMap);
-        sampleUnit.setSampleAttributes(Collections.singletonList(sampleAttributes));
+        sampleUnit.setSampleAttributes(sampleAttributes);
 
         uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit desinationSampleUnit = new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit();
 

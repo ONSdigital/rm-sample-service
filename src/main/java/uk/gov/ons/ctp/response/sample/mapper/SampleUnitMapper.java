@@ -14,7 +14,7 @@ public class SampleUnitMapper extends CustomMapper<SampleUnit, uk.gov.ons.ctp.re
         if (sampleUnit.getSampleAttributes() != null) {
             uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.SampleAttributes.Builder<Void> builder =
                     new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.SampleAttributes().newCopyBuilder();
-            sampleUnit.getSampleAttributes().get(0).getAttributes().forEach((k, v) -> builder.addEntries().withKey(k).withValue(v));
+            sampleUnit.getSampleAttributes().getAttributes().forEach((k, v) -> builder.addEntries().withKey(k).withValue(v));
             sampleUnit2.setSampleAttributes(builder.build());
         }
     }

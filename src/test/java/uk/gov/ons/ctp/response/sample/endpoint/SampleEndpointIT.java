@@ -22,7 +22,11 @@ import uk.gov.ons.ctp.response.sample.config.Rabbitmq;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
+import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
@@ -50,7 +54,7 @@ public class SampleEndpointIT {
     private BlockingQueue<String> sampleDeliveryMessageListener;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         Rabbitmq config = this.appConfig.getRabbitmq();
         sml = new SimpleMessageListener(config.getHost(), config.getPort(), config.getUsername(),
                 config.getPassword());
@@ -84,7 +88,7 @@ public class SampleEndpointIT {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         sml.close();
     }
 
@@ -113,7 +117,7 @@ public class SampleEndpointIT {
     }
 
     @Test
-    public void shouldUploadSocialSampleFile() throws UnirestException, IOException, InterruptedException {
+    public void shouldUploadSocialSampleFile() throws UnirestException, IOException {
         // Given
         final String sampleFile = "/csv/social-survey-sample.csv";
 
@@ -132,7 +136,7 @@ public class SampleEndpointIT {
     }
 
     @Test
-    public void shouldPutSampleUnitsOnQueue() throws UnirestException, InterruptedException, IOException {
+    public void shouldPutSampleAttributesOnQueueWhenSampleUnitsRequested() throws UnirestException, InterruptedException, JAXBException {
         // Given
         final String sampleFile = "/csv/social-survey-sample.csv";
         HttpResponse<SampleSummary> sampleSummaryResponse =
@@ -154,7 +158,14 @@ public class SampleEndpointIT {
         // Then
         assertThat(sampleUnitResponse.getStatus()).isEqualTo(201);
         String message = sampleDeliveryMessageListener.take();
-        System.out.println(message);
+
+        JAXBContext jaxbContext = JAXBContext.newInstance(SampleUnit.class);
+        SampleUnit sampleUnit = (SampleUnit) jaxbContext.createUnmarshaller().unmarshal(new ByteArrayInputStream(message.getBytes()));
+        assertThat(sampleUnit.getSampleAttributes().getEntries()).contains(
+                new SampleUnit.SampleAttributes.Entry("Prem1", "14 ASHMEAD VIEW"),
+                new SampleUnit.SampleAttributes.Entry("Postcode", "TS184QG"),
+                new SampleUnit.SampleAttributes.Entry("PostTown", "STOCKTON-ON-TEES"),
+                new SampleUnit.SampleAttributes.Entry("CountryCode", "E"));
     }
 
 

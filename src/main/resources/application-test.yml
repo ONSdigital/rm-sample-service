@@ -7,3 +7,6 @@ spring:
     schema: classpath:/schema.sql
     username: postgres
     password: postgres
+
+sample-unit-distribution:
+  delay-milli-seconds: 1000

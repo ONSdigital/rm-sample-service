@@ -14,8 +14,8 @@ import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
 import uk.gov.ons.ctp.response.sample.party.PartyUtil;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
-import uk.gov.ons.ctp.response.sample.service.impl.SampleServiceImpl;
 import validation.BusinessSampleUnit;
 import validation.SampleUnitBase;
 
@@ -105,7 +105,7 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
           throw new CTPException(e.getFault(), newMessage);
         }
       }
-      SampleSummary sampleSummaryWithCICount = sampleService.saveSample(sampleSummary, sampleUnitList);
+      SampleSummary sampleSummaryWithCICount = sampleService.saveSample(sampleSummary, sampleUnitList, SampleUnitDTO.SampleUnitState.INIT);
       publishToPartyQueue(sampleUnitList, sampleSummary.getId().toString());
 
       return sampleSummaryWithCICount;

@@ -62,7 +62,6 @@ public class SampleUnit implements Serializable {
   @Column(name = "statefk")
   private SampleUnitDTO.SampleUnitState state;
 
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "sampleUnit")
-  private List<SampleAttributes> sampleAttributes;
-
+  @Transient
+  private SampleAttributes sampleAttributes;
 }

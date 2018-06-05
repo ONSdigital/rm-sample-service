@@ -14,6 +14,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesRepository;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterSocial;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.SocialSampleUnit;
 
@@ -68,7 +69,7 @@ public class CsvIngesterSocialTest {
 
     // Then
     verify(sampleService).saveSample(eq(newSummary),
-        anyListOf(SocialSampleUnit.class));
+        anyListOf(SocialSampleUnit.class), eq(SampleUnitDTO.SampleUnitState.PERSISTED));
   }
 
   @Test(expected = CTPException.class)
@@ -83,7 +84,7 @@ public class CsvIngesterSocialTest {
 
     // Then
     verify(sampleService, times(0)).saveSample(eq(newSummary),
-        anyListOf(SocialSampleUnit.class));
+        anyListOf(SocialSampleUnit.class), eq(SampleUnitDTO.SampleUnitState.PERSISTED));
     thrown.expect(CTPException.class);
   }
 
@@ -99,7 +100,7 @@ public class CsvIngesterSocialTest {
 
     // Then
     verify(sampleService, times(0)).saveSample(eq(newSummary),
-            anyListOf(SocialSampleUnit.class));
+            anyListOf(SocialSampleUnit.class), eq(SampleUnitDTO.SampleUnitState.PERSISTED));
     thrown.expect(CTPException.class);
     thrown.expectMessage("Error in header row, missing required headers Prem1");
   }
@@ -108,7 +109,7 @@ public class CsvIngesterSocialTest {
   public void testIngestSocialSampleSavesAttributes() throws Exception {
     // Given
     SampleSummary newSummary = new SampleSummary();
-    given(sampleService.saveSample(any(), argumentCaptor.capture())).willReturn(newSummary);
+    given(sampleService.saveSample(any(), argumentCaptor.capture(), eq(SampleUnitDTO.SampleUnitState.PERSISTED))).willReturn(newSummary);
     String csv = "Prem1,Prem2,Prem3,Prem4,District,PostTown,Postcode,CountryCode\n" +
             "14 ASHMEAD VIEW,,,,,STOCKTON-ON-TEES,TS184QG,E";
 
