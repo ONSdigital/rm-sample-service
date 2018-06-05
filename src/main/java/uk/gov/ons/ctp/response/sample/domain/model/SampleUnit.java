@@ -1,22 +1,26 @@
 package uk.gov.ons.ctp.response.sample.domain.model;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.UUID;
-
-import javax.persistence.*;
-
-import net.sourceforge.cobertura.CoverageIgnore;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.NaturalId;
-import org.hibernate.annotations.Parameter;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.sourceforge.cobertura.CoverageIgnore;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * Domain model object.
@@ -43,7 +47,6 @@ public class SampleUnit implements Serializable {
   private Integer sampleUnitPK;
   
   @Column(name = "id")
-  @NaturalId
   private UUID id;
 
   @Column(name = "samplesummaryfk")

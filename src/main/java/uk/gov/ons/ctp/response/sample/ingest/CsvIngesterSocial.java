@@ -56,7 +56,6 @@ public class CsvIngesterSocial extends CsvToBean<SocialSampleUnit> {
             }
         }
 
-        // TODO social sample units need to have state set to PERSISTED
         sampleService.saveSample(sampleSummary, socialSamples, SampleUnitDTO.SampleUnitState.PERSISTED);
         sampleAttributesRepository.save(sampleAttributes);
         sampleService.activateSampleSummaryState(sampleSummary.getSampleSummaryPK());

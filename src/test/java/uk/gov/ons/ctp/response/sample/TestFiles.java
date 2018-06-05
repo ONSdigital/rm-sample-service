@@ -8,14 +8,6 @@ import java.nio.file.Paths;
 
 public class TestFiles {
 
-    /**
-     * take a named test file and create a copy of it - is because the ingester
-     * will delete the source csv file after ingest
-     *
-     * @param fileName source file name
-     * @return the newly created file
-     * @throws Exception oops
-     */
     public static MockMultipartFile getTestFile(String fileName) throws Exception {
         Path csvFileLocation = Paths.get(TestFiles.class.getClassLoader().getResource("csv/" + fileName).toURI());
         return new MockMultipartFile("file", fileName, "csv",

@@ -34,6 +34,7 @@ import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.ons.ctp.response.sample.Unirest.initialiseUnirest;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration
@@ -65,32 +66,14 @@ public class SampleEndpointIT {
         sampleDeliveryMessageListener = sml.listen(SimpleMessageListener.ExchangeType.Direct,
                 "sample-outbound-exchange", "Sample.SampleDelivery.binding");
 
-        Unirest.setObjectMapper(new com.mashape.unirest.http.ObjectMapper() {
-            private com.fasterxml.jackson.databind.ObjectMapper jacksonObjectMapper
-                    = new com.fasterxml.jackson.databind.ObjectMapper();
-
-            public <T> T readValue(String value, Class<T> valueType) {
-                try {
-                    return jacksonObjectMapper.readValue(value, valueType);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            public String writeValue(Object value) {
-                try {
-                    return jacksonObjectMapper.writeValueAsString(value);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
+        initialiseUnirest();
     }
 
     @After
     public void tearDown() {
         sml.close();
     }
+
 
     @Test
     public void shouldUploadBusinessSampleFile() throws UnirestException, IOException, InterruptedException {
