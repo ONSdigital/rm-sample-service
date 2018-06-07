@@ -21,6 +21,7 @@ import uk.gov.ons.ctp.response.sample.config.Rabbitmq;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
 import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
 
 import javax.xml.bind.JAXBContext;
@@ -89,7 +90,7 @@ public class SampleEndpointIT {
         // Then
         assertThat(sampleSummaryResponse.getStatus()).isEqualTo(201);
         SampleSummary sampleSummary = mapper.readValue(sampleSummaryResponse.getBody(), new TypeReference<SampleSummary>() {});
-        assertThat(sampleSummary.getState()).isEqualTo(SampleSummaryDTO.SampleState.INIT);
+        assertThat(sampleSummary.getState()).isEqualTo(SampleState.INIT);
 
         String message = uploadFinishedMessageListener.take();
         SampleSummaryDTO active = mapper.readValue(message, SampleSummaryDTO.class);

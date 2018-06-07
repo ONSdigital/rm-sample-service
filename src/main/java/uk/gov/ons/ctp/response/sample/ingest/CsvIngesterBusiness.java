@@ -106,7 +106,7 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
           sampleUnitList.add(parseLine(nextLine, unitRefs));
         } catch(CTPException e){
           String newMessage = String.format("Line %d: %s", csvReader.getRecordsRead(), e.getMessage());
-          throw new CTPException(e.getFault(), newMessage);
+          throw new CTPException(e.getFault(), e, newMessage);
         }
       }
       SampleSummary sampleSummaryWithCICount = sampleService.saveSample(sampleSummary, sampleUnitList, SampleUnitState.INIT);
