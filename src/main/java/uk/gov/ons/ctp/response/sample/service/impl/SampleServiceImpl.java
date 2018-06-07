@@ -24,8 +24,10 @@ import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterCensus;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterSocial;
 import uk.gov.ons.ctp.response.sample.message.EventPublisher;
 import uk.gov.ons.ctp.response.sample.message.SampleOutboundPublisher;
-import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
-import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEvent;
 import uk.gov.ons.ctp.response.sample.service.CollectionExerciseJobService;
 import uk.gov.ons.ctp.response.sample.service.PartySvcClientService;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
@@ -50,12 +52,12 @@ public class SampleServiceImpl implements SampleService {
 
   @Autowired
   @Qualifier("sampleSummaryTransitionManager")
-  private StateTransitionManager<SampleSummaryDTO.SampleState, SampleSummaryDTO.SampleEvent>
+  private StateTransitionManager<SampleState, SampleEvent>
           sampleSvcStateTransitionManager;
 
   @Autowired
   @Qualifier("sampleUnitTransitionManager")
-  private StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent>
+  private StateTransitionManager<SampleUnitState, SampleUnitEvent>
           sampleSvcUnitStateTransitionManager;
 
   @Autowired
@@ -94,7 +96,7 @@ public class SampleServiceImpl implements SampleService {
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED)
-  public SampleSummary saveSample(SampleSummary sampleSummary, List<? extends SampleUnitBase> samplingUnitList, SampleUnitDTO.SampleUnitState sampleUnitState) {
+  public SampleSummary saveSample(SampleSummary sampleSummary, List<? extends SampleUnitBase> samplingUnitList, SampleUnitState sampleUnitState) {
     int expectedCI = calculateExpectedCollectionInstruments(samplingUnitList);
 
     sampleSummary.setTotalSampleUnits(samplingUnitList.size());
@@ -119,13 +121,13 @@ public class SampleServiceImpl implements SampleService {
   public SampleSummary createAndSaveSampleSummary(){
     SampleSummary sampleSummary = new SampleSummary();
 
-    sampleSummary.setState(SampleSummaryDTO.SampleState.INIT);
+    sampleSummary.setState(SampleState.INIT);
     sampleSummary.setId(UUID.randomUUID());
 
     return sampleSummaryRepository.save(sampleSummary);
   }
 
-  private void saveSampleUnits(List<? extends SampleUnitBase> samplingUnitList, SampleSummary sampleSummary, SampleUnitDTO.SampleUnitState sampleUnitState) {
+  private void saveSampleUnits(List<? extends SampleUnitBase> samplingUnitList, SampleSummary sampleSummary, SampleUnitState sampleUnitState) {
     for (SampleUnitBase sampleUnitBase : samplingUnitList) {
       SampleUnit sampleUnit = new SampleUnit();
       sampleUnit.setSampleSummaryFK(sampleSummary.getSampleSummaryPK());
@@ -149,8 +151,8 @@ public class SampleServiceImpl implements SampleService {
   @Override
   public SampleSummary activateSampleSummaryState(Integer sampleSummaryPK) throws CTPException {
     SampleSummary targetSampleSummary = sampleSummaryRepository.findOne(sampleSummaryPK);
-    SampleSummaryDTO.SampleState newState = sampleSvcStateTransitionManager.transition(targetSampleSummary.getState(),
-            SampleSummaryDTO.SampleEvent.ACTIVATED);
+    SampleState newState = sampleSvcStateTransitionManager.transition(targetSampleSummary.getState(),
+            SampleEvent.ACTIVATED);
     targetSampleSummary.setState(newState);
     targetSampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
     sampleSummaryRepository.saveAndFlush(targetSampleSummary);
@@ -170,8 +172,8 @@ public class SampleServiceImpl implements SampleService {
   }
 
   private void changeSampleUnitState(SampleUnit sampleUnit) throws CTPException {
-    SampleUnitDTO.SampleUnitState newState = sampleSvcUnitStateTransitionManager.transition(sampleUnit.getState(),
-            SampleUnitDTO.SampleUnitEvent.PERSISTING);
+    SampleUnitState newState = sampleSvcUnitStateTransitionManager.transition(sampleUnit.getState(),
+            SampleUnitEvent.PERSISTING);
     sampleUnit.setState(newState);
     sampleUnitRepository.saveAndFlush(sampleUnit);
   }
@@ -220,7 +222,7 @@ public class SampleServiceImpl implements SampleService {
     if(sampleSummary != null) {
       List<SampleUnit> sampleUnitList = sampleUnitRepository.findBySampleSummaryFK(sampleSummary.getSampleSummaryPK());
       for (SampleUnit su : sampleUnitList) {
-        su.setState(SampleUnitDTO.SampleUnitState.PERSISTED);
+        su.setState(SampleUnitState.PERSISTED);
         sampleUnitRepository.saveAndFlush(su);
       }
       sampleUnitsTotal = sampleUnitsTotal + sampleUnitList.size();
@@ -255,8 +257,8 @@ public class SampleServiceImpl implements SampleService {
   @Override
   public Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, String message){
     try {
-      SampleSummaryDTO.SampleState newState = sampleSvcStateTransitionManager.transition(sampleSummary.getState(),
-              SampleSummaryDTO.SampleEvent.FAIL_VALIDATION);
+      SampleState newState = sampleSvcStateTransitionManager.transition(sampleSummary.getState(),
+              SampleEvent.FAIL_VALIDATION);
       sampleSummary.setState(newState);
       sampleSummary.setNotes(message);
       SampleSummary persisted = this.sampleSummaryRepository.save(sampleSummary);

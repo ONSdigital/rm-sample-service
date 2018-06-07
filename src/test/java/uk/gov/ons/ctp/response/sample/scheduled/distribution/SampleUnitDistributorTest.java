@@ -25,7 +25,8 @@ import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesReposito
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.message.SampleUnitPublisher;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
-import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEvent;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -73,7 +74,7 @@ public class SampleUnitDistributorTest {
   private MapperFacade mapperFacade = new SampleBeanMapper();
 
   @Mock
-  private StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent> sampleUnitStateTransitionManager;
+  private StateTransitionManager<SampleUnitState, SampleUnitEvent> sampleUnitStateTransitionManager;
 
   @InjectMocks
   private SampleUnitDistributor sampleUnitDistributor;
@@ -112,7 +113,7 @@ public class SampleUnitDistributorTest {
     verify(sampleUnitDistributionListManager, times(1)).saveList(any(String.class),
             any(List.class), any(Boolean.class));
     verify(sampleUnitStateTransitionManager, times(2)).transition(
-            SampleUnitDTO.SampleUnitState.INIT, SampleUnitDTO.SampleUnitEvent.DELIVERING);
+            SampleUnitState.INIT, SampleUnitEvent.DELIVERING);
     verify(sampleUnitRepo, times(2)).saveAndFlush(any(SampleUnit.class));
 
     verify(sampleUnitPublisher, times(2)).send(
@@ -232,7 +233,7 @@ public class SampleUnitDistributorTest {
     verify(sampleUnitDistributionListManager, times(1)).saveList(any(String.class),
             any(List.class), any(Boolean.class));
     verify(sampleUnitStateTransitionManager, times(2)).transition(
-            SampleUnitDTO.SampleUnitState.INIT, SampleUnitDTO.SampleUnitEvent.DELIVERING);
+            SampleUnitState.INIT, SampleUnitEvent.DELIVERING);
     verify(sampleUnitRepo, times(2)).saveAndFlush(any(SampleUnit.class));
 
     verify(sampleUnitPublisher, times(2)).send(

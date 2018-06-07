@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.io.IOException;
 
-public class Unirest {
+public class UnirestInitialiser {
 
     public static void initialiseUnirest() {
         com.mashape.unirest.http.Unirest.setObjectMapper(new com.mashape.unirest.http.ObjectMapper() {

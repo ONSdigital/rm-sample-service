@@ -1,6 +1,5 @@
 package uk.gov.ons.ctp.response.sample.endpoint;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.HttpResponse;
@@ -34,7 +33,7 @@ import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.ons.ctp.response.sample.Unirest.initialiseUnirest;
+import static uk.gov.ons.ctp.response.sample.UnirestInitialiser.initialiseUnirest;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration

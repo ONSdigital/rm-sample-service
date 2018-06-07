@@ -19,7 +19,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
 import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
 import uk.gov.ons.ctp.response.sample.party.PartyUtil;
-import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.BusinessSampleUnit;
 
@@ -117,14 +117,14 @@ public class CsvIngesterBusinessTest {
     SampleSummary sampleSummary = new SampleSummary();
     sampleSummary.setId(UUID.randomUUID());
     BusinessSampleUnit businessSampleUnit = createBusinessSampleUnit();
-    given(sampleService.saveSample(sampleSummary, Collections.singletonList(businessSampleUnit), SampleUnitDTO.SampleUnitState.INIT)).willReturn(sampleSummary);
+    given(sampleService.saveSample(sampleSummary, Collections.singletonList(businessSampleUnit), SampleUnitState.INIT)).willReturn(sampleSummary);
 
     // When
     csvIngester.ingest(sampleSummary, TestFiles.getTestFile("business-survey-sample.csv"));
 
     // Then
     verify(sampleService, times(1)).saveSample(eq(sampleSummary),
-        anyListOf(BusinessSampleUnit.class), eq(SampleUnitDTO.SampleUnitState.INIT));
+        anyListOf(BusinessSampleUnit.class), eq(SampleUnitState.INIT));
   }
 
   @Test
@@ -132,18 +132,18 @@ public class CsvIngesterBusinessTest {
     // Given
     SampleSummary sampleSummary = new SampleSummary();
     sampleSummary.setId(UUID.randomUUID());
-    given(sampleService.saveSample(any(), any(), eq(SampleUnitDTO.SampleUnitState.INIT))).willReturn(sampleSummary);
+    given(sampleService.saveSample(any(), any(), eq(SampleUnitState.INIT))).willReturn(sampleSummary);
 
     // When
     csvIngester.ingest(sampleSummary, TestFiles.getTestFile("business-survey-sample-multiple.csv"));
 
     // Then
     verify(sampleService, times(1)).saveSample(eq(sampleSummary),
-            anyListOf(BusinessSampleUnit.class), eq(SampleUnitDTO.SampleUnitState.INIT));
+            anyListOf(BusinessSampleUnit.class), eq(SampleUnitState.INIT));
   }
 
   @Test(expected = CTPException.class)
-  public void testParseDateFromSampleSummary() throws Exception {
+  public void testInvalidDateFromSampleSummary() throws Exception {
     // Given
     SampleSummary sampleSummary = new SampleSummary();
 
@@ -152,7 +152,7 @@ public class CsvIngesterBusinessTest {
 
     // Then
     verify(sampleService, times(0)).saveSample(eq(sampleSummary),
-        anyListOf(BusinessSampleUnit.class), eq(SampleUnitDTO.SampleUnitState.INIT));
+        anyListOf(BusinessSampleUnit.class), eq(SampleUnitState.INIT));
   }
 
   @Test(expected = CTPException.class)
@@ -165,7 +165,7 @@ public class CsvIngesterBusinessTest {
 
     // Then
     verify(sampleService, times(0)).saveSample(eq(sampleSummary),
-            anyListOf(BusinessSampleUnit.class), eq(SampleUnitDTO.SampleUnitState.INIT));
+            anyListOf(BusinessSampleUnit.class), eq(SampleUnitState.INIT));
     thrown.expect(CTPException.class);
   }
 
@@ -214,7 +214,7 @@ public class CsvIngesterBusinessTest {
 
     // Then
     verify(sampleService, times(0)).saveSample(eq(sampleSummary),
-            anyListOf(BusinessSampleUnit.class), eq(SampleUnitDTO.SampleUnitState.INIT));
+            anyListOf(BusinessSampleUnit.class), eq(SampleUnitState.INIT));
     thrown.expect(CTPException.class);
   }
 
@@ -223,7 +223,7 @@ public class CsvIngesterBusinessTest {
     // Given
     SampleSummary sampleSummary = new SampleSummary();
     sampleSummary.setId(UUID.randomUUID());
-    given(sampleService.saveSample(any(), argumentCaptor.capture(), eq(SampleUnitDTO.SampleUnitState.INIT))).willReturn(sampleSummary);
+    given(sampleService.saveSample(any(), argumentCaptor.capture(), eq(SampleUnitState.INIT))).willReturn(sampleSummary);
 
     // When
     csvIngester.ingest(sampleSummary, TestFiles.getTestFile("business-survey-sample.csv"));

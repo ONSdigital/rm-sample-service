@@ -35,7 +35,6 @@ public class CsvIngesterSocial extends CsvToBean<SocialSampleUnit> {
 
     @Autowired
     private SampleAttributesRepository sampleAttributesRepository;
-    private SampleUnitRepository sampleUnitRepository;
 
     @Transactional(propagation = Propagation.REQUIRED)
     public SampleSummary ingest(final SampleSummary sampleSummary, final MultipartFile file)
@@ -70,7 +69,7 @@ public class CsvIngesterSocial extends CsvToBean<SocialSampleUnit> {
         if (!invalidColumns.isEmpty()) {
             String errorMessage = String.format("Error in row [%s] due to missing field(s) [%s]", StringUtils.join(line.toMap().values(), ","),
                     StringUtils.join(invalidColumns, ","));
-            log.error(errorMessage);
+            log.warn(errorMessage);
             throw new CTPException(CTPException.Fault.VALIDATION_FAILED, errorMessage);
         }
         return sampleUnit;
@@ -80,7 +79,7 @@ public class CsvIngesterSocial extends CsvToBean<SocialSampleUnit> {
         Set<String> missingRequriedHeaders = Sets.difference(SocialSampleUnit.REQUIRED_ATTRIBUTES, headers);
         if (!missingRequriedHeaders.isEmpty()){
             String errorMessage = String.format("Error in header row, missing required header(s) [%s]", StringUtils.join(missingRequriedHeaders, ","));
-            log.error(errorMessage);
+            log.warn(errorMessage);
             throw new CTPException(CTPException.Fault.VALIDATION_FAILED, errorMessage);
         }
     }

@@ -14,7 +14,7 @@ import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
 import uk.gov.ons.ctp.response.sample.party.PartyUtil;
-import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.BusinessSampleUnit;
 import validation.SampleUnitBase;
@@ -76,7 +76,6 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
 
   private ColumnPositionMappingStrategy<BusinessSampleUnit> columnPositionMappingStrategy;
 
-
   /**
    * Lazy create a reusable validator
    *
@@ -110,7 +109,7 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
           throw new CTPException(e.getFault(), newMessage);
         }
       }
-      SampleSummary sampleSummaryWithCICount = sampleService.saveSample(sampleSummary, sampleUnitList, SampleUnitDTO.SampleUnitState.INIT);
+      SampleSummary sampleSummaryWithCICount = sampleService.saveSample(sampleSummary, sampleUnitList, SampleUnitState.INIT);
       publishToPartyQueue(sampleUnitList, sampleSummary.getId().toString());
 
       return sampleSummaryWithCICount;
@@ -121,7 +120,7 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
 
       // If a unit ref is already registered
       if (unitRefs.contains(businessSampleUnit.getSampleUnitRef())) {
-        log.error("This sample unit ref {} is duplicated in the file.", businessSampleUnit.getSampleUnitRef());
+        log.warn("This sample unit ref {} is duplicated in the file.", businessSampleUnit.getSampleUnitRef());
         throw new CTPException(CTPException.Fault.VALIDATION_FAILED,
                 String.format("This sample unit ref %s is duplicated in the file.", businessSampleUnit.getSampleUnitRef()));
       }
@@ -130,7 +129,7 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
           if (!namesOfInvalidColumns.isEmpty()) {
             String errorMessage = String.format("Error in %s due to field(s) %s", Arrays.toString(nextLine),
                     Arrays.toString(namesOfInvalidColumns.toArray()));
-            log.error(errorMessage);
+            log.warn(errorMessage);
             throw new CTPException(CTPException.Fault.VALIDATION_FAILED, errorMessage);
           }
           businessSampleUnit.setSampleUnitType("B");

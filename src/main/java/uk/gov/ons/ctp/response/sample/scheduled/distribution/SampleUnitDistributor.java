@@ -11,7 +11,6 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
-import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.CollectionExerciseJobRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesRepository;
@@ -19,6 +18,7 @@ import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.message.SampleUnitPublisher;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
+import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.SampleAttributes;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -97,7 +97,7 @@ public class SampleUnitDistributor {
           try {
             uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit = mapperFacade.map(sampleUnit,
                 uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.class);
-            SampleAttributes sampleAttributes = sampleAttributesRepository.findOne(sampleUnit.getId());
+            uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes sampleAttributes = sampleAttributesRepository.findOne(sampleUnit.getId());
             if (sampleAttributes != null) {
               mappedSampleUnit.setSampleAttributes(mapSampleAttributes(sampleAttributes));
             }
@@ -131,9 +131,9 @@ public class SampleUnitDistributor {
     return distInfo;
   }
 
-  private uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.SampleAttributes mapSampleAttributes(SampleAttributes sampleAttributes) {
-    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.SampleAttributes mappedSampleAttributes = new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.SampleAttributes();
-    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.SampleAttributes.Builder<Void> sampleAttributesBuilder = mappedSampleAttributes.newCopyBuilder();
+  private SampleAttributes mapSampleAttributes(uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes sampleAttributes) {
+    SampleAttributes mappedSampleAttributes = new SampleAttributes();
+    SampleAttributes.Builder<Void> sampleAttributesBuilder = mappedSampleAttributes.newCopyBuilder();
     for (Map.Entry<String, String> attribute : sampleAttributes.getAttributes().entrySet()) {
       sampleAttributesBuilder.addEntries().withKey(attribute.getKey()).withValue(attribute.getValue());
     }

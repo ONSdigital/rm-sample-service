@@ -13,7 +13,7 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterCensus;
-import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.CensusSampleUnit;
 
@@ -21,9 +21,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -68,7 +67,7 @@ public class CsvIngesterCensusTest {
     SampleSummary newSummary = new SampleSummary();
     csvIngester.ingest(newSummary, getTestFile("census-survey-sample.csv"));
     verify(sampleService, times(1)).saveSample(eq(newSummary),
-            anyListOf(CensusSampleUnit.class), eq(SampleUnitDTO.SampleUnitState.INIT));
+            anyListOf(CensusSampleUnit.class), eq(SampleUnitState.INIT));
   }
 
   @Test(expected = Exception.class)
@@ -76,7 +75,7 @@ public class CsvIngesterCensusTest {
     SampleSummary newSummary = new SampleSummary();
     csvIngester.ingest(newSummary, getTestFile("census-survey-sample-missing-columns.csv"));
     verify(sampleService, times(0)).saveSample(eq(newSummary),
-        anyListOf(CensusSampleUnit.class), eq(SampleUnitDTO.SampleUnitState.INIT));
+        anyListOf(CensusSampleUnit.class), eq(SampleUnitState.INIT));
     thrown.expect(CTPException.class);
   }
 
@@ -85,7 +84,7 @@ public class CsvIngesterCensusTest {
     SampleSummary newSummary = new SampleSummary();
     csvIngester.ingest(newSummary, getTestFile("census-survey-sample-incorrect-data.csv"));
     verify(sampleService, times(0)).saveSample(eq(newSummary),
-        anyListOf(CensusSampleUnit.class), eq(SampleUnitDTO.SampleUnitState.INIT));
+        anyListOf(CensusSampleUnit.class), eq(SampleUnitState.INIT));
     thrown.expect(CTPException.class);
   }
 

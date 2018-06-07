@@ -1,18 +1,6 @@
 package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-
+import ma.glasnost.orika.MapperFacade;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,8 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.distributed.DistributedListManager;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
@@ -32,8 +18,20 @@ import uk.gov.ons.ctp.response.sample.domain.repository.CollectionExerciseJobRep
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.message.SampleUnitPublisher;
-import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
-import uk.gov.ons.ctp.response.sample.scheduled.distribution.SampleUnitDistributor;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by wardlk on 02/05/2017.
@@ -77,7 +75,7 @@ public class SendToCollExQueueTest {
     public void verifyRetrievedSampleUnitsAreDeliveredToTheQueue() throws Exception{
         UUID cEId = UUID.randomUUID();
         when(collectionExerciseJobRepository.findAll()).thenReturn(Collections.singletonList(new CollectionExerciseJob(1,cEId,"str1234",new Timestamp(0),new Timestamp(0),UUID.randomUUID())));
-        SampleUnit su1 = SampleUnit.builder().sampleSummaryFK(1).sampleUnitPK(2).sampleUnitRef("str1234").sampleUnitType("H").state(SampleUnitDTO.SampleUnitState.INIT).build();
+        SampleUnit su1 = SampleUnit.builder().sampleSummaryFK(1).sampleUnitPK(2).sampleUnitRef("str1234").sampleUnitType("H").state(SampleUnitState.INIT).build();
         SampleUnit su2 = SampleUnit.builder().sampleUnitPK(3).build();
         List<SampleUnit> suList = new ArrayList<>();
         suList.add(su1);
@@ -89,7 +87,7 @@ public class SendToCollExQueueTest {
         sud.setRetrievalMax(2);
         when(appConfig.getSampleUnitDistribution()).thenReturn(sud);
         when(mapperFacade.map(any(),any())).thenReturn(new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit());
-        when(sampleUnitStateTransitionManager.transition(any(),any())).thenReturn(SampleUnitDTO.SampleUnitState.DELIVERED);
+        when(sampleUnitStateTransitionManager.transition(any(),any())).thenReturn(SampleUnitState.DELIVERED);
 
         when(sampleUnitDistributionListManager.findList(anyString(), anyBoolean())).thenReturn(new ArrayList<Integer>());
         
