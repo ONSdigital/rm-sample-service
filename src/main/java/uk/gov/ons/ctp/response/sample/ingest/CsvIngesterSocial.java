@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.SocialSampleUnit;
 
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -42,7 +44,9 @@ public class CsvIngesterSocial extends CsvToBean<SocialSampleUnit> {
         List<SocialSampleUnit> socialSamples = new ArrayList<>();
         List<SampleAttributes> sampleAttributes = new ArrayList<>();
 
-        try (CSVParser parser = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(new InputStreamReader(file.getInputStream()))) {
+        final Reader reader = new InputStreamReader(new BOMInputStream(file.getInputStream()));
+
+        try (CSVParser parser = CSVParser.parse(reader, CSVFormat.RFC4180.withFirstRecordAsHeader().withIgnoreSurroundingSpaces())) {
             Set<String> headers = parser.getHeaderMap().keySet();
             validateHeaders(headers);
 

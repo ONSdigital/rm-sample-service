@@ -76,6 +76,21 @@ public class CsvIngesterSocialTest {
         anyListOf(SocialSampleUnit.class), eq(SampleUnitState.PERSISTED));
   }
 
+  @Test
+  public void testIngestSocialSampleFileWithByteOrderMark() throws Exception {
+    // Given
+    SampleSummary newSummary = new SampleSummary();
+    String csv = "\uFEFFPrem1,Prem2,Prem3,Prem4,District,PostTown,Postcode,CountryCode\n" +
+            "14 ASHMEAD VIEW,,,,,STOCKTON-ON-TEES,TS184QG,E";
+
+    // When
+    csvIngester.ingest(newSummary, TestFiles.getTestFileFromString(csv));
+
+    // Then
+    verify(sampleService).saveSample(eq(newSummary),
+            anyListOf(SocialSampleUnit.class), eq(SampleUnitState.PERSISTED));
+  }
+
   @Test(expected = CTPException.class)
   public void testMissingMandatoryColumns() throws Exception {
     // Given
