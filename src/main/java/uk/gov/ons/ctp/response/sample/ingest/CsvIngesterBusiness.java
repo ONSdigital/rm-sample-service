@@ -1,5 +1,6 @@
 package uk.gov.ons.ctp.response.sample.ingest;
 
+import liquibase.util.StringUtils;
 import liquibase.util.csv.opencsv.CSVReader;
 import liquibase.util.csv.opencsv.bean.ColumnPositionMappingStrategy;
 import liquibase.util.csv.opencsv.bean.CsvToBean;
@@ -99,7 +100,7 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
 
         try {
           BusinessSampleUnit businessSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
-          Optional<String> namesOfInvalidColumns = validateLine(businessSampleUnit);
+          List<String> namesOfInvalidColumns = validateLine(businessSampleUnit);
 
           // If a unit ref is already registered
           if (unitRefs.contains(businessSampleUnit.getSampleUnitRef())) {
@@ -109,11 +110,11 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
           }
           unitRefs.add(businessSampleUnit.getSampleUnitRef());
 
-          if (namesOfInvalidColumns.isPresent()) {
-            log.error("Problem parsing line {} due to {} - entire ingest aborted", Arrays.toString(nextLine),
-                    namesOfInvalidColumns.get());
-            throw new CTPException(CTPException.Fault.VALIDATION_FAILED, String.format("Error in %s due to field(s) %s", Arrays.toString(nextLine),
-                    namesOfInvalidColumns.get()));
+          if (!namesOfInvalidColumns.isEmpty()) {
+            String errorMessage = String.format("Error in %s due to field(s) %s", Arrays.toString(nextLine),
+                    Arrays.toString(namesOfInvalidColumns.toArray()));
+            log.error(errorMessage);
+            throw new CTPException(CTPException.Fault.VALIDATION_FAILED, errorMessage);
           }
           businessSampleUnit.setSampleUnitType("B");
 
@@ -128,18 +129,17 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
       return sampleService.processSampleSummary(sampleSummary, samplingUnitList);
   }
 
-  /**
-   * validate the csv line and return the optional concatenated list of fields
-   * failing validation
-   *
-   * @param csvLine the line
-   * @return the errored column names separated by '_'
-   */
-  private Optional<String> validateLine(BusinessSampleUnit csvLine) {
+  private List<String> validateLine(BusinessSampleUnit csvLine) {
     Set<ConstraintViolation<BusinessSampleUnit>> violations = getValidator().validate(csvLine);
-    String invalidColumns = violations.stream().map(v -> v.getPropertyPath().toString())
-        .collect(Collectors.joining("_"));
-    return (invalidColumns.length() == 0) ? Optional.empty() : Optional.ofNullable(invalidColumns);
+    List<String> invalidFields = violations.stream().map(v -> v.getPropertyPath().toString())
+            .collect(Collectors.toList());
+    if (StringUtils.isEmpty(csvLine.getSampleUnitRef())) {
+      invalidFields.add(SAMPLEUNITREF);
+    }
+    if (StringUtils.isEmpty(csvLine.getFormType())) {
+      invalidFields.add(FORMTYPE);
+    }
+    return invalidFields;
   }
 
 }
