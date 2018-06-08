@@ -115,8 +115,9 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
       return sampleSummaryWithCICount;
   }
 
-  private BusinessSampleUnit parseLine(String[] nextLine, Set<String> unitRefs) throws IllegalAccessException, java.lang.reflect.InvocationTargetException, InstantiationException, java.beans.IntrospectionException, CTPException {BusinessSampleUnit businessSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
-          List<String> namesOfInvalidColumns = validateLine(businessSampleUnit);
+  private BusinessSampleUnit parseLine(String[] nextLine, Set<String> unitRefs) throws IllegalAccessException, java.lang.reflect.InvocationTargetException, InstantiationException, java.beans.IntrospectionException, CTPException {
+      BusinessSampleUnit businessSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
+      List<String> namesOfInvalidColumns = validateLine(businessSampleUnit);
 
       // If a unit ref is already registered
       if (unitRefs.contains(businessSampleUnit.getSampleUnitRef())) {
