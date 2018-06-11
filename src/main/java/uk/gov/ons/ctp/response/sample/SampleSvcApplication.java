@@ -1,6 +1,8 @@
 package uk.gov.ons.ctp.response.sample;
 
 import net.sourceforge.cobertura.CoverageIgnore;
+
+import org.apache.tomcat.jdbc.pool.DataSource;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -26,7 +28,6 @@ import uk.gov.ons.ctp.common.rest.RestUtility;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.common.state.StateTransitionManagerFactory;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
-import uk.gov.ons.ctp.response.sample.config.DataSourceConfiguration;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEvent;
@@ -56,7 +57,7 @@ public class SampleSvcApplication {
   private AppConfig appConfig;
   
   @Autowired
-  private DataSourceConfiguration dataSource;
+  private DataSource dataSource;
 
   /**
    * Bean used to access Distributed Lock Manager
