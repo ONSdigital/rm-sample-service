@@ -10,10 +10,14 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.common.error.CTPException;
+import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
+import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
+import uk.gov.ons.ctp.response.sample.party.PartyUtil;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.BusinessSampleUnit;
-import validation.BusinessSurveySample;
+import validation.SampleUnitBase;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -22,11 +26,11 @@ import javax.validation.ValidatorFactory;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.HashSet;
 
 @Slf4j
 @Service
@@ -67,6 +71,9 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
   @Autowired
   private SampleService sampleService;
 
+  @Autowired
+  private PartyPublisher partyPublisher;
+
   private ColumnPositionMappingStrategy<BusinessSampleUnit> columnPositionMappingStrategy;
 
   /**
@@ -91,42 +98,44 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
 
     CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()), ':');
     String[] nextLine;
-    List<BusinessSampleUnit> samplingUnitList = new ArrayList<>();
-    int lineNumber = 0;
+    List<BusinessSampleUnit> sampleUnitList = new ArrayList<>();
     Set<String> unitRefs = new HashSet<>();
 
       while((nextLine = csvReader.readNext()) != null) {
-        lineNumber++;
-
         try {
-          BusinessSampleUnit businessSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
-          List<String> namesOfInvalidColumns = validateLine(businessSampleUnit);
+          sampleUnitList.add(parseLine(nextLine, unitRefs));
+        } catch(CTPException e){
+          String newMessage = String.format("Line %d: %s", csvReader.getRecordsRead(), e.getMessage());
+          throw new CTPException(e.getFault(), e, newMessage);
+        }
+      }
+      SampleSummary sampleSummaryWithCICount = sampleService.saveSample(sampleSummary, sampleUnitList, SampleUnitState.INIT);
+      publishToPartyQueue(sampleUnitList, sampleSummary.getId().toString());
 
-          // If a unit ref is already registered
-          if (unitRefs.contains(businessSampleUnit.getSampleUnitRef())) {
-            log.error("This sample unit ref {} is duplicated in the file.", businessSampleUnit.getSampleUnitRef());
-            throw new CTPException(CTPException.Fault.VALIDATION_FAILED,
-                    String.format("This sample unit ref %s is duplicated in the file.", businessSampleUnit.getSampleUnitRef()));
-          }
-          unitRefs.add(businessSampleUnit.getSampleUnitRef());
+      return sampleSummaryWithCICount;
+  }
+
+  private BusinessSampleUnit parseLine(String[] nextLine, Set<String> unitRefs) throws IllegalAccessException, java.lang.reflect.InvocationTargetException, InstantiationException, java.beans.IntrospectionException, CTPException {
+      BusinessSampleUnit businessSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
+      List<String> namesOfInvalidColumns = validateLine(businessSampleUnit);
+
+      // If a unit ref is already registered
+      if (unitRefs.contains(businessSampleUnit.getSampleUnitRef())) {
+        log.warn("This sample unit ref {} is duplicated in the file.", businessSampleUnit.getSampleUnitRef());
+        throw new CTPException(CTPException.Fault.VALIDATION_FAILED,
+                String.format("This sample unit ref %s is duplicated in the file.", businessSampleUnit.getSampleUnitRef()));
+      }
+      unitRefs.add(businessSampleUnit.getSampleUnitRef());
 
           if (!namesOfInvalidColumns.isEmpty()) {
             String errorMessage = String.format("Error in %s due to field(s) %s", Arrays.toString(nextLine),
                     Arrays.toString(namesOfInvalidColumns.toArray()));
-            log.error(errorMessage);
+            log.warn(errorMessage);
             throw new CTPException(CTPException.Fault.VALIDATION_FAILED, errorMessage);
           }
           businessSampleUnit.setSampleUnitType("B");
 
-          samplingUnitList.add(businessSampleUnit);
-        } catch(CTPException e){
-          String newMessage = String.format("Line %d: %s", lineNumber, e.getMessage());
-
-          throw new CTPException(e.getFault(), newMessage);
-        }
-      }
-
-      return sampleService.processSampleSummary(sampleSummary, samplingUnitList);
+      return businessSampleUnit;
   }
 
   private List<String> validateLine(BusinessSampleUnit csvLine) {
@@ -142,4 +151,13 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
     return invalidFields;
   }
 
+
+  private void publishToPartyQueue(List<? extends SampleUnitBase> samplingUnitList, String sampleSummaryId){
+    for (SampleUnitBase sampleUnitBase : samplingUnitList) {
+          PartyCreationRequestDTO party = PartyUtil.convertToParty(sampleUnitBase);
+          party.getAttributes().setSampleUnitId(sampleUnitBase.getSampleUnitId().toString());
+          party.setSampleSummaryId(sampleSummaryId);
+          partyPublisher.publish(party);
+    }
+  }
 }
