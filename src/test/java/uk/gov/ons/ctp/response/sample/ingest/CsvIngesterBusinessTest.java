@@ -1,5 +1,6 @@
-package uk.gov.ons.ctp.response.sample.endpoint;
+package uk.gov.ons.ctp.response.sample.ingest;
 
+import javafx.util.Pair;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -18,7 +19,6 @@ import uk.gov.ons.ctp.response.sample.TestFiles;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.config.SampleIngest;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
-import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
 import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
 import uk.gov.ons.ctp.response.sample.party.PartyUtil;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
@@ -32,7 +32,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import static org.mockito.Matchers.eq;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
@@ -210,6 +210,31 @@ public class CsvIngesterBusinessTest {
     verify(sampleService, times(0)).saveSample(eq(sampleSummary),
             anyListOf(BusinessSampleUnit.class), eq(SampleUnitState.INIT));
     thrown.expect(CTPException.class);
+  }
+
+  @Test
+  public void handleMutlipleErrrors() throws Exception {
+    // Given
+    SampleSummary sampleSummary = new SampleSummary();
+    MockMultipartFile f = TestFiles.getTestFile("business-survey-sample-multiple-errors.csv");
+
+    // When
+    Pair<List<BusinessSampleUnit>, List<CsvIngesterBusiness.ValidationError>> result =
+            csvIngester.parseAndValidateFile(f, 50);
+
+    assertEquals(1, result.getKey().size());
+    assertEquals(3, result.getValue().size());
+
+    assertEquals(2, result
+            .getValue()
+            .stream()
+            .filter(ve -> ve.getErrorType() == CsvIngesterBusiness.ValidationErrorType.InvalidColumns)
+            .count());
+    assertEquals(1, result
+            .getValue()
+            .stream()
+            .filter(ve -> ve.getErrorType() == CsvIngesterBusiness.ValidationErrorType.DuplicateRU)
+            .count());
   }
 
   @Test(expected = CTPException.class)

@@ -229,7 +229,7 @@ public class SampleServiceImpl implements SampleService {
     return sampleUnitsTotal;
   }
 
-  private void validateFilename(String filename) throws IngesterException {
+  void validateFilename(String filename) throws IngesterException {
     if (!filename.toLowerCase().endsWith(".csv")) {
       throw new IngesterException(CTPException.Fault.VALIDATION_FAILED, SampleSummaryDTO.ErrorCode.NotCsv,
               String.format("%s is not a valid CSV file (must have .csv extension)", filename));

@@ -111,10 +111,9 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
         return report.toString();
     }
 
-    public SampleSummary ingest(final SampleSummary sampleSummary, final MultipartFile file)
+    Pair<List<BusinessSampleUnit>,List<ValidationError>> parseAndValidateFile(final MultipartFile file, int maxErrors)
             throws Exception {
 
-        int maxErrors = this.appConfig.getSampleIngest().getMaxErrors();
         CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()), ':');
         String[] nextLine;
         int lineNumber = 0;
@@ -138,6 +137,19 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
                 throw new CTPException(e.getFault(), e, newMessage);
             }
         }
+
+        return new Pair<>(sampleUnitList, errors);
+    }
+
+    public SampleSummary ingest(final SampleSummary sampleSummary, final MultipartFile file)
+            throws Exception {
+
+        int maxErrors = this.appConfig.getSampleIngest().getMaxErrors();
+
+        Pair<List<BusinessSampleUnit>, List<ValidationError>> result = parseAndValidateFile(file, maxErrors);
+        List<ValidationError> errors = result.getValue();
+        List<BusinessSampleUnit> sampleUnitList = result.getKey();
+
         if (errors.size() > 0) {
             String errorReport = generateErrorReport(maxErrors, sampleUnitList, errors);
 
@@ -201,13 +213,13 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
         }
     }
 
-    private enum ValidationErrorType {
+    enum ValidationErrorType {
         InvalidColumns, DuplicateRU
     }
 
     @Data
     @AllArgsConstructor
-    private static class ValidationError {
+    static class ValidationError {
         private int lineNumber;
         private ValidationErrorType errorType;
         private String errorDetail;

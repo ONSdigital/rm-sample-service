@@ -18,6 +18,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
+import uk.gov.ons.ctp.response.sample.ingest.IngesterException;
 import uk.gov.ons.ctp.response.sample.message.EventPublisher;
 import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
 import uk.gov.ons.ctp.response.sample.message.SampleOutboundPublisher;
@@ -304,7 +305,17 @@ public class SampleServiceImplTest {
     when(csvIngesterBusiness.ingest(any(SampleSummary.class), any(MultipartFile.class))).thenReturn(summary);
 
     // When
-    SampleSummary finalSummary = sampleServiceImpl.ingest(summary, file, invalidType);
+    sampleServiceImpl.ingest(summary, file, invalidType);
+  }
+
+  @Test
+  public void testValidateFilenameValidFilename() throws IngesterException {
+      sampleServiceImpl.validateFilename("test.csv");
+  }
+
+  @Test(expected = IngesterException.class)
+  public void testValidateFilenameInvalidFilename() throws IngesterException {
+    sampleServiceImpl.validateFilename("test");
   }
 
 }
