@@ -16,7 +16,6 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.BusinessSampleUnit;
-import validation.BusinessSurveySample;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -118,9 +117,9 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
     return report.toString();
   }
 
-  private void validateFilename(String filename) throws IngesterCTPException {
+  private void validateFilename(String filename) throws IngesterException {
     if (!filename.toLowerCase().endsWith(".csv")){
-      throw new IngesterCTPException(CTPException.Fault.VALIDATION_FAILED, SampleSummaryDTO.ErrorCode.NotCsv,
+      throw new IngesterException(CTPException.Fault.VALIDATION_FAILED, SampleSummaryDTO.ErrorCode.NotCsv,
               String.format("%s is not a valid CSV file (must have .csv extension)", filename));
     }
   }
@@ -166,7 +165,7 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
       if (errors.size() > 0){
           String errorReport = generateErrorReport(maxErrors, samplingUnitList, errors);
 
-          throw new IngesterCTPException(CTPException.Fault.VALIDATION_FAILED, SampleSummaryDTO.ErrorCode.DataError, errorReport);
+          throw new IngesterException(CTPException.Fault.VALIDATION_FAILED, SampleSummaryDTO.ErrorCode.DataError, errorReport);
       }
 
       return sampleService.processSampleSummary(sampleSummary, samplingUnitList);

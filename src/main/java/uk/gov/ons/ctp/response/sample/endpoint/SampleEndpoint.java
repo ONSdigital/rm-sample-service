@@ -3,7 +3,6 @@ package uk.gov.ons.ctp.response.sample.endpoint;
 import liquibase.util.csv.opencsv.bean.CsvToBean;
 import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
@@ -23,7 +22,7 @@ import uk.gov.ons.ctp.common.time.DateTimeUtil;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
-import uk.gov.ons.ctp.response.sample.ingest.IngesterCTPException;
+import uk.gov.ons.ctp.response.sample.ingest.IngesterException;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
@@ -40,7 +39,6 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 
 /**
@@ -120,7 +118,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     Callable<Optional<SampleSummary>> callable =() -> {
       try {
         return Optional.of(this.sampleService.ingest(newSummary, file, type));
-      } catch (IngesterCTPException e){
+      } catch (IngesterException e){
         return this.sampleService.failSampleSummary(newSummary, e.getErrorCode(), e);
       } catch (Exception e) {
         return this.sampleService.failSampleSummary(newSummary, SampleSummaryDTO.ErrorCode.NotSpecified, e);
