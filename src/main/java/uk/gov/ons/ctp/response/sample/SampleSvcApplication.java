@@ -55,9 +55,6 @@ public class SampleSvcApplication {
 
   @Autowired
   private AppConfig appConfig;
-  
-  @Autowired
-  private DataSource dataSource;
 
   /**
    * Bean used to access Distributed Lock Manager
