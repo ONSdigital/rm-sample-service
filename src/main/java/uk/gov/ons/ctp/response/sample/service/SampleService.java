@@ -1,6 +1,5 @@
 package uk.gov.ons.ctp.response.sample.service;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
@@ -8,12 +7,12 @@ import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
 import validation.SampleUnitBase;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.Future;
 
 /**
  * The SampleService interface defines all business behaviours for operations on the Sample entity model.
@@ -36,11 +35,11 @@ public interface SampleService {
 
   /**
    * Create and save a SampleSummary from the incoming SurveySample
-   *
-   * @param sampleSummary the sample summary being processed
+   *  @param sampleSummary the sample summary being processed
    * @param samplingUnitList list of sampling units.
+   * @param sampleUnitState
    */
-  SampleSummary processSampleSummary(SampleSummary sampleSummary, List<? extends SampleUnitBase> samplingUnitList);
+  SampleSummary saveSample(SampleSummary sampleSummary, List<? extends SampleUnitBase> samplingUnitList, SampleUnitState sampleUnitState);
 
   /**
    * Create a new sample summary and persist to the database
