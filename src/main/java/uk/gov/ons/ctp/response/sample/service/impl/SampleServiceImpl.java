@@ -1,7 +1,6 @@
 package uk.gov.ons.ctp.response.sample.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
@@ -17,40 +16,33 @@ import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
+import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterCensus;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterSocial;
 import uk.gov.ons.ctp.response.sample.message.EventPublisher;
-import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
 import uk.gov.ons.ctp.response.sample.message.SampleOutboundPublisher;
-import uk.gov.ons.ctp.response.sample.party.PartyUtil;
-import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
-import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEvent;
 import uk.gov.ons.ctp.response.sample.service.CollectionExerciseJobService;
 import uk.gov.ons.ctp.response.sample.service.PartySvcClientService;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.SampleUnitBase;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 @Slf4j
 @Service
 @Configuration
 public class SampleServiceImpl implements SampleService {
-
-  private static final int MAX_DESCRIPTION_LENGTH = 5;
 
   @Autowired
   private SampleSummaryRepository sampleSummaryRepository;
@@ -60,19 +52,16 @@ public class SampleServiceImpl implements SampleService {
 
   @Autowired
   @Qualifier("sampleSummaryTransitionManager")
-  private StateTransitionManager<SampleSummaryDTO.SampleState, SampleSummaryDTO.SampleEvent>
+  private StateTransitionManager<SampleState, SampleEvent>
           sampleSvcStateTransitionManager;
 
   @Autowired
   @Qualifier("sampleUnitTransitionManager")
-  private StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent>
+  private StateTransitionManager<SampleUnitState, SampleUnitEvent>
           sampleSvcUnitStateTransitionManager;
 
   @Autowired
   private PartySvcClientService partySvcClient;
-
-  @Autowired
-  private PartyPublisher partyPublisher;
 
   @Autowired
   private SampleOutboundPublisher sampleOutboundPublisher;
@@ -102,16 +91,19 @@ public class SampleServiceImpl implements SampleService {
   @Autowired
   private EventPublisher eventPublisher;
 
+  @Autowired
+  private SampleAttributesRepository sampleAttributesRepository;
+
   @Override
-  @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
-  public SampleSummary processSampleSummary(SampleSummary sampleSummary, List<? extends SampleUnitBase> samplingUnitList) {
+  @Transactional(propagation = Propagation.REQUIRED)
+  public SampleSummary saveSample(SampleSummary sampleSummary, List<? extends SampleUnitBase> samplingUnitList, SampleUnitState sampleUnitState) {
     int expectedCI = calculateExpectedCollectionInstruments(samplingUnitList);
 
     sampleSummary.setTotalSampleUnits(samplingUnitList.size());
     sampleSummary.setExpectedCollectionInstruments(expectedCI);
     SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
-    Map<String, UUID> sampleUnitIds = saveSampleUnits(samplingUnitList, savedSampleSummary);
-    publishToPartyQueue(samplingUnitList, sampleUnitIds, sampleSummary.getId().toString());
+    saveSampleUnits(samplingUnitList, savedSampleSummary, sampleUnitState);
+
     return savedSampleSummary;
   }
 
@@ -129,40 +121,23 @@ public class SampleServiceImpl implements SampleService {
   public SampleSummary createAndSaveSampleSummary(){
     SampleSummary sampleSummary = new SampleSummary();
 
-    sampleSummary.setState(SampleSummaryDTO.SampleState.INIT);
+    sampleSummary.setState(SampleState.INIT);
     sampleSummary.setId(UUID.randomUUID());
 
     return sampleSummaryRepository.save(sampleSummary);
   }
 
-  private Map<String, UUID> saveSampleUnits(List<? extends SampleUnitBase> samplingUnitList, SampleSummary sampleSummary) {
-    Map<String, UUID> ids = new HashMap<>();
+  private void saveSampleUnits(List<? extends SampleUnitBase> samplingUnitList, SampleSummary sampleSummary, SampleUnitState sampleUnitState) {
     for (SampleUnitBase sampleUnitBase : samplingUnitList) {
       SampleUnit sampleUnit = new SampleUnit();
       sampleUnit.setSampleSummaryFK(sampleSummary.getSampleSummaryPK());
       sampleUnit.setSampleUnitRef(sampleUnitBase.getSampleUnitRef());
       sampleUnit.setSampleUnitType(sampleUnitBase.getSampleUnitType());
       sampleUnit.setFormType(sampleUnitBase.getFormType());
-      sampleUnit.setState(SampleUnitDTO.SampleUnitState.INIT);
-      sampleUnit.setId(UUID.randomUUID());
-      ids.put(sampleUnit.getSampleUnitRef(), sampleUnit.getId());
+      sampleUnit.setState(sampleUnitState);
+      sampleUnit.setId(sampleUnitBase.getSampleUnitId());
       eventPublisher.publishEvent("Sample Init");
       sampleUnitRepository.save(sampleUnit);
-    }
-    return ids;
-  }
-
-  /**
-   * create sampleUnits, save them to the Database and post to internal queue
-   * @param sampleUnitIds 
-   * @throws Exception 
-   * */
-  private void publishToPartyQueue(List<? extends SampleUnitBase> samplingUnitList, Map<String, UUID> sampleUnitIds, String sampleSummaryId){
-    for (SampleUnitBase sampleUnitBase : samplingUnitList) {
-          PartyCreationRequestDTO party = PartyUtil.convertToParty(sampleUnitBase);
-          party.getAttributes().setSampleUnitId(sampleUnitIds.get(sampleUnitBase.getSampleUnitRef()).toString());
-          party.setSampleSummaryId(sampleSummaryId);
-          partyPublisher.publish(party);
     }
   }
 
@@ -176,8 +151,8 @@ public class SampleServiceImpl implements SampleService {
   @Override
   public SampleSummary activateSampleSummaryState(Integer sampleSummaryPK) throws CTPException {
     SampleSummary targetSampleSummary = sampleSummaryRepository.findOne(sampleSummaryPK);
-    SampleSummaryDTO.SampleState newState = sampleSvcStateTransitionManager.transition(targetSampleSummary.getState(),
-            SampleSummaryDTO.SampleEvent.ACTIVATED);
+    SampleState newState = sampleSvcStateTransitionManager.transition(targetSampleSummary.getState(),
+            SampleEvent.ACTIVATED);
     targetSampleSummary.setState(newState);
     targetSampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
     sampleSummaryRepository.saveAndFlush(targetSampleSummary);
@@ -197,8 +172,8 @@ public class SampleServiceImpl implements SampleService {
   }
 
   private void changeSampleUnitState(SampleUnit sampleUnit) throws CTPException {
-    SampleUnitDTO.SampleUnitState newState = sampleSvcUnitStateTransitionManager.transition(sampleUnit.getState(),
-            SampleUnitDTO.SampleUnitEvent.PERSISTING);
+    SampleUnitState newState = sampleSvcUnitStateTransitionManager.transition(sampleUnit.getState(),
+            SampleUnitEvent.PERSISTING);
     sampleUnit.setState(newState);
     sampleUnitRepository.saveAndFlush(sampleUnit);
   }
@@ -247,7 +222,7 @@ public class SampleServiceImpl implements SampleService {
     if(sampleSummary != null) {
       List<SampleUnit> sampleUnitList = sampleUnitRepository.findBySampleSummaryFK(sampleSummary.getSampleSummaryPK());
       for (SampleUnit su : sampleUnitList) {
-        su.setState(SampleUnitDTO.SampleUnitState.PERSISTED);
+        su.setState(SampleUnitState.PERSISTED);
         sampleUnitRepository.saveAndFlush(su);
       }
       sampleUnitsTotal = sampleUnitsTotal + sampleUnitList.size();
@@ -282,8 +257,8 @@ public class SampleServiceImpl implements SampleService {
   @Override
   public Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, String message){
     try {
-      SampleSummaryDTO.SampleState newState = sampleSvcStateTransitionManager.transition(sampleSummary.getState(),
-              SampleSummaryDTO.SampleEvent.FAIL_VALIDATION);
+      SampleState newState = sampleSvcStateTransitionManager.transition(sampleSummary.getState(),
+              SampleEvent.FAIL_VALIDATION);
       sampleSummary.setState(newState);
       sampleSummary.setNotes(message);
       SampleSummary persisted = this.sampleSummaryRepository.save(sampleSummary);

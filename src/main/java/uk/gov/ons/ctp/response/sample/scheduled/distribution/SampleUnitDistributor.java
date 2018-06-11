@@ -1,14 +1,10 @@
 package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
+import lombok.extern.slf4j.Slf4j;
+import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-
-import lombok.extern.slf4j.Slf4j;
-import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.distributed.DistributedListManager;
 import uk.gov.ons.ctp.common.distributed.LockingException;
 import uk.gov.ons.ctp.common.error.CTPException;
@@ -17,10 +13,17 @@ import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.CollectionExerciseJobRepository;
+import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.message.SampleUnitPublisher;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
+import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.SampleAttributes;
+
+import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Distributes SampleUnits
@@ -37,6 +40,9 @@ public class SampleUnitDistributor {
 
   @Autowired
   private SampleUnitRepository sampleUnitRepository;
+
+  @Autowired
+  private SampleAttributesRepository sampleAttributesRepository;
 
   @Autowired
   private AppConfig appConfig;
@@ -58,7 +64,8 @@ public class SampleUnitDistributor {
   /**
    * @return SampleUnitDistributionInfo Information for SampelUnit Distribution
    */
-  public final SampleUnitDistributionInfo distribute() {
+  @Transactional
+  public SampleUnitDistributionInfo distribute() {
     log.info("SampleUnitDistributor is in the house");
     SampleUnitDistributionInfo distInfo = new SampleUnitDistributionInfo();
 
@@ -81,7 +88,7 @@ public class SampleUnitDistributor {
 
         if (sampleUnits.size() > 0) {
           sampleUnitDistributionListManager.saveList(SAMPLEUNIT_DISTRIBUTOR_LIST_ID, sampleUnits.stream()
-              .map(su -> su.getSampleUnitPK())
+              .map(SampleUnit::getSampleUnitPK)
               .collect(Collectors.toList()), true);
         }
 
@@ -90,8 +97,13 @@ public class SampleUnitDistributor {
           try {
             uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit = mapperFacade.map(sampleUnit,
                 uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.class);
+            uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes sampleAttributes = sampleAttributesRepository.findOne(sampleUnit.getId());
+            if (sampleAttributes != null) {
+              mappedSampleUnit.setSampleAttributes(mapSampleAttributes(sampleAttributes));
+            }
             mappedSampleUnit.setCollectionExerciseId(job.getCollectionExerciseId().toString());
             sendSampleUnitToCollectionExerciseQueue(sampleUnit, mappedSampleUnit);
+
             successes++;
           } catch (CTPException e) {
             // single case/questionnaire db changes rolled back
@@ -109,7 +121,7 @@ public class SampleUnitDistributor {
         }
       }
     } catch (Exception e) {
-      log.error("Failed to process sample units because {}", e);
+      log.error("Failed to process sample units", e);
     }
 
     distInfo.setSampleUnitsSucceeded(successes);
@@ -117,6 +129,15 @@ public class SampleUnitDistributor {
 
     log.info("SampleUnitsDistributor sleeping");
     return distInfo;
+  }
+
+  private SampleAttributes mapSampleAttributes(uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes sampleAttributes) {
+    SampleAttributes mappedSampleAttributes = new SampleAttributes();
+    SampleAttributes.Builder<Void> sampleAttributesBuilder = mappedSampleAttributes.newCopyBuilder();
+    for (Map.Entry<String, String> attribute : sampleAttributes.getAttributes().entrySet()) {
+      sampleAttributesBuilder.addEntries().withKey(attribute.getKey()).withValue(attribute.getValue());
+    }
+    return sampleAttributesBuilder.build();
   }
 
   /**
@@ -128,25 +149,17 @@ public class SampleUnitDistributor {
    */
   private void sendSampleUnitToCollectionExerciseQueue(SampleUnit sampleUnit,
       uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit) throws CTPException {
-    transitionSampleUnitStateFromDeliveryEvent(sampleUnit.getSampleUnitPK());
+    transitionSampleUnitStateFromDeliveryEvent(sampleUnit);
     sampleUnitPublisher.send(mappedSampleUnit);
   }
 
-  /**
-   * Transitions SampleUnit State from Delivery Event
-   *
-   * @param sampleUnitPK sample unit primary key
-   * @return SampleUnit the target sampleunit
-   * @throws CTPException if transition issue
-   */
-  public SampleUnit transitionSampleUnitStateFromDeliveryEvent(Integer sampleUnitPK) throws CTPException {
-    SampleUnit targetSampleUnit = sampleUnitRepository.findOne(sampleUnitPK);
+  private SampleUnit transitionSampleUnitStateFromDeliveryEvent(SampleUnit sampleUnit) throws CTPException {
     SampleUnitDTO.SampleUnitState newState = sampleUnitStateTransitionManager.transition(
-        targetSampleUnit.getState(),
+        sampleUnit.getState(),
         SampleUnitDTO.SampleUnitEvent.DELIVERING);
-    targetSampleUnit.setState(newState);
-    sampleUnitRepository.saveAndFlush(targetSampleUnit);
-    return targetSampleUnit;
+    sampleUnit.setState(newState);
+    sampleUnitRepository.saveAndFlush(sampleUnit);
+    return sampleUnit;
   }
 
 }
