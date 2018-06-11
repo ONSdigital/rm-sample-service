@@ -1,6 +1,5 @@
 package uk.gov.ons.ctp.response.sample.service.impl;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,9 +32,7 @@ import uk.gov.ons.ctp.response.sample.service.PartySvcClientService;
 import validation.BusinessSurveySample;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.Future;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -136,15 +133,14 @@ public class SampleServiceImplTest {
    * @throws Exception oops
    */
   @Test
-  public void testSampleSummaryAndSampleUnitsAreSavedAndThenSampleUnitsPublishedToQueue() {
+  public void testSampleSummaryAndSampleUnitsAreSaved() {
     SampleSummary newSummary = sampleServiceImpl.createAndSaveSampleSummary();
     BusinessSurveySample businessSample = surveySample.get(0);
 
-    sampleServiceImpl.processSampleSummary(newSummary, businessSample.getSampleUnits());
+    sampleServiceImpl.saveSample(newSummary, businessSample.getSampleUnits(), SampleUnitState.INIT);
 
     verify(sampleSummaryRepository, times(2)).save(any(SampleSummary.class));
     verify(sampleUnitRepository, times(2)).save(any(SampleUnit.class));
-    verify(partyPublisher, times(2)).publish(any(PartyCreationRequestDTO.class));
   }
 
   /**
@@ -261,10 +257,14 @@ public class SampleServiceImplTest {
     assertThat(sampleUnitsTotal, is(0));
   }
 
+  private MockMultipartFile createMockMultipartFile(){
+    return new MockMultipartFile("file", "file.csv", "text/csv", "data".getBytes());
+  }
+
   @Test
   public void testIngestBTypeSample() throws Exception {
     // Given
-    MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
+    MockMultipartFile file = createMockMultipartFile();
 
     SampleSummary summary = createSampleSummary(5, 10);
     when(csvIngesterBusiness.ingest(any(SampleSummary.class), any(MultipartFile.class))).thenReturn(summary);
@@ -279,7 +279,7 @@ public class SampleServiceImplTest {
   @Test
   public void testIngestTypeSampleIsCaseInsensitive() throws Exception {
     // Given
-    MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
+    MockMultipartFile file = createMockMultipartFile();
 
     SampleSummary summary = createSampleSummary(5, 10);
     when(csvIngesterBusiness.ingest(any(SampleSummary.class), any(MultipartFile.class))).thenReturn(summary);
@@ -296,7 +296,7 @@ public class SampleServiceImplTest {
     when(this.sampleSvcStateTransitionManager.transition(SampleState.INIT, SampleEvent.FAIL_VALIDATION))
             .thenReturn(SampleState.FAILED);
     // Given
-    MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
+    MockMultipartFile file = createMockMultipartFile();
 
     final String invalidType = "invalid-type";
 
@@ -305,21 +305,6 @@ public class SampleServiceImplTest {
 
     // When
     SampleSummary finalSummary = sampleServiceImpl.ingest(summary, file, invalidType);
-  }
-
-  @Test
-  public void testIngestMessagesSent() throws Exception {
-    // Given
-    MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
-
-    SampleSummary summary = createSampleSummary(5, 10);
-    when(csvIngesterBusiness.ingest(any(SampleSummary.class), any(MultipartFile.class))).thenReturn(summary);
-
-    // When
-    sampleServiceImpl.ingest(summary, file, "B");
-
-    // Then
-    verify(sampleOutboundPublisher, times(1)).sampleUploadStarted(any());
   }
 
 }

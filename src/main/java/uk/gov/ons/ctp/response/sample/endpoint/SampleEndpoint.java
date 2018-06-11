@@ -23,6 +23,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.ingest.IngesterException;
+import uk.gov.ons.ctp.response.sample.message.SampleOutboundPublisher;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
@@ -57,6 +58,9 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   private static final int NUM_UPLOAD_THREADS = 5;
 
   private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(NUM_UPLOAD_THREADS);
+
+  @Autowired
+  private SampleOutboundPublisher sampleOutboundPublisher;
 
   @Autowired
   public SampleEndpoint(SampleService sampleService, MapperFacade mapperFacade) {
@@ -112,17 +116,30 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
    * @return a newly created sample summary that won't have samples or collection instruments populated
    * @throws CTPException thrown if upload started message cannot be sent
    */
-  public SampleSummary ingest(final MultipartFile file, final String type, String filename) throws CTPException {
+  public SampleSummary ingest(final MultipartFile file, final String type){
     final SampleSummary newSummary = this.sampleService.createAndSaveSampleSummary();
 
     Callable<Optional<SampleSummary>> callable =() -> {
+      Optional<SampleSummary> result = null;
+
       try {
-        return Optional.of(this.sampleService.ingest(newSummary, file, type));
+        this.sampleOutboundPublisher.sampleUploadStarted(newSummary);
+
+        result = Optional.of(this.sampleService.ingest(newSummary, file, type));
       } catch (IngesterException e){
-        return this.sampleService.failSampleSummary(newSummary, e.getErrorCode(), e);
+        result = this.sampleService.failSampleSummary(newSummary, e.getErrorCode(), e);
       } catch (Exception e) {
-        return this.sampleService.failSampleSummary(newSummary, SampleSummaryDTO.ErrorCode.NotSpecified, e);
+        result = this.sampleService.failSampleSummary(newSummary, SampleSummaryDTO.ErrorCode.NotSpecified, e);
+      } finally {
+        SampleSummary forMessage = result != null && result.isPresent() ? result.get() : newSummary;
+
+        // This should always be sent - it is up to the receiver of the message to query the resource and
+        // deal with any error condition (i.e. this message indicates the process is complete, not that it is
+        // successful)
+        this.sampleOutboundPublisher.sampleUploadFinished(forMessage);
       }
+
+      return result;
     };
 
     EXECUTOR_SERVICE.submit(callable);
@@ -140,8 +157,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     }
 
     try {
-      String filename = file.getOriginalFilename();
-      SampleSummary result = ingest(file, type, filename);
+      SampleSummary result = ingest(file, type);
 
       URI location = ServletUriComponentsBuilder
               .fromCurrentServletMapping()
