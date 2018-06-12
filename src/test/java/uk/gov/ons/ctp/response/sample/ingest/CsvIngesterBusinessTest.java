@@ -1,6 +1,7 @@
 package uk.gov.ons.ctp.response.sample.ingest;
 
-import javafx.util.Pair;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -214,24 +215,21 @@ public class CsvIngesterBusinessTest {
 
   @Test
   public void handleMutlipleErrrors() throws Exception {
-    // Given
-    SampleSummary sampleSummary = new SampleSummary();
     MockMultipartFile f = TestFiles.getTestFile("business-survey-sample-multiple-errors.csv");
 
-    // When
     Pair<List<BusinessSampleUnit>, List<CsvIngesterBusiness.ValidationError>> result =
             csvIngester.parseAndValidateFile(f, 50);
 
-    assertEquals(1, result.getKey().size());
-    assertEquals(3, result.getValue().size());
+    assertEquals(1, result.getLeft().size());
+    assertEquals(3, result.getRight().size());
 
     assertEquals(2, result
-            .getValue()
+            .getRight()
             .stream()
             .filter(ve -> ve.getErrorType() == CsvIngesterBusiness.ValidationErrorType.InvalidColumns)
             .count());
     assertEquals(1, result
-            .getValue()
+            .getRight()
             .stream()
             .filter(ve -> ve.getErrorType() == CsvIngesterBusiness.ValidationErrorType.DuplicateRU)
             .count());

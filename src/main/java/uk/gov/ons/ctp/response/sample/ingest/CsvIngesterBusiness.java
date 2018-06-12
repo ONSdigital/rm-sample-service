@@ -1,6 +1,5 @@
 package uk.gov.ons.ctp.response.sample.ingest;
 
-import javafx.util.Pair;
 import liquibase.util.StringUtils;
 import liquibase.util.csv.opencsv.CSVReader;
 import liquibase.util.csv.opencsv.bean.ColumnPositionMappingStrategy;
@@ -8,6 +7,8 @@ import liquibase.util.csv.opencsv.bean.CsvToBean;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -138,7 +139,7 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
             }
         }
 
-        return new Pair<>(sampleUnitList, errors);
+        return new ImmutablePair<>(sampleUnitList, errors);
     }
 
     public SampleSummary ingest(final SampleSummary sampleSummary, final MultipartFile file)
@@ -185,9 +186,9 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
         if (errors.size() == 0){
             businessSampleUnit.setSampleUnitType("B");
 
-            return new Pair(businessSampleUnit, errors);
+            return new ImmutablePair(businessSampleUnit, errors);
         } else {
-            return new Pair(null, errors);
+            return new ImmutablePair(null, errors);
         }
     }
 
