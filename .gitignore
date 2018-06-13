@@ -58,3 +58,6 @@ target
 *.data
 *.redo
 *.backup
+
+plantuml.jar
+diagrams/*.svg
