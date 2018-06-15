@@ -145,3 +145,6 @@ swagger-settings:
 retries:
   maxAttempts: 3
   backoff: 5000
+
+sample-ingest:
+  max-errors: 50

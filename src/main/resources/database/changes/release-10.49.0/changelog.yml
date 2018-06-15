@@ -66,3 +66,12 @@ databaseChangeLog:
             path: alter_notes_column_to_text.sql
             relativeToChangelogFile: true
             splitStatements: false
+  - changeSet:
+      id: 10.49.0-8
+      author: Matt Innes
+      changes:
+        - sqlFile:
+            comment: Created error column to hold an error code
+            path: add_errorcode_to_sample_summary.sql
+            relativeToChangelogFile: true
+            splitStatements: false

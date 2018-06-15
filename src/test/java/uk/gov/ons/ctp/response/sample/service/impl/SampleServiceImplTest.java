@@ -18,6 +18,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
+import uk.gov.ons.ctp.response.sample.ingest.IngesterException;
 import uk.gov.ons.ctp.response.sample.message.EventPublisher;
 import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
 import uk.gov.ons.ctp.response.sample.message.SampleOutboundPublisher;
@@ -257,10 +258,14 @@ public class SampleServiceImplTest {
     assertThat(sampleUnitsTotal, is(0));
   }
 
+  private MockMultipartFile createMockMultipartFile(){
+    return new MockMultipartFile("file", "file.csv", "text/csv", "data".getBytes());
+  }
+
   @Test
   public void testIngestBTypeSample() throws Exception {
     // Given
-    MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
+    MockMultipartFile file = createMockMultipartFile();
 
     SampleSummary summary = createSampleSummary(5, 10);
     when(csvIngesterBusiness.ingest(any(SampleSummary.class), any(MultipartFile.class))).thenReturn(summary);
@@ -275,7 +280,7 @@ public class SampleServiceImplTest {
   @Test
   public void testIngestTypeSampleIsCaseInsensitive() throws Exception {
     // Given
-    MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
+    MockMultipartFile file = createMockMultipartFile();
 
     SampleSummary summary = createSampleSummary(5, 10);
     when(csvIngesterBusiness.ingest(any(SampleSummary.class), any(MultipartFile.class))).thenReturn(summary);
@@ -292,7 +297,7 @@ public class SampleServiceImplTest {
     when(this.sampleSvcStateTransitionManager.transition(SampleState.INIT, SampleEvent.FAIL_VALIDATION))
             .thenReturn(SampleState.FAILED);
     // Given
-    MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
+    MockMultipartFile file = createMockMultipartFile();
 
     final String invalidType = "invalid-type";
 
@@ -300,22 +305,17 @@ public class SampleServiceImplTest {
     when(csvIngesterBusiness.ingest(any(SampleSummary.class), any(MultipartFile.class))).thenReturn(summary);
 
     // When
-    SampleSummary finalSummary = sampleServiceImpl.ingest(summary, file, invalidType);
+    sampleServiceImpl.ingest(summary, file, invalidType);
   }
 
   @Test
-  public void testIngestMessagesSent() throws Exception {
-    // Given
-    MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
+  public void testValidateFilenameValidFilename() throws IngesterException {
+      sampleServiceImpl.validateFilename("test.csv");
+  }
 
-    SampleSummary summary = createSampleSummary(5, 10);
-    when(csvIngesterBusiness.ingest(any(SampleSummary.class), any(MultipartFile.class))).thenReturn(summary);
-
-    // When
-    sampleServiceImpl.ingest(summary, file, "B");
-
-    // Then
-    verify(sampleOutboundPublisher, times(1)).sampleUploadStarted(any());
+  @Test(expected = IngesterException.class)
+  public void testValidateFilenameInvalidFilename() throws IngesterException {
+    sampleServiceImpl.validateFilename("test");
   }
 
 }

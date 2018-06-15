@@ -7,6 +7,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
 import validation.SampleUnitBase;
 
@@ -88,9 +89,11 @@ public interface SampleService {
    */
   SampleSummary ingest(SampleSummary sampleSummary, MultipartFile file, String type) throws Exception;
 
-  Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, String message);
+  Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, SampleSummaryDTO.ErrorCode errorCode,
+                                            String message);
 
-  Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, Exception exception);
+  Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, SampleSummaryDTO.ErrorCode errorCode,
+                                            Exception exception);
 
   /**
    * find sampleUnit

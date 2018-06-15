@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.entity.ContentType;
 import org.junit.After;
 import org.junit.Before;
@@ -41,6 +42,7 @@ import static uk.gov.ons.ctp.response.sample.UnirestInitialiser.initialiseUnires
 @ContextConfiguration
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+@Slf4j
 public class SampleEndpointIT {
 
     @Autowired
@@ -78,6 +80,7 @@ public class SampleEndpointIT {
 
     @Test
     public void shouldUploadBusinessSampleFile() throws UnirestException, IOException, InterruptedException {
+        log.info("STARTING - shouldUploadBusinessSampleFile");
         // Given
         final String sampleFile = "/csv/business-survey-sample.csv";
 
@@ -85,7 +88,7 @@ public class SampleEndpointIT {
         HttpResponse<String> sampleSummaryResponse =
                 Unirest.post("http://localhost:" + port + "/samples/B/fileupload")
                 .basicAuth("admin", "secret")
-                .field("file", getClass().getResourceAsStream(sampleFile), ContentType.MULTIPART_FORM_DATA, "file")
+                .field("file", getClass().getResourceAsStream(sampleFile), ContentType.MULTIPART_FORM_DATA, "file.csv")
                 .asString();
 
         // Then
@@ -98,10 +101,12 @@ public class SampleEndpointIT {
 
         assertThat(active.getExpectedCollectionInstruments()).isEqualTo(1);
         assertThat(active.getTotalSampleUnits()).isEqualTo(1);
+        log.info("ENDING - shouldUploadBusinessSampleFile");
     }
 
     @Test
     public void shouldUploadSocialSampleFile() throws UnirestException, IOException {
+        log.info("STARTING - shouldUploadSocialSampleFile");
         // Given
         final String sampleFile = "/csv/social-survey-sample.csv";
 
@@ -109,24 +114,26 @@ public class SampleEndpointIT {
         HttpResponse<String> sampleSummaryResponse =
                 Unirest.post("http://localhost:" + port + "/samples/SOCIAL/fileupload")
                         .basicAuth("admin", "secret")
-                        .field("file", getClass().getResourceAsStream(sampleFile), ContentType.MULTIPART_FORM_DATA, "file")
+                        .field("file", getClass().getResourceAsStream(sampleFile), ContentType.MULTIPART_FORM_DATA, "file.csv")
                         .asString();
 
         // Then
         assertThat(sampleSummaryResponse.getStatus()).isEqualTo(201);
         SampleSummary sampleSummary = mapper.readValue(sampleSummaryResponse.getBody(), new TypeReference<SampleSummary>() {});
         assertThat(sampleSummary.getState()).isEqualTo(SampleSummaryDTO.SampleState.INIT);
+        log.info("FINISHING - shouldUploadSocialSampleFile");
 
     }
 
     @Test
     public void shouldPutSampleAttributesOnQueueWhenSampleUnitsRequested() throws UnirestException, InterruptedException, JAXBException {
+        log.info("STARTING - shouldPutSampleAttributesOnQueueWhenSampleUnitsRequested");
         // Given
         final String sampleFile = "/csv/social-survey-sample.csv";
         HttpResponse<SampleSummary> sampleSummaryResponse =
                 Unirest.post("http://localhost:" + port + "/samples/SOCIAL/fileupload")
                         .basicAuth("admin", "secret")
-                        .field("file", getClass().getResourceAsStream(sampleFile), ContentType.MULTIPART_FORM_DATA, "file")
+                        .field("file", getClass().getResourceAsStream(sampleFile), ContentType.MULTIPART_FORM_DATA, "file.csv")
                         .asObject(SampleSummary.class);
         CollectionExerciseJobCreationRequestDTO collexJobRequest = new CollectionExerciseJobCreationRequestDTO(
                 UUID.randomUUID(), "TEST", new Date(), Collections.singletonList(sampleSummaryResponse.getBody().getId()));
@@ -150,6 +157,7 @@ public class SampleEndpointIT {
                 new SampleUnit.SampleAttributes.Entry("Postcode", "TS184QG"),
                 new SampleUnit.SampleAttributes.Entry("PostTown", "STOCKTON-ON-TEES"),
                 new SampleUnit.SampleAttributes.Entry("CountryCode", "E"));
+        log.info("FINISHING - shouldPutSampleAttributesOnQueueWhenSampleUnitsRequested");
     }
 
 

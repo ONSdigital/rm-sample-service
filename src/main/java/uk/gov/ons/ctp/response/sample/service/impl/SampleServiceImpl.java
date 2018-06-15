@@ -22,8 +22,10 @@ import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterCensus;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterSocial;
+import uk.gov.ons.ctp.response.sample.ingest.IngesterException;
 import uk.gov.ons.ctp.response.sample.message.EventPublisher;
 import uk.gov.ons.ctp.response.sample.message.SampleOutboundPublisher;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
@@ -62,9 +64,6 @@ public class SampleServiceImpl implements SampleService {
 
   @Autowired
   private PartySvcClientService partySvcClient;
-
-  @Autowired
-  private SampleOutboundPublisher sampleOutboundPublisher;
 
   @Autowired
   private CollectionExerciseJobService collectionExerciseJobService;
@@ -156,8 +155,6 @@ public class SampleServiceImpl implements SampleService {
     targetSampleSummary.setState(newState);
     targetSampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
     sampleSummaryRepository.saveAndFlush(targetSampleSummary);
-    // Notify the outside world the sample upload has finished
-    this.sampleOutboundPublisher.sampleUploadFinished(targetSampleSummary);
 
     return targetSampleSummary;
   }
@@ -232,11 +229,19 @@ public class SampleServiceImpl implements SampleService {
     return sampleUnitsTotal;
   }
 
+  void validateFilename(String filename) throws IngesterException {
+    if (!filename.toLowerCase().endsWith(".csv")) {
+      throw new IngesterException(CTPException.Fault.VALIDATION_FAILED, SampleSummaryDTO.ErrorCode.NotCsv,
+              String.format("%s is not a valid CSV file (must have .csv extension)", filename));
+    }
+  }
+
   @Override
   public SampleSummary ingest(final SampleSummary sampleSummary, final MultipartFile file, final String type) throws Exception {
-    this.sampleOutboundPublisher.sampleUploadStarted(sampleSummary);
+    SampleSummary result = null;
 
-    SampleSummary result;
+    validateFilename(file.getOriginalFilename());
+
     switch (type.toUpperCase()) {
       case "B":
         result = csvIngesterBusiness.ingest(sampleSummary, file);
@@ -249,18 +254,20 @@ public class SampleServiceImpl implements SampleService {
         break;
       default:
         throw new UnsupportedOperationException(String.format("Type %s not implemented", type));
-    }
+      }
 
     return result;
   }
 
   @Override
-  public Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, String message){
+  public Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, SampleSummaryDTO.ErrorCode errorCode,
+                                                   String message){
     try {
       SampleState newState = sampleSvcStateTransitionManager.transition(sampleSummary.getState(),
               SampleEvent.FAIL_VALIDATION);
       sampleSummary.setState(newState);
       sampleSummary.setNotes(message);
+      sampleSummary.setErrorCode(errorCode);
       SampleSummary persisted = this.sampleSummaryRepository.save(sampleSummary);
 
       return Optional.of(persisted);
@@ -271,15 +278,17 @@ public class SampleServiceImpl implements SampleService {
     } catch(RuntimeException e){
       // Hibernate throws RuntimeException if any issue persisting the SampleSummary.  This is to ensure it is logged
       // (otherwise they just disappear).
-      log.error("Failed to persist sample summary - {}", e);
+      log.error("Failed to persist sample summary {} - {}", sampleSummary.getId(), e);
 
       throw e;
     }
   }
 
   @Override
-  public Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, Exception exception){
-      return failSampleSummary(sampleSummary, exception.getMessage());
+  public Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, SampleSummaryDTO.ErrorCode errorCode,
+                                                   Exception exception){
+      return failSampleSummary(sampleSummary, errorCode,
+              String.format("%s : %s", exception.getClass(), exception.getMessage()));
   }
 
   @Override

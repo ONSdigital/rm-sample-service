@@ -76,6 +76,10 @@ public class SampleSummary implements Serializable {
   @Column(name = "notes")
   private String notes;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "errorcode")
+  private SampleSummaryDTO.ErrorCode errorCode = SampleSummaryDTO.ErrorCode.None;
+
   @Column(name = "description")
   @Size(max=250)
   private String description;
