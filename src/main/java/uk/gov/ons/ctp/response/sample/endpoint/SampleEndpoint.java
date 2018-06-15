@@ -3,7 +3,6 @@ package uk.gov.ons.ctp.response.sample.endpoint;
 import liquibase.util.csv.opencsv.bean.CsvToBean;
 import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
@@ -21,12 +20,14 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.InvalidRequestException;
 import uk.gov.ons.ctp.common.time.DateTimeUtil;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
+import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleAttributesDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.BusinessSampleUnit;
 
@@ -39,7 +40,6 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 
 /**
@@ -61,26 +61,25 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
 
   @Autowired
   public SampleEndpoint(SampleService sampleService, MapperFacade mapperFacade) {
-      this.sampleService = sampleService;
-      this.mapperFacade = mapperFacade;
+    this.sampleService = sampleService;
+    this.mapperFacade = mapperFacade;
   }
 
   /**
    * POST CollectionExerciseJob associated to SampleSummary surveyRef and
    * exerciseDateTime
    *
-   * @param collectionExerciseJobCreationRequestDTO
-   *          CollectionExerciseJobCreationRequestDTO related to SampleUnits
-   * @param bindingResult collects errors thrown
+   * @param collectionExerciseJobCreationRequestDTO CollectionExerciseJobCreationRequestDTO related to SampleUnits
+   * @param bindingResult                           collects errors thrown
    * @return Response Returns sampleUnitsTotal value
-   * @throws CTPException if update operation fails or CollectionExerciseJob
-   *           already exists
+   * @throws CTPException            if update operation fails or CollectionExerciseJob
+   *                                 already exists
    * @throws InvalidRequestException if binding errors
    */
   @RequestMapping(value = "/sampleunitrequests", method = RequestMethod.POST, consumes = "application/json")
   public ResponseEntity<SampleUnitsRequestDTO> createSampleUnitRequest(
-      final @Valid @RequestBody CollectionExerciseJobCreationRequestDTO collectionExerciseJobCreationRequestDTO,
-      BindingResult bindingResult) throws CTPException, InvalidRequestException {
+          final @Valid @RequestBody CollectionExerciseJobCreationRequestDTO collectionExerciseJobCreationRequestDTO,
+          BindingResult bindingResult) throws CTPException, InvalidRequestException {
     log.debug("Entering createCollectionExerciseJob with requestObject {}", collectionExerciseJobCreationRequestDTO);
     if (bindingResult.hasErrors()) {
       throw new InvalidRequestException("Binding errors for create action: ", bindingResult);
@@ -88,26 +87,31 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     CollectionExerciseJob cej = new CollectionExerciseJob();
     Integer sampleUnitsTotal = 0;
     List<UUID> sampleSummaryIds = collectionExerciseJobCreationRequestDTO.getSampleSummaryUUIDList();
-    for(UUID sampleSummaryID : sampleSummaryIds) {
+    for (UUID sampleSummaryID : sampleSummaryIds) {
       cej = mapperFacade
-          .map(collectionExerciseJobCreationRequestDTO, CollectionExerciseJob.class);
+              .map(collectionExerciseJobCreationRequestDTO, CollectionExerciseJob.class);
       cej.setCreatedDateTime(DateTimeUtil.nowUTC());
       cej.setSampleSummaryId(sampleSummaryID);
 
       sampleUnitsTotal += sampleService.initialiseCollectionExerciseJob(cej);
     }
-      SampleUnitsRequestDTO sampleUnitsRequest = new SampleUnitsRequestDTO(sampleUnitsTotal);
+    SampleUnitsRequestDTO sampleUnitsRequest = new SampleUnitsRequestDTO(sampleUnitsTotal);
 
-      String newResourceUrl = ServletUriComponentsBuilder
-          .fromCurrentRequest().path("/{id}")
-          .buildAndExpand(cej.getCollectionExerciseId()).toUri().toString();
+    String newResourceUrl = ServletUriComponentsBuilder
+            .fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(cej.getCollectionExerciseId())
+            .toUri()
+            .toString();
 
-      return ResponseEntity.created(URI.create(newResourceUrl)).body(sampleUnitsRequest);
+    return ResponseEntity.created(URI.create(newResourceUrl))
+                         .body(sampleUnitsRequest);
 
   }
 
   /**
    * Method to kick off a task to ingest a sample file
+   *
    * @param file Multipart File of SurveySample to be used
    * @param type Type of Survey to be used
    * @return a newly created sample summary that won't have samples or collection instruments populated
@@ -116,7 +120,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   public SampleSummary ingest(final MultipartFile file, final String type) throws CTPException {
     final SampleSummary newSummary = this.sampleService.createAndSaveSampleSummary();
 
-    Callable<Optional<SampleSummary>> callable =() -> {
+    Callable<Optional<SampleSummary>> callable = () -> {
       try {
         return Optional.of(this.sampleService.ingest(newSummary, file, type));
       } catch (Exception e) {
@@ -131,10 +135,13 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   }
 
   @RequestMapping(value = "/{type}/fileupload", method = RequestMethod.POST, consumes = "multipart/form-data")
-  public final @ResponseBody ResponseEntity<SampleSummary> uploadSampleFile(@PathVariable("type") final String type, @RequestParam("file") MultipartFile file) throws CTPException {
+  public final @ResponseBody
+  ResponseEntity<SampleSummary> uploadSampleFile(@PathVariable("type") final String type, @RequestParam("file") MultipartFile file) throws CTPException {
     log.info("Entering Sample file upload for Type {}", type);
-    if (!Arrays.asList("B", "CENSUS", "SOCIAL").contains(type.toUpperCase())) {
-      return ResponseEntity.badRequest().build();
+    if (!Arrays.asList("B", "CENSUS", "SOCIAL")
+               .contains(type.toUpperCase())) {
+      return ResponseEntity.badRequest()
+                           .build();
     }
 
     try {
@@ -143,9 +150,11 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       URI location = ServletUriComponentsBuilder
               .fromCurrentServletMapping()
               .path("/samples/samplesummary/{id}")
-              .buildAndExpand(result.getId()).toUri();
+              .buildAndExpand(result.getId())
+              .toUri();
 
-      return ResponseEntity.created(location).body(result);
+      return ResponseEntity.created(location)
+                           .body(result);
     } catch (Exception e) {
       throw new CTPException(CTPException.Fault.VALIDATION_FAILED, e, "Error ingesting file %s", file.getOriginalFilename());
     }
@@ -161,7 +170,8 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   public ResponseEntity<List<SampleSummaryDTO>> findSampleSummaries() {
     List<SampleSummary> sampleSummaries = sampleService.findAllSampleSummaries();
     if (CollectionUtils.isEmpty(sampleSummaries)) {
-      return ResponseEntity.noContent().build();
+      return ResponseEntity.noContent()
+                           .build();
     } else {
       List<SampleSummaryDTO> result = mapperFacade.mapAsList(sampleSummaries, SampleSummaryDTO.class);
       return ResponseEntity.ok(result);
@@ -181,24 +191,54 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     SampleSummary sampleSummary = sampleService.findSampleSummary(sampleSummaryId);
     if (sampleSummary == null) {
       throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND,
-          String.format("Sample Summary not found for sampleSummaryId %s", sampleSummaryId));
+                             String.format("Sample Summary not found for sampleSummaryId %s", sampleSummaryId));
     }
     SampleSummaryDTO result = mapperFacade.map(sampleSummary, SampleSummaryDTO.class);
 
     return ResponseEntity.ok(result);
 
   }
-  
+
   @RequestMapping(value = "{id}", method = RequestMethod.GET)
   public ResponseEntity<SampleUnitDTO> requestSampleUnit(@PathVariable("id") final UUID sampleUnitId) throws CTPException {
     SampleUnit sampleUnit = sampleService.findSampleUnit(sampleUnitId);
     if (sampleUnit == null) {
       throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND,
-          String.format("Sample Unit not found for sampleUnitId %s", sampleUnitId));
+                             String.format("Sample Unit not found for sampleUnitId %s", sampleUnitId));
     }
     SampleUnitDTO result = mapperFacade.map(sampleUnit, SampleUnitDTO.class);
 
     return ResponseEntity.ok(result);
+  }
+
+  @RequestMapping(value = "{ref}/attributes", method = RequestMethod.GET)
+  public ResponseEntity<SampleAttributesDTO> requestSampleAttributes(@PathVariable("ref") final String sampleUnitRef) throws CTPException {
+    SampleUnit sampleUnit = sampleService.findSampleUnitBySampleUnitRef(sampleUnitRef);
+
+    if (sampleUnit == null || sampleUnit.getId() == null) {
+      throw new CTPException(CTPException.Fault.SYSTEM_ERROR, String.format("Sample was not found for sample unit ref %s", sampleUnitRef));
+    }
+
+    SampleAttributes sampleAttribs = sampleService.findSampleAttributes(sampleUnit.getId());
+
+    if (sampleAttribs == null) {
+      throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND, String.format("Sample attributes were not found for sampleUnitRef %s", sampleUnitRef));
+    }
+    SampleAttributesDTO result = mapperFacade.map(sampleAttribs, SampleAttributesDTO.class);
+
+    return ResponseEntity.ok(result);
+  }
+
+  @RequestMapping(value = "{sampleSummaryId}/sampleunits", method = RequestMethod.GET)
+  public ResponseEntity<SampleUnitDTO[]> requestSampleUnitsForSampleSummary(@PathVariable("sampleSummaryId") final UUID sampleSummaryId) throws CTPException {
+
+    List<SampleUnit> sampleUnits = sampleService.findSampleUnitsBySampleSummary(sampleSummaryId);
+
+    List<SampleUnitDTO> result = mapperFacade.mapAsList(sampleUnits, SampleUnitDTO.class);
+
+    if (!sampleUnits.isEmpty())
+      return ResponseEntity.ok(result.toArray(new SampleUnitDTO[]{}));
+    throw new CTPException(CTPException.Fault.BAD_REQUEST, String.format("No sample units were found for sample summary %s", sampleSummaryId));
   }
 
 }

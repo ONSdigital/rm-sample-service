@@ -21,10 +21,13 @@ import uk.gov.ons.ctp.common.error.InvalidRequestException;
 import uk.gov.ons.ctp.common.error.RestExceptionHandler;
 import uk.gov.ons.ctp.common.jackson.CustomObjectMapper;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
+import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -123,6 +126,21 @@ public class SampleEndpointUnitTest {
         BindingResult bindingResult = mock(BindingResult.class);
         when(bindingResult.hasErrors()).thenReturn(true);
         sampleEndpoint.createSampleUnitRequest(null, bindingResult);
+    }
+
+    @Test
+    public void ensureAttributesReturnedById() throws Exception {
+
+//      UUID id = UUID.randomUUID();
+//      SampleAttributes sampleAttribs = new SampleAttributes();
+//      Map<String, String> attribs = new HashMap<>();
+//
+//      attribs.put("ref", id.toString());
+//      sampleAttribs.setAttributes(attribs);
+//
+//      when(sampleService.findSampleAttributes(any())).thenReturn(sampleAttribs);
+//
+//      sampleEndpoint.requestSampleAttributes(id);
     }
 
 }

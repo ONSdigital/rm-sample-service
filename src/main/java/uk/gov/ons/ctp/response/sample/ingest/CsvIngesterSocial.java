@@ -69,6 +69,8 @@ public class CsvIngesterSocial extends CsvToBean<SocialSampleUnit> {
     private SocialSampleUnit parseLine(CSVRecord line) throws CTPException{
         SocialSampleUnit sampleUnit = new SocialSampleUnit();
         sampleUnit.setAttributes(line.toMap());
+        String ref = (String) line.toMap().get("Reference");
+        sampleUnit.setSampleUnitRef(ref);
         List<String> invalidColumns = sampleUnit.validate();
         if (!invalidColumns.isEmpty()) {
             String errorMessage = String.format("Error in row [%s] due to missing field(s) [%s]", StringUtils.join(line.toMap().values(), ","),

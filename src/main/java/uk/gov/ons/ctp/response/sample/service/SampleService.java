@@ -4,6 +4,7 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
+import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
@@ -98,4 +99,23 @@ public interface SampleService {
    * @return SampleUnit
    */
   SampleUnit findSampleUnit(UUID id);
+
+  /**
+   * Return the attributes of the sample based on
+   *
+   * @param id - The sample unit reference
+   */
+  SampleAttributes findSampleAttributes(UUID id);
+
+  /**
+   * Return the sample unit based on the sample unit reference
+   * @param sampleUnitRef
+   * @return
+   */
+  SampleUnit findSampleUnitBySampleUnitRef(String sampleUnitRef);
+
+  /**
+   * Get sample unit based on sample summary
+   */
+  List<SampleUnit> findSampleUnitsBySampleSummary(UUID sampleSummaryId);
 }
