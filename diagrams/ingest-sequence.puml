@@ -12,7 +12,7 @@ loop for each sample unit
   Party -> DB: Process and Store
   Party -> RabbitMQ: enqueue recept (SampleUnitUUID)
   Sample -> RabbitMQ: Read Receipt
-  Sample -> update Sample Unit to PERSISTED
+  Sample -> DB : update Sample Unit to PERSISTED
 end
 Sample -> DB: update Sample Summary state to ACTIVE
 @enduml
