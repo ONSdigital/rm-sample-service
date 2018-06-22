@@ -1,6 +1,7 @@
 package uk.gov.ons.ctp.response.sample;
 
 import net.sourceforge.cobertura.CoverageIgnore;
+
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
