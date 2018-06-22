@@ -4,6 +4,7 @@ import ma.glasnost.orika.MapperFacade;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -34,8 +35,10 @@ import java.util.List;
 import java.util.UUID;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -246,15 +249,18 @@ public class SampleUnitDistributorTest {
   @Test
   public void testShouldSendSampleUnitWithAttributesWhenPresent() {
     // Given
+    String addressKey = "Prem1";
+    String addressValue = "14 ASHMEAD VIEW";
     CollectionExerciseJob collectionExerciseJob = new CollectionExerciseJob();
     collectionExerciseJob.setCollectionExerciseId(UUID.randomUUID());
     collectionExerciseJob.setSampleSummaryId(UUID.randomUUID());
     given(collectionExerciseJobRepository.findAll()).willReturn(Collections.singletonList(collectionExerciseJob));
 
     SampleUnit sampleUnit = new SampleUnit();
-    sampleUnit.setId(UUID.randomUUID());
+    UUID sampleUnitId = UUID.randomUUID();
+    sampleUnit.setId(sampleUnitId);
     SampleAttributes sampleAttributes = new SampleAttributes();
-    sampleAttributes.setAttributes(Collections.singletonMap("Prem1","14 ASHMEAD VIEW"));
+    sampleAttributes.setAttributes(Collections.singletonMap(addressKey, addressValue));
     given(sampleAttributesRepository.findOne(sampleUnit.getId())).willReturn(sampleAttributes);
 
     given(sampleUnitRepo.getSampleUnits(
@@ -264,17 +270,27 @@ public class SampleUnitDistributorTest {
             Collections.singletonList(-9999)
             )).willReturn(Collections.singletonList(sampleUnit));
 
+    ArgumentCaptor<uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit> sampleUnitCaptor =
+            ArgumentCaptor.forClass(uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.class);
+    doNothing().when(this.sampleUnitPublisher).send(sampleUnitCaptor.capture());
+
     // When
     sampleUnitDistributor.distribute();
 
     // Then
-    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit sentSampleUnit = new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit();
-    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.SampleAttributes.Builder<Void> builder = new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.SampleAttributes().newCopyBuilder();
-    builder.addEntries().withKey("Prem1").withValue("14 ASHMEAD VIEW");
-    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.SampleAttributes attributes = builder.build();
-    sentSampleUnit.setSampleAttributes(attributes);
-    sentSampleUnit.setCollectionExerciseId(collectionExerciseJob.getCollectionExerciseId().toString());
-    verify(sampleUnitPublisher).send(sentSampleUnit);
+    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit param = sampleUnitCaptor.getValue();
+    assertEquals(collectionExerciseJob.getCollectionExerciseId().toString(), param.getCollectionExerciseId());
+    assertEquals("Incorrect UUID for sample unit", sampleUnitId, UUID.fromString(param.getId()));
+
+    List<uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.SampleAttributes.Entry> entries =
+            param.getSampleAttributes().getEntries();
+
+    assertEquals("Incorrect number of sample attrbutes", 1, entries.size());
+
+    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.SampleAttributes.Entry entry = entries.get(0);
+
+    assertEquals("Attribute key incorrect", addressKey, entry.getKey());
+    assertEquals("Attribute value incorrect", addressValue, entry.getValue());
   }
 
   @Test
@@ -286,7 +302,8 @@ public class SampleUnitDistributorTest {
     given(collectionExerciseJobRepository.findAll()).willReturn(Collections.singletonList(collectionExerciseJob));
 
     SampleUnit sampleUnit = new SampleUnit();
-    sampleUnit.setId(UUID.randomUUID());
+    UUID sampleUnitId = UUID.randomUUID();
+    sampleUnit.setId(sampleUnitId);
 
     given(sampleUnitRepo.getSampleUnits(
             collectionExerciseJob.getSampleSummaryId(),
@@ -295,12 +312,18 @@ public class SampleUnitDistributorTest {
             Collections.singletonList(-9999)
     )).willReturn(Collections.singletonList(sampleUnit));
 
+    ArgumentCaptor<uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit> sampleUnitCaptor =
+            ArgumentCaptor.forClass(uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.class);
+    doNothing().when(this.sampleUnitPublisher).send(sampleUnitCaptor.capture());
+
     // When
     sampleUnitDistributor.distribute();
 
     // Then
-    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit sentSampleUnit = new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit();
-    sentSampleUnit.setCollectionExerciseId(collectionExerciseJob.getCollectionExerciseId().toString());
-    verify(sampleUnitPublisher).send(sentSampleUnit);
+    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit param = sampleUnitCaptor.getValue();
+    assertEquals("Incorrect collection exercise", collectionExerciseJob.getCollectionExerciseId().toString(), param.getCollectionExerciseId());
+    assertEquals("Incorrect UUID for sample unit", sampleUnitId, UUID.fromString(param.getId()));
+
+    assertNull("Sample attributs should be null", param.getSampleAttributes());
   }
 }

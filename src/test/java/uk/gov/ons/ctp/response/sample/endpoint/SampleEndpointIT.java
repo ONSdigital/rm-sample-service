@@ -57,6 +57,7 @@ public class SampleEndpointIT {
   @Autowired
   private ObjectMapper mapper;
   private SimpleMessageListener sml;
+
   private BlockingQueue<String> uploadFinishedMessageListener;
   private BlockingQueue<String> sampleDeliveryMessageListener;
 
