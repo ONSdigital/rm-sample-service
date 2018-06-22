@@ -302,6 +302,11 @@ public class SampleServiceImpl implements SampleService {
   }
 
   @Override
+  public SampleUnit findSampleUnitBySampleUnitId(UUID sampleUnitId) {
+    return sampleUnitRepository.findById(sampleUnitId);
+  }
+
+  @Override
   public List<SampleUnit> findSampleUnitsBySampleSummary(UUID sampleSummaryId) {
     SampleSummary ss = sampleSummaryRepository.findById(sampleSummaryId);
     return sampleUnitRepository.findBySampleSummaryFK(ss.getSampleSummaryPK());

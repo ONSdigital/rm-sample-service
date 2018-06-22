@@ -211,18 +211,18 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     return ResponseEntity.ok(result);
   }
 
-  @RequestMapping(value = "{ref}/attributes", method = RequestMethod.GET)
-  public ResponseEntity<SampleAttributesDTO> requestSampleAttributes(@PathVariable("ref") final String sampleUnitRef) throws CTPException {
-    SampleUnit sampleUnit = sampleService.findSampleUnitBySampleUnitRef(sampleUnitRef);
+  @RequestMapping(value = "{id}/attributes", method = RequestMethod.GET)
+  public ResponseEntity<SampleAttributesDTO> requestSampleAttributes(@PathVariable("id") final UUID sampleUnitId) throws CTPException {
+    SampleUnit sampleUnit = sampleService.findSampleUnitBySampleUnitId(sampleUnitId);
 
     if (sampleUnit == null || sampleUnit.getId() == null) {
-      throw new CTPException(CTPException.Fault.SYSTEM_ERROR, String.format("Sample was not found for sample unit ref %s", sampleUnitRef));
+      throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND, String.format("Sample was not found for sample unit ref %s", sampleUnitId));
     }
 
     SampleAttributes sampleAttribs = sampleService.findSampleAttributes(sampleUnit.getId());
 
     if (sampleAttribs == null) {
-      throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND, String.format("Sample attributes were not found for sampleUnitRef %s", sampleUnitRef));
+      sampleAttribs = new SampleAttributes();
     }
     SampleAttributesDTO result = mapperFacade.map(sampleAttribs, SampleAttributesDTO.class);
 

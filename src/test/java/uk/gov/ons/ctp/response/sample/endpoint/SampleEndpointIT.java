@@ -151,6 +151,8 @@ public class SampleEndpointIT {
     assertThat(sampleUnitResponse.getStatus()).isEqualTo(201);
     String message = sampleDeliveryMessageListener.take();
 
+    log.debug("message = " + message);
+
     JAXBContext jaxbContext = JAXBContext.newInstance(SampleUnit.class);
     SampleUnit sampleUnit = (SampleUnit) jaxbContext.createUnmarshaller()
                                                     .unmarshal(new ByteArrayInputStream(message.getBytes()));
@@ -175,49 +177,32 @@ public class SampleEndpointIT {
                                                        .basicAuth("admin", "secret")
                                                        .asObject(SampleUnitDTO[].class);
 
-    String ref = sampleUnits.getBody()[0].getSampleUnitRef();
+    String id = sampleUnits.getBody()[0].getId();
 
-    assertThat(ref).isNotBlank();
+    assertThat(id).isNotBlank();
 
-    HttpResponse<SampleAttributesDTO> sampleAttribResponse = Unirest.get(String.format("http://localhost:%d/samples/%s/attributes", port, ref))
+    HttpResponse<SampleAttributesDTO> sampleAttribResponse = Unirest.get(String.format("http://localhost:%d/samples/%s/attributes", port, id))
                                                        .header("Content-Type", "application/json")
                                                        .basicAuth("admin", "secret")
                                                        .asObject(SampleAttributesDTO.class);
 
     log.debug("res = {}", sampleAttribResponse.getBody());
 
-    assertThat(sampleAttribResponse.getBody().getAttributes().get("sampleUnitRef")).isEqualTo(ref);
-  }
-
-  @Test
-  public void ensureAttributesAreIncludedWithSampleUnit() throws Exception {
-    SampleSummaryDTO sampleSummary = loadSocialSample("/csv/social-survey-sample-ref.csv");
-
-    assertThat(sampleSummary).isNotNull();
-
-    HttpResponse<SampleUnitDTO[]> sampleUnits = Unirest.get(String.format("http://localhost:%d/samples/%s/sampleunits", port, sampleSummary.getId()))
-                                                       .header("Content-Type", "application/json")
-                                                       .basicAuth("admin", "secret")
-                                                       .asObject(SampleUnitDTO[].class);
-
-    SampleUnitDTO[] body = sampleUnits.getBody();
-    log.debug("body: {}", body);
-
-    String id = body[0].getId();
-
-    assertThat(id).isNotNull();
-
     HttpResponse<SampleUnitDTO> sampleUnitResponse = Unirest.get(String.format("http://localhost:%d/samples/%s", port, id))
-                                                         .header("Content-Type", "application/json")
-                                                         .basicAuth("admin", "secret")
-                                                         .asObject(SampleUnitDTO.class);
+            .header("Content-Type", "application/json")
+            .basicAuth("admin", "secret")
+            .asObject(SampleUnitDTO.class);
+
+    assertThat(sampleUnitResponse.getBody().getId()).isEqualTo(id);
 
     assertThat(sampleUnitResponse.getBody().getSampleAttributes().getAttributes().entrySet()).contains(
-            entry("Prem1", "14 ASHMEAD VIEW"),
-            entry("Postcode", "TS184QG"),
-            entry("PostTown", "STOCKTON-ON-TEES"),
-            entry("CountryCode", "E"),
-            entry("Reference", "LMS0001"));
+            entry("Prem1", sampleAttribResponse.getBody().getAttributes().get("Prem1")),
+            entry("Postcode", sampleAttribResponse.getBody().getAttributes().get("Postcode")),
+            entry("PostTown", sampleAttribResponse.getBody().getAttributes().get("PostTown")),
+            entry("CountryCode", sampleAttribResponse.getBody().getAttributes().get("CountryCode")),
+            entry("Reference", sampleAttribResponse.getBody().getAttributes().get("Reference")));
+
+    assertThat(sampleAttribResponse.getBody().getAttributes().get("Reference")).isEqualTo("LMS0001");
   }
 
   private SampleSummaryDTO loadSocialSample(String sampleFile) throws UnirestException, IOException, InterruptedException {

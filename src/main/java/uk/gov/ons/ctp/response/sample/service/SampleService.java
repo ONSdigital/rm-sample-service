@@ -118,4 +118,11 @@ public interface SampleService {
    * Get sample unit based on sample summary
    */
   List<SampleUnit> findSampleUnitsBySampleSummary(UUID sampleSummaryId);
+
+  /**
+   * Find a sample unit by its unique UUID
+   * @param sampleUnitId
+   * @return
+   */
+  SampleUnit findSampleUnitBySampleUnitId(UUID sampleUnitId);
 }
