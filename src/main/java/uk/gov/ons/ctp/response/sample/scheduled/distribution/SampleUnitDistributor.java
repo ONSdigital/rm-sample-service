@@ -98,6 +98,9 @@ public class SampleUnitDistributor {
             uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit = mapperFacade.map(sampleUnit,
                 uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.class);
             uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes sampleAttributes = sampleAttributesRepository.findOne(sampleUnit.getId());
+            if (sampleUnit.getId() != null) {
+              mappedSampleUnit.setId(sampleUnit.getId().toString());
+            }
             if (sampleAttributes != null) {
               mappedSampleUnit.setSampleAttributes(mapSampleAttributes(sampleAttributes));
             }

@@ -11,6 +11,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.BindingResult;
@@ -21,12 +22,17 @@ import uk.gov.ons.ctp.common.error.InvalidRequestException;
 import uk.gov.ons.ctp.common.error.RestExceptionHandler;
 import uk.gov.ons.ctp.common.jackson.CustomObjectMapper;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
+import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
+import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
+import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.isA;
 import static org.mockito.Matchers.any;
@@ -34,6 +40,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.ons.ctp.common.MvcHelper.postJson;
@@ -123,6 +130,27 @@ public class SampleEndpointUnitTest {
         BindingResult bindingResult = mock(BindingResult.class);
         when(bindingResult.hasErrors()).thenReturn(true);
         sampleEndpoint.createSampleUnitRequest(null, bindingResult);
+    }
+
+    @Test
+    public void ensureAttributesReturnedById() throws Exception {
+
+      UUID id = UUID.randomUUID();
+      SampleUnit sampleUnit = new SampleUnit();
+      SampleAttributes sampleAttribs = new SampleAttributes();
+      Map<String, String> attribs = new HashMap<>();
+
+      attribs.put("Reference", "LMS0001");
+      sampleAttribs.setAttributes(attribs);
+
+      sampleUnit.setId(id);
+      sampleUnit.setSampleAttributes(sampleAttribs);
+
+      when(sampleService.findSampleUnitBySampleUnitId(any())).thenReturn(sampleUnit);
+      when(sampleService.findSampleAttributes(any())).thenReturn(sampleAttribs);
+
+      ResultActions getAttribs = mockMvc.perform(get(String.format("/samples/%s/attributes", id.toString())));
+      getAttribs.andExpect(status().isOk());
     }
 
 }

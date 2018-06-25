@@ -84,6 +84,13 @@ public interface SampleUnitRepository extends JpaRepository<SampleUnit, Integer>
                                         @Param("sampleunittype") String sampleUnitType);
 
   /**
+   * Get the sample unit object based on the sample unit reference
+   * @param sampleUnitRef
+   * @return
+   */
+  SampleUnit findBySampleUnitRef(String sampleUnitRef);
+
+  /**
    * Find how many SampleUnits from a given SampleSummary have been POSTed to Party and are now 'PERSISTED'
    * @param sampleSummaryFK sampleSummaryFK of SampleSummary to be counted, from a SampleUnit in that summary.
    * @return int count of matching sampleUnits

@@ -65,8 +65,8 @@ public class CsvIngesterSocialTest {
   public void testIngestSocialSampleFile() throws Exception {
     // Given
     SampleSummary newSummary = new SampleSummary();
-    String csv = "Prem1,Prem2,Prem3,Prem4,District,PostTown,Postcode,CountryCode\n" +
-            "14 ASHMEAD VIEW,,,,,STOCKTON-ON-TEES,TS184QG,E";
+    String csv = "Prem1,Prem2,Prem3,Prem4,District,PostTown,Postcode,CountryCode,Reference\n" +
+            "14 ASHMEAD VIEW,,,,,STOCKTON-ON-TEES,TS184QG,E,LMS00001";
 
     // When
     csvIngester.ingest(newSummary, TestFiles.getTestFileFromString(csv));
@@ -81,7 +81,7 @@ public class CsvIngesterSocialTest {
     // Given
     SampleSummary newSummary = new SampleSummary();
     String csv = "Prem1,Prem2,Prem3,Prem4,District,PostTown,Postcode,CountryCode\n" +
-            "14 ASHMEAD VIEW,,,,,STOCKTON-ON-TEES,,E";
+            "14 ASHMEAD VIEW,,,,,STOCKTON-ON-TEES,TS184QG,E";
 
     // When
     csvIngester.ingest(newSummary, TestFiles.getTestFileFromString(csv));
@@ -96,8 +96,8 @@ public class CsvIngesterSocialTest {
   public void testMissingMandatoryHeaders() throws Exception {
     // Given
     SampleSummary newSummary = new SampleSummary();
-    String csv = "Prem2,Prem3,Prem4,District,PostTown,Postcode,CountryCode\n" +
-            ",,,,STOCKTON-ON-TEES,TS184QG,E";
+    String csv = "Prem2,Prem3,Prem4,District,PostTown,Postcode,CountryCode,Reference\n" +
+            ",,,,STOCKTON-ON-TEES,TS184QG,E,LMS00001";
 
     // When
     csvIngester.ingest(newSummary, TestFiles.getTestFileFromString(csv));
@@ -114,8 +114,8 @@ public class CsvIngesterSocialTest {
     // Given
     SampleSummary newSummary = new SampleSummary();
     given(sampleService.saveSample(any(), argumentCaptor.capture(), eq(SampleUnitState.PERSISTED))).willReturn(newSummary);
-    String csv = "Prem1,Prem2,Prem3,Prem4,District,PostTown,Postcode,CountryCode\n" +
-            "14 ASHMEAD VIEW,,,,,STOCKTON-ON-TEES,TS184QG,E";
+    String csv = "Prem1,Prem2,Prem3,Prem4,District,PostTown,Postcode,CountryCode,Reference\n" +
+            "14 ASHMEAD VIEW,,,,,STOCKTON-ON-TEES,TS184QG,E,LMS00001";
 
     // When
     csvIngester.ingest(newSummary, TestFiles.getTestFileFromString(csv));
@@ -131,6 +131,7 @@ public class CsvIngesterSocialTest {
             .put("PostTown", "STOCKTON-ON-TEES")
             .put("Postcode", "TS184QG")
             .put("CountryCode", "E")
+            .put("Reference", "LMS00001")
             .build();
     SampleAttributes sampleAttriubutes = new SampleAttributes(socialSampleUnit.getSampleUnitId(), attributes);
     List<SampleAttributes> sampleAttributesList = Collections.singletonList(sampleAttriubutes);

@@ -14,6 +14,7 @@ import uk.gov.ons.ctp.common.time.DateTimeUtil;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
+import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesRepository;
@@ -282,9 +283,33 @@ public class SampleServiceImpl implements SampleService {
       return failSampleSummary(sampleSummary, exception.getMessage());
   }
 
+  // TODO get this to get the attributes in a separate call then stitch the results into the value returned by sampleUnitRepository.findById
   @Override
   public SampleUnit findSampleUnit(UUID id) {
-    return sampleUnitRepository.findById(id);
+    SampleUnit su = sampleUnitRepository.findById(id);
+    su.setSampleAttributes(sampleAttributesRepository.findOne(id));
+    return su;
+  }
+
+  @Override
+  public SampleAttributes findSampleAttributes(UUID id) {
+    return sampleAttributesRepository.findOne(id);
+  }
+
+  @Override
+  public SampleUnit findSampleUnitBySampleUnitRef(String sampleUnitRef) {
+    return sampleUnitRepository.findBySampleUnitRef(sampleUnitRef);
+  }
+
+  @Override
+  public SampleUnit findSampleUnitBySampleUnitId(UUID sampleUnitId) {
+    return sampleUnitRepository.findById(sampleUnitId);
+  }
+
+  @Override
+  public List<SampleUnit> findSampleUnitsBySampleSummary(UUID sampleSummaryId) {
+    SampleSummary ss = sampleSummaryRepository.findById(sampleSummaryId);
+    return sampleUnitRepository.findBySampleSummaryFK(ss.getSampleSummaryPK());
   }
 
 }
