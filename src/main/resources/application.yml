@@ -65,8 +65,8 @@ spring:
       min-idle: 3
   http:
     multipart:
-      max-file-size: 5MB
-      max-request-size: 10MB
+      max-file-size: 10MB
+      max-request-size: 12MB
       file-size-threshold: 0
 
   jpa:
