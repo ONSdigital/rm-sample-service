@@ -16,9 +16,9 @@ public class PartyPublisherImpl implements PartyPublisher {
   @Autowired
   private RabbitTemplate rabbitTemplate;
 
-    @Override
-    public void publish(PartyCreationRequestDTO party) {
-        log.debug("send to queue to be sent to partySvc {}", party);
-        rabbitTemplate.convertAndSend(party);
-    }
+  @Override
+  public void publish(PartyCreationRequestDTO party) {
+    log.debug("send to queue to be sent to partySvc {}", party);
+    rabbitTemplate.convertAndSend(party);
+  }
 }

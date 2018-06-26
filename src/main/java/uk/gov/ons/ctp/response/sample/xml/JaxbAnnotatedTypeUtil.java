@@ -1,24 +1,20 @@
 package uk.gov.ons.ctp.response.sample.xml;
 
-import net.sourceforge.cobertura.CoverageIgnore;
-
-import javax.xml.bind.annotation.XmlType;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import javax.xml.bind.annotation.XmlType;
+import net.sourceforge.cobertura.CoverageIgnore;
 
-/**
- * Util class to manipulate or inspect Jaxb type annotated objects
- *
- */
+/** Util class to manipulate or inspect Jaxb type annotated objects */
 public final class JaxbAnnotatedTypeUtil {
 
   @CoverageIgnore
-  private JaxbAnnotatedTypeUtil(){}
+  private JaxbAnnotatedTypeUtil() {}
+
   /**
-   * Takes the given object and extracts using reflection the @XmlType annotated
-   * properties, returning a map where the keys are the property names and the
-   * values are the property values.
+   * Takes the given object and extracts using reflection the @XmlType annotated properties,
+   * returning a map where the keys are the property names and the values are the property values.
    *
    * @param xmlObject the object to extract properties from
    * @return the map of property names and their values
@@ -29,17 +25,16 @@ public final class JaxbAnnotatedTypeUtil {
   }
 
   /**
-   * Navigates up the inheritance chain of an object recursively, harvesting the
-   * fields from each class level that have been annotated with @XmlType
+   * Navigates up the inheritance chain of an object recursively, harvesting the fields from each
+   * class level that have been annotated with @XmlType
    *
    * @param xmlObject the object to extract properties from
-   * @param xmlClass the class from which the Xml declared fields should be
-   *          harvested
+   * @param xmlClass the class from which the Xml declared fields should be harvested
    * @return the map of property names and their values
    * @throws Exception Should not happen. Something went really wrong.
    */
-  private static Map<String, String> extractXmlProperties(Object xmlObject, Class<? extends Object> xmlClass)
-      throws Exception {
+  private static Map<String, String> extractXmlProperties(
+      Object xmlObject, Class<? extends Object> xmlClass) throws Exception {
     Map<String, String> attribBucket = new HashMap<>();
     if (xmlClass != null) {
       XmlType xmlAnnotation = xmlClass.getAnnotation(XmlType.class);

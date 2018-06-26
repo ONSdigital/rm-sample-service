@@ -1,24 +1,20 @@
 package uk.gov.ons.ctp.response.sample.party;
 
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestAttributesDTO;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import validation.BusinessSampleUnit;
 import validation.SampleUnitBase;
 
-import org.apache.commons.lang3.StringUtils;
-
-/**
- * Util for the Party Service
- */
+/** Util for the Party Service */
 public class PartyUtil {
 
   /**
-   * Util method to convert from any of the SampleUnitBase subtypes to the
-   * Generic PartyService Party type. All fields other than identity fields will
-   * be collected into a key:value map in Party.attributes.
+   * Util method to convert from any of the SampleUnitBase subtypes to the Generic PartyService
+   * Party type. All fields other than identity fields will be collected into a key:value map in
+   * Party.attributes.
    *
-   * @param unit the SampleUnitBase subtype for a Census, Business or Social
-   *          SampleUnit
+   * @param unit the SampleUnitBase subtype for a Census, Business or Social SampleUnit
    * @return the created Party object
    */
   public static PartyCreationRequestDTO convertToParty(SampleUnitBase unit) {
@@ -26,7 +22,8 @@ public class PartyUtil {
     party.setSampleUnitType(unit.getSampleUnitType());
     party.setSampleUnitRef(unit.getSampleUnitRef());
     if (unit instanceof BusinessSampleUnit) {
-      PartyCreationRequestAttributesDTO businessSampleUnit = new PartyCreationRequestAttributesDTO();
+      PartyCreationRequestAttributesDTO businessSampleUnit =
+          new PartyCreationRequestAttributesDTO();
       BusinessSampleUnit bsu = (BusinessSampleUnit) unit;
       businessSampleUnit.setCheckletter(bsu.getCheckletter());
       businessSampleUnit.setFrosic92(bsu.getFrosic92());
@@ -64,5 +61,4 @@ public class PartyUtil {
     }
     return party;
   }
-
 }

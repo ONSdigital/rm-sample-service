@@ -1,5 +1,16 @@
 package uk.gov.ons.ctp.response.sample.domain.model;
 
+import java.io.Serializable;
+import java.util.UUID;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,21 +21,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import java.io.Serializable;
-import java.util.UUID;
-
-/**
- * Domain model object.
- */
+/** Domain model object. */
 @CoverageIgnore
 @Entity
 @Data
@@ -38,14 +35,16 @@ public class SampleUnit implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "sampleunitseq_gen")
-  @GenericGenerator(name = "sampleunitseq_gen", strategy =
-  "org.hibernate.id.enhanced.SequenceStyleGenerator", parameters = {
-      @Parameter(name = "sequence_name", value = "sample.sampleunitseq"),
-      @Parameter(name = "increment_size", value = "1")
-  })
+  @GenericGenerator(
+      name = "sampleunitseq_gen",
+      strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+      parameters = {
+        @Parameter(name = "sequence_name", value = "sample.sampleunitseq"),
+        @Parameter(name = "increment_size", value = "1")
+      })
   @Column(name = "sampleunitpk")
   private Integer sampleUnitPK;
-  
+
   @Column(name = "id")
   private UUID id;
 
@@ -65,6 +64,5 @@ public class SampleUnit implements Serializable {
   @Column(name = "statefk")
   private SampleUnitDTO.SampleUnitState state;
 
-  @Transient
-  private SampleAttributes sampleAttributes;
+  @Transient private SampleAttributes sampleAttributes;
 }

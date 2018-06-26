@@ -1,5 +1,16 @@
 package uk.gov.ons.ctp.response.sample.ingest;
 
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import liquibase.util.csv.opencsv.CSVReader;
 import liquibase.util.csv.opencsv.bean.ColumnPositionMappingStrategy;
 import liquibase.util.csv.opencsv.bean.CsvToBean;
@@ -13,18 +24,6 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.CensusSampleUnit;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -57,14 +56,45 @@ public class CsvIngesterCensus extends CsvToBean<CensusSampleUnit> {
   private static final String LSOA = "lsoa";
   private static final String CENSUSREGION = "censusRegion";
 
-  private static final String[] COLUMNS = new String[] {SAMPLEUNITREF, FORMTYPE, LINE1, LINE2, LINE3, LINE4, LINE5,
-      POSTCODE, TITLE, FORENAME, SURNAME, PHONENUMBER, EMAILADDRESS, ADDRESSTYPE, ESTABTYPE, ORGANISATIONNAME, CATEGORY,
-      LADCODE, LATITUDE, LONGITUDE, HTC, LOCALITY, OA, MSOA, LSOA, CENSUSREGION};
+  private static final String[] COLUMNS =
+      new String[] {
+        SAMPLEUNITREF,
+        FORMTYPE,
+        LINE1,
+        LINE2,
+        LINE3,
+        LINE4,
+        LINE5,
+        POSTCODE,
+        TITLE,
+        FORENAME,
+        SURNAME,
+        PHONENUMBER,
+        EMAILADDRESS,
+        ADDRESSTYPE,
+        ESTABTYPE,
+        ORGANISATIONNAME,
+        CATEGORY,
+        LADCODE,
+        LATITUDE,
+        LONGITUDE,
+        HTC,
+        LOCALITY,
+        OA,
+        MSOA,
+        LSOA,
+        CENSUSREGION
+      };
 
-  @Autowired
-  private SampleService sampleService;
+  @Autowired private SampleService sampleService;
 
   private ColumnPositionMappingStrategy<CensusSampleUnit> columnPositionMappingStrategy;
+
+  public CsvIngesterCensus() {
+    columnPositionMappingStrategy = new ColumnPositionMappingStrategy<>();
+    columnPositionMappingStrategy.setType(CensusSampleUnit.class);
+    columnPositionMappingStrategy.setColumnMapping(COLUMNS);
+  }
 
   /**
    * Lazy create a reusable validator
@@ -77,52 +107,53 @@ public class CsvIngesterCensus extends CsvToBean<CensusSampleUnit> {
     return factory.getValidator();
   }
 
-  public CsvIngesterCensus() {
-    columnPositionMappingStrategy = new ColumnPositionMappingStrategy<>();
-    columnPositionMappingStrategy.setType(CensusSampleUnit.class);
-    columnPositionMappingStrategy.setColumnMapping(COLUMNS);
-  }
-
   public SampleSummary ingest(final SampleSummary sampleSummary, final MultipartFile file)
       throws Exception {
 
     CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()), ':');
     String[] nextLine;
     List<CensusSampleUnit> samplingUnitList = new ArrayList<>();
-    Integer expectedCI = 1; //TODO: Census should only have one collection instrument if this is not the case when census is onboarded expectedCI should be calculated
+    Integer expectedCI =
+        1; // TODO: Census should only have one collection instrument if this is not the case when
+    // census is onboarded expectedCI should be calculated
 
-      while((nextLine = csvReader.readNext()) != null) {
+    while ((nextLine = csvReader.readNext()) != null) {
 
-          CensusSampleUnit censusSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
-          Optional<String> namesOfInvalidColumns = validateLine(censusSampleUnit);
-          if (namesOfInvalidColumns.isPresent()) {
-            log.error("Problem parsing line {} due to {} - entire ingest aborted", Arrays.toString(nextLine),
-                namesOfInvalidColumns.get());
-            throw new CTPException(CTPException.Fault.VALIDATION_FAILED, String.format("Problem parsing line %s due to %s", Arrays.toString(nextLine),
-                namesOfInvalidColumns.get()));
-          }
-
-          censusSampleUnit.setSampleUnitType("H");
-          
-          samplingUnitList.add(censusSampleUnit);
-
+      CensusSampleUnit censusSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
+      Optional<String> namesOfInvalidColumns = validateLine(censusSampleUnit);
+      if (namesOfInvalidColumns.isPresent()) {
+        log.error(
+            "Problem parsing line {} due to {} - entire ingest aborted",
+            Arrays.toString(nextLine),
+            namesOfInvalidColumns.get());
+        throw new CTPException(
+            CTPException.Fault.VALIDATION_FAILED,
+            String.format(
+                "Problem parsing line %s due to %s",
+                Arrays.toString(nextLine), namesOfInvalidColumns.get()));
       }
 
-      return sampleService.saveSample(sampleSummary, samplingUnitList, SampleUnitState.INIT);
+      censusSampleUnit.setSampleUnitType("H");
+
+      samplingUnitList.add(censusSampleUnit);
+    }
+
+    return sampleService.saveSample(sampleSummary, samplingUnitList, SampleUnitState.INIT);
   }
 
   /**
-   * validate the csv line and return the optional concatenated list of fields
-   * failing validation
+   * validate the csv line and return the optional concatenated list of fields failing validation
    *
    * @param csvLine the line
    * @return the errored column names separated by '_'
    */
   private Optional<String> validateLine(CensusSampleUnit csvLine) {
     Set<ConstraintViolation<CensusSampleUnit>> violations = getValidator().validate(csvLine);
-    String invalidColumns = violations.stream().map(v -> v.getPropertyPath().toString())
-        .collect(Collectors.joining("_"));
+    String invalidColumns =
+        violations
+            .stream()
+            .map(v -> v.getPropertyPath().toString())
+            .collect(Collectors.joining("_"));
     return (invalidColumns.length() == 0) ? Optional.empty() : Optional.ofNullable(invalidColumns);
   }
-
 }
