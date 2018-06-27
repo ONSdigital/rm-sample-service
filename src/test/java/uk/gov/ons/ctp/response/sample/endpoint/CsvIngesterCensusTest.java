@@ -1,5 +1,13 @@
 package uk.gov.ons.ctp.response.sample.endpoint;
 
+import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -17,48 +25,33 @@ import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitSta
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.CensusSampleUnit;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
-/**
- * Test the CsvIngester distributor
- */
+/** Test the CsvIngester distributor */
 @RunWith(MockitoJUnitRunner.class)
 public class CsvIngesterCensusTest {
 
-  @Spy
-  private AppConfig appConfig = new AppConfig();
+  @Spy private AppConfig appConfig = new AppConfig();
 
-  @InjectMocks
-  private CsvIngesterCensus csvIngester;
+  @InjectMocks private CsvIngesterCensus csvIngester;
 
-  @InjectMocks
-  private SampleEndpoint sampleEndpoint;
+  @InjectMocks private SampleEndpoint sampleEndpoint;
 
-  @Mock
-  private SampleService sampleService;
+  @Mock private SampleService sampleService;
 
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
+  @Rule public ExpectedException thrown = ExpectedException.none();
 
   /**
-   * take a named test file and create a copy of it - is because the ingester
-   * will delete the source csv file after ingest
+   * take a named test file and create a copy of it - is because the ingester will delete the source
+   * csv file after ingest
    *
    * @param fileName source file name
    * @return the newly created file
    * @throws Exception oops
    */
   private MockMultipartFile getTestFile(String fileName) throws Exception {
-    Path csvFileLocation = Paths.get(getClass().getClassLoader().getResource("csv/" + fileName).toURI());
-    MockMultipartFile multipartFile = new MockMultipartFile("file", fileName, "csv",
-        Files.readAllBytes(csvFileLocation));
+    Path csvFileLocation =
+        Paths.get(getClass().getClassLoader().getResource("csv/" + fileName).toURI());
+    MockMultipartFile multipartFile =
+        new MockMultipartFile("file", fileName, "csv", Files.readAllBytes(csvFileLocation));
     return multipartFile;
   }
 
@@ -66,16 +59,16 @@ public class CsvIngesterCensusTest {
   public void testBlueSky() throws Exception {
     SampleSummary newSummary = new SampleSummary();
     csvIngester.ingest(newSummary, getTestFile("census-survey-sample.csv"));
-    verify(sampleService, times(1)).saveSample(eq(newSummary),
-            anyListOf(CensusSampleUnit.class), eq(SampleUnitState.INIT));
+    verify(sampleService, times(1))
+        .saveSample(eq(newSummary), anyListOf(CensusSampleUnit.class), eq(SampleUnitState.INIT));
   }
 
   @Test(expected = Exception.class)
   public void missingColumns() throws Exception {
     SampleSummary newSummary = new SampleSummary();
     csvIngester.ingest(newSummary, getTestFile("census-survey-sample-missing-columns.csv"));
-    verify(sampleService, times(0)).saveSample(eq(newSummary),
-        anyListOf(CensusSampleUnit.class), eq(SampleUnitState.INIT));
+    verify(sampleService, times(0))
+        .saveSample(eq(newSummary), anyListOf(CensusSampleUnit.class), eq(SampleUnitState.INIT));
     thrown.expect(CTPException.class);
   }
 
@@ -83,9 +76,8 @@ public class CsvIngesterCensusTest {
   public void incorrectData() throws Exception {
     SampleSummary newSummary = new SampleSummary();
     csvIngester.ingest(newSummary, getTestFile("census-survey-sample-incorrect-data.csv"));
-    verify(sampleService, times(0)).saveSample(eq(newSummary),
-        anyListOf(CensusSampleUnit.class), eq(SampleUnitState.INIT));
+    verify(sampleService, times(0))
+        .saveSample(eq(newSummary), anyListOf(CensusSampleUnit.class), eq(SampleUnitState.INIT));
     thrown.expect(CTPException.class);
   }
-
 }

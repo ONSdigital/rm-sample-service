@@ -14,23 +14,18 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import uk.gov.ons.ctp.response.sample.endpoint.SampleEndpoint;
 
-
-/**
- * Application config bean for Swagger UI.
- */
+/** Application config bean for Swagger UI. */
 @CoverageIgnore
 @Configuration
 @EnableSwagger2
-@ComponentScan(basePackageClasses = {
-        SampleEndpoint.class
-})
+@ComponentScan(basePackageClasses = {SampleEndpoint.class})
 public class SwaggerConfig {
 
-  @Autowired
-  private AppConfig appConfig;
+  @Autowired private AppConfig appConfig;
 
   /**
    * Creates Docket for swagger ui configuration
+   *
    * @return Docket springfox api configuration object
    */
   @Bean
@@ -38,7 +33,8 @@ public class SwaggerConfig {
 
     SwaggerSettings swaggerSettings = appConfig.getSwaggerSettings();
 
-    ApiInfo apiInfo = new ApiInfoBuilder()
+    ApiInfo apiInfo =
+        new ApiInfoBuilder()
             .title(swaggerSettings.getTitle())
             .description(swaggerSettings.getDescription())
             .version(swaggerSettings.getVersion())
@@ -53,12 +49,11 @@ public class SwaggerConfig {
     }
 
     return new Docket(DocumentationType.SWAGGER_2)
-            .groupName(swaggerSettings.getGroupName())
-            .apiInfo(apiInfo)
-            .select()
-            .apis(RequestHandlerSelectors.basePackage("uk.gov.ons.ctp.response.sample.endpoint"))
-            .paths(pathSelector::test)
-            .build();
+        .groupName(swaggerSettings.getGroupName())
+        .apiInfo(apiInfo)
+        .select()
+        .apis(RequestHandlerSelectors.basePackage("uk.gov.ons.ctp.response.sample.endpoint"))
+        .paths(pathSelector::test)
+        .build();
   }
-
 }

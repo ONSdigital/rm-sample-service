@@ -6,9 +6,7 @@ import lombok.NoArgsConstructor;
 import net.sourceforge.cobertura.CoverageIgnore;
 import uk.gov.ons.ctp.common.health.ScheduledHealthInfo;
 
-/**
- * Information object for SampleUnit Distributor
- */
+/** Information object for SampleUnit Distributor */
 @CoverageIgnore
 @Data
 @NoArgsConstructor

@@ -1,5 +1,14 @@
 package uk.gov.ons.ctp.response.sample.domain.model;
 
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.UUID;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,19 +18,7 @@ import net.sourceforge.cobertura.CoverageIgnore;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.UUID;
-
-/**
- * Domain model object.
- */
+/** Domain model object. */
 @CoverageIgnore
 @Entity
 @Data
@@ -35,12 +32,13 @@ public class CollectionExerciseJob implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "collectionexercisejobseq_gen")
-  @GenericGenerator(name = "collectionexercisejobseq_gen",
-          strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
-          parameters = {
-                  @Parameter(name = "sequence_name", value = "sample.collectionexercisejobseq"),
-                  @Parameter(name = "increment_size", value = "1")
-          })
+  @GenericGenerator(
+      name = "collectionexercisejobseq_gen",
+      strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+      parameters = {
+        @Parameter(name = "sequence_name", value = "sample.collectionexercisejobseq"),
+        @Parameter(name = "increment_size", value = "1")
+      })
   @Column(name = "collectionexercisejobpk")
   private Integer collectionExerciseJobPK;
 
@@ -58,5 +56,4 @@ public class CollectionExerciseJob implements Serializable {
 
   @Column(name = "samplesummaryid")
   private UUID sampleSummaryId;
-
 }
