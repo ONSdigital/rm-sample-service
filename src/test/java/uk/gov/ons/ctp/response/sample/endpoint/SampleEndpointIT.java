@@ -195,6 +195,7 @@ public class SampleEndpointIT {
             .asObject(SampleUnitDTO.class);
 
     assertThat(sampleUnitResponse.getBody().getId()).isEqualTo(id);
+    assertThat(sampleAttribResponse.getBody().getId().toString()).isEqualTo(id);
 
     assertThat(sampleUnitResponse.getBody().getSampleAttributes().getAttributes().entrySet()).contains(
             entry("Prem1", sampleAttribResponse.getBody().getAttributes().get("Prem1")),
