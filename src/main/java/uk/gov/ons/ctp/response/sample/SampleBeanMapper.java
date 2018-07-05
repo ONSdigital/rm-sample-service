@@ -8,9 +8,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import uk.gov.ons.ctp.response.sample.mapper.SampleUnitMapper;
 
-/**
- * The bean mapper to go from Entity objects to Presentation objects.
- */
+/** The bean mapper to go from Entity objects to Presentation objects. */
 @Primary
 @Component
 public class SampleBeanMapper extends ConfigurableMapper {

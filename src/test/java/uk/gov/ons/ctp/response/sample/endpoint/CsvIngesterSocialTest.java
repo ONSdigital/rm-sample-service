@@ -1,6 +1,16 @@
 package uk.gov.ons.ctp.response.sample.endpoint;
 
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import com.google.common.collect.ImmutableMap;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -22,73 +32,56 @@ import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitSta
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.SocialSampleUnit;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
-/**
- * Test the CsvIngester distributor
- */
+/** Test the CsvIngester distributor */
 @RunWith(MockitoJUnitRunner.class)
 public class CsvIngesterSocialTest {
 
-  @Spy
-  private AppConfig appConfig = new AppConfig();
+  @Spy private AppConfig appConfig = new AppConfig();
 
-  @InjectMocks
-  private CsvIngesterSocial csvIngester;
+  @InjectMocks private CsvIngesterSocial csvIngester;
 
-  @InjectMocks
-  private SampleEndpoint sampleEndpoint;
+  @InjectMocks private SampleEndpoint sampleEndpoint;
 
-  @Mock
-  private SampleService sampleService;
+  @Mock private SampleService sampleService;
 
-  @Mock
-  private SampleAttributesRepository sampleAttributesRepository;
+  @Mock private SampleAttributesRepository sampleAttributesRepository;
 
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
+  @Rule public ExpectedException thrown = ExpectedException.none();
 
-  @Captor
-  public ArgumentCaptor<List<SocialSampleUnit>> argumentCaptor;
-
+  @Captor public ArgumentCaptor<List<SocialSampleUnit>> argumentCaptor;
 
   @Test
   public void testIngestSocialSampleFile() throws Exception {
     // Given
     SampleSummary newSummary = new SampleSummary();
-    String csv = "Prem1,Prem2,Prem3,Prem4,District,PostTown,Postcode,CountryCode,Reference\n" +
-            "14 ASHMEAD VIEW,,,,,STOCKTON-ON-TEES,TS184QG,E,LMS00001";
+    String csv =
+        "Prem1,Prem2,Prem3,Prem4,District,PostTown,Postcode,CountryCode,Reference\n"
+            + "14 ASHMEAD VIEW,,,,,STOCKTON-ON-TEES,TS184QG,E,LMS00001";
 
     // When
     csvIngester.ingest(newSummary, TestFiles.getTestFileFromString(csv));
 
     // Then
-    verify(sampleService).saveSample(eq(newSummary),
-        anyListOf(SocialSampleUnit.class), eq(SampleUnitState.PERSISTED));
+    verify(sampleService)
+        .saveSample(
+            eq(newSummary), anyListOf(SocialSampleUnit.class), eq(SampleUnitState.PERSISTED));
   }
 
   @Test(expected = CTPException.class)
   public void testMissingMandatoryColumns() throws Exception {
     // Given
     SampleSummary newSummary = new SampleSummary();
-    String csv = "Prem1,Prem2,Prem3,Prem4,District,PostTown,Postcode,CountryCode\n" +
-            "14 ASHMEAD VIEW,,,,,STOCKTON-ON-TEES,TS184QG,E";
+    String csv =
+        "Prem1,Prem2,Prem3,Prem4,District,PostTown,Postcode,CountryCode\n"
+            + "14 ASHMEAD VIEW,,,,,STOCKTON-ON-TEES,TS184QG,E";
 
     // When
     csvIngester.ingest(newSummary, TestFiles.getTestFileFromString(csv));
 
     // Then
-    verify(sampleService, times(0)).saveSample(eq(newSummary),
-        anyListOf(SocialSampleUnit.class), eq(SampleUnitState.PERSISTED));
+    verify(sampleService, times(0))
+        .saveSample(
+            eq(newSummary), anyListOf(SocialSampleUnit.class), eq(SampleUnitState.PERSISTED));
     thrown.expect(CTPException.class);
   }
 
@@ -96,15 +89,17 @@ public class CsvIngesterSocialTest {
   public void testMissingMandatoryHeaders() throws Exception {
     // Given
     SampleSummary newSummary = new SampleSummary();
-    String csv = "Prem2,Prem3,Prem4,District,PostTown,Postcode,CountryCode,Reference\n" +
-            ",,,,STOCKTON-ON-TEES,TS184QG,E,LMS00001";
+    String csv =
+        "Prem2,Prem3,Prem4,District,PostTown,Postcode,CountryCode,Reference\n"
+            + ",,,,STOCKTON-ON-TEES,TS184QG,E,LMS00001";
 
     // When
     csvIngester.ingest(newSummary, TestFiles.getTestFileFromString(csv));
 
     // Then
-    verify(sampleService, times(0)).saveSample(eq(newSummary),
-            anyListOf(SocialSampleUnit.class), eq(SampleUnitState.PERSISTED));
+    verify(sampleService, times(0))
+        .saveSample(
+            eq(newSummary), anyListOf(SocialSampleUnit.class), eq(SampleUnitState.PERSISTED));
     thrown.expect(CTPException.class);
     thrown.expectMessage("Error in header row, missing required headers Prem1");
   }
@@ -113,16 +108,19 @@ public class CsvIngesterSocialTest {
   public void testIngestSocialSampleSavesAttributes() throws Exception {
     // Given
     SampleSummary newSummary = new SampleSummary();
-    given(sampleService.saveSample(any(), argumentCaptor.capture(), eq(SampleUnitState.PERSISTED))).willReturn(newSummary);
-    String csv = "Prem1,Prem2,Prem3,Prem4,District,PostTown,Postcode,CountryCode,Reference\n" +
-            "14 ASHMEAD VIEW,,,,,STOCKTON-ON-TEES,TS184QG,E,LMS00001";
+    given(sampleService.saveSample(any(), argumentCaptor.capture(), eq(SampleUnitState.PERSISTED)))
+        .willReturn(newSummary);
+    String csv =
+        "Prem1,Prem2,Prem3,Prem4,District,PostTown,Postcode,CountryCode,Reference\n"
+            + "14 ASHMEAD VIEW,,,,,STOCKTON-ON-TEES,TS184QG,E,LMS00001";
 
     // When
     csvIngester.ingest(newSummary, TestFiles.getTestFileFromString(csv));
 
     // Then
     SocialSampleUnit socialSampleUnit = argumentCaptor.getValue().get(0);
-    Map<String, String> attributes = ImmutableMap.<String, String>builder()
+    Map<String, String> attributes =
+        ImmutableMap.<String, String>builder()
             .put("Prem1", "14 ASHMEAD VIEW")
             .put("Prem2", "")
             .put("Prem3", "")
@@ -133,9 +131,9 @@ public class CsvIngesterSocialTest {
             .put("CountryCode", "E")
             .put("Reference", "LMS00001")
             .build();
-    SampleAttributes sampleAttriubutes = new SampleAttributes(socialSampleUnit.getSampleUnitId(), attributes);
+    SampleAttributes sampleAttriubutes =
+        new SampleAttributes(socialSampleUnit.getSampleUnitId(), attributes);
     List<SampleAttributes> sampleAttributesList = Collections.singletonList(sampleAttriubutes);
     verify(sampleAttributesRepository).save(sampleAttributesList);
   }
-
 }

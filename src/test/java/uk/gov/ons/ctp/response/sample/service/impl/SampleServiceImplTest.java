@@ -1,5 +1,16 @@
 package uk.gov.ons.ctp.response.sample.service.impl;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.*;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,21 +42,7 @@ import uk.gov.ons.ctp.response.sample.service.CollectionExerciseJobService;
 import uk.gov.ons.ctp.response.sample.service.PartySvcClientService;
 import validation.BusinessSurveySample;
 
-import java.util.List;
-import java.util.UUID;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.*;
-import static org.mockito.AdditionalAnswers.returnsFirstArg;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-/**
- *tests
- */
+/** tests */
 @RunWith(MockitoJUnitRunner.class)
 public class SampleServiceImplTest {
 
@@ -53,38 +50,31 @@ public class SampleServiceImplTest {
 
   private static final String SAMPLEUNIT_ID = "4ef7326b-4143-43f7-ba67-65056d4e20b8";
 
-  @Mock
-  private SampleSummaryRepository sampleSummaryRepository;
+  @Mock private SampleSummaryRepository sampleSummaryRepository;
+
+  @Mock private SampleUnitRepository sampleUnitRepository;
 
   @Mock
-  private SampleUnitRepository sampleUnitRepository;
-  
-  @Mock
-  private StateTransitionManager<SampleSummaryDTO.SampleState, SampleSummaryDTO.SampleEvent> sampleSvcStateTransitionManager;
+  private StateTransitionManager<SampleSummaryDTO.SampleState, SampleSummaryDTO.SampleEvent>
+      sampleSvcStateTransitionManager;
 
   @Mock
-  private StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent> sampleSvcUnitStateTransitionManager;
+  private StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent>
+      sampleSvcUnitStateTransitionManager;
 
-  @Mock
-  private PartySvcClientService partySvcClient;
+  @Mock private PartySvcClientService partySvcClient;
 
-  @Mock
-  private PartyPublisher partyPublisher;
+  @Mock private PartyPublisher partyPublisher;
 
-  @Mock
-  private SampleOutboundPublisher sampleOutboundPublisher;
+  @Mock private SampleOutboundPublisher sampleOutboundPublisher;
 
-  @Mock
-  private CollectionExerciseJobService collectionExerciseJobService;
+  @Mock private CollectionExerciseJobService collectionExerciseJobService;
 
-  @Mock
-  private EventPublisher eventPublisher;
+  @Mock private EventPublisher eventPublisher;
 
-  @Mock
-  private CsvIngesterBusiness csvIngesterBusiness;
+  @Mock private CsvIngesterBusiness csvIngesterBusiness;
 
-  @InjectMocks
-  private SampleServiceImpl sampleServiceImpl;
+  @InjectMocks private SampleServiceImpl sampleServiceImpl;
 
   private List<BusinessSurveySample> surveySample;
   private List<PartyCreationRequestDTO> party;
@@ -112,8 +102,7 @@ public class SampleServiceImplTest {
   }
 
   /**
-   * Verify that a SampleSummary is correctly created when a SurveySample is
-   * passed into the method.
+   * Verify that a SampleSummary is correctly created when a SurveySample is passed into the method.
    */
   @Test
   public void verifySampleSummaryCreatedCorrectly() {
@@ -126,8 +115,8 @@ public class SampleServiceImplTest {
   }
 
   /**
-   * Verify that a SampleSummary containing two SampleUnits is created and then saved to the database. Also
-   * verifies that both SampleUnits are saved to the database and then published to
+   * Verify that a SampleSummary containing two SampleUnits is created and then saved to the
+   * database. Also verifies that both SampleUnits are saved to the database and then published to
    * the internal queue.
    *
    * @throws Exception oops
@@ -144,16 +133,17 @@ public class SampleServiceImplTest {
   }
 
   /**
-   * Test that when a Party is posted to Party Service the appropriate states
-   * are changed
+   * Test that when a Party is posted to Party Service the appropriate states are changed
    *
    * @throws Exception oops
    */
   @Test
   public void postPartyDTOToPartyServiceAndUpdateStatesTest() throws Exception {
     when(partySvcClient.postParty(any())).thenReturn(partyDTO.get(0));
-    when(sampleUnitRepository.findById(UUID.fromString(SAMPLEUNIT_ID))).thenReturn(sampleUnit.get(0));
-    when(sampleSvcUnitStateTransitionManager.transition(SampleUnitState.INIT, SampleUnitEvent.PERSISTING))
+    when(sampleUnitRepository.findById(UUID.fromString(SAMPLEUNIT_ID)))
+        .thenReturn(sampleUnit.get(0));
+    when(sampleSvcUnitStateTransitionManager.transition(
+            SampleUnitState.INIT, SampleUnitEvent.PERSISTING))
         .thenReturn(SampleUnitState.PERSISTED);
     when(sampleSummaryRepository.findOne(1)).thenReturn(sampleSummaryList.get(0));
     when(sampleSvcStateTransitionManager.transition(SampleState.INIT, SampleEvent.ACTIVATED))
@@ -167,16 +157,18 @@ public class SampleServiceImplTest {
   }
 
   /**
-   * Test that SampleSummary state is not changed to active unless all Party
-   * objects have been sent to the Party Service
+   * Test that SampleSummary state is not changed to active unless all Party objects have been sent
+   * to the Party Service
    *
    * @throws Exception oops
    */
   @Test
   public void sendToPartyServiceTestNotAllSampleUnitsPosted() throws Exception {
     when(partySvcClient.postParty(any())).thenReturn(partyDTO.get(0));
-    when(sampleUnitRepository.findById(UUID.fromString(SAMPLEUNIT_ID))).thenReturn(sampleUnit.get(0));
-    when(sampleSvcUnitStateTransitionManager.transition(SampleUnitState.INIT, SampleUnitEvent.PERSISTING))
+    when(sampleUnitRepository.findById(UUID.fromString(SAMPLEUNIT_ID)))
+        .thenReturn(sampleUnit.get(0));
+    when(sampleSvcUnitStateTransitionManager.transition(
+            SampleUnitState.INIT, SampleUnitEvent.PERSISTING))
         .thenReturn(SampleUnitState.PERSISTED);
     when(sampleSummaryRepository.findOne(1)).thenReturn(sampleSummaryList.get(0));
     when(sampleSvcStateTransitionManager.transition(SampleState.INIT, SampleEvent.ACTIVATED))
@@ -191,21 +183,22 @@ public class SampleServiceImplTest {
   }
 
   /**
-   * Test that a CollectionExerciseJob is only stored if there are SampleUnits
-   * found for the surveyRef and have not been previously sent
+   * Test that a CollectionExerciseJob is only stored if there are SampleUnits found for the
+   * surveyRef and have not been previously sent
    *
    * @throws Exception oops
    */
   @Test
   public void testNoCollectionExerciseStoredWhenNoSampleUnits() throws Exception {
-    Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
+    Integer sampleUnitsTotal =
+        sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(0)).storeCollectionExerciseJob(any());
     assertThat(sampleUnitsTotal, is(0));
   }
 
   /**
-   * Test that a CollectionExerciseJob is stored if there are SampleUnits
-   * found for the surveyRef that have not been previously sent to CollectionExercise
+   * Test that a CollectionExerciseJob is stored if there are SampleUnits found for the surveyRef
+   * that have not been previously sent to CollectionExercise
    *
    * @throws Exception oops
    */
@@ -213,12 +206,13 @@ public class SampleServiceImplTest {
   public void testOneCollectionExerciseJobIsStoredWhenSampleUnitsAreFound() throws Exception {
     SampleSummary newSummary = createSampleSummary(5, 2);
     when(sampleSummaryRepository.findById(any())).thenReturn(newSummary);
-    Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
+    Integer sampleUnitsTotal =
+        sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(1)).storeCollectionExerciseJob(any());
     assertThat(sampleUnitsTotal, is(5));
   }
 
-  private SampleSummary createSampleSummary(int numSamples, int expectedInstruments){
+  private SampleSummary createSampleSummary(int numSamples, int expectedInstruments) {
     SampleSummary newSummary = sampleServiceImpl.createAndSaveSampleSummary();
 
     newSummary.setTotalSampleUnits(numSamples);
@@ -228,8 +222,8 @@ public class SampleServiceImplTest {
   }
 
   /**
-   * Test that a CollectionExerciseJob is NOT stored if there are No SampleUnits
-   * found for the surveyRef that have not been previously sent to CollectionExercise
+   * Test that a CollectionExerciseJob is NOT stored if there are No SampleUnits found for the
+   * surveyRef that have not been previously sent to CollectionExercise
    *
    * @throws Exception oops
    */
@@ -237,22 +231,24 @@ public class SampleServiceImplTest {
   public void testNoCollectionExerciseJobIsStoredWhenNoSampleUnitsAreFound() throws Exception {
     SampleSummary newSummary = createSampleSummary(0, 2);
     when(sampleSummaryRepository.findById(any())).thenReturn(newSummary);
-    Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
+    Integer sampleUnitsTotal =
+        sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(0)).storeCollectionExerciseJob(any());
     assertThat(sampleUnitsTotal, is(0));
   }
-  
+
   /**
-   * Test that a CollectionExerciseJob is NOT stored if there are No SampleSummaries
-   * found for the surveyRef that have not been previously sent to CollectionExercise
+   * Test that a CollectionExerciseJob is NOT stored if there are No SampleSummaries found for the
+   * surveyRef that have not been previously sent to CollectionExercise
    *
    * @throws Exception oops
    */
   @Test
   public void testNoCollectionExerciseJobIsStoredWhenNoSampleSummaryIsFound() throws Exception {
-	SampleSummary sampleSummary = null;
+    SampleSummary sampleSummary = null;
     when(sampleSummaryRepository.findById(any())).thenReturn(sampleSummary);
-    Integer sampleUnitsTotal = sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
+    Integer sampleUnitsTotal =
+        sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(0)).storeCollectionExerciseJob(any());
     assertThat(sampleUnitsTotal, is(0));
   }
@@ -263,7 +259,8 @@ public class SampleServiceImplTest {
     MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
 
     SampleSummary summary = createSampleSummary(5, 10);
-    when(csvIngesterBusiness.ingest(any(SampleSummary.class), any(MultipartFile.class))).thenReturn(summary);
+    when(csvIngesterBusiness.ingest(any(SampleSummary.class), any(MultipartFile.class)))
+        .thenReturn(summary);
 
     // When
     SampleSummary result = sampleServiceImpl.ingest(summary, file, "B");
@@ -278,7 +275,8 @@ public class SampleServiceImplTest {
     MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
 
     SampleSummary summary = createSampleSummary(5, 10);
-    when(csvIngesterBusiness.ingest(any(SampleSummary.class), any(MultipartFile.class))).thenReturn(summary);
+    when(csvIngesterBusiness.ingest(any(SampleSummary.class), any(MultipartFile.class)))
+        .thenReturn(summary);
 
     // When
     SampleSummary result = sampleServiceImpl.ingest(summary, file, "b");
@@ -289,15 +287,17 @@ public class SampleServiceImplTest {
 
   @Test(expected = UnsupportedOperationException.class)
   public void testUploadInvalidTypeSample() throws Exception {
-    when(this.sampleSvcStateTransitionManager.transition(SampleState.INIT, SampleEvent.FAIL_VALIDATION))
-            .thenReturn(SampleState.FAILED);
+    when(this.sampleSvcStateTransitionManager.transition(
+            SampleState.INIT, SampleEvent.FAIL_VALIDATION))
+        .thenReturn(SampleState.FAILED);
     // Given
     MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
 
     final String invalidType = "invalid-type";
 
     SampleSummary summary = createSampleSummary(5, 10);
-    when(csvIngesterBusiness.ingest(any(SampleSummary.class), any(MultipartFile.class))).thenReturn(summary);
+    when(csvIngesterBusiness.ingest(any(SampleSummary.class), any(MultipartFile.class)))
+        .thenReturn(summary);
 
     // When
     SampleSummary finalSummary = sampleServiceImpl.ingest(summary, file, invalidType);
@@ -309,7 +309,8 @@ public class SampleServiceImplTest {
     MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
 
     SampleSummary summary = createSampleSummary(5, 10);
-    when(csvIngesterBusiness.ingest(any(SampleSummary.class), any(MultipartFile.class))).thenReturn(summary);
+    when(csvIngesterBusiness.ingest(any(SampleSummary.class), any(MultipartFile.class)))
+        .thenReturn(summary);
 
     // When
     sampleServiceImpl.ingest(summary, file, "B");
@@ -317,5 +318,4 @@ public class SampleServiceImplTest {
     // Then
     verify(sampleOutboundPublisher, times(1)).sampleUploadStarted(any());
   }
-
 }

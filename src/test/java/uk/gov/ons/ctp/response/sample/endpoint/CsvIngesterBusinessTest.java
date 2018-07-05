@@ -1,5 +1,16 @@
 package uk.gov.ons.ctp.response.sample.endpoint;
 
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static uk.gov.ons.ctp.response.sample.TestFiles.getTestFileFromString;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -23,42 +34,21 @@ import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitSta
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.BusinessSampleUnit;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static uk.gov.ons.ctp.response.sample.TestFiles.getTestFileFromString;
-
-/**
- * Test the CsvIngester distributor
- */
+/** Test the CsvIngester distributor */
 @RunWith(MockitoJUnitRunner.class)
 public class CsvIngesterBusinessTest {
 
-  @Spy
-  private AppConfig appConfig = new AppConfig();
+  @Spy private AppConfig appConfig = new AppConfig();
 
-  @InjectMocks
-  private CsvIngesterBusiness csvIngester;
+  @InjectMocks private CsvIngesterBusiness csvIngester;
 
-  @Mock
-  private SampleService sampleService;
+  @Mock private SampleService sampleService;
 
-  @Mock
-  private PartyPublisher partyPublisher;
+  @Mock private PartyPublisher partyPublisher;
 
-  @Captor
-  public ArgumentCaptor<List<BusinessSampleUnit>> argumentCaptor;
+  @Captor public ArgumentCaptor<List<BusinessSampleUnit>> argumentCaptor;
 
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
-
+  @Rule public ExpectedException thrown = ExpectedException.none();
 
   @Test
   public void testIngestBusinessSampleSuccess() throws Exception {
@@ -66,14 +56,18 @@ public class CsvIngesterBusinessTest {
     SampleSummary sampleSummary = new SampleSummary();
     sampleSummary.setId(UUID.randomUUID());
     BusinessSampleUnit businessSampleUnit = createBusinessSampleUnit();
-    given(sampleService.saveSample(sampleSummary, Collections.singletonList(businessSampleUnit), SampleUnitState.INIT)).willReturn(sampleSummary);
+    given(
+            sampleService.saveSample(
+                sampleSummary, Collections.singletonList(businessSampleUnit), SampleUnitState.INIT))
+        .willReturn(sampleSummary);
 
     // When
     csvIngester.ingest(sampleSummary, TestFiles.getTestFile("business-survey-sample.csv"));
 
     // Then
-    verify(sampleService, times(1)).saveSample(eq(sampleSummary),
-        anyListOf(BusinessSampleUnit.class), eq(SampleUnitState.INIT));
+    verify(sampleService, times(1))
+        .saveSample(
+            eq(sampleSummary), anyListOf(BusinessSampleUnit.class), eq(SampleUnitState.INIT));
   }
 
   @Test
@@ -81,14 +75,16 @@ public class CsvIngesterBusinessTest {
     // Given
     SampleSummary sampleSummary = new SampleSummary();
     sampleSummary.setId(UUID.randomUUID());
-    given(sampleService.saveSample(any(), any(), eq(SampleUnitState.INIT))).willReturn(sampleSummary);
+    given(sampleService.saveSample(any(), any(), eq(SampleUnitState.INIT)))
+        .willReturn(sampleSummary);
 
     // When
     csvIngester.ingest(sampleSummary, TestFiles.getTestFile("business-survey-sample-multiple.csv"));
 
     // Then
-    verify(sampleService, times(1)).saveSample(eq(sampleSummary),
-            anyListOf(BusinessSampleUnit.class), eq(SampleUnitState.INIT));
+    verify(sampleService, times(1))
+        .saveSample(
+            eq(sampleSummary), anyListOf(BusinessSampleUnit.class), eq(SampleUnitState.INIT));
   }
 
   @Test(expected = CTPException.class)
@@ -100,8 +96,9 @@ public class CsvIngesterBusinessTest {
     csvIngester.ingest(sampleSummary, TestFiles.getTestFile("business-survey-sample-date.csv"));
 
     // Then
-    verify(sampleService, times(0)).saveSample(eq(sampleSummary),
-        anyListOf(BusinessSampleUnit.class), eq(SampleUnitState.INIT));
+    verify(sampleService, times(0))
+        .saveSample(
+            eq(sampleSummary), anyListOf(BusinessSampleUnit.class), eq(SampleUnitState.INIT));
   }
 
   @Test(expected = CTPException.class)
@@ -110,11 +107,13 @@ public class CsvIngesterBusinessTest {
     SampleSummary sampleSummary = new SampleSummary();
 
     // When
-    csvIngester.ingest(sampleSummary, TestFiles.getTestFile("business-survey-sample-missing-columns.csv"));
+    csvIngester.ingest(
+        sampleSummary, TestFiles.getTestFile("business-survey-sample-missing-columns.csv"));
 
     // Then
-    verify(sampleService, times(0)).saveSample(eq(sampleSummary),
-            anyListOf(BusinessSampleUnit.class), eq(SampleUnitState.INIT));
+    verify(sampleService, times(0))
+        .saveSample(
+            eq(sampleSummary), anyListOf(BusinessSampleUnit.class), eq(SampleUnitState.INIT));
     thrown.expect(CTPException.class);
   }
 
@@ -122,16 +121,18 @@ public class CsvIngesterBusinessTest {
   public void testMissingFormTypeColumn() throws Exception {
     // Given
     SampleSummary sampleSummary = new SampleSummary();
-    String missingFormType = "49900000001:F:50300:50300:45320:45320:8478:801325:" +
-            "9900000576:1:E:FE:01/09/1993:ENTNAME1_COMPANY1:ENTNAME2_COMPANY1:" +
-            ":RUNAME1_COMPANY1:RUNNAME2_COMPANY1::TOTAL UK ACTIVITY:::C:D:7::S";
+    String missingFormType =
+        "49900000001:F:50300:50300:45320:45320:8478:801325:"
+            + "9900000576:1:E:FE:01/09/1993:ENTNAME1_COMPANY1:ENTNAME2_COMPANY1:"
+            + ":RUNAME1_COMPANY1:RUNNAME2_COMPANY1::TOTAL UK ACTIVITY:::C:D:7::S";
 
     // When
     csvIngester.ingest(sampleSummary, getTestFileFromString(missingFormType));
 
     // Then
-    verify(sampleService, times(0)).saveSample(eq(sampleSummary),
-            anyListOf(BusinessSampleUnit.class), eq(SampleUnitState.INIT));
+    verify(sampleService, times(0))
+        .saveSample(
+            eq(sampleSummary), anyListOf(BusinessSampleUnit.class), eq(SampleUnitState.INIT));
     thrown.expect(CTPException.class);
   }
 
@@ -139,16 +140,18 @@ public class CsvIngesterBusinessTest {
   public void testMissingSampleUnitRefColumn() throws Exception {
     // Given
     SampleSummary sampleSummary = new SampleSummary();
-    String missingSampleUnitRef = ":F:50300:50300:45320:45320:8478:801325:" +
-            "9900000576:1:E:FE:01/09/1993:ENTNAME1_COMPANY1:ENTNAME2_COMPANY1:" +
-            ":RUNAME1_COMPANY1:RUNNAME2_COMPANY1::TOTAL UK ACTIVITY:::C:D:7:15:S";
+    String missingSampleUnitRef =
+        ":F:50300:50300:45320:45320:8478:801325:"
+            + "9900000576:1:E:FE:01/09/1993:ENTNAME1_COMPANY1:ENTNAME2_COMPANY1:"
+            + ":RUNAME1_COMPANY1:RUNNAME2_COMPANY1::TOTAL UK ACTIVITY:::C:D:7:15:S";
 
     // When
     csvIngester.ingest(sampleSummary, getTestFileFromString(missingSampleUnitRef));
 
     // Then
-    verify(sampleService, times(0)).saveSample(eq(sampleSummary),
-            anyListOf(BusinessSampleUnit.class), eq(SampleUnitState.INIT));
+    verify(sampleService, times(0))
+        .saveSample(
+            eq(sampleSummary), anyListOf(BusinessSampleUnit.class), eq(SampleUnitState.INIT));
     thrown.expect(CTPException.class);
   }
 
@@ -162,8 +165,9 @@ public class CsvIngesterBusinessTest {
     csvIngester.ingest(sampleSummary, f);
 
     // Then
-    verify(sampleService, times(0)).saveSample(eq(sampleSummary),
-            anyListOf(BusinessSampleUnit.class), eq(SampleUnitState.INIT));
+    verify(sampleService, times(0))
+        .saveSample(
+            eq(sampleSummary), anyListOf(BusinessSampleUnit.class), eq(SampleUnitState.INIT));
     thrown.expect(CTPException.class);
   }
 
@@ -172,7 +176,8 @@ public class CsvIngesterBusinessTest {
     // Given
     SampleSummary sampleSummary = new SampleSummary();
     sampleSummary.setId(UUID.randomUUID());
-    given(sampleService.saveSample(any(), argumentCaptor.capture(), eq(SampleUnitState.INIT))).willReturn(sampleSummary);
+    given(sampleService.saveSample(any(), argumentCaptor.capture(), eq(SampleUnitState.INIT)))
+        .willReturn(sampleSummary);
 
     // When
     csvIngester.ingest(sampleSummary, TestFiles.getTestFile("business-survey-sample.csv"));
@@ -185,7 +190,6 @@ public class CsvIngesterBusinessTest {
     party.getAttributes().setSampleUnitId(businessSampleUnit.getSampleUnitId().toString());
     party.setSampleSummaryId(sampleSummary.getId().toString());
     verify(partyPublisher).publish(party);
-
   }
 
   private BusinessSampleUnit createBusinessSampleUnit() {
@@ -220,5 +224,4 @@ public class CsvIngesterBusinessTest {
     businessSampleUnit.setCurrency("S");
     return businessSampleUnit;
   }
-
 }

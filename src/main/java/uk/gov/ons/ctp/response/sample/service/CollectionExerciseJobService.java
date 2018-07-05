@@ -4,8 +4,8 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 
 /**
- * The CollectionExerciseJobService interface defines all business behaviours for operations on
- * the CollectionExerciseJob entity model.
+ * The CollectionExerciseJobService interface defines all business behaviours for operations on the
+ * CollectionExerciseJob entity model.
  */
 public interface CollectionExerciseJobService {
 
@@ -17,4 +17,3 @@ public interface CollectionExerciseJobService {
    */
   void storeCollectionExerciseJob(CollectionExerciseJob collectionExerciseJob) throws CTPException;
 }
-
