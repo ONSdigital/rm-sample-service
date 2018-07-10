@@ -1,5 +1,6 @@
 package uk.gov.ons.ctp.response.sample.endpoint;
 
+import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.isA;
 import static org.mockito.Matchers.any;
@@ -38,6 +39,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleAttributesDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 public class SampleEndpointUnitTest {
@@ -141,19 +143,28 @@ public class SampleEndpointUnitTest {
     UUID id = UUID.randomUUID();
     SampleUnit sampleUnit = new SampleUnit();
     SampleAttributes sampleAttribs = new SampleAttributes();
+    SampleAttributesDTO sampleAttributesDTO = new SampleAttributesDTO();
     Map<String, String> attribs = new HashMap<>();
 
     attribs.put("Reference", "LMS0001");
+    sampleAttribs.setSampleUnitFK(id);
     sampleAttribs.setAttributes(attribs);
+
+    sampleAttributesDTO.setAttributes(attribs);
 
     sampleUnit.setId(id);
     sampleUnit.setSampleAttributes(sampleAttribs);
 
     when(sampleService.findSampleUnitBySampleUnitId(any())).thenReturn(sampleUnit);
     when(sampleService.findSampleAttributes(any())).thenReturn(sampleAttribs);
+    when(mapperFacade.map(sampleAttribs, SampleAttributesDTO.class))
+            .thenReturn(sampleAttributesDTO);
 
     ResultActions getAttribs =
         mockMvc.perform(get(String.format("/samples/%s/attributes", id.toString())));
+
     getAttribs.andExpect(status().isOk());
+
+    assertThat(sampleAttributesDTO.getId()).isEqualTo(id);
   }
 }
