@@ -138,7 +138,7 @@ public class SampleEndpointUnitTest {
   }
 
   @Test
-  public void ensureAttributesReturnedById() throws Exception {
+  public void ensureAttAttribributesReturnedById() throws Exception {
 
     UUID id = UUID.randomUUID();
     SampleUnit sampleUnit = new SampleUnit();

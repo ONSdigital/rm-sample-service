@@ -233,9 +233,6 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     }
     SampleAttributesDTO result = mapperFacade.map(sampleAttribs, SampleAttributesDTO.class);
 
-    // Setting it because mapperFacade fails to set the ID from sampleAttribs to result
-    result.setId(sampleUnitId);
-
     return ResponseEntity.ok(result);
   }
 
