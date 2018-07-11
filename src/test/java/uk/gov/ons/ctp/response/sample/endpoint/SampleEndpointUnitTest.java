@@ -150,6 +150,7 @@ public class SampleEndpointUnitTest {
     sampleAttribs.setSampleUnitFK(id);
     sampleAttribs.setAttributes(attribs);
 
+    sampleAttributesDTO.setId(id);
     sampleAttributesDTO.setAttributes(attribs);
 
     sampleUnit.setId(id);
