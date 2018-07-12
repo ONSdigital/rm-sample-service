@@ -20,14 +20,6 @@ services:
     - "6672:5672"
     - "16671:15671"
     - "16672:15672"
- sftp:
-    container_name: sftp
-    image: atmoz/sftp
-    volumes:
-        - ~/Documents/sftp:/home/centos/Documents/sftp
-    ports:
-        - "122:22"
-    command: centos:JLibV2&XD,:1001
  party-service:
   container_name: party-service
   image: sdcplatform/ras-party
