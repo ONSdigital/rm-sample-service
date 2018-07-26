@@ -2,7 +2,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   <artifactId>samplesvc</artifactId>
-  <version>10.49.14</version>
+  <version>10.49.15-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>CTP : SampleService</name>
@@ -18,7 +18,7 @@
     <connection>scm:git:https://github.com/ONSdigital/rm-sample-service.git</connection>
     <developerConnection>scm:git:https://github.com/ONSdigital/rm-sample-service.git</developerConnection>
     <url>https://github.com/ONSdigital/rm-sample-service.git</url>
-    <tag>samplesvc-10.49.14</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <properties>
