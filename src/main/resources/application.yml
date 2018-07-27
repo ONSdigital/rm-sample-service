@@ -20,7 +20,7 @@ liquibase:
   user: samplesvc
   password: samplesvc
   default-schema: sample
-  url: jdbc:postgresql://localhost:6432/postgres
+  url: jdbc:postgresql://localhost:36432/postgres
   changeLog: classpath:/database/changelog-master.yml
 
 security:
@@ -53,7 +53,7 @@ spring:
   application:
     name: ONS SampleService
   datasource:
-    url: jdbc:postgresql://localhost:6432/postgres
+    url: jdbc:postgresql://localhost:36432/postgres
     username: samplesvc
     password: samplesvc
     driverClassName: org.postgresql.Driver
