@@ -83,7 +83,7 @@ party-svc:
   connection-config:
     scheme: http
     host: localhost
-    port: 8081
+    port: 38081
     username: admin
     password: secret
 
@@ -105,7 +105,7 @@ rabbitmq:
   username: guest
   password: guest
   host: localhost
-  port: 6672
+  port: 36672
   virtualhost: /
   cron: "* * * * * ?"
 
