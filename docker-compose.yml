@@ -4,29 +4,29 @@ services:
   container_name: postgres
   image: sdcplatform/ras-rm-docker-postgres
   ports:
-   - "6432:5432"
+   - "36432:5432"
  redis:
   container_name: redis
   image: redis:3.2.9
   ports:
-   - "7379:6379"
+   - "37379:6379"
  rabbitmq:
   container_name: rabbitmq
   image: rabbitmq:3.6.10-management
   ports:
-    - "5369:4369"
-    - "45672:25672"
-    - "6671:5671"
-    - "6672:5672"
-    - "16671:15671"
-    - "16672:15672"
+    - "35369:4369"
+    - "55672:25672"
+    - "36671:5671"
+    - "36672:5672"
+    - "26671:15671"
+    - "26672:15672"
  party-service:
   container_name: party-service
   image: sdcplatform/ras-party
   links:
         - "postgres:postgres"
   ports:
-    - "8081:8081"
+    - "38081:8081"
   environment:
     - DATABASE_URI=postgresql://postgres:postgres@postgres:5432/postgres
     - SECURITY_USER_NAME=admin
