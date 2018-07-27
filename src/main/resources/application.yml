@@ -111,10 +111,10 @@ rabbitmq:
 
 redis:
   host: localhost
-  port: 7379
+  port: 37379
 
 data-grid:
-  address: localhost:7379
+  address: localhost:37379
   list-time-to-live-seconds: 600
   list-time-to-wait-seconds: 600
   lock-time-to-live-seconds: 600
