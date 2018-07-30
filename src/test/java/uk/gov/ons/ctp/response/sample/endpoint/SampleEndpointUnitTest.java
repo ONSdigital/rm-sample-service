@@ -159,7 +159,7 @@ public class SampleEndpointUnitTest {
     when(sampleService.findSampleUnitBySampleUnitId(any())).thenReturn(sampleUnit);
     when(sampleService.findSampleAttributes(any())).thenReturn(sampleAttribs);
     when(mapperFacade.map(sampleAttribs, SampleAttributesDTO.class))
-            .thenReturn(sampleAttributesDTO);
+        .thenReturn(sampleAttributesDTO);
 
     ResultActions getAttribs =
         mockMvc.perform(get(String.format("/samples/%s/attributes", id.toString())));

@@ -1,13 +1,12 @@
 package uk.gov.ons.ctp.response.sample.mapper;
 
-import org.junit.Test;
-import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
-import uk.gov.ons.ctp.response.sample.representation.SampleAttributesDTO;
+import static org.assertj.core.api.Java6Assertions.assertThat;
 
 import java.util.Collections;
 import java.util.UUID;
-
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import org.junit.Test;
+import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
+import uk.gov.ons.ctp.response.sample.representation.SampleAttributesDTO;
 
 public class SampleAttributeMapperTest {
 
