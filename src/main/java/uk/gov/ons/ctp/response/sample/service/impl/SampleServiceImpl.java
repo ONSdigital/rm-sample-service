@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -273,7 +274,7 @@ public class SampleServiceImpl implements SampleService {
 
       return Optional.empty();
     } catch (RuntimeException e) {
-      // Hibernate throws RuntimeException if any issue persisting the SampleSummary.  This is to
+      // Hibernate throws RuntimeException if any issue persisting the SampleSummary. This is to
       // ensure it is logged
       // (otherwise they just disappear).
       log.error("Failed to persist sample summary - {}", e);
@@ -316,5 +317,23 @@ public class SampleServiceImpl implements SampleService {
   public List<SampleUnit> findSampleUnitsBySampleSummary(UUID sampleSummaryId) {
     SampleSummary ss = sampleSummaryRepository.findById(sampleSummaryId);
     return sampleUnitRepository.findBySampleSummaryFK(ss.getSampleSummaryPK());
+  }
+
+  @Override
+  public List<SampleAttributes> findSampleAttributesByPostcode(String postcode) {
+    return sampleAttributesRepository.findByPostcode(postcode);
+  }
+
+  @Override
+  public List<SampleUnit> findSampleUnitsByPostcode(String postcode) {
+    return findSampleAttributesByPostcode(postcode)
+        .stream()
+        .map(
+            e -> {
+              SampleUnit su = findSampleUnitBySampleUnitId(e.getSampleUnitFK());
+              su.setSampleAttributes(sampleAttributesRepository.findOne(e.getSampleUnitFK()));
+              return su;
+            })
+        .collect(Collectors.toList());
   }
 }
