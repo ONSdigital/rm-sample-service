@@ -24,7 +24,7 @@ services:
   container_name: party-service-it
   image: sdcplatform/ras-party
   links:
-        - "postgres-it:postgres-it"
+        - "postgres:postgres-it"
   ports:
     - "8079:8081"
   environment:
