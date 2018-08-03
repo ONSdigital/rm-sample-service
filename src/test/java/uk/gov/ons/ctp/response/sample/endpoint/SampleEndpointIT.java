@@ -236,7 +236,7 @@ public class SampleEndpointIT {
   
   @Test
   public void ensureSampleUnitReceivedByPostcode() throws Exception {
-    SampleSummaryDTO sampleSummary = loadSocialSample("/csv/social-survey-sample-ref.csv");
+    SampleSummaryDTO sampleSummary = loadSocialSample("/csv/social-survey-sample-postcode.csv");
     
     HttpResponse<SampleUnitDTO[]> sampleUnits =
         Unirest.get(

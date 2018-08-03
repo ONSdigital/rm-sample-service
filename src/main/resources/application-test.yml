@@ -15,7 +15,7 @@ sample-unit-distribution:
   
 rabbitmq:
   host: localhost
-  port: 6671
+  port: 6617
 
 redis:
   port: 8379
@@ -24,4 +24,5 @@ data-grid:
   address: localhost:8379
   
 party-svc:
-    port: 8079
+    connection-config:
+        port: 8079
