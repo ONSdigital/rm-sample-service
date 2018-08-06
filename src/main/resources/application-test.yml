@@ -1,28 +1,27 @@
 liquibase:
   user: postgres
   password: postgres
-  url: jdbc:postgresql://localhost:7321/postgres
+  url: jdbc:postgresql://localhost:36432/postgres
 
 spring:
   datasource:
     schema: classpath:/schema.sql
     username: postgres
     password: postgres
-    url: jdbc:postgresql://localhost:7321/postgres
+    url: jdbc:postgresql://localhost:36432/postgres
 
 sample-unit-distribution:
   delay-milli-seconds: 1000
-  
+
+party-svc:
+  connection-config:
+    port: 38081
+
 rabbitmq:
-  host: localhost
-  port: 6617
+  port: 36672
 
 redis:
-  port: 8379
+  port: 37379
 
 data-grid:
-  address: localhost:8379
-  
-party-svc:
-    connection-config:
-        port: 8079
+  address: localhost:37379
