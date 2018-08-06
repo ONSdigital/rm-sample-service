@@ -1,20 +1,10 @@
 package uk.gov.ons.ctp.response.sample.endpoint;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.data.MapEntry.entry;
-import static uk.gov.ons.ctp.response.sample.UnirestInitialiser.initialiseUnirest;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.BlockingQueue;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.entity.ContentType;
 import org.junit.After;
@@ -31,12 +21,24 @@ import uk.gov.ons.ctp.common.message.rabbit.Rabbitmq;
 import uk.gov.ons.ctp.common.message.rabbit.SimpleMessageListener;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
-import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleAttributesDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitRequest;
 import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.UUID;
+import java.util.concurrent.BlockingQueue;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.data.MapEntry.entry;
+import static uk.gov.ons.ctp.response.sample.UnirestInitialiser.initialiseUnirest;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration
@@ -149,12 +151,10 @@ public class SampleEndpointIT {
                 ContentType.MULTIPART_FORM_DATA,
                 "file")
             .asObject(SampleSummary.class);
-    CollectionExerciseJobCreationRequestDTO collexJobRequest =
-        new CollectionExerciseJobCreationRequestDTO(
-            UUID.randomUUID(),
-            "TEST",
-            new Date(),
-            Collections.singletonList(sampleSummaryResponse.getBody().getId()));
+    SampleUnitRequest collexJobRequest =
+        new SampleUnitRequest(
+            UUID.randomUUID(), Collections.singletonList(sampleSummaryResponse.getBody().getId()));
+    uploadFinishedMessageListener.take();
 
     // When
     HttpResponse<String> sampleUnitResponse =
