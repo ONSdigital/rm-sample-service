@@ -26,17 +26,16 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.InvalidRequestException;
-import uk.gov.ons.ctp.common.time.DateTimeUtil;
-import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
-import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleAttributesDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitRequest;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
+import uk.gov.ons.ctp.response.sample.service.SampleUnitDistributor;
 import validation.BusinessSampleUnit;
 
 /** The REST endpoint controller for Sample Service. */
@@ -48,61 +47,50 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   private static final int NUM_UPLOAD_THREADS = 5;
   private static final ExecutorService EXECUTOR_SERVICE =
       Executors.newFixedThreadPool(NUM_UPLOAD_THREADS);
+  private final SampleUnitDistributor sampleUnitDistributor;
   private SampleService sampleService;
   private MapperFacade mapperFacade;
 
   @Autowired
-  public SampleEndpoint(SampleService sampleService, MapperFacade mapperFacade) {
+  public SampleEndpoint(
+      SampleService sampleService,
+      MapperFacade mapperFacade,
+      SampleUnitDistributor sampleUnitDistributor) {
     this.sampleService = sampleService;
     this.mapperFacade = mapperFacade;
+    this.sampleUnitDistributor = sampleUnitDistributor;
   }
 
   /**
-   * POST CollectionExerciseJob associated to SampleSummary surveyRef and exerciseDateTime
+   * Publish all sample units associated to the sample summary to the SampleDelivery queue
    *
-   * @param collectionExerciseJobCreationRequestDTO CollectionExerciseJobCreationRequestDTO related
-   *     to SampleUnits
+   * @param request the sample summary ids to publish for the collection exercise
    * @param bindingResult collects errors thrown
-   * @return Response Returns sampleUnitsTotal value
-   * @throws CTPException if update operation fails or CollectionExerciseJob already exists
+   * @return the total number of sample units that will be published
    * @throws InvalidRequestException if binding errors
    */
   @RequestMapping(
       value = "/sampleunitrequests",
       method = RequestMethod.POST,
       consumes = "application/json")
-  public ResponseEntity<SampleUnitsRequestDTO> createSampleUnitRequest(
-      final @Valid @RequestBody CollectionExerciseJobCreationRequestDTO
-              collectionExerciseJobCreationRequestDTO,
-      BindingResult bindingResult)
-      throws CTPException, InvalidRequestException {
-    log.debug(
-        "Entering createCollectionExerciseJob with requestObject {}",
-        collectionExerciseJobCreationRequestDTO);
+  public ResponseEntity<SampleUnitsRequestDTO> publishSampleUnits(
+      final @Valid @RequestBody SampleUnitRequest request, BindingResult bindingResult)
+      throws InvalidRequestException {
+    log.debug("Entering createCollectionExerciseJob with requestObject {}", request);
     if (bindingResult.hasErrors()) {
       throw new InvalidRequestException("Binding errors for create action: ", bindingResult);
     }
-    CollectionExerciseJob cej = new CollectionExerciseJob();
-    Integer sampleUnitsTotal = 0;
-    List<UUID> sampleSummaryIds =
-        collectionExerciseJobCreationRequestDTO.getSampleSummaryUUIDList();
-    for (UUID sampleSummaryID : sampleSummaryIds) {
-      cej = mapperFacade.map(collectionExerciseJobCreationRequestDTO, CollectionExerciseJob.class);
-      cej.setCreatedDateTime(DateTimeUtil.nowUTC());
-      cej.setSampleSummaryId(sampleSummaryID);
-
-      sampleUnitsTotal += sampleService.initialiseCollectionExerciseJob(cej);
-    }
+    Integer sampleUnitsTotal =
+        request
+            .getSampleSummaryUUIDList()
+            .stream()
+            .peek(
+                s -> sampleUnitDistributor.publishSampleUnits(s, request.getCollectionExerciseId()))
+            .mapToInt(s -> sampleService.findSampleSummary(s).getTotalSampleUnits())
+            .sum();
     SampleUnitsRequestDTO sampleUnitsRequest = new SampleUnitsRequestDTO(sampleUnitsTotal);
 
-    String newResourceUrl =
-        ServletUriComponentsBuilder.fromCurrentRequest()
-            .path("/{id}")
-            .buildAndExpand(cej.getCollectionExerciseId())
-            .toUri()
-            .toString();
-
-    return ResponseEntity.created(URI.create(newResourceUrl)).body(sampleUnitsRequest);
+    return ResponseEntity.ok(sampleUnitsRequest);
   }
 
   /**

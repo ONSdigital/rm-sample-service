@@ -11,7 +11,8 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -31,11 +32,11 @@ import uk.gov.ons.ctp.common.message.rabbit.Rabbitmq;
 import uk.gov.ons.ctp.common.message.rabbit.SimpleMessageListener;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
-import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleAttributesDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitRequest;
 import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
 
 @RunWith(SpringRunner.class)
@@ -149,12 +150,10 @@ public class SampleEndpointIT {
                 ContentType.MULTIPART_FORM_DATA,
                 "file")
             .asObject(SampleSummary.class);
-    CollectionExerciseJobCreationRequestDTO collexJobRequest =
-        new CollectionExerciseJobCreationRequestDTO(
-            UUID.randomUUID(),
-            "TEST",
-            new Date(),
-            Collections.singletonList(sampleSummaryResponse.getBody().getId()));
+    SampleUnitRequest collexJobRequest =
+        new SampleUnitRequest(
+            UUID.randomUUID(), Collections.singletonList(sampleSummaryResponse.getBody().getId()));
+    uploadFinishedMessageListener.take();
 
     // When
     HttpResponse<String> sampleUnitResponse =
@@ -165,7 +164,7 @@ public class SampleEndpointIT {
             .asString();
 
     // Then
-    assertThat(sampleUnitResponse.getStatus()).isEqualTo(201);
+    assertThat(sampleUnitResponse.getStatus()).isEqualTo(200);
     String message = sampleDeliveryMessageListener.take();
 
     log.debug("message = " + message);

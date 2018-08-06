@@ -1,5 +1,6 @@
 package uk.gov.ons.ctp.response.sample.mapper;
 
+import java.util.Objects;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MappingContext;
 import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
@@ -12,6 +13,7 @@ public class SampleUnitMapper
       uk.gov.ons.ctp.response.sample.domain.model.SampleUnit sampleUnit,
       SampleUnit sampleUnit2,
       MappingContext context) {
+    sampleUnit2.setId(Objects.toString(sampleUnit.getId(), null));
     sampleUnit2.setFormType(sampleUnit.getFormType());
     sampleUnit2.setSampleUnitRef(sampleUnit.getSampleUnitRef());
     sampleUnit2.setSampleUnitType(sampleUnit.getSampleUnitType());

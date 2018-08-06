@@ -40,6 +40,7 @@ public class SampleUnitMapperTest {
     assertEquals(
         "test_attribute_value",
         desinationSampleUnit.getSampleAttributes().getEntries().get(0).getValue());
+    assertEquals(sampleUnit.getId().toString(), desinationSampleUnit.getId());
     assertEquals(sampleUnit.getFormType(), desinationSampleUnit.getFormType());
     assertEquals(sampleUnit.getSampleUnitType(), desinationSampleUnit.getSampleUnitType());
     assertEquals(sampleUnit.getSampleUnitRef(), desinationSampleUnit.getSampleUnitRef());
@@ -56,6 +57,7 @@ public class SampleUnitMapperTest {
     sampleUnitMapper.mapAtoB(sampleUnit, desinationSampleUnit, null);
 
     // Then
+    assertNull(desinationSampleUnit.getId());
     assertNull(desinationSampleUnit.getSampleAttributes());
     assertNull(desinationSampleUnit.getSampleAttributes());
     assertNull(desinationSampleUnit.getSampleAttributes());

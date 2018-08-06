@@ -13,11 +13,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.ons.ctp.common.MvcHelper.postJson;
 import static uk.gov.ons.ctp.common.utility.MockMvcControllerAdviceHelper.mockAdviceFor;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import ma.glasnost.orika.MapperFacade;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -38,21 +38,23 @@ import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
-import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleAttributesDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
+import uk.gov.ons.ctp.response.sample.service.SampleUnitDistributor;
 
 public class SampleEndpointUnitTest {
   private static final String SAMPLE_VALIDJSON =
-      "{ \"collectionExerciseId\" : \"c6467711-21eb-4e78-804c-1db8392f93fb\", \"surveyRef\" : \"str1234\", \"exerciseDateTime\" : \"2012-12-13T12:12:12.000+0000\", \"sampleSummaryUUIDList\" : [\"c6467711-21eb-4e78-804c-1db8392f93fb\"] }";
+      "{ \"collectionExerciseId\" : \"c6467711-21eb-4e78-804c-1db8392f93fb\", \"sampleSummaryUUIDList\" : [\"c6467711-21eb-4e78-804c-1db8392f93fb\"] }";
   private static final String SAMPLE_INVALIDJSON =
-      "{ \"collectionExerciseId\" : \"c6467711-21eb-4e78-804c-1db8393f93fb\", \"surveyRef\" : \"str1234\", \"exerciseDateTime\" : \"201.000+0000\" }";
+      "{ \"collectionExerciseId\" : \"c6467711-21eb-4e78-804c-1db8393f93fb\" }";
 
   @InjectMocks private SampleEndpoint sampleEndpoint;
 
   @Mock private MapperFacade mapperFacade;
 
   @Mock private SampleService sampleService;
+
+  @Mock private SampleUnitDistributor sampleUnitDistributor;
 
   private MockMvc mockMvc;
 
@@ -69,18 +71,28 @@ public class SampleEndpointUnitTest {
   }
 
   @Test
-  public void getSampleSummaryValidJSON() throws Exception {
-    CollectionExerciseJobCreationRequestDTO cej =
-        new ObjectMapper()
-            .readValue(SAMPLE_VALIDJSON, CollectionExerciseJobCreationRequestDTO.class);
-    when(mapperFacade.map(cej, CollectionExerciseJob.class))
-        .thenReturn(new CollectionExerciseJob());
-    when(sampleService.initialiseCollectionExerciseJob(any())).thenReturn(4);
+  public void requestSampleUnits() throws Exception {
+    when(sampleService.findSampleSummary(any()))
+        .thenReturn(SampleSummary.builder().totalSampleUnits(4).build());
 
     ResultActions actions =
         mockMvc.perform(postJson("/samples/sampleunitrequests", SAMPLE_VALIDJSON));
 
-    actions.andExpect(status().isCreated());
+    actions.andExpect(status().isOk());
+    actions.andExpect(jsonPath("$.sampleUnitsTotal", is(4)));
+  }
+
+  @Test
+  public void requestSampleUnitsAllowsAdditionalFields() throws Exception {
+    when(sampleService.findSampleSummary(any()))
+        .thenReturn(SampleSummary.builder().totalSampleUnits(4).build());
+    JSONObject jsonObject = new JSONObject(SAMPLE_VALIDJSON);
+    jsonObject.put("I don't belong here", "");
+
+    ResultActions actions =
+        mockMvc.perform(postJson("/samples/sampleunitrequests", jsonObject.toString()));
+
+    actions.andExpect(status().isOk());
     actions.andExpect(jsonPath("$.sampleUnitsTotal", is(4)));
   }
 
@@ -127,18 +139,18 @@ public class SampleEndpointUnitTest {
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.error.code", is(CTPException.Fault.VALIDATION_FAILED.name())))
         .andExpect(jsonPath("$.error.timestamp", isA(String.class)))
-        .andExpect(jsonPath("$.error.message", is("Provided json is incorrect.")));
+        .andExpect(jsonPath("$.error.message", is("Provided json fails validation.")));
   }
 
   @Test(expected = InvalidRequestException.class)
   public void verifyBadBindingResultThrowsException() throws Exception {
     BindingResult bindingResult = mock(BindingResult.class);
     when(bindingResult.hasErrors()).thenReturn(true);
-    sampleEndpoint.createSampleUnitRequest(null, bindingResult);
+    sampleEndpoint.publishSampleUnits(null, bindingResult);
   }
 
   @Test
-  public void ensureAttAttribributesReturnedById() throws Exception {
+  public void ensureAttributesReturnedById() throws Exception {
 
     UUID id = UUID.randomUUID();
     SampleUnit sampleUnit = new SampleUnit();

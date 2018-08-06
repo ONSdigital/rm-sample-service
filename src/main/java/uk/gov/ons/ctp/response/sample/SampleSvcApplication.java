@@ -16,6 +16,7 @@ import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.integration.annotation.IntegrationComponentScan;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.ons.ctp.common.distributed.DistributedListManager;
@@ -35,6 +36,7 @@ import uk.gov.ons.ctp.response.sample.service.state.SampleSvcStateTransitionMana
 /** The main entry point into the Sample Service SpringBoot Application. */
 @CoverageIgnore
 @SpringBootApplication
+@EnableAsync
 @EnableTransactionManagement
 @EnableCaching
 @IntegrationComponentScan
