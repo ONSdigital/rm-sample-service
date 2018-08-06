@@ -27,8 +27,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.ons.ctp.common.UnirestInitialiser;
-import uk.gov.ons.ctp.common.message.rabbit.Rabbitmq;
-import uk.gov.ons.ctp.common.message.rabbit.SimpleMessageListener;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
@@ -37,6 +35,8 @@ import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
+import uk.gov.ons.tools.rabbit.Rabbitmq;
+import uk.gov.ons.tools.rabbit.SimpleMessageListener;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration
@@ -233,11 +233,11 @@ public class SampleEndpointIT {
     assertThat(sampleAttribResponse.getBody().getAttributes().get("Reference"))
         .isEqualTo("LMS0001");
   }
-  
+
   @Test
   public void ensureSampleUnitReceivedByPostcode() throws Exception {
     SampleSummaryDTO sampleSummary = loadSocialSample("/csv/social-survey-sample-postcode.csv");
-    
+
     HttpResponse<SampleUnitDTO[]> sampleUnits =
         Unirest.get(
                 String.format(
@@ -249,24 +249,24 @@ public class SampleEndpointIT {
     String sampleUnitId = sampleUnits.getBody()[0].getId();
 
     assertThat(sampleUnitId).isNotBlank();
-    
+
     HttpResponse<SampleAttributesDTO> sampleAttribResponse =
         Unirest.get(String.format("http://localhost:%d/samples/%s/attributes", port, sampleUnitId))
             .header("Content-Type", "application/json")
             .basicAuth("admin", "secret")
             .asObject(SampleAttributesDTO.class);
-    
+
     String postcode = sampleAttribResponse.getBody().getAttributes().get("Postcode");
-    
+
     assertThat(postcode).isNotBlank();
-    
+
     HttpResponse<SampleUnitDTO[]> sampleUnitResponse =
         Unirest.get(String.format("http://localhost:%d/samples/postcode", port))
             .queryString("postcode", postcode)
             .header("Content-Type", "application/json")
             .basicAuth("admin", "secret")
             .asObject(SampleUnitDTO[].class);
-    
+
     assertThat(sampleUnitResponse.getBody()[0].getId()).isEqualTo(sampleUnitId);
   }
 

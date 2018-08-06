@@ -12,17 +12,16 @@ spring:
 
 sample-unit-distribution:
   delay-milli-seconds: 1000
-  
+
+party-svc:
+  connection-config:
+    port: 8079
+
 rabbitmq:
-  host: localhost
-  port: 6617
+  port: 36672
 
 redis:
   port: 8379
 
 data-grid:
   address: localhost:8379
-  
-party-svc:
-    connection-config:
-        port: 8079
