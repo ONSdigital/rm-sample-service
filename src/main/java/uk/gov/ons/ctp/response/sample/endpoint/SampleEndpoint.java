@@ -27,12 +27,12 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.InvalidRequestException;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
-import uk.gov.ons.ctp.response.sample.representation.SampleUnitRequest;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.representation.SampleAttributesDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitRequest;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import uk.gov.ons.ctp.response.sample.service.SampleUnitDistributor;
@@ -74,7 +74,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       method = RequestMethod.POST,
       consumes = "application/json")
   public ResponseEntity<SampleUnitsRequestDTO> publishSampleUnits(
-      final @Valid @RequestBody SampleUnitRequest  request, BindingResult bindingResult)
+      final @Valid @RequestBody SampleUnitRequest request, BindingResult bindingResult)
       throws InvalidRequestException {
     log.debug("Entering createCollectionExerciseJob with requestObject {}", request);
     if (bindingResult.hasErrors()) {

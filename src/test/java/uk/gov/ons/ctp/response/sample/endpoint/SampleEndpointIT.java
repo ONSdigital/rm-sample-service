@@ -1,10 +1,21 @@
 package uk.gov.ons.ctp.response.sample.endpoint;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.data.MapEntry.entry;
+import static uk.gov.ons.ctp.response.sample.UnirestInitialiser.initialiseUnirest;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.UUID;
+import java.util.concurrent.BlockingQueue;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.entity.ContentType;
 import org.junit.After;
@@ -27,18 +38,6 @@ import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleStat
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitRequest;
 import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.UUID;
-import java.util.concurrent.BlockingQueue;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.data.MapEntry.entry;
-import static uk.gov.ons.ctp.response.sample.UnirestInitialiser.initialiseUnirest;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration
@@ -165,7 +164,7 @@ public class SampleEndpointIT {
             .asString();
 
     // Then
-    assertThat(sampleUnitResponse.getStatus()).isEqualTo(201);
+    assertThat(sampleUnitResponse.getStatus()).isEqualTo(200);
     String message = sampleDeliveryMessageListener.take();
 
     log.debug("message = " + message);

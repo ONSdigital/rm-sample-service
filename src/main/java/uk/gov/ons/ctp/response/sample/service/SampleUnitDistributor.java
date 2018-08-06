@@ -77,6 +77,16 @@ public class SampleUnitDistributor {
     publishSampleUnits(sampleUnits, collectionExerciseId);
   }
 
+  private void publishSampleUnits(List<SampleUnit> sampleUnits, UUID collectionExerciseId) {
+    for (SampleUnit sampleUnit : sampleUnits) {
+      try {
+        sampleUnitPublisher.send(mapSampleUnit(collectionExerciseId, sampleUnit));
+      } catch (AmqpException e) {
+        log.error("Failed to publish sampleUnit={}", sampleUnit.getSampleUnitPK());
+      }
+    }
+  }
+
   private List<SampleUnit> getSampleUnits(SampleSummary sampleSummary) {
     SampleUnit sampleUnit =
         SampleUnit.builder()
@@ -101,16 +111,6 @@ public class SampleUnitDistributor {
     } catch (CTPException e) {
       log.warn("Could not transition to DELIVERING sampleunitpk={}", sampleUnit.getSampleUnitPK());
       return sampleUnit.getState();
-    }
-  }
-
-  private void publishSampleUnits(List<SampleUnit> sampleUnits, UUID collectionExerciseId) {
-    for (SampleUnit sampleUnit : sampleUnits) {
-      try {
-        sampleUnitPublisher.send(mapSampleUnit(collectionExerciseId, sampleUnit));
-      } catch (AmqpException e) {
-        log.error("Failed to publish sampleUnit={}", sampleUnit.getSampleUnitPK());
-      }
     }
   }
 
