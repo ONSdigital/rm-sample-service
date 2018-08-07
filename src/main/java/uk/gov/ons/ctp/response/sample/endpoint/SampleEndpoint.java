@@ -253,7 +253,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
         String.format("No sample units were found for sample summary %s", sampleSummaryId));
   }
 
-  @RequestMapping(value = "/postcode", method = RequestMethod.GET)
+  @RequestMapping(value = "/sampleunits", method = RequestMethod.GET)
   public ResponseEntity<SampleUnitDTO[]> getSampleUnitsByPostcode(
       @RequestParam("postcode") String postcode) throws CTPException {
 

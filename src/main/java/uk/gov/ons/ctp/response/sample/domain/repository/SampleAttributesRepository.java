@@ -15,8 +15,8 @@ public interface SampleAttributesRepository extends JpaRepository<SampleAttribut
   @Query(
       value =
           "select sa.* from sample.sampleattributes sa where "
-              + "REPLACE(attributes->>'Postcode', ' ', '') = "
-              + "REPLACE(:postcode, ' ', '')",
+              + "UPPER(REPLACE(attributes->>'Postcode', ' ', '')) = "
+              + "UPPER(REPLACE(:postcode, ' ', ''))",
       nativeQuery = true)
   public List<SampleAttributes> findByPostcode(@Param("postcode") String postcode);
 }

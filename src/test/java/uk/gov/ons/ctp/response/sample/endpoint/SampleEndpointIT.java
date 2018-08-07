@@ -261,7 +261,7 @@ public class SampleEndpointIT {
     assertThat(postcode).isNotBlank();
 
     HttpResponse<SampleUnitDTO[]> sampleUnitResponse =
-        Unirest.get(String.format("http://localhost:%d/samples/postcode", port))
+        Unirest.get(String.format("http://localhost:%d/samples/sampleunits", port))
             .queryString("postcode", postcode)
             .header("Content-Type", "application/json")
             .basicAuth("admin", "secret")

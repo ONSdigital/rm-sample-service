@@ -329,9 +329,9 @@ public class SampleServiceImpl implements SampleService {
     return findSampleAttributesByPostcode(postcode)
         .stream()
         .map(
-            e -> {
-              SampleUnit su = findSampleUnitBySampleUnitId(e.getSampleUnitFK());
-              su.setSampleAttributes(sampleAttributesRepository.findOne(e.getSampleUnitFK()));
+            attrs -> {
+              SampleUnit su = findSampleUnitBySampleUnitId(attrs.getSampleUnitFK());
+              su.setSampleAttributes(attrs);
               return su;
             })
         .collect(Collectors.toList());
