@@ -254,12 +254,11 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   }
 
   @RequestMapping(value = "/sampleunits", method = RequestMethod.GET)
-  public ResponseEntity<SampleUnitDTO[]> getSampleUnitsByPostcode(
+  public ResponseEntity<List<SampleUnitDTO>> getSampleUnitsByPostcode(
       @RequestParam("postcode") String postcode) throws CTPException {
 
     List<SampleUnit> sampleUnits = sampleService.findSampleUnitsByPostcode(postcode);
-    SampleUnitDTO[] result = new SampleUnitDTO[sampleUnits.size()];
-    result = mapperFacade.mapAsArray(result, sampleUnits, SampleUnitDTO.class);
+    List<SampleUnitDTO> result = mapperFacade.mapAsList(sampleUnits, SampleUnitDTO.class);
 
     if (!sampleUnits.isEmpty()) {
       return ResponseEntity.ok(result);
