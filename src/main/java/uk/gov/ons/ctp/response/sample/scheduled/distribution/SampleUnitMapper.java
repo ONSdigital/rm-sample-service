@@ -7,6 +7,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesRepository;
 import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.SampleAttributes;
 
+/** Maps a SampleUnit JPA entity to SampleUnit which can be sent via Rabbit queue */
 @Component
 public class SampleUnitMapper {
   private SampleAttributesRepository sampleAttributesRepository;
@@ -18,6 +19,7 @@ public class SampleUnitMapper {
     this.mapperFacade = mapperFacade;
   }
 
+  /** Convert a SampleUnit */
   public uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mapSampleUnit(
       SampleUnit sampleUnit, String collectionExerciseId) {
     uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit =

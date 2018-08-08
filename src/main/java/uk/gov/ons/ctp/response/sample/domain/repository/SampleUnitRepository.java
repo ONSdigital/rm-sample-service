@@ -29,7 +29,7 @@ public interface SampleUnitRepository extends JpaRepository<SampleUnit, Integer>
   Integer countBySampleSummaryFK(Integer sampleSummaryFK);
 
   Stream<SampleUnit> findBySampleSummaryFKAndState(
-      UUID sampleSummaryFK, SampleUnitDTO.SampleUnitState state);
+      Integer sampleSummaryFK, SampleUnitDTO.SampleUnitState state);
 
   /**
    * find SampleUnit by sampleUnitRef and sampleUnitType from Party object

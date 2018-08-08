@@ -3,6 +3,7 @@ package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -22,21 +23,31 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import uk.gov.ons.ctp.common.error.CTPException;
+import uk.gov.ons.ctp.common.error.CTPException.Fault;
+import uk.gov.ons.ctp.response.sample.config.AppConfig;
+import uk.gov.ons.ctp.response.sample.config.DataGrid;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
+import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.CollectionExerciseJobRepository;
+import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
 
 /** Test the Sample Unit Distributor */
 @RunWith(MockitoJUnitRunner.class)
 public class SampleUnitDistributorTest {
+  @Mock private AppConfig appConfig;
 
-  @Mock private SampleUnitSenderFactory sampleUnitSenderFactory;
+  @Mock private SampleUnitSender sampleUnitSender;
 
   @Mock private CollectionExerciseJobRepository collectionExerciseJobRepository;
 
   @Mock private SampleUnitRepository sampleUnitRepository;
+
+  @Mock private SampleSummaryRepository sampleSummaryRepository;
 
   @Mock private SampleUnitMapper sampleUnitMapper;
 
@@ -44,53 +55,64 @@ public class SampleUnitDistributorTest {
 
   @InjectMocks private SampleUnitDistributor sampleUnitDistributor;
 
+  private RLock lock;
+
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
-    RLock lock = mock(RLock.class);
+    DataGrid dataGrid = new DataGrid();
+    dataGrid.setLockTimeToLiveSeconds(30);
+    dataGrid.setLockTimeToWaitSeconds(600);
+    when(appConfig.getDataGrid()).thenReturn(dataGrid);
+
+    lock = mock(RLock.class);
     when(redissonClient.getFairLock(any())).thenReturn(lock);
     when(lock.tryLock(anyLong(), anyLong(), any(TimeUnit.class))).thenReturn(true);
   }
 
   @Test
-  public void testDistributeSuccess() throws InterruptedException {
+  public void testDistributeSuccess() throws CTPException {
     UUID collexID = UUID.randomUUID();
     UUID sampleSummaryId = UUID.randomUUID();
-    UUID sampleUnitId = UUID.randomUUID();
 
     CollectionExerciseJob collectionExerciseJob = new CollectionExerciseJob();
     collectionExerciseJob.setCollectionExerciseId(collexID);
     collectionExerciseJob.setSampleSummaryId(sampleSummaryId);
 
-    SampleUnit sampleUnit = new SampleUnit();
-    sampleUnit.setId(sampleUnitId);
+    SampleSummary sampleSummary = new SampleSummary();
+    sampleSummary.setSampleSummaryPK(666);
+    sampleSummary.setState(SampleState.ACTIVE);
 
-    SampleUnitSender sampleUnitSender = mock(SampleUnitSender.class);
+    SampleUnit sampleUnit = new SampleUnit();
+
+    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit =
+        new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit();
 
     when(collectionExerciseJobRepository.findByJobCompleteIsFalse())
         .thenReturn(Collections.singletonList(collectionExerciseJob));
+    when(sampleSummaryRepository.findById(any())).thenReturn(sampleSummary);
     when(sampleUnitRepository.findBySampleSummaryFKAndState(any(), any()))
         .thenReturn(Stream.of(sampleUnit));
-    when(sampleUnitSenderFactory.getNewSampleUnitSender(any())).thenReturn(sampleUnitSender);
-    when(sampleUnitSender.call()).thenReturn(Boolean.TRUE);
+    when(sampleUnitMapper.mapSampleUnit(any(), any())).thenReturn(mappedSampleUnit);
 
     sampleUnitDistributor.distribute();
 
-    verify(sampleUnitRepository)
-        .findBySampleSummaryFKAndState(sampleSummaryId, SampleUnitState.PERSISTED);
+    verify(sampleUnitRepository).findBySampleSummaryFKAndState(666, SampleUnitState.PERSISTED);
 
     ArgumentCaptor<CollectionExerciseJob> collexJobArgCap =
         ArgumentCaptor.forClass(CollectionExerciseJob.class);
     verify(collectionExerciseJobRepository).saveAndFlush(collexJobArgCap.capture());
+    assertEquals(collectionExerciseJob, collexJobArgCap.getValue());
     assertEquals(true, collexJobArgCap.getValue().isJobComplete());
-    assertEquals(collexID, collexJobArgCap.getValue().getCollectionExerciseId());
 
-    verify(sampleUnitSender).call();
+    verify(sampleUnitSender).sendSampleUnit(mappedSampleUnit);
+
+    verify(lock).unlock();
   }
 
   @Test
-  public void testDistributeFail() {
+  public void testDistributeFail() throws CTPException {
     UUID collexID = UUID.randomUUID();
     UUID sampleSummaryId = UUID.randomUUID();
     UUID sampleUnitId = UUID.randomUUID();
@@ -99,41 +121,47 @@ public class SampleUnitDistributorTest {
     collectionExerciseJob.setCollectionExerciseId(collexID);
     collectionExerciseJob.setSampleSummaryId(sampleSummaryId);
 
+    SampleSummary sampleSummary = new SampleSummary();
+    sampleSummary.setSampleSummaryPK(666);
+    sampleSummary.setState(SampleState.ACTIVE);
+
     SampleUnit sampleUnit = new SampleUnit();
     sampleUnit.setId(sampleUnitId);
 
-    SampleUnitSender sampleUnitSender = mock(SampleUnitSender.class);
+    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit =
+        new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit();
 
     when(collectionExerciseJobRepository.findByJobCompleteIsFalse())
         .thenReturn(Collections.singletonList(collectionExerciseJob));
+    when(sampleSummaryRepository.findById(any())).thenReturn(sampleSummary);
     when(sampleUnitRepository.findBySampleSummaryFKAndState(any(), any()))
         .thenReturn(Stream.of(sampleUnit));
-    when(sampleUnitSenderFactory.getNewSampleUnitSender(any())).thenReturn(sampleUnitSender);
-    when(sampleUnitSender.call()).thenReturn(Boolean.FALSE);
+    when(sampleUnitMapper.mapSampleUnit(any(), any())).thenReturn(mappedSampleUnit);
+    doThrow(new CTPException(Fault.SYSTEM_ERROR)).when(sampleUnitSender).sendSampleUnit(any());
 
     sampleUnitDistributor.distribute();
 
-    verify(sampleUnitRepository)
-        .findBySampleSummaryFKAndState(sampleSummaryId, SampleUnitState.PERSISTED);
-
+    verify(sampleUnitSender).sendSampleUnit(mappedSampleUnit);
     verify(collectionExerciseJobRepository, never()).saveAndFlush(any());
-
-    verify(sampleUnitSender).call();
+    verify(lock).unlock();
   }
 
   @Test
-  public void testDistributeNoJobs() {
+  public void testDistributeNoJobs() throws InterruptedException {
     when(collectionExerciseJobRepository.findByJobCompleteIsFalse())
         .thenReturn(Collections.emptyList());
 
     sampleUnitDistributor.distribute();
 
     verify(collectionExerciseJobRepository).findByJobCompleteIsFalse();
+    verify(redissonClient, never()).getFairLock(any());
+    verify(lock, never()).tryLock(anyLong(), anyLong(), any(TimeUnit.class));
     verify(collectionExerciseJobRepository, never()).saveAndFlush(any());
+    verify(lock, never()).unlock();
   }
 
   @Test
-  public void testDistributeNoSampleUnits() {
+  public void testDistributeNoSampleUnits() throws CTPException {
     UUID collexID = UUID.randomUUID();
     UUID sampleSummaryId = UUID.randomUUID();
 
@@ -141,24 +169,55 @@ public class SampleUnitDistributorTest {
     collectionExerciseJob.setCollectionExerciseId(collexID);
     collectionExerciseJob.setSampleSummaryId(sampleSummaryId);
 
-    SampleUnitSender sampleUnitSender = mock(SampleUnitSender.class);
+    SampleSummary sampleSummary = new SampleSummary();
+    sampleSummary.setSampleSummaryPK(666);
 
     when(collectionExerciseJobRepository.findByJobCompleteIsFalse())
         .thenReturn(Collections.singletonList(collectionExerciseJob));
+    when(sampleSummaryRepository.findById(any())).thenReturn(sampleSummary);
     when(sampleUnitRepository.findBySampleSummaryFKAndState(any(), any()))
         .thenReturn(Stream.empty());
-    when(sampleUnitSenderFactory.getNewSampleUnitSender(any())).thenReturn(sampleUnitSender);
-    when(sampleUnitSender.call()).thenReturn(Boolean.TRUE);
 
     sampleUnitDistributor.distribute();
 
-    verify(sampleUnitRepository)
-        .findBySampleSummaryFKAndState(sampleSummaryId, SampleUnitState.PERSISTED);
+    verify(sampleUnitSender, never()).sendSampleUnit(any());
 
     ArgumentCaptor<CollectionExerciseJob> argumentCaptor =
         ArgumentCaptor.forClass(CollectionExerciseJob.class);
     verify(collectionExerciseJobRepository).saveAndFlush(argumentCaptor.capture());
     assertEquals(true, argumentCaptor.getValue().isJobComplete());
     assertEquals(collexID, argumentCaptor.getValue().getCollectionExerciseId());
+    verify(lock).unlock();
+  }
+
+  @Test
+  public void testDistributeSummaryFailed() throws CTPException {
+    UUID collexID = UUID.randomUUID();
+    UUID sampleSummaryId = UUID.randomUUID();
+
+    CollectionExerciseJob collectionExerciseJob = new CollectionExerciseJob();
+    collectionExerciseJob.setCollectionExerciseId(collexID);
+    collectionExerciseJob.setSampleSummaryId(sampleSummaryId);
+
+    SampleSummary sampleSummary = new SampleSummary();
+    sampleSummary.setSampleSummaryPK(666);
+    sampleSummary.setState(SampleState.FAILED);
+
+    when(collectionExerciseJobRepository.findByJobCompleteIsFalse())
+        .thenReturn(Collections.singletonList(collectionExerciseJob));
+    when(sampleSummaryRepository.findById(any())).thenReturn(sampleSummary);
+    when(sampleUnitRepository.findBySampleSummaryFKAndState(any(), any()))
+        .thenReturn(Stream.empty());
+
+    sampleUnitDistributor.distribute();
+
+    verify(sampleUnitSender, never()).sendSampleUnit(any());
+
+    ArgumentCaptor<CollectionExerciseJob> argumentCaptor =
+        ArgumentCaptor.forClass(CollectionExerciseJob.class);
+    verify(collectionExerciseJobRepository).saveAndFlush(argumentCaptor.capture());
+    assertEquals(true, argumentCaptor.getValue().isJobComplete());
+    assertEquals(collexID, argumentCaptor.getValue().getCollectionExerciseId());
+    verify(lock).unlock();
   }
 }

@@ -7,8 +7,5 @@ import net.sourceforge.cobertura.CoverageIgnore;
 @CoverageIgnore
 @Data
 public class SampleUnitDistribution {
-  private Integer retrievalMax;
-  private Integer distributionMax;
-  private Integer retrySleepSeconds;
   private Integer delayMilliSeconds;
 }
