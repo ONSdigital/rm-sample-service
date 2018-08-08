@@ -255,7 +255,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
 
   @RequestMapping(value = "/sampleunits", method = RequestMethod.GET)
   public ResponseEntity<List<SampleUnitDTO>> getSampleUnitsByPostcode(
-      @RequestParam("postcode") String postcode) throws CTPException {
+      @RequestParam("postcode") String postcode) {
 
     List<SampleUnit> sampleUnits = sampleService.findSampleUnitsByPostcode(postcode);
     List<SampleUnitDTO> result = mapperFacade.mapAsList(sampleUnits, SampleUnitDTO.class);
@@ -263,9 +263,6 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     if (!sampleUnits.isEmpty()) {
       return ResponseEntity.ok(result);
     }
-
-    throw new CTPException(
-        CTPException.Fault.RESOURCE_NOT_FOUND,
-        String.format("No samples were found relating to the postcode {}", postcode));
+    return ResponseEntity.notFound().build();
   }
 }
