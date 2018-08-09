@@ -27,6 +27,7 @@ import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
 @Component
 @Slf4j
 public class SampleUnitDistributor {
+  private static final String LOCK_PREFIX = "SampleCollexJob-";
 
   @Autowired private AppConfig appConfig;
 
@@ -49,7 +50,7 @@ public class SampleUnitDistributor {
     List<CollectionExerciseJob> jobs = collectionExerciseJobRepository.findByJobCompleteIsFalse();
 
     for (CollectionExerciseJob job : jobs) {
-      String uniqueLockName = "SampleCollexJob-" + job.getCollectionExerciseJobPK();
+      String uniqueLockName = LOCK_PREFIX + job.getCollectionExerciseJobPK();
 
       RLock lock = redissonClient.getFairLock(uniqueLockName);
 
@@ -60,43 +61,42 @@ public class SampleUnitDistributor {
             appConfig.getDataGrid().getLockTimeToWaitSeconds(),
             appConfig.getDataGrid().getLockTimeToLiveSeconds(),
             TimeUnit.SECONDS)) {
-          processJob(job, lock);
+          try {
+            processJob(job);
+          } finally {
+            // Always unlock the distributed lock
+            lock.unlock();
+          }
         }
       } catch (InterruptedException e) {
-        // Ignored
+        // Ignored - process stopped while waiting for lock
       }
     }
   }
 
-  private void processJob(CollectionExerciseJob job, RLock lock) {
-    try {
-      List<uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit> mappedSampleUnits =
-          getMappedSampleUnits(job.getSampleSummaryId(), job.getCollectionExerciseId().toString());
+  private void processJob(CollectionExerciseJob job) {
+    List<SampleUnit> mappedSampleUnits =
+        getMappedSampleUnits(job.getSampleSummaryId(), job.getCollectionExerciseId().toString());
 
-      boolean hasErrors = false;
+    boolean hasErrors = false;
 
-      for (uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit msu : mappedSampleUnits) {
-        try {
-          sampleUnitSender.sendSampleUnit(msu);
-        } catch (CTPException e) {
-          hasErrors = true;
-          log.error(
-              "Failed to send a sample unit to queue and update state with ID: {}", msu.getId(), e);
-        }
+    for (SampleUnit msu : mappedSampleUnits) {
+      try {
+        sampleUnitSender.sendSampleUnit(msu);
+      } catch (CTPException e) {
+        hasErrors = true;
+        log.error(
+            "Failed to send a sample unit to queue and update state with ID: {}", msu.getId(), e);
       }
+    }
 
-      if (!hasErrors) {
-        job.setJobComplete(true);
-        collectionExerciseJobRepository.saveAndFlush(job);
-      }
-    } finally {
-      // Finally, we can unlock the distributed lock
-      lock.unlock();
+    if (!hasErrors) {
+      job.setJobComplete(true);
+      collectionExerciseJobRepository.saveAndFlush(job);
     }
   }
 
-  private List<uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit> getMappedSampleUnits(
-      UUID sampleSummaryId, String collectionExerciseId) {
+  private List<SampleUnit> getMappedSampleUnits(UUID sampleSummaryId, String collectionExerciseId) {
 
     List<SampleUnit> mappedSampleUnits = new LinkedList<>();
 
