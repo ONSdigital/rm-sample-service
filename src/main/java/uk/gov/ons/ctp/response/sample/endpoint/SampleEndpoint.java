@@ -90,6 +90,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       cej = mapperFacade.map(collectionExerciseJobCreationRequestDTO, CollectionExerciseJob.class);
       cej.setCreatedDateTime(DateTimeUtil.nowUTC());
       cej.setSampleSummaryId(sampleSummaryID);
+      cej.setJobComplete(false);
 
       sampleUnitsTotal += sampleService.initialiseCollectionExerciseJob(cej);
     }

@@ -16,12 +16,12 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
-import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.CollectionExerciseJobRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
+import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
 
 /** Distributes SampleUnits to Collex when requested via job. Retries failures until successful */
 @Component
@@ -98,18 +98,17 @@ public class SampleUnitDistributor {
   private List<uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit> getMappedSampleUnits(
       UUID sampleSummaryId, String collectionExerciseId) {
 
-    List<uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit> mappedSampleUnits =
-        new LinkedList<>();
+    List<SampleUnit> mappedSampleUnits = new LinkedList<>();
 
     SampleSummary sampleSummary = sampleSummaryRepository.findById(sampleSummaryId);
 
     if (sampleSummary.getState() == SampleState.ACTIVE) {
-      try (Stream<SampleUnit> sampleUnits =
+      try (Stream<uk.gov.ons.ctp.response.sample.domain.model.SampleUnit> sampleUnits =
           sampleUnitRepository.findBySampleSummaryFKAndState(
               sampleSummary.getSampleSummaryPK(), SampleUnitState.PERSISTED)) {
         sampleUnits.forEach(
             su -> {
-              uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit =
+              SampleUnit mappedSampleUnit =
                   sampleUnitMapper.mapSampleUnit(su, collectionExerciseId);
 
               mappedSampleUnits.add(mappedSampleUnit);

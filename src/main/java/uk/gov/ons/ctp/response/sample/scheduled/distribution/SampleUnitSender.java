@@ -8,12 +8,12 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
-import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.message.SampleUnitPublisher;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
+import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
 
 /** Sends SampleUnits via Rabbit queue and updates DB state */
 @Slf4j
@@ -39,14 +39,12 @@ public class SampleUnitSender {
 
   /** Send a SampleUnit */
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void sendSampleUnit(
-      uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit)
-      throws CTPException {
+  public void sendSampleUnit(SampleUnit mappedSampleUnit) throws CTPException {
     // Send to Rabbit queue
     sampleUnitPublisher.send(mappedSampleUnit);
 
     // Because we've now successfully queued the message we can change the state in the DB
-    SampleUnit sampleUnit =
+    uk.gov.ons.ctp.response.sample.domain.model.SampleUnit sampleUnit =
         sampleUnitRepository.findById(UUID.fromString(mappedSampleUnit.getId()));
     SampleUnitDTO.SampleUnitState newState =
         sampleUnitStateTransitionManager.transition(

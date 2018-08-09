@@ -3,8 +3,8 @@ package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 import java.util.Map;
 import ma.glasnost.orika.MapperFacade;
 import org.springframework.stereotype.Component;
-import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesRepository;
+import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
 import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.SampleAttributes;
 
 /** Maps a SampleUnit JPA entity to SampleUnit which can be sent via Rabbit queue */
@@ -20,11 +20,10 @@ public class SampleUnitMapper {
   }
 
   /** Convert a SampleUnit */
-  public uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mapSampleUnit(
-      SampleUnit sampleUnit, String collectionExerciseId) {
-    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit =
-        mapperFacade.map(
-            sampleUnit, uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.class);
+  public SampleUnit mapSampleUnit(
+      uk.gov.ons.ctp.response.sample.domain.model.SampleUnit sampleUnit,
+      String collectionExerciseId) {
+    SampleUnit mappedSampleUnit = mapperFacade.map(sampleUnit, SampleUnit.class);
 
     uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes sampleAttributes =
         sampleAttributesRepository.findOne(sampleUnit.getId());
