@@ -74,7 +74,7 @@ A `HTTP 201 Created` status code is returned if the sample csv is successfully u
 ```
 
 ## Find Sample Summary by Id
-* `GET /samples/samplesummaries/{sampleSummaryId}` get Sample Summary by ID
+* `GET /samples/samplesummary/{sampleSummaryId}` get Sample Summary by ID
 
 **Required parameters:** `sampleSummaryId` as the ID of the sample summary
 
