@@ -180,8 +180,10 @@ public class SampleServiceImpl implements SampleService {
   }
 
   private void sampleSummaryStateCheck(SampleUnit sampleUnit) throws CTPException {
-    int partied = sampleUnitRepository.getPartiedForSampleSummary(sampleUnit.getSampleSummaryFK());
-    int total = sampleUnitRepository.getTotalForSampleSummary(sampleUnit.getSampleSummaryFK());
+    int partied =
+        sampleUnitRepository.countBySampleSummaryFKAndState(
+            sampleUnit.getSampleSummaryFK(), SampleUnitState.PERSISTED);
+    int total = sampleUnitRepository.countBySampleSummaryFK(sampleUnit.getSampleSummaryFK());
     if (total == partied) {
       activateSampleSummaryState(sampleUnit.getSampleSummaryFK());
     }

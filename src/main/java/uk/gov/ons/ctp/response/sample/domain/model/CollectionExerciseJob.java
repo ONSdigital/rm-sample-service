@@ -56,4 +56,7 @@ public class CollectionExerciseJob implements Serializable {
 
   @Column(name = "samplesummaryid")
   private UUID sampleSummaryId;
+
+  @Column(name = "jobcomplete")
+  private boolean jobComplete;
 }
