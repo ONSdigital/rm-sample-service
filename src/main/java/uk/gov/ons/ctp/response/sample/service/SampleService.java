@@ -131,4 +131,20 @@ public interface SampleService {
    * @return
    */
   SampleUnit findSampleUnitBySampleUnitId(UUID sampleUnitId);
+
+  /**
+   * Get sample attributes by their associated post code
+   *
+   * @param postcode
+   * @return
+   */
+  List<SampleAttributes> findSampleAttributesByPostcode(String postcode);
+
+  /**
+   * Get the sample unit associated with a post code
+   *
+   * @param postcode
+   * @return
+   */
+  List<SampleUnit> findSampleUnitsByPostcode(String postcode);
 }
