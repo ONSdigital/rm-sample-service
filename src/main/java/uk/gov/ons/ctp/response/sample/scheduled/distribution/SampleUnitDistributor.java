@@ -1,5 +1,6 @@
 package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -97,23 +98,24 @@ public class SampleUnitDistributor {
   }
 
   private List<SampleUnit> getMappedSampleUnits(UUID sampleSummaryId, String collectionExerciseId) {
+    SampleSummary sampleSummary = sampleSummaryRepository.findById(sampleSummaryId);
+
+    if (sampleSummary.getState() != SampleState.ACTIVE) {
+      return Collections.EMPTY_LIST;
+    }
 
     List<SampleUnit> mappedSampleUnits = new LinkedList<>();
 
-    SampleSummary sampleSummary = sampleSummaryRepository.findById(sampleSummaryId);
+    try (Stream<uk.gov.ons.ctp.response.sample.domain.model.SampleUnit> sampleUnits =
+        sampleUnitRepository.findBySampleSummaryFKAndState(
+            sampleSummary.getSampleSummaryPK(), SampleUnitState.PERSISTED)) {
+      sampleUnits.forEach(
+          su -> {
+            SampleUnit mappedSampleUnit =
+                sampleUnitMapper.mapSampleUnit(su, collectionExerciseId);
 
-    if (sampleSummary.getState() == SampleState.ACTIVE) {
-      try (Stream<uk.gov.ons.ctp.response.sample.domain.model.SampleUnit> sampleUnits =
-          sampleUnitRepository.findBySampleSummaryFKAndState(
-              sampleSummary.getSampleSummaryPK(), SampleUnitState.PERSISTED)) {
-        sampleUnits.forEach(
-            su -> {
-              SampleUnit mappedSampleUnit =
-                  sampleUnitMapper.mapSampleUnit(su, collectionExerciseId);
-
-              mappedSampleUnits.add(mappedSampleUnit);
-            });
-      }
+            mappedSampleUnits.add(mappedSampleUnit);
+          });
     }
 
     return mappedSampleUnits;
