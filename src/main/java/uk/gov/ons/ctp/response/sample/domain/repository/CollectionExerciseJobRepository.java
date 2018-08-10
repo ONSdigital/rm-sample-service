@@ -1,5 +1,6 @@
 package uk.gov.ons.ctp.response.sample.domain.repository;
 
+import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -17,4 +18,6 @@ public interface CollectionExerciseJobRepository
    * @return CollectionExerciseJob object or null
    */
   CollectionExerciseJob findByCollectionExerciseId(UUID collectionExerciseId);
+
+  List<CollectionExerciseJob> findByJobCompleteIsFalse();
 }

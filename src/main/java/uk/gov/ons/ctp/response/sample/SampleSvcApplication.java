@@ -18,8 +18,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.ons.ctp.common.distributed.DistributedListManager;
-import uk.gov.ons.ctp.common.distributed.DistributedListManagerRedissonImpl;
 import uk.gov.ons.ctp.common.error.RestExceptionHandler;
 import uk.gov.ons.ctp.common.jackson.CustomObjectMapper;
 import uk.gov.ons.ctp.common.rest.RestUtility;
@@ -44,8 +42,6 @@ import uk.gov.ons.ctp.response.sample.service.state.SampleSvcStateTransitionMana
 @ImportResource("springintegration/main.xml")
 public class SampleSvcApplication {
 
-  public static final String SAMPLE_UNIT_DISTRIBUTION_LIST = "samplesvc.sampleunit.distribution";
-
   @Autowired private StateTransitionManagerFactory stateTransitionManager;
 
   @Autowired private AppConfig appConfig;
@@ -57,22 +53,6 @@ public class SampleSvcApplication {
    */
   public static void main(final String[] args) {
     SpringApplication.run(SampleSvcApplication.class, args);
-  }
-
-  /**
-   * Bean used to access Distributed Lock Manager
-   *
-   * @param redissonClient Redisson Client
-   * @return the Distributed Lock Manager
-   */
-  @Bean
-  public DistributedListManager<Integer> actionDistributionListManager(
-      RedissonClient redissonClient) {
-    return new DistributedListManagerRedissonImpl<Integer>(
-        SampleSvcApplication.SAMPLE_UNIT_DISTRIBUTION_LIST,
-        redissonClient,
-        appConfig.getDataGrid().getListTimeToWaitSeconds(),
-        appConfig.getDataGrid().getListTimeToLiveSeconds());
   }
 
   /**

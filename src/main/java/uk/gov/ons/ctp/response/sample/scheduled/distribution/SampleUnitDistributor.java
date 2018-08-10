@@ -1,170 +1,122 @@
 package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import javax.transaction.Transactional;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
-import ma.glasnost.orika.MapperFacade;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import uk.gov.ons.ctp.common.distributed.DistributedListManager;
-import uk.gov.ons.ctp.common.distributed.LockingException;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.ons.ctp.common.error.CTPException;
-import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
-import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
+import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.repository.CollectionExerciseJobRepository;
-import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesRepository;
+import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
-import uk.gov.ons.ctp.response.sample.message.SampleUnitPublisher;
-import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
-import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
-import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.SampleAttributes;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
+import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
 
-/** Distributes SampleUnits */
+/** Distributes SampleUnits to Collex when requested via job. Retries failures until successful */
 @Component
 @Slf4j
 public class SampleUnitDistributor {
-  public static final String SAMPLEUNIT_DISTRIBUTOR_SPAN = "sampleunitDistributor";
-  public static final String SAMPLEUNIT_DISTRIBUTOR_LIST_ID = "sampleunit";
-  private static final int E = -9999;
+  private static final String LOCK_PREFIX = "SampleCollexJob-";
+
+  @Autowired private AppConfig appConfig;
+
+  @Autowired private SampleUnitSender sampleUnitSender;
+
   @Autowired private CollectionExerciseJobRepository collectionExerciseJobRepository;
 
   @Autowired private SampleUnitRepository sampleUnitRepository;
 
-  @Autowired private SampleAttributesRepository sampleAttributesRepository;
+  @Autowired private SampleSummaryRepository sampleSummaryRepository;
 
-  @Autowired private AppConfig appConfig;
+  @Autowired private RedissonClient redissonClient;
 
-  @Autowired private MapperFacade mapperFacade;
+  @Autowired private SampleUnitMapper sampleUnitMapper;
 
-  @Autowired private SampleUnitPublisher sampleUnitPublisher;
-
-  @Autowired
-  @Qualifier("sampleUnitTransitionManager")
-  private StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent>
-      sampleUnitStateTransitionManager;
-
-  @Autowired private DistributedListManager<Integer> sampleUnitDistributionListManager;
-
-  /** @return SampleUnitDistributionInfo Information for SampelUnit Distribution */
+  /** Scheduled job for distributing SampleUnits */
+  @Scheduled(fixedDelayString = "#{appConfig.sampleUnitDistribution.delayMilliSeconds}")
   @Transactional
-  public SampleUnitDistributionInfo distribute() {
-    log.info("SampleUnitDistributor is in the house");
-    SampleUnitDistributionInfo distInfo = new SampleUnitDistributionInfo();
+  public void distribute() {
+    List<CollectionExerciseJob> jobs = collectionExerciseJobRepository.findByJobCompleteIsFalse();
 
-    int successes = 0;
-    int failures = 0;
-    try {
-      List<CollectionExerciseJob> jobs = collectionExerciseJobRepository.findAll();
-      for (CollectionExerciseJob job : jobs) {
-        List<SampleUnit> sampleUnits;
+    for (CollectionExerciseJob job : jobs) {
+      String uniqueLockName = LOCK_PREFIX + job.getCollectionExerciseJobPK();
 
-        List<Integer> excludedCases =
-            sampleUnitDistributionListManager.findList(SAMPLEUNIT_DISTRIBUTOR_LIST_ID, false);
-        log.debug("retrieve sample units excluding {}", excludedCases);
-        if (excludedCases.size() == 0) {
-          excludedCases.add(E);
-        }
+      RLock lock = redissonClient.getFairLock(uniqueLockName);
 
-        sampleUnits =
-            sampleUnitRepository.getSampleUnits(
-                job.getSampleSummaryId(),
-                SampleSummaryDTO.SampleState.ACTIVE.toString(),
-                appConfig.getSampleUnitDistribution().getRetrievalMax(),
-                excludedCases);
-
-        if (sampleUnits.size() > 0) {
-          sampleUnitDistributionListManager.saveList(
-              SAMPLEUNIT_DISTRIBUTOR_LIST_ID,
-              sampleUnits.stream().map(SampleUnit::getSampleUnitPK).collect(Collectors.toList()),
-              true);
-        }
-
-        for (SampleUnit sampleUnit : sampleUnits) {
+      try {
+        // Wait for a lock. Automatically unlock after a certain amount of time to prevent issues
+        // when lock holder crashes or Redis crashes causing permanent lockout
+        if (lock.tryLock(
+            appConfig.getDataGrid().getLockTimeToWaitSeconds(),
+            appConfig.getDataGrid().getLockTimeToLiveSeconds(),
+            TimeUnit.SECONDS)) {
           try {
-            uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit =
-                mapperFacade.map(
-                    sampleUnit, uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.class);
-            uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes sampleAttributes =
-                sampleAttributesRepository.findOne(sampleUnit.getId());
-            if (sampleUnit.getId() != null) {
-              mappedSampleUnit.setId(sampleUnit.getId().toString());
-            }
-            if (sampleAttributes != null) {
-              mappedSampleUnit.setSampleAttributes(mapSampleAttributes(sampleAttributes));
-            }
-            mappedSampleUnit.setCollectionExerciseId(job.getCollectionExerciseId().toString());
-            sendSampleUnitToCollectionExerciseQueue(sampleUnit, mappedSampleUnit);
-
-            successes++;
-          } catch (CTPException e) {
-            // single case/questionnaire db changes rolled back
-            log.error(
-                "Exception {} thrown processing sampleunit {}. Processing postponed",
-                e.getMessage(),
-                sampleUnit.getSampleUnitPK());
-            log.error("Stack trace: " + e);
-            failures++;
+            processJob(job);
+          } finally {
+            // Always unlock the distributed lock
+            lock.unlock();
           }
         }
-        sampleUnitDistributionListManager.deleteList(SAMPLEUNIT_DISTRIBUTOR_LIST_ID, true);
-        try {
-          sampleUnitDistributionListManager.unlockContainer();
-        } catch (LockingException le) {
-          // oh well - will time out or we never had the lock
-        }
+      } catch (InterruptedException e) {
+        // Ignored - process stopped while waiting for lock
       }
-    } catch (Exception e) {
-      log.error("Failed to process sample units", e);
+    }
+  }
+
+  private void processJob(CollectionExerciseJob job) {
+    List<SampleUnit> mappedSampleUnits =
+        getMappedSampleUnits(job.getSampleSummaryId(), job.getCollectionExerciseId().toString());
+
+    boolean hasErrors = false;
+
+    for (SampleUnit msu : mappedSampleUnits) {
+      try {
+        sampleUnitSender.sendSampleUnit(msu);
+      } catch (CTPException e) {
+        hasErrors = true;
+        log.error(
+            "Failed to send a sample unit to queue and update state with ID: {}", msu.getId(), e);
+      }
     }
 
-    distInfo.setSampleUnitsSucceeded(successes);
-    distInfo.setSampleUnitsFailed(failures);
-
-    log.info("SampleUnitsDistributor sleeping");
-    return distInfo;
-  }
-
-  private SampleAttributes mapSampleAttributes(
-      uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes sampleAttributes) {
-    SampleAttributes mappedSampleAttributes = new SampleAttributes();
-    SampleAttributes.Builder<Void> sampleAttributesBuilder =
-        mappedSampleAttributes.newCopyBuilder();
-    for (Map.Entry<String, String> attribute : sampleAttributes.getAttributes().entrySet()) {
-      sampleAttributesBuilder
-          .addEntries()
-          .withKey(attribute.getKey())
-          .withValue(attribute.getValue());
+    if (!hasErrors) {
+      job.setJobComplete(true);
+      collectionExerciseJobRepository.saveAndFlush(job);
     }
-    return sampleAttributesBuilder.build();
   }
 
-  /**
-   * Sends SampleUnit to the CollectionExercise queue
-   *
-   * @param sampleUnit sample unit to be mapped
-   * @param mappedSampleUnit mapped sample unit to be sent
-   * @throws CTPException if transition issue
-   */
-  private void sendSampleUnitToCollectionExerciseQueue(
-      SampleUnit sampleUnit,
-      uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit)
-      throws CTPException {
-    transitionSampleUnitStateFromDeliveryEvent(sampleUnit);
-    sampleUnitPublisher.send(mappedSampleUnit);
-  }
+  private List<SampleUnit> getMappedSampleUnits(UUID sampleSummaryId, String collectionExerciseId) {
+    SampleSummary sampleSummary = sampleSummaryRepository.findById(sampleSummaryId);
 
-  private SampleUnit transitionSampleUnitStateFromDeliveryEvent(SampleUnit sampleUnit)
-      throws CTPException {
-    SampleUnitDTO.SampleUnitState newState =
-        sampleUnitStateTransitionManager.transition(
-            sampleUnit.getState(), SampleUnitDTO.SampleUnitEvent.DELIVERING);
-    sampleUnit.setState(newState);
-    sampleUnitRepository.saveAndFlush(sampleUnit);
-    return sampleUnit;
+    if (sampleSummary.getState() != SampleState.ACTIVE) {
+      return Collections.EMPTY_LIST;
+    }
+
+    List<SampleUnit> mappedSampleUnits = new LinkedList<>();
+
+    try (Stream<uk.gov.ons.ctp.response.sample.domain.model.SampleUnit> sampleUnits =
+        sampleUnitRepository.findBySampleSummaryFKAndState(
+            sampleSummary.getSampleSummaryPK(), SampleUnitState.PERSISTED)) {
+      sampleUnits.forEach(
+          su -> {
+            SampleUnit mappedSampleUnit = sampleUnitMapper.mapSampleUnit(su, collectionExerciseId);
+
+            mappedSampleUnits.add(mappedSampleUnit);
+          });
+    }
+
+    return mappedSampleUnits;
   }
 }
