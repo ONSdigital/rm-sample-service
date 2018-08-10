@@ -111,8 +111,7 @@ public class SampleUnitDistributor {
             sampleSummary.getSampleSummaryPK(), SampleUnitState.PERSISTED)) {
       sampleUnits.forEach(
           su -> {
-            SampleUnit mappedSampleUnit =
-                sampleUnitMapper.mapSampleUnit(su, collectionExerciseId);
+            SampleUnit mappedSampleUnit = sampleUnitMapper.mapSampleUnit(su, collectionExerciseId);
 
             mappedSampleUnits.add(mappedSampleUnit);
           });
