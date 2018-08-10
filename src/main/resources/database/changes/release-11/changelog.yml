@@ -1,0 +1,11 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 11-1
+      author: Nick Grant
+      changes:
+        - sqlFile:
+            comment: Add jobCompleted column to CollexJob table
+            path: add_job_completed_column.sql
+            relativeToChangelogFile: true
+            splitStatements: false

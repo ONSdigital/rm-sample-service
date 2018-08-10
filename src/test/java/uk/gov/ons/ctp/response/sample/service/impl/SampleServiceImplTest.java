@@ -173,7 +173,7 @@ public class SampleServiceImplTest {
     when(sampleSummaryRepository.findOne(1)).thenReturn(sampleSummaryList.get(0));
     when(sampleSvcStateTransitionManager.transition(SampleState.INIT, SampleEvent.ACTIVATED))
         .thenReturn(SampleState.ACTIVE);
-    when(sampleUnitRepository.getTotalForSampleSummary(1)).thenReturn(1);
+    when(sampleUnitRepository.countBySampleSummaryFK(1)).thenReturn(1);
 
     PartyDTO testParty = sampleServiceImpl.sendToPartyService(party.get(0));
     assertEquals(SAMPLE_SUMMARY_ID, testParty.getSampleSummaryId());
