@@ -1,14 +1,22 @@
 package uk.gov.ons.ctp.response.sample.message;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.integration.annotation.MessageEndpoint;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 
-/** Service responsible for publishing Party(s) to queue Sample.Party */
-public interface PartyPublisher {
+@Slf4j
+@MessageEndpoint
+public class PartyPublisher {
 
-  /**
-   * To put one Party on the queue Sample.Party
-   *
-   * @param party the party to put on the queue
-   */
-  void publish(PartyCreationRequestDTO party);
+  @Qualifier("partyRabbitTemplate")
+  @Autowired
+  private RabbitTemplate rabbitTemplate;
+
+  public void publish(PartyCreationRequestDTO party) {
+    log.debug("send to queue to be sent to partySvc {}", party);
+    rabbitTemplate.convertAndSend(party);
+  }
 }
