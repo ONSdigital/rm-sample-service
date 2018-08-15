@@ -1,150 +1,290 @@
 package uk.gov.ons.ctp.response.sample.service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.common.error.CTPException;
+import uk.gov.ons.ctp.common.state.StateTransitionManager;
+import uk.gov.ons.ctp.common.time.DateTimeUtil;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
+import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesRepository;
+import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
+import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
+import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
+import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterCensus;
+import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterSocial;
+import uk.gov.ons.ctp.response.sample.message.EventPublisher;
+import uk.gov.ons.ctp.response.sample.message.SampleOutboundPublisher;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
 import validation.SampleUnitBase;
 
-/**
- * The SampleService interface defines all business behaviours for operations on the Sample entity
- * model.
- */
-public interface SampleService {
+@Slf4j
+@Service
+@Configuration
+public class SampleService {
 
-  /**
-   * find all sampleSummaries
-   *
-   * @return list of SampleSummary
-   */
-  List<SampleSummary> findAllSampleSummaries();
+  @Autowired private SampleSummaryRepository sampleSummaryRepository;
 
-  /**
-   * find sampleSummary
-   *
-   * @return SampleSummary
-   */
-  SampleSummary findSampleSummary(UUID id);
+  @Autowired private SampleUnitRepository sampleUnitRepository;
 
-  /**
-   * Create and save a SampleSummary from the incoming SurveySample
-   *
-   * @param sampleSummary the sample summary being processed
-   * @param samplingUnitList list of sampling units.
-   * @param sampleUnitState
-   */
-  SampleSummary saveSample(
+  @Autowired
+  @Qualifier("sampleSummaryTransitionManager")
+  private StateTransitionManager<SampleState, SampleEvent> sampleSvcStateTransitionManager;
+
+  @Autowired
+  @Qualifier("sampleUnitTransitionManager")
+  private StateTransitionManager<SampleUnitState, SampleUnitEvent>
+      sampleSvcUnitStateTransitionManager;
+
+  @Autowired private PartySvcClientService partySvcClient;
+
+  @Autowired private SampleOutboundPublisher sampleOutboundPublisher;
+
+  @Autowired private CollectionExerciseJobService collectionExerciseJobService;
+
+  @Autowired private CsvIngesterBusiness csvIngesterBusiness;
+
+  @Autowired private CsvIngesterCensus csvIngesterCensus;
+
+  @Autowired private CsvIngesterSocial csvIngesterSocial;
+  @Autowired private EventPublisher eventPublisher;
+  @Autowired private SampleAttributesRepository sampleAttributesRepository;
+
+  public List<SampleSummary> findAllSampleSummaries() {
+    return sampleSummaryRepository.findAll();
+  }
+
+  public SampleSummary findSampleSummary(UUID id) {
+    return sampleSummaryRepository.findById(id);
+  }
+
+  @Transactional(propagation = Propagation.REQUIRED)
+  public SampleSummary saveSample(
       SampleSummary sampleSummary,
       List<? extends SampleUnitBase> samplingUnitList,
-      SampleUnitState sampleUnitState);
+      SampleUnitState sampleUnitState) {
+    int expectedCI = calculateExpectedCollectionInstruments(samplingUnitList);
+
+    sampleSummary.setTotalSampleUnits(samplingUnitList.size());
+    sampleSummary.setExpectedCollectionInstruments(expectedCI);
+    SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
+    saveSampleUnits(samplingUnitList, savedSampleSummary, sampleUnitState);
+
+    return savedSampleSummary;
+  }
+
+  private Integer calculateExpectedCollectionInstruments(
+      List<? extends SampleUnitBase> samplingUnitList) {
+    // TODO: get survey classifiers from survey service, currently using formtype for all business
+    // surveys
+    Set<String> formTypes = new HashSet<>();
+    for (SampleUnitBase businessSampleUnit : samplingUnitList) {
+      formTypes.add(businessSampleUnit.getFormType());
+    }
+    return formTypes.size();
+  }
+
+  @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+  public SampleSummary createAndSaveSampleSummary() {
+    SampleSummary sampleSummary = new SampleSummary();
+
+    sampleSummary.setState(SampleState.INIT);
+    sampleSummary.setId(UUID.randomUUID());
+
+    return sampleSummaryRepository.save(sampleSummary);
+  }
+
+  private void saveSampleUnits(
+      List<? extends SampleUnitBase> samplingUnitList,
+      SampleSummary sampleSummary,
+      SampleUnitState sampleUnitState) {
+    for (SampleUnitBase sampleUnitBase : samplingUnitList) {
+      SampleUnit sampleUnit = new SampleUnit();
+      sampleUnit.setSampleSummaryFK(sampleSummary.getSampleSummaryPK());
+      sampleUnit.setSampleUnitRef(sampleUnitBase.getSampleUnitRef());
+      sampleUnit.setSampleUnitType(sampleUnitBase.getSampleUnitType());
+      sampleUnit.setFormType(sampleUnitBase.getFormType());
+      sampleUnit.setState(sampleUnitState);
+      sampleUnit.setId(sampleUnitBase.getSampleUnitId());
+      eventPublisher.publishEvent("Sample Init");
+      sampleUnitRepository.save(sampleUnit);
+    }
+  }
 
   /**
-   * Create a new sample summary and persist to the database
+   * Effect a state transition for the target SampleSummary if one is required
    *
-   * @return the newly created sample summary
-   */
-  SampleSummary createAndSaveSampleSummary();
-
-  /**
-   * Update the SampleSummary state
-   *
-   * @param sampleSummaryPK The sampleSummaryPK
-   * @return SampleSummary object or null
+   * @param sampleSummaryPK the sampleSummaryPK to be updated
+   * @return SampleSummary the updated SampleSummary
    * @throws CTPException if transition errors
    */
-  SampleSummary activateSampleSummaryState(Integer sampleSummaryPK) throws CTPException;
+  public SampleSummary activateSampleSummaryState(Integer sampleSummaryPK) throws CTPException {
+    SampleSummary targetSampleSummary = sampleSummaryRepository.findOne(sampleSummaryPK);
+    SampleState newState =
+        sampleSvcStateTransitionManager.transition(
+            targetSampleSummary.getState(), SampleEvent.ACTIVATED);
+    targetSampleSummary.setState(newState);
+    targetSampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
+    sampleSummaryRepository.saveAndFlush(targetSampleSummary);
+    // Notify the outside world the sample upload has finished
+    this.sampleOutboundPublisher.sampleUploadFinished(targetSampleSummary);
+
+    return targetSampleSummary;
+  }
+
+  public PartyDTO sendToPartyService(PartyCreationRequestDTO partyCreationRequest)
+      throws Exception {
+    PartyDTO returnedParty = partySvcClient.postParty(partyCreationRequest);
+    SampleUnit sampleUnit =
+        sampleUnitRepository.findById(
+            UUID.fromString(partyCreationRequest.getAttributes().getSampleUnitId()));
+    changeSampleUnitState(sampleUnit);
+    sampleSummaryStateCheck(sampleUnit);
+    return returnedParty;
+  }
+
+  private void changeSampleUnitState(SampleUnit sampleUnit) throws CTPException {
+    SampleUnitState newState =
+        sampleSvcUnitStateTransitionManager.transition(
+            sampleUnit.getState(), SampleUnitEvent.PERSISTING);
+    sampleUnit.setState(newState);
+    sampleUnitRepository.saveAndFlush(sampleUnit);
+  }
+
+  private void sampleSummaryStateCheck(SampleUnit sampleUnit) throws CTPException {
+    int partied =
+        sampleUnitRepository.countBySampleSummaryFKAndState(
+            sampleUnit.getSampleSummaryFK(), SampleUnitState.PERSISTED);
+    int total = sampleUnitRepository.countBySampleSummaryFK(sampleUnit.getSampleSummaryFK());
+    if (total == partied) {
+      activateSampleSummaryState(sampleUnit.getSampleSummaryFK());
+    }
+  }
 
   /**
-   * Save a CollectionExerciseJob based on the associated CollectionExerciseId, and SampleSummary
-   * surveyRef and exerciseDateTime
+   * Save CollectionExerciseJob to collectionExerciseJob table
    *
-   * @param collectionExerciseJob CollectionExerciseJobCreationRequestDTO related to SampleUnits
-   * @return Integer sampleUnitsTotal value
+   * @param job CollectionExerciseJobCreationRequestDTO related to SampleUnits
+   * @return Integer Returns sampleUnitsTotal value
    * @throws CTPException if update operation fails or CollectionExerciseJob already exists
    */
-  Integer initialiseCollectionExerciseJob(CollectionExerciseJob collectionExerciseJob)
-      throws CTPException;
+  public Integer initialiseCollectionExerciseJob(CollectionExerciseJob job) throws CTPException {
+    // Integer sampleUnitsTotal =
+    // initialiseSampleUnitsForCollectionExcerciseCollection(job.getSampleSummaryId());
+    Integer sampleUnitsTotal = 0;
+    SampleSummary sampleSummary = sampleSummaryRepository.findById(job.getSampleSummaryId());
+    if (sampleSummary != null && sampleSummary.getTotalSampleUnits() != 0) {
+      sampleUnitsTotal = sampleSummary.getTotalSampleUnits();
+      collectionExerciseJobService.storeCollectionExerciseJob(job);
+    }
+    return sampleUnitsTotal;
+  }
 
-  /**
-   * Post to partySvc. If successful, it then goes on to change SampleUnit(s) state and to effect a
-   * state transition for the target SampleSummary if one is required.
-   *
-   * @param party party picked up from queue
-   * @return the Party representation data
-   * @throws Exception exception thrown
-   */
-  PartyDTO sendToPartyService(PartyCreationRequestDTO party) throws Exception;
+  public SampleSummary ingest(
+      final SampleSummary sampleSummary, final MultipartFile file, final String type)
+      throws Exception {
+    this.sampleOutboundPublisher.sampleUploadStarted(sampleSummary);
 
-  /**
-   * Ingest survey sample
-   *
-   * @param sampleSummary a newly created samplesummary
-   * @param file Multipart File of SurveySample to be used
-   * @param type Type of Survey to be used
-   * @return an updated samplesummary
-   * @throws Exception thrown if issue reading CSV
-   */
-  SampleSummary ingest(SampleSummary sampleSummary, MultipartFile file, String type)
-      throws Exception;
+    SampleSummary result;
+    switch (type.toUpperCase()) {
+      case "B":
+        result = csvIngesterBusiness.ingest(sampleSummary, file);
+        break;
+      case "CENSUS":
+        result = csvIngesterCensus.ingest(sampleSummary, file);
+        break;
+      case "SOCIAL":
+        result = csvIngesterSocial.ingest(sampleSummary, file);
+        break;
+      default:
+        throw new UnsupportedOperationException(String.format("Type %s not implemented", type));
+    }
 
-  Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, String message);
+    return result;
+  }
 
-  Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, Exception exception);
+  public Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, String message) {
+    try {
+      SampleState newState =
+          sampleSvcStateTransitionManager.transition(
+              sampleSummary.getState(), SampleEvent.FAIL_VALIDATION);
+      sampleSummary.setState(newState);
+      sampleSummary.setNotes(message);
+      SampleSummary persisted = this.sampleSummaryRepository.save(sampleSummary);
 
-  /**
-   * find sampleUnit
-   *
-   * @return SampleUnit
-   */
-  SampleUnit findSampleUnit(UUID id);
+      return Optional.of(persisted);
+    } catch (CTPException e) {
+      log.error("Failed to put sample summary {} into FAILED state - {}", sampleSummary.getId(), e);
 
-  /**
-   * Return the attributes of the sample based on
-   *
-   * @param id - The sample unit reference
-   */
-  SampleAttributes findSampleAttributes(UUID id);
+      return Optional.empty();
+    } catch (RuntimeException e) {
+      // Hibernate throws RuntimeException if any issue persisting the SampleSummary. This is to
+      // ensure it is logged
+      // (otherwise they just disappear).
+      log.error("Failed to persist sample summary - {}", e);
 
-  /**
-   * Return the sample unit based on the sample unit reference
-   *
-   * @param sampleUnitRef
-   * @return
-   */
-  SampleUnit findSampleUnitBySampleUnitRef(String sampleUnitRef);
+      throw e;
+    }
+  }
 
-  /** Get sample unit based on sample summary */
-  List<SampleUnit> findSampleUnitsBySampleSummary(UUID sampleSummaryId);
+  public Optional<SampleSummary> failSampleSummary(
+      SampleSummary sampleSummary, Exception exception) {
+    return failSampleSummary(sampleSummary, exception.getMessage());
+  }
 
-  /**
-   * Find a sample unit by its unique UUID
-   *
-   * @param sampleUnitId
-   * @return
-   */
-  SampleUnit findSampleUnitBySampleUnitId(UUID sampleUnitId);
+  // TODO get this to get the attributes in a separate call then stitch the results into the value
+  // returned by sampleUnitRepository.findById
+  public SampleUnit findSampleUnit(UUID id) {
+    SampleUnit su = sampleUnitRepository.findById(id);
+    su.setSampleAttributes(sampleAttributesRepository.findOne(id));
+    return su;
+  }
 
-  /**
-   * Get sample attributes by their associated post code
-   *
-   * @param postcode
-   * @return
-   */
-  List<SampleAttributes> findSampleAttributesByPostcode(String postcode);
+  public SampleAttributes findSampleAttributes(UUID id) {
+    return sampleAttributesRepository.findOne(id);
+  }
 
-  /**
-   * Get the sample unit associated with a post code
-   *
-   * @param postcode
-   * @return
-   */
-  List<SampleUnit> findSampleUnitsByPostcode(String postcode);
+  public SampleUnit findSampleUnitBySampleUnitId(UUID sampleUnitId) {
+    return sampleUnitRepository.findById(sampleUnitId);
+  }
+
+  public List<SampleUnit> findSampleUnitsBySampleSummary(UUID sampleSummaryId) {
+    SampleSummary ss = sampleSummaryRepository.findById(sampleSummaryId);
+    return sampleUnitRepository.findBySampleSummaryFK(ss.getSampleSummaryPK());
+  }
+
+  public List<SampleAttributes> findSampleAttributesByPostcode(String postcode) {
+    return sampleAttributesRepository.findByPostcode(postcode);
+  }
+
+  public List<SampleUnit> findSampleUnitsByPostcode(String postcode) {
+    return findSampleAttributesByPostcode(postcode)
+        .stream()
+        .map(
+            attrs -> {
+              SampleUnit su = findSampleUnitBySampleUnitId(attrs.getSampleUnitFK());
+              su.setSampleAttributes(attrs);
+              return su;
+            })
+        .collect(Collectors.toList());
+  }
 }

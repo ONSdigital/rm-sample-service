@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.response.sample.service.impl;
+package uk.gov.ons.ctp.response.sample.service;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -38,13 +38,11 @@ import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleStat
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
-import uk.gov.ons.ctp.response.sample.service.CollectionExerciseJobService;
-import uk.gov.ons.ctp.response.sample.service.PartySvcClientService;
 import validation.BusinessSurveySample;
 
 /** tests */
 @RunWith(MockitoJUnitRunner.class)
-public class SampleServiceImplTest {
+public class SampleServiceTest {
 
   private static final String SAMPLE_SUMMARY_ID = "c6ea7ae3-468d-4b7d-847c-af54874baa46";
 
@@ -74,7 +72,7 @@ public class SampleServiceImplTest {
 
   @Mock private CsvIngesterBusiness csvIngesterBusiness;
 
-  @InjectMocks private SampleServiceImpl sampleServiceImpl;
+  @InjectMocks private SampleService sampleService;
 
   private List<BusinessSurveySample> surveySample;
   private List<PartyCreationRequestDTO> party;
@@ -106,7 +104,7 @@ public class SampleServiceImplTest {
    */
   @Test
   public void verifySampleSummaryCreatedCorrectly() {
-    SampleSummary sampleSummary = sampleServiceImpl.createAndSaveSampleSummary();
+    SampleSummary sampleSummary = sampleService.createAndSaveSampleSummary();
 
     assertTrue(sampleSummary.getState() == SampleSummaryDTO.SampleState.INIT);
     assertNotNull(sampleSummary.getId());
@@ -123,10 +121,10 @@ public class SampleServiceImplTest {
    */
   @Test
   public void testSampleSummaryAndSampleUnitsAreSaved() {
-    SampleSummary newSummary = sampleServiceImpl.createAndSaveSampleSummary();
+    SampleSummary newSummary = sampleService.createAndSaveSampleSummary();
     BusinessSurveySample businessSample = surveySample.get(0);
 
-    sampleServiceImpl.saveSample(newSummary, businessSample.getSampleUnits(), SampleUnitState.INIT);
+    sampleService.saveSample(newSummary, businessSample.getSampleUnits(), SampleUnitState.INIT);
 
     verify(sampleSummaryRepository, times(2)).save(any(SampleSummary.class));
     verify(sampleUnitRepository, times(2)).save(any(SampleUnit.class));
@@ -149,7 +147,7 @@ public class SampleServiceImplTest {
     when(sampleSvcStateTransitionManager.transition(SampleState.INIT, SampleEvent.ACTIVATED))
         .thenReturn(SampleState.ACTIVE);
 
-    PartyDTO testParty = sampleServiceImpl.sendToPartyService(party.get(0));
+    PartyDTO testParty = sampleService.sendToPartyService(party.get(0));
     assertEquals(SAMPLE_SUMMARY_ID, testParty.getSampleSummaryId());
     verify(partySvcClient).postParty(any(PartyCreationRequestDTO.class));
     assertThat(sampleUnit.get(0).getState(), is(SampleUnitState.PERSISTED));
@@ -175,7 +173,7 @@ public class SampleServiceImplTest {
         .thenReturn(SampleState.ACTIVE);
     when(sampleUnitRepository.countBySampleSummaryFK(1)).thenReturn(1);
 
-    PartyDTO testParty = sampleServiceImpl.sendToPartyService(party.get(0));
+    PartyDTO testParty = sampleService.sendToPartyService(party.get(0));
     assertEquals(SAMPLE_SUMMARY_ID, testParty.getSampleSummaryId());
     verify(partySvcClient).postParty(any(PartyCreationRequestDTO.class));
     assertThat(sampleUnit.get(0).getState(), is(SampleUnitState.PERSISTED));
@@ -191,7 +189,7 @@ public class SampleServiceImplTest {
   @Test
   public void testNoCollectionExerciseStoredWhenNoSampleUnits() throws Exception {
     Integer sampleUnitsTotal =
-        sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
+        sampleService.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(0)).storeCollectionExerciseJob(any());
     assertThat(sampleUnitsTotal, is(0));
   }
@@ -207,13 +205,13 @@ public class SampleServiceImplTest {
     SampleSummary newSummary = createSampleSummary(5, 2);
     when(sampleSummaryRepository.findById(any())).thenReturn(newSummary);
     Integer sampleUnitsTotal =
-        sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
+        sampleService.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(1)).storeCollectionExerciseJob(any());
     assertThat(sampleUnitsTotal, is(5));
   }
 
   private SampleSummary createSampleSummary(int numSamples, int expectedInstruments) {
-    SampleSummary newSummary = sampleServiceImpl.createAndSaveSampleSummary();
+    SampleSummary newSummary = sampleService.createAndSaveSampleSummary();
 
     newSummary.setTotalSampleUnits(numSamples);
     newSummary.setExpectedCollectionInstruments(expectedInstruments);
@@ -232,7 +230,7 @@ public class SampleServiceImplTest {
     SampleSummary newSummary = createSampleSummary(0, 2);
     when(sampleSummaryRepository.findById(any())).thenReturn(newSummary);
     Integer sampleUnitsTotal =
-        sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
+        sampleService.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(0)).storeCollectionExerciseJob(any());
     assertThat(sampleUnitsTotal, is(0));
   }
@@ -248,7 +246,7 @@ public class SampleServiceImplTest {
     SampleSummary sampleSummary = null;
     when(sampleSummaryRepository.findById(any())).thenReturn(sampleSummary);
     Integer sampleUnitsTotal =
-        sampleServiceImpl.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
+        sampleService.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(0)).storeCollectionExerciseJob(any());
     assertThat(sampleUnitsTotal, is(0));
   }
@@ -263,7 +261,7 @@ public class SampleServiceImplTest {
         .thenReturn(summary);
 
     // When
-    SampleSummary result = sampleServiceImpl.ingest(summary, file, "B");
+    SampleSummary result = sampleService.ingest(summary, file, "B");
 
     // Then
     verify(csvIngesterBusiness, times(1)).ingest(summary, file);
@@ -279,7 +277,7 @@ public class SampleServiceImplTest {
         .thenReturn(summary);
 
     // When
-    SampleSummary result = sampleServiceImpl.ingest(summary, file, "b");
+    SampleSummary result = sampleService.ingest(summary, file, "b");
 
     // Then
     verify(csvIngesterBusiness, times(1)).ingest(result, file);
@@ -300,7 +298,7 @@ public class SampleServiceImplTest {
         .thenReturn(summary);
 
     // When
-    SampleSummary finalSummary = sampleServiceImpl.ingest(summary, file, invalidType);
+    SampleSummary finalSummary = sampleService.ingest(summary, file, invalidType);
   }
 
   @Test
@@ -313,7 +311,7 @@ public class SampleServiceImplTest {
         .thenReturn(summary);
 
     // When
-    sampleServiceImpl.ingest(summary, file, "B");
+    sampleService.ingest(summary, file, "B");
 
     // Then
     verify(sampleOutboundPublisher, times(1)).sampleUploadStarted(any());
