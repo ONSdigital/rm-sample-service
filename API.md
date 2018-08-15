@@ -104,3 +104,48 @@ A `HTTP 201 Created` status code is returned if the sample csv is successfully u
     "state": "DELIVERED",
     "sampleUnitId": null
 }
+```
+
+## Find Sample Units by Sample Summary Id
+* `GET /samples/{sampleSummaryId}/sampleunits` get Sample Units by Summary ID
+
+**Required parameters:** `sampleSummaryId` as the ID of the sample summary
+
+### Example JSON Response
+```json
+[
+    {
+    "sampleUnitPK": 1,
+    "sampleSummaryFK": 1,
+    "sampleUnitRef": "LMS0001",
+    "sampleUnitType": "H",
+    "formType": null,
+    "state": "DELIVERED",
+    "id": "5df02ac7-a840-4512-b7e9-bae9d20d4208"
+    },
+    ...
+]
+```
+
+## Find Sample Unit Attributes by Sample Id
+* `GET /samples/{id}/attributes` get Sample Unit Attributes by Sample ID
+
+**Required parameters:** `id` the ID of the sample
+
+### Example JSON Response
+```json
+{
+    "id": "5df02ac7-a840-4512-b7e9-bae9d20d4208",
+    "attributes": {
+    "Prem1": "14 ASHMEAD VIEW",
+    "Prem2": "",
+    "Prem3": "",
+    "Prem4": "",
+    "District": "",
+    "PostTown": "STOCKTON-ON-TEES",
+    "Postcode": "TS184QG",
+    "Reference": "LMS0001",
+    "CountryCode": "E"
+    }
+}
+```
