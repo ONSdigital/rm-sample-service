@@ -15,7 +15,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.repository.CollectionExerciseJobRepository;
-import uk.gov.ons.ctp.response.sample.service.impl.CollectionExerciseJobImpl;
 
 /** Created by wardlk on 03/07/2017. */
 @RunWith(MockitoJUnitRunner.class)
@@ -24,7 +23,7 @@ public class StoreCollectionExerciseJobTest {
   private static final UUID COLLECTIONEXERCISEID =
       UUID.fromString("84867a71-264b-46f0-bf7e-7e19e40a6cb8");
 
-  @InjectMocks private CollectionExerciseJobImpl collectionExerciseJobImpl;
+  @InjectMocks private CollectionExerciseJobService collectionExerciseJobService;
 
   @Mock private CollectionExerciseJobRepository collectionExerciseJobRepository;
 
@@ -51,7 +50,7 @@ public class StoreCollectionExerciseJobTest {
         CollectionExerciseJob.builder().collectionExerciseId(COLLECTIONEXERCISEID).build();
     when(collectionExerciseJobRepository.findByCollectionExerciseId(COLLECTIONEXERCISEID))
         .thenReturn(null);
-    collectionExerciseJobImpl.storeCollectionExerciseJob(inputCollectionExerciseJob);
+    collectionExerciseJobService.storeCollectionExerciseJob(inputCollectionExerciseJob);
     verify(collectionExerciseJobRepository, times(1)).saveAndFlush(inputCollectionExerciseJob);
   }
 
@@ -68,6 +67,6 @@ public class StoreCollectionExerciseJobTest {
     CollectionExerciseJob returnedCollectionExerciseJob = new CollectionExerciseJob();
     when(collectionExerciseJobRepository.findByCollectionExerciseId(COLLECTIONEXERCISEID))
         .thenReturn(returnedCollectionExerciseJob);
-    collectionExerciseJobImpl.storeCollectionExerciseJob(inputCollectionExerciseJob);
+    collectionExerciseJobService.storeCollectionExerciseJob(inputCollectionExerciseJob);
   }
 }
