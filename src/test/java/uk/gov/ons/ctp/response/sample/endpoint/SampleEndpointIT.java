@@ -180,8 +180,8 @@ public class SampleEndpointIT {
 
     assertThat(sampleUnit.getSampleAttributes().getEntries())
         .contains(
-            new SampleUnit.SampleAttributes.Entry("ADDRESS_LINE2", "14 HILL VIEW"),
-            new SampleUnit.SampleAttributes.Entry("POSTCODE", "TS86BE"),
+            new SampleUnit.SampleAttributes.Entry("ADDRESS_LINE2", "11 HILL VIEW"),
+            new SampleUnit.SampleAttributes.Entry("POSTCODE", "AA11AA"),
             new SampleUnit.SampleAttributes.Entry("TOWN_NAME", "STOCKTON-ON-TEES"),
             new SampleUnit.SampleAttributes.Entry("COUNTRY", "E"),
             new SampleUnit.SampleAttributes.Entry("TLA", "LMS"),
@@ -299,7 +299,7 @@ public class SampleEndpointIT {
 
     assertThat(sampleUnitId).isNotBlank();
 
-    String postcode = "PQ3 1AL";
+    String postcode = "EE5 5EE";
 
     assertThat(postcode).isNotBlank();
 
@@ -330,7 +330,7 @@ public class SampleEndpointIT {
 
     assertThat(sampleUnitId).isNotBlank();
 
-    String postcode = "LN21AL";
+    String postcode = "DD44DD";
 
     assertThat(postcode).isNotBlank();
 
@@ -370,7 +370,7 @@ public class SampleEndpointIT {
             .asObject(SampleAttributesDTO.class);
 
     String partialPostcode =
-        sampleAttributeResponse.getBody().getAttributes().get("Postcode").substring(0, 2);
+        sampleAttributeResponse.getBody().getAttributes().get("POSTCODE").substring(0, 2);
 
     assertThat(partialPostcode).isNotBlank();
 
