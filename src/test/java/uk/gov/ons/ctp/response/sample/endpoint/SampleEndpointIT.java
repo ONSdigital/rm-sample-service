@@ -6,6 +6,7 @@ import static org.assertj.core.data.MapEntry.entry;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import java.io.ByteArrayInputStream;
@@ -268,6 +269,109 @@ public class SampleEndpointIT {
             .asObject(SampleUnitDTO[].class);
 
     assertThat(sampleUnitResponse.getBody()[0].getId()).isEqualTo(sampleUnitId);
+  }
+
+  @Test
+  public void ensureSampleUnitReceivedByPostcodeHasNoSpacesSearchedWithSpace() throws Exception {
+    SampleSummaryDTO sampleSummary =
+        loadSocialSample("/csv/social-survey-sample-no-space-postcode.csv");
+
+    HttpResponse<SampleUnitDTO[]> sampleUnits =
+        Unirest.get(
+                String.format(
+                    "http://localhost:%d/samples/%s/sampleunits", port, sampleSummary.getId()))
+            .header("Content-Type", "application/json")
+            .basicAuth("admin", "secret")
+            .asObject(SampleUnitDTO[].class);
+
+    String sampleUnitId = sampleUnits.getBody()[0].getId();
+
+    assertThat(sampleUnitId).isNotBlank();
+
+    String postcode = "PQ3 1AL";
+
+    assertThat(postcode).isNotBlank();
+
+    HttpResponse<SampleUnitDTO[]> sampleUnitResponse =
+        Unirest.get(String.format("http://localhost:%d/samples/sampleunits", port))
+            .queryString("postcode", postcode)
+            .header("Content-Type", "application/json")
+            .basicAuth("admin", "secret")
+            .asObject(SampleUnitDTO[].class);
+
+    assertThat(sampleUnitResponse.getBody()[0].getId()).isEqualTo(sampleUnitId);
+  }
+
+  @Test
+  public void ensureSampleUnitReceivedByPostcodeHasSpacesSearchedWithNoSpace() throws Exception {
+    SampleSummaryDTO sampleSummary =
+        loadSocialSample("/csv/social-survey-sample-with-space-postcode.csv");
+
+    HttpResponse<SampleUnitDTO[]> sampleUnits =
+        Unirest.get(
+                String.format(
+                    "http://localhost:%d/samples/%s/sampleunits", port, sampleSummary.getId()))
+            .header("Content-Type", "application/json")
+            .basicAuth("admin", "secret")
+            .asObject(SampleUnitDTO[].class);
+
+    String sampleUnitId = sampleUnits.getBody()[0].getId();
+
+    assertThat(sampleUnitId).isNotBlank();
+
+    String postcode = "LN21AL";
+
+    assertThat(postcode).isNotBlank();
+
+    HttpResponse<SampleUnitDTO[]> sampleUnitResponse =
+        Unirest.get(String.format("http://localhost:%d/samples/sampleunits", port))
+            .queryString("postcode", postcode)
+            .header("Content-Type", "application/json")
+            .basicAuth("admin", "secret")
+            .asObject(SampleUnitDTO[].class);
+
+    assertThat(sampleUnitResponse.getBody()[0].getId()).isEqualTo(sampleUnitId);
+  }
+
+  @Test
+  public void validateSearchPartialPostcodeReturnsNull() throws Exception {
+    // Given
+    SampleSummaryDTO sampleSummary =
+        loadSocialSample("/csv/social-survey-sample-partial-postcode.csv");
+
+    HttpResponse<SampleUnitDTO[]> sampleUnits =
+        Unirest.get(
+                String.format(
+                    "http://localhost:%d/samples/%s/sampleunits", port, sampleSummary.getId()))
+            .header("Content-Type", "application/json")
+            .basicAuth("admin", "secret")
+            .asObject(SampleUnitDTO[].class);
+
+    String sampleUnitId = sampleUnits.getBody()[0].getId();
+
+    assertThat(sampleUnitId).isNotBlank();
+
+    // When
+    HttpResponse<SampleAttributesDTO> sampleAttributeResponse =
+        Unirest.get(String.format("http://localhost:%d/samples/%s/attributes", port, sampleUnitId))
+            .header("Content-Type", "application/json")
+            .basicAuth("admin", "secret")
+            .asObject(SampleAttributesDTO.class);
+
+    String partialPostcode =
+        sampleAttributeResponse.getBody().getAttributes().get("Postcode").substring(0, 2);
+
+    assertThat(partialPostcode).isNotBlank();
+
+    HttpResponse<JsonNode> sampleUnitResponse =
+        Unirest.get(String.format("http://localhost:%d/samples/sampleunits", port))
+            .queryString("postcode", partialPostcode)
+            .header("Content-Type", "application/json")
+            .basicAuth("admin", "secret")
+            .asJson();
+
+    // Then
+    assertThat(sampleUnitResponse.getStatus()).isEqualTo(404);
   }
 
   private SampleSummaryDTO loadSocialSample(String sampleFile)
