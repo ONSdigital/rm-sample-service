@@ -1,5 +1,7 @@
 package uk.gov.ons.ctp.response.sample.endpoint;
 
+import com.godaddy.logging.Logger;
+import com.godaddy.logging.LoggerFactory;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
@@ -10,7 +12,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.validation.Valid;
 import liquibase.util.csv.opencsv.bean.CsvToBean;
-import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -42,8 +43,8 @@ import validation.BusinessSampleUnit;
 /** The REST endpoint controller for Sample Service. */
 @RestController
 @RequestMapping(value = "/samples", produces = "application/json")
-@Slf4j
 public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
+  private static final Logger log = LoggerFactory.getLogger(SampleEndpoint.class);
 
   private static final int NUM_UPLOAD_THREADS = 5;
   private static final ExecutorService EXECUTOR_SERVICE =

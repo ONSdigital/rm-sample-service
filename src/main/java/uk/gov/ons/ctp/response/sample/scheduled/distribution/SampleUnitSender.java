@@ -1,7 +1,8 @@
 package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 
+import com.godaddy.logging.Logger;
+import com.godaddy.logging.LoggerFactory;
 import java.util.UUID;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -16,9 +17,10 @@ import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitSta
 import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
 
 /** Sends SampleUnits via Rabbit queue and updates DB state */
-@Slf4j
 @Component
 public class SampleUnitSender {
+  private static final Logger log = LoggerFactory.getLogger(SampleUnitSender.class);
+
   private final SampleUnitRepository sampleUnitRepository;
 
   private final SampleUnitPublisher sampleUnitPublisher;
