@@ -1,7 +1,6 @@
 package uk.gov.ons.ctp.response.sample.service;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleReportRepository;
@@ -11,8 +10,8 @@ import uk.gov.ons.ctp.response.sample.domain.repository.SampleReportRepository;
  * SampleReport entity model.
  */
 @Service
+@Slf4j
 public class SampleReportService {
-  private static final Logger log = LoggerFactory.getLogger(SampleReportService.class);
 
   @Autowired private SampleReportRepository sampleReportRepository;
 

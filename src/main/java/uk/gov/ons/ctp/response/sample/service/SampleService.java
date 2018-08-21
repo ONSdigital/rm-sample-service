@@ -1,13 +1,12 @@
 package uk.gov.ons.ctp.response.sample.service;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
@@ -38,10 +37,10 @@ import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEve
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
 import validation.SampleUnitBase;
 
+@Slf4j
 @Service
 @Configuration
 public class SampleService {
-  private static final Logger log = LoggerFactory.getLogger(SampleService.class);
 
   @Autowired private SampleSummaryRepository sampleSummaryRepository;
 

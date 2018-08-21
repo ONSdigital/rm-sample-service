@@ -1,7 +1,5 @@
 package uk.gov.ons.ctp.response.sample.ingest;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +14,7 @@ import javax.validation.ValidatorFactory;
 import liquibase.util.csv.opencsv.CSVReader;
 import liquibase.util.csv.opencsv.bean.ColumnPositionMappingStrategy;
 import liquibase.util.csv.opencsv.bean.CsvToBean;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -26,9 +25,9 @@ import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitSta
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.CensusSampleUnit;
 
+@Slf4j
 @Service
 public class CsvIngesterCensus extends CsvToBean<CensusSampleUnit> {
-  private static final Logger log = LoggerFactory.getLogger(CsvIngesterCensus.class);
 
   private static final String SAMPLEUNITREF = "sampleUnitRef";
   private static final String FORMTYPE = "formType";

@@ -1,16 +1,15 @@
 package uk.gov.ons.ctp.response.sample.message;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
+@Slf4j
 @MessageEndpoint
 public class PartyReceiver {
-  private static final Logger log = LoggerFactory.getLogger(PartyReceiver.class);
 
   @Autowired private SampleService sampleService;
 

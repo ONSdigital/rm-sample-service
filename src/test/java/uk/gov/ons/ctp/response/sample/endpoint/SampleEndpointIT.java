@@ -5,8 +5,6 @@ import static org.assertj.core.data.MapEntry.entry;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -17,6 +15,7 @@ import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.entity.ContentType;
 import org.junit.After;
 import org.junit.Before;
@@ -44,8 +43,8 @@ import uk.gov.ons.tools.rabbit.SimpleMessageListener;
 @ContextConfiguration
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+@Slf4j
 public class SampleEndpointIT {
-  private static final Logger log = LoggerFactory.getLogger(SampleEndpointIT.class);
 
   @Autowired private AppConfig appConfig;
 

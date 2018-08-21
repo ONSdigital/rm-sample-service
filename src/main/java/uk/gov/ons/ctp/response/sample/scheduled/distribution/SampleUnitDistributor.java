@@ -1,13 +1,12 @@
 package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +26,8 @@ import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
 
 /** Distributes SampleUnits to Collex when requested via job. Retries failures until successful */
 @Component
+@Slf4j
 public class SampleUnitDistributor {
-  private static final Logger log = LoggerFactory.getLogger(SampleUnitDistributor.class);
-
   private static final String LOCK_PREFIX = "SampleCollexJob-";
 
   @Autowired private AppConfig appConfig;

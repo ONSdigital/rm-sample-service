@@ -1,7 +1,5 @@
 package uk.gov.ons.ctp.response.sample.ingest;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
 import com.google.common.collect.Sets;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -9,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import liquibase.util.csv.opencsv.bean.CsvToBean;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -27,9 +26,9 @@ import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitSta
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.SocialSampleUnit;
 
+@Slf4j
 @Service
 public class CsvIngesterSocial extends CsvToBean<SocialSampleUnit> {
-  private static final Logger log = LoggerFactory.getLogger(CsvIngesterSocial.class);
 
   @Autowired private SampleService sampleService;
 

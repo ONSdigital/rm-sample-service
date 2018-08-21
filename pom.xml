@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>uk.gov.ons.ctp.product</groupId>
 		<artifactId>rm-common-config</artifactId>
-		<version>10.49.13</version>
+		<version>10.49.12</version>
 	</parent>
 	<scm>
 		<connection>scm:git:https://github.com/ONSdigital/rm-sample-service.git</connection>
@@ -172,10 +172,6 @@
 			<groupId>uk.gov.ons.tools</groupId>
 			<artifactId>rabbit</artifactId>
 			<version>1.0.2</version>
-		</dependency>
-		<dependency>
-			<groupId>com.godaddy</groupId>
-			<artifactId>logging</artifactId>
 		</dependency>
 		<!-- END -->
 
