@@ -69,8 +69,6 @@ public class CsvIngesterSocial extends CsvToBean<SocialSampleUnit> {
   private SocialSampleUnit parseLine(CSVRecord line) throws CTPException {
     SocialSampleUnit sampleUnit = new SocialSampleUnit();
     sampleUnit.setAttributes(line.toMap());
-    String ref = line.toMap().get("REFERENCE");
-    sampleUnit.setSampleUnitRef(ref);
     List<String> invalidColumns = sampleUnit.validate();
     if (!invalidColumns.isEmpty()) {
       String errorMessage =
@@ -80,6 +78,8 @@ public class CsvIngesterSocial extends CsvToBean<SocialSampleUnit> {
       log.warn(errorMessage);
       throw new CTPException(CTPException.Fault.VALIDATION_FAILED, errorMessage);
     }
+    sampleUnit.setSampleUnitRef(
+        sampleUnit.getAttributes().get("TLA") + sampleUnit.getAttributes().get("REFERENCE"));
     return sampleUnit;
   }
 

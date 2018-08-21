@@ -190,6 +190,7 @@ public class SampleEndpointIT {
             new SampleUnit.SampleAttributes.Entry("REFERENCE", "0001"));
 
     assertThat(sampleUnit.getId()).isNotNull();
+    assertThat(sampleUnit.getSampleUnitRef()).isEqualTo("LMS0001");
   }
 
   @Test
