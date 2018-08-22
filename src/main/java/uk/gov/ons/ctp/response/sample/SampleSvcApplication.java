@@ -1,5 +1,6 @@
 package uk.gov.ons.ctp.response.sample;
 
+import com.godaddy.logging.LoggingConfigs;
 import net.sourceforge.cobertura.CoverageIgnore;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
@@ -52,6 +53,8 @@ public class SampleSvcApplication {
    * @param args These are the optional command line arguments
    */
   public static void main(final String[] args) {
+    LoggingConfigs.setCurrent(LoggingConfigs.getCurrent().useJson());
+
     SpringApplication.run(SampleSvcApplication.class, args);
   }
 

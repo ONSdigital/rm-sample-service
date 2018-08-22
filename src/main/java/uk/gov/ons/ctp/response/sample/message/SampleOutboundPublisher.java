@@ -2,7 +2,8 @@ package uk.gov.ons.ctp.response.sample.message;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
+import com.godaddy.logging.Logger;
+import com.godaddy.logging.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,9 +12,9 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 
 /** Publisher of messages about samples uploaded */
-@Slf4j
 @MessageEndpoint
 public class SampleOutboundPublisher {
+  private static final Logger log = LoggerFactory.getLogger(SampleOutboundPublisher.class);
 
   private static final String UPLOAD_STARTED_ROUTING_KEY = "Sample.SampleUploadStarted.binding";
   private static final String UPLOAD_FINISHED_ROUTING_KEY = "Sample.SampleUploadFinished.binding";
