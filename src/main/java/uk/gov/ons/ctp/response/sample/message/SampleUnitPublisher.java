@@ -1,6 +1,7 @@
 package uk.gov.ons.ctp.response.sample.message;
 
-import lombok.extern.slf4j.Slf4j;
+import com.godaddy.logging.Logger;
+import com.godaddy.logging.LoggerFactory;
 import net.sourceforge.cobertura.CoverageIgnore;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +11,9 @@ import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
 
 /** The publisher to queues */
 @CoverageIgnore
-@Slf4j
 @MessageEndpoint
 public class SampleUnitPublisher {
+  private static final Logger log = LoggerFactory.getLogger(SampleUnitPublisher.class);
 
   @Qualifier("sampleUnitRabbitTemplate")
   @Autowired

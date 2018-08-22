@@ -1,7 +1,8 @@
 package uk.gov.ons.ctp.response.sample.service;
 
+import com.godaddy.logging.Logger;
+import com.godaddy.logging.LoggerFactory;
 import java.util.UUID;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ctp.common.error.CTPException;
@@ -11,8 +12,8 @@ import uk.gov.ons.ctp.response.sample.domain.repository.CollectionExerciseJobRep
 
 /** Accept feedback from handlers */
 @Service
-@Slf4j
 public class CollectionExerciseJobService {
+  private static final Logger log = LoggerFactory.getLogger(CollectionExerciseJobService.class);
 
   @Autowired private CollectionExerciseJobRepository collectionExerciseJobRepository;
 
