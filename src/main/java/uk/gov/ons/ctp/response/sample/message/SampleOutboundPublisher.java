@@ -36,7 +36,9 @@ public class SampleOutboundPublisher {
   private void sendMessage(String routingKey, SampleSummary sampleSummary) throws CTPException {
     try {
       String message = this.objectMapper.writeValueAsString(sampleSummary);
-      log.debug("Sending message to routing key {} - {}", routingKey, message);
+      log.with("routing_key", routingKey)
+          .with("message", message)
+          .debug("Sending message to routing key", routingKey, message);
       rabbitTemplate.convertAndSend(routingKey, message);
     } catch (JsonProcessingException e) {
       throw new CTPException(

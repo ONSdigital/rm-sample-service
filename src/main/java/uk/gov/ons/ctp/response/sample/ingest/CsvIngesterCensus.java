@@ -123,10 +123,9 @@ public class CsvIngesterCensus extends CsvToBean<CensusSampleUnit> {
       CensusSampleUnit censusSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
       Optional<String> namesOfInvalidColumns = validateLine(censusSampleUnit);
       if (namesOfInvalidColumns.isPresent()) {
-        log.error(
-            "Problem parsing line {} due to {} - entire ingest aborted",
-            Arrays.toString(nextLine),
-            namesOfInvalidColumns.get());
+        log.with("line", Arrays.toString(nextLine))
+            .with("invalid_columns", namesOfInvalidColumns.get())
+            .error("Problem parsing line, entire ingest aborted");
         throw new CTPException(
             CTPException.Fault.VALIDATION_FAILED,
             String.format(

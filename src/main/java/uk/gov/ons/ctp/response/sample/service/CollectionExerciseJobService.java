@@ -23,9 +23,8 @@ public class CollectionExerciseJobService {
     if (collectionExerciseJobRepository.findByCollectionExerciseId(collectionExerciseId) == null) {
       collectionExerciseJobRepository.saveAndFlush(collectionExerciseJob);
     } else {
-      log.debug(
-          "CollectionExerciseId {} already exists in the collectionexercisejob table",
-          collectionExerciseId);
+      log.with("collection_exercise_id", collectionExerciseId)
+          .debug("CollectionExerciseId already exists in the collectionexercisejob table");
       throw new CTPException(
           Fault.BAD_REQUEST,
           "CollectionExerciseId %s already exists in the collectionexercisejob table",
