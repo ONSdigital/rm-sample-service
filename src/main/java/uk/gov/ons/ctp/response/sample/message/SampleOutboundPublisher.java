@@ -38,7 +38,7 @@ public class SampleOutboundPublisher {
       String message = this.objectMapper.writeValueAsString(sampleSummary);
       log.with("routing_key", routingKey)
           .with("message", message)
-          .debug("Sending message to routing key", routingKey, message);
+          .debug("Sending message to routing key");
       rabbitTemplate.convertAndSend(routingKey, message);
     } catch (JsonProcessingException e) {
       throw new CTPException(
