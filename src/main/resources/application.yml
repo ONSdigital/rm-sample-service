@@ -68,7 +68,9 @@ spring:
       max-file-size: 50MB
       max-request-size: 60MB
       file-size-threshold: 0
-
+  zipkin:
+    baseUrl: http://localhost:9411
+    enabled: false
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
