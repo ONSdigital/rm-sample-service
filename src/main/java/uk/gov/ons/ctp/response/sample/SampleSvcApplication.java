@@ -7,6 +7,7 @@ import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -41,7 +42,7 @@ import uk.gov.ons.ctp.response.sample.service.state.SampleSvcStateTransitionMana
 @EnableJpaRepositories(basePackages = {"uk.gov.ons.ctp.response"})
 @EntityScan("uk.gov.ons.ctp.response")
 @ImportResource("springintegration/main.xml")
-public class SampleSvcApplication {
+public class SampleSvcApplication implements CommandLineRunner {
 
   @Autowired private StateTransitionManagerFactory stateTransitionManager;
 
@@ -56,6 +57,13 @@ public class SampleSvcApplication {
     LoggingConfigs.setCurrent(LoggingConfigs.getCurrent().useJson());
 
     SpringApplication.run(SampleSvcApplication.class, args);
+  }
+
+  @Override
+  public void run(String... args) throws Exception {
+    if (appConfig.getLogging().isUseJson()) {
+      LoggingConfigs.setCurrent(LoggingConfigs.getCurrent().useJson());
+    }
   }
 
   /**

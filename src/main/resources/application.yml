@@ -15,6 +15,7 @@ logging:
     io.pivotal.springcloud: DEBUG
 
   profile: DEV
+  useJson: false
 
 liquibase:
   user: samplesvc
