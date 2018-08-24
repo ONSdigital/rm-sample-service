@@ -3,7 +3,7 @@ applications:
 - name: samplesvc-SPACE
   instances: INSTANCES
   host: samplesvc-SPACE
-  memory: 1024M
+  memory: 1536M
   path: target/samplesvc.jar
   timeout: 180
   services:
