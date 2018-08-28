@@ -3,7 +3,7 @@ applications:
 - name: samplesvc
   instances: 1
   host: samplesvc
-  memory: 1024M
+  memory: 1536M
   path: target/samplesvc.jar
   timeout: 180
   services:

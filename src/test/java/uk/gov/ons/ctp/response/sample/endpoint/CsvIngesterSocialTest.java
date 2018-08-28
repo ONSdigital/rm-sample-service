@@ -19,11 +19,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.TestFiles;
-import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesRepository;
@@ -36,11 +34,7 @@ import validation.SocialSampleUnit;
 @RunWith(MockitoJUnitRunner.class)
 public class CsvIngesterSocialTest {
 
-  @Spy private AppConfig appConfig = new AppConfig();
-
   @InjectMocks private CsvIngesterSocial csvIngester;
-
-  @InjectMocks private SampleEndpoint sampleEndpoint;
 
   @Mock private SampleService sampleService;
 
@@ -55,8 +49,8 @@ public class CsvIngesterSocialTest {
     // Given
     SampleSummary newSummary = new SampleSummary();
     String csv =
-        "Prem1,Prem2,Prem3,Prem4,District,PostTown,Postcode,CountryCode,Reference\n"
-            + "14 ASHMEAD VIEW,,,,,STOCKTON-ON-TEES,TS184QG,E,LMS00001";
+        "ADDRESS_LINE1,ADDRESS_LINE2,LOCALITY,TOWN_NAME,POSTCODE,COUNTRY,REFERENCE,TLA\n"
+            + "14 HILL VIEW,,,STOCKTON-ON-TEES,T121AB,E,00001,LMS";
 
     // When
     csvIngester.ingest(newSummary, TestFiles.getTestFileFromString(csv));
@@ -72,8 +66,8 @@ public class CsvIngesterSocialTest {
     // Given
     SampleSummary newSummary = new SampleSummary();
     String csv =
-        "Prem1,Prem2,Prem3,Prem4,District,PostTown,Postcode,CountryCode\n"
-            + "14 ASHMEAD VIEW,,,,,STOCKTON-ON-TEES,TS184QG,E";
+        "ADDRESS_LINE1,ADDRESS_LINE2,LOCALITY,TOWN_NAME,POSTCODE,COUNTRY,REFERENCE,TLA\n"
+            + "14 HILL VIEW,,,STOCKTON-ON-TEES,T121AB,E,,LMS";
 
     // When
     csvIngester.ingest(newSummary, TestFiles.getTestFileFromString(csv));
@@ -83,6 +77,7 @@ public class CsvIngesterSocialTest {
         .saveSample(
             eq(newSummary), anyListOf(SocialSampleUnit.class), eq(SampleUnitState.PERSISTED));
     thrown.expect(CTPException.class);
+    thrown.expectMessage("Error in row [1] due to missing field(s) [REFERENCE]");
   }
 
   @Test(expected = CTPException.class)
@@ -90,8 +85,8 @@ public class CsvIngesterSocialTest {
     // Given
     SampleSummary newSummary = new SampleSummary();
     String csv =
-        "Prem2,Prem3,Prem4,District,PostTown,Postcode,CountryCode,Reference\n"
-            + ",,,,STOCKTON-ON-TEES,TS184QG,E,LMS00001";
+        "ADDRESS_LINE1,LOCALITY,TOWN_NAME,POSTCODE,COUNTRY,TLA\n"
+            + "14 HILL VIEW,,STOCKTON-ON-TEES,T121AB,E,LMS";
 
     // When
     csvIngester.ingest(newSummary, TestFiles.getTestFileFromString(csv));
@@ -101,7 +96,7 @@ public class CsvIngesterSocialTest {
         .saveSample(
             eq(newSummary), anyListOf(SocialSampleUnit.class), eq(SampleUnitState.PERSISTED));
     thrown.expect(CTPException.class);
-    thrown.expectMessage("Error in header row, missing required headers Prem1");
+    thrown.expectMessage("Error in header row, missing required headers [REFERENCE]");
   }
 
   @Test
@@ -111,8 +106,8 @@ public class CsvIngesterSocialTest {
     given(sampleService.saveSample(any(), argumentCaptor.capture(), eq(SampleUnitState.PERSISTED)))
         .willReturn(newSummary);
     String csv =
-        "Prem1,Prem2,Prem3,Prem4,District,PostTown,Postcode,CountryCode,Reference\n"
-            + "14 ASHMEAD VIEW,,,,,STOCKTON-ON-TEES,TS184QG,E,LMS00001";
+        "ADDRESS_LINE1,ADDRESS_LINE2,ORGANISATION_NAME,LOCALITY,TOWN_NAME,POSTCODE,COUNTRY,REFERENCE,TLA,UPRN\n"
+            + "14 HILL VIEW,,,FAKEVILL,STOCKTON-ON-TEES,T121AB,E,00001,LMS,123456";
 
     // When
     csvIngester.ingest(newSummary, TestFiles.getTestFileFromString(csv));
@@ -121,15 +116,16 @@ public class CsvIngesterSocialTest {
     SocialSampleUnit socialSampleUnit = argumentCaptor.getValue().get(0);
     Map<String, String> attributes =
         ImmutableMap.<String, String>builder()
-            .put("Prem1", "14 ASHMEAD VIEW")
-            .put("Prem2", "")
-            .put("Prem3", "")
-            .put("Prem4", "")
-            .put("District", "")
-            .put("PostTown", "STOCKTON-ON-TEES")
-            .put("Postcode", "TS184QG")
-            .put("CountryCode", "E")
-            .put("Reference", "LMS00001")
+            .put("ADDRESS_LINE1", "14 HILL VIEW")
+            .put("ADDRESS_LINE2", "")
+            .put("ORGANISATION_NAME", "")
+            .put("LOCALITY", "FAKEVILL")
+            .put("TOWN_NAME", "STOCKTON-ON-TEES")
+            .put("POSTCODE", "T121AB")
+            .put("COUNTRY", "E")
+            .put("REFERENCE", "00001")
+            .put("TLA", "LMS")
+            .put("UPRN", "123456")
             .build();
     SampleAttributes sampleAttriubutes =
         new SampleAttributes(socialSampleUnit.getSampleUnitId(), attributes);

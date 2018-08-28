@@ -181,12 +181,17 @@ public class SampleEndpointIT {
 
     assertThat(sampleUnit.getSampleAttributes().getEntries())
         .contains(
-            new SampleUnit.SampleAttributes.Entry("Prem1", "14 ASHMEAD VIEW"),
-            new SampleUnit.SampleAttributes.Entry("Postcode", "TS184QG"),
-            new SampleUnit.SampleAttributes.Entry("PostTown", "STOCKTON-ON-TEES"),
-            new SampleUnit.SampleAttributes.Entry("CountryCode", "E"));
+            new SampleUnit.SampleAttributes.Entry("ADDRESS_LINE2", "11 HILL VIEW"),
+            new SampleUnit.SampleAttributes.Entry("POSTCODE", "AA11AA"),
+            new SampleUnit.SampleAttributes.Entry("TOWN_NAME", "STOCKTON-ON-TEES"),
+            new SampleUnit.SampleAttributes.Entry("COUNTRY", "E"),
+            new SampleUnit.SampleAttributes.Entry("TLA", "LMS"),
+            new SampleUnit.SampleAttributes.Entry("LOCALITY", "FAKEVILL"),
+            new SampleUnit.SampleAttributes.Entry("UPRN", "123456"),
+            new SampleUnit.SampleAttributes.Entry("REFERENCE", "0001"));
 
     assertThat(sampleUnit.getId()).isNotNull();
+    assertThat(sampleUnit.getSampleUnitRef()).isEqualTo("LMS0001");
   }
 
   @Test
@@ -226,14 +231,21 @@ public class SampleEndpointIT {
 
     assertThat(sampleUnitResponse.getBody().getSampleAttributes().getAttributes().entrySet())
         .contains(
-            entry("Prem1", sampleAttribResponse.getBody().getAttributes().get("Prem1")),
-            entry("Postcode", sampleAttribResponse.getBody().getAttributes().get("Postcode")),
-            entry("PostTown", sampleAttribResponse.getBody().getAttributes().get("PostTown")),
-            entry("CountryCode", sampleAttribResponse.getBody().getAttributes().get("CountryCode")),
-            entry("Reference", sampleAttribResponse.getBody().getAttributes().get("Reference")));
+            entry(
+                "ADDRESS_LINE1",
+                sampleAttribResponse.getBody().getAttributes().get("ADDRESS_LINE1")),
+            entry(
+                "ADDRESS_LINE2",
+                sampleAttribResponse.getBody().getAttributes().get("ADDRESS_LINE2")),
+            entry("POSTCODE", sampleAttribResponse.getBody().getAttributes().get("POSTCODE")),
+            entry("TOWN_NAME", sampleAttribResponse.getBody().getAttributes().get("TOWN_NAME")),
+            entry("COUNTRY", sampleAttribResponse.getBody().getAttributes().get("COUNTRY")),
+            entry("LOCALITY", sampleAttribResponse.getBody().getAttributes().get("LOCALITY")),
+            entry("TLA", sampleAttribResponse.getBody().getAttributes().get("TLA")),
+            entry("UPRN", sampleAttribResponse.getBody().getAttributes().get("UPRN")),
+            entry("REFERENCE", sampleAttribResponse.getBody().getAttributes().get("REFERENCE")));
 
-    assertThat(sampleAttribResponse.getBody().getAttributes().get("Reference"))
-        .isEqualTo("LMS0001");
+    assertThat(sampleAttribResponse.getBody().getAttributes().get("REFERENCE")).isEqualTo("0002");
   }
 
   @Test
@@ -258,7 +270,7 @@ public class SampleEndpointIT {
             .basicAuth("admin", "secret")
             .asObject(SampleAttributesDTO.class);
 
-    String postcode = sampleAttribResponse.getBody().getAttributes().get("Postcode");
+    String postcode = sampleAttribResponse.getBody().getAttributes().get("POSTCODE");
 
     assertThat(postcode).isNotBlank();
 
@@ -289,7 +301,7 @@ public class SampleEndpointIT {
 
     assertThat(sampleUnitId).isNotBlank();
 
-    String postcode = "PQ3 1AL";
+    String postcode = "EE5 5EE";
 
     assertThat(postcode).isNotBlank();
 
@@ -320,7 +332,7 @@ public class SampleEndpointIT {
 
     assertThat(sampleUnitId).isNotBlank();
 
-    String postcode = "LN21AL";
+    String postcode = "DD44DD";
 
     assertThat(postcode).isNotBlank();
 
@@ -360,7 +372,7 @@ public class SampleEndpointIT {
             .asObject(SampleAttributesDTO.class);
 
     String partialPostcode =
-        sampleAttributeResponse.getBody().getAttributes().get("Postcode").substring(0, 2);
+        sampleAttributeResponse.getBody().getAttributes().get("POSTCODE").substring(0, 2);
 
     assertThat(partialPostcode).isNotBlank();
 
@@ -390,8 +402,7 @@ public class SampleEndpointIT {
     log.debug("sampleSummaryResponse = " + sampleSummaryResponse.getBody());
 
     String message = uploadFinishedMessageListener.take();
-    SampleSummaryDTO sampleSummary = mapper.readValue(message, SampleSummaryDTO.class);
 
-    return sampleSummary;
+    return mapper.readValue(message, SampleSummaryDTO.class);
   }
 }

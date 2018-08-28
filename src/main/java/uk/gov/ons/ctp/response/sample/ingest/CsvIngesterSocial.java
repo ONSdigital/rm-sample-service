@@ -70,8 +70,6 @@ public class CsvIngesterSocial extends CsvToBean<SocialSampleUnit> {
   private SocialSampleUnit parseLine(CSVRecord line) throws CTPException {
     SocialSampleUnit sampleUnit = new SocialSampleUnit();
     sampleUnit.setAttributes(line.toMap());
-    String ref = (String) line.toMap().get("Reference");
-    sampleUnit.setSampleUnitRef(ref);
     List<String> invalidColumns = sampleUnit.validate();
     if (!invalidColumns.isEmpty()) {
       String errorMessage =
@@ -81,17 +79,19 @@ public class CsvIngesterSocial extends CsvToBean<SocialSampleUnit> {
       log.warn(errorMessage);
       throw new CTPException(CTPException.Fault.VALIDATION_FAILED, errorMessage);
     }
+    sampleUnit.setSampleUnitRef(
+        sampleUnit.getAttributes().get("TLA") + sampleUnit.getAttributes().get("REFERENCE"));
     return sampleUnit;
   }
 
   private void validateHeaders(Set<String> headers) throws CTPException {
-    Set<String> missingRequriedHeaders =
+    Set<String> missingRequiredHeaders =
         Sets.difference(SocialSampleUnit.REQUIRED_ATTRIBUTES, headers);
-    if (!missingRequriedHeaders.isEmpty()) {
+    if (!missingRequiredHeaders.isEmpty()) {
       String errorMessage =
           String.format(
               "Error in header row, missing required header(s) [%s]",
-              StringUtils.join(missingRequriedHeaders, ","));
+              StringUtils.join(missingRequiredHeaders, ","));
       log.warn(errorMessage);
       throw new CTPException(CTPException.Fault.VALIDATION_FAILED, errorMessage);
     }
