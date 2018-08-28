@@ -58,9 +58,7 @@ public class PartySvcClientService {
       try {
         party = objectMapper.readValue(responseBody, PartyDTO.class);
       } catch (IOException e) {
-        log.with("cause", e.getCause())
-            .with("message", e.getMessage())
-            .error("Unable to read party response");
+        log.error("Unable to read party response", e);
       }
     }
     log.with("party", party).debug("PARTY GOTTEN");

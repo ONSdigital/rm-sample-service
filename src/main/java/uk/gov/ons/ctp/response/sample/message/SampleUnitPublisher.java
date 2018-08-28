@@ -25,7 +25,7 @@ public class SampleUnitPublisher {
    * @param sampleUnit to be sent
    */
   public void send(SampleUnit sampleUnit) {
-    log.with("sampleUnit", sampleUnit).debug("send to queue sampleDelivery");
+    log.with("sample_Unit", sampleUnit).debug("send to queue sampleDelivery");
     rabbitTemplate.convertAndSend(sampleUnit);
   }
 }
