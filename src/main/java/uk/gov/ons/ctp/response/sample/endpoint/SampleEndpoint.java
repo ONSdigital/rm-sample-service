@@ -140,7 +140,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   public ResponseEntity<SampleSummary> uploadSampleFile(
       @PathVariable("type") final String type, @RequestParam("file") MultipartFile file)
       throws CTPException {
-    log.with("sample_type", type).info("Entering Sample file upload");
+    log.with("sample_type", type).debug("Entering Sample file upload");
     if (!Arrays.asList("B", "CENSUS", "SOCIAL").contains(type.toUpperCase())) {
       return ResponseEntity.badRequest().build();
     }
