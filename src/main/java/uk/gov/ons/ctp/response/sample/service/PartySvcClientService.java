@@ -61,7 +61,7 @@ public class PartySvcClientService {
         log.error("Unable to read party response", e);
       }
     }
-    log.with("party", party).debug("PARTY GOTTEN");
+    log.with("Successfully retrieved party", party).debug("PARTY GOTTEN");
     eventPublisher.publishEvent("Sample PERSISTED");
     return party;
   }
