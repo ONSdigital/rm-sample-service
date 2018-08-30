@@ -16,7 +16,7 @@ public class PartyReceiver {
 
   @ServiceActivator(inputChannel = "partyTransformed", adviceChain = "partyRetryAdvice")
   public void acceptParty(PartyCreationRequestDTO party) throws Exception {
-    log.debug("acceptParty {}", party);
+    log.with("party", party).debug("acceptParty");
     sampleService.sendToPartyService(party);
   }
 }

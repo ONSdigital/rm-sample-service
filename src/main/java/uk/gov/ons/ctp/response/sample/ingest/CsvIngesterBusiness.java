@@ -149,9 +149,8 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
 
     // If a unit ref is already registered
     if (unitRefs.contains(businessSampleUnit.getSampleUnitRef())) {
-      log.warn(
-          "This sample unit ref {} is duplicated in the file.",
-          businessSampleUnit.getSampleUnitRef());
+      log.with("sample_unit_ref", businessSampleUnit.getSampleUnitRef())
+          .warn("sample unit ref is duplicated in the file.");
       throw new CTPException(
           CTPException.Fault.VALIDATION_FAILED,
           String.format(
