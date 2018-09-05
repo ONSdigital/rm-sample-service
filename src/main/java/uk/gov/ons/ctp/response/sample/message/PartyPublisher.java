@@ -17,7 +17,7 @@ public class PartyPublisher {
   private RabbitTemplate rabbitTemplate;
 
   public void publish(PartyCreationRequestDTO party) {
-    log.debug("send to queue to be sent to partySvc {}", party);
+    log.with("party", party).debug("send to queue to be sent to partySvc");
     rabbitTemplate.convertAndSend(party);
   }
 }

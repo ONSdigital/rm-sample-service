@@ -13,6 +13,7 @@ logging:
     org.springframework: WARN
     uk.gov.ons.ctp: DEBUG
   profile: CLOUD
+  useJson: true
 
 liquibase:
   user: ${cloud.services.postgresql.connection.username}

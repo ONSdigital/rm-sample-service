@@ -77,9 +77,8 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
               collectionExerciseJobCreationRequestDTO,
       BindingResult bindingResult)
       throws CTPException, InvalidRequestException {
-    log.debug(
-        "Entering createCollectionExerciseJob with requestObject {}",
-        collectionExerciseJobCreationRequestDTO);
+    log.with("collection_exercise_job_creation_request", collectionExerciseJobCreationRequestDTO)
+        .debug("Entering createCollectionExerciseJob ");
     if (bindingResult.hasErrors()) {
       throw new InvalidRequestException("Binding errors for create action: ", bindingResult);
     }
@@ -124,7 +123,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
           try {
             return Optional.of(this.sampleService.ingest(newSummary, file, type));
           } catch (Exception e) {
-            log.error("Failed to ingest sample [{}]", newSummary.getId(), e);
+            log.with("sample_id", newSummary.getId()).error("Failed to ingest sample", e);
             return this.sampleService.failSampleSummary(newSummary, e);
           }
         };
@@ -141,7 +140,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   public ResponseEntity<SampleSummary> uploadSampleFile(
       @PathVariable("type") final String type, @RequestParam("file") MultipartFile file)
       throws CTPException {
-    log.info("Entering Sample file upload for Type {}", type);
+    log.with("sample_type", type).debug("Entering Sample file upload");
     if (!Arrays.asList("B", "CENSUS", "SOCIAL").contains(type.toUpperCase())) {
       return ResponseEntity.badRequest().build();
     }

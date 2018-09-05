@@ -234,7 +234,8 @@ public class SampleService {
 
       return Optional.of(persisted);
     } catch (CTPException e) {
-      log.error("Failed to put sample summary {} into FAILED state - {}", sampleSummary.getId(), e);
+      log.with("sample_summary", sampleSummary.getId())
+          .error("Failed to put sample summary into FAILED state", e);
 
       return Optional.empty();
     } catch (RuntimeException e) {

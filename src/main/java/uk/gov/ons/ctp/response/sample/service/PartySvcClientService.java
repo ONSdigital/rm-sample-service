@@ -58,11 +58,10 @@ public class PartySvcClientService {
       try {
         party = objectMapper.readValue(responseBody, PartyDTO.class);
       } catch (IOException e) {
-        String msg = String.format("cause = %s - message = %s", e.getCause(), e.getMessage());
-        log.error(msg);
+        log.error("Unable to read party response", e);
       }
     }
-    log.debug("PARTY GOTTEN: {}", party);
+    log.with("party", party).debug("Successfully retrieved party");
     eventPublisher.publishEvent("Sample PERSISTED");
     return party;
   }

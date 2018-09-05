@@ -88,8 +88,8 @@ public class SampleUnitDistributor {
         sampleUnitSender.sendSampleUnit(msu);
       } catch (CTPException e) {
         hasErrors = true;
-        log.error(
-            "Failed to send a sample unit to queue and update state with ID: {}", msu.getId(), e);
+        log.with("sample_unit_id", msu.getId())
+            .error("Failed to send a sample unit to queue and update state with ID", e);
       }
     }
 
