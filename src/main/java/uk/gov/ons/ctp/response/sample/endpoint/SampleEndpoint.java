@@ -36,6 +36,7 @@ import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreati
 import uk.gov.ons.ctp.response.sample.representation.SampleAttributesDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitSizeRequestDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.BusinessSampleUnit;
@@ -104,6 +105,33 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
             .toString();
 
     return ResponseEntity.created(URI.create(newResourceUrl)).body(sampleUnitsRequest);
+  }
+
+  @RequestMapping(
+      value = "/sampleunitsize",
+      method = RequestMethod.POST,
+      consumes = "application/json")
+  public ResponseEntity<SampleUnitsRequestDTO> getSampleUnitSize(
+      final @Valid @RequestBody SampleUnitSizeRequestDTO sampleUnitSizeRequestDTO,
+      BindingResult bindingResult)
+      throws CTPException, InvalidRequestException {
+    log.with("sample_unit_size_request", sampleUnitSizeRequestDTO)
+        .debug("Entering getSampleUnitSize");
+
+    if (bindingResult.hasErrors()) {
+      throw new InvalidRequestException("Binding errors for create action: ", bindingResult);
+    }
+
+    int sampleUnitsTotal = 0;
+
+    List<UUID> sampleSummaryIds = sampleUnitSizeRequestDTO.getSampleSummaryUUIDList();
+
+    for (UUID sampleSummaryID : sampleSummaryIds) {
+      sampleUnitsTotal += sampleService.getSampleSummaryUnitCount(sampleSummaryID);
+    }
+    SampleUnitsRequestDTO sampleUnitsRequest = new SampleUnitsRequestDTO(sampleUnitsTotal);
+
+    return ResponseEntity.ok(sampleUnitsRequest);
   }
 
   /**

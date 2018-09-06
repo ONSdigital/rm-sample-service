@@ -200,6 +200,26 @@ public class SampleService {
     return sampleUnitsTotal;
   }
 
+  public int getSampleSummaryUnitCount(UUID sampleSummaryId) {
+    int sampleUnitsTotal = 0;
+
+    SampleSummary sampleSummary = sampleSummaryRepository.findById(sampleSummaryId);
+
+    if (sampleSummary != null) {
+      if (sampleSummary.getTotalSampleUnits() != null) {
+        sampleUnitsTotal = sampleSummary.getTotalSampleUnits().intValue();
+      } else {
+        throw new IllegalStateException(
+            String.format("Sample summary %s has no total sample units set", sampleSummaryId));
+      }
+    } else {
+      throw new IllegalArgumentException(
+          String.format("Sample summary %s cannot be found", sampleSummaryId));
+    }
+
+    return sampleUnitsTotal;
+  }
+
   public SampleSummary ingest(
       final SampleSummary sampleSummary, final MultipartFile file, final String type)
       throws Exception {

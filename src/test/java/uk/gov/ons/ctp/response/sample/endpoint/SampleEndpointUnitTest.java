@@ -47,6 +47,10 @@ public class SampleEndpointUnitTest {
       "{ \"collectionExerciseId\" : \"c6467711-21eb-4e78-804c-1db8392f93fb\", \"surveyRef\" : \"str1234\", \"exerciseDateTime\" : \"2012-12-13T12:12:12.000+0000\", \"sampleSummaryUUIDList\" : [\"c6467711-21eb-4e78-804c-1db8392f93fb\"] }";
   private static final String SAMPLE_INVALIDJSON =
       "{ \"collectionExerciseId\" : \"c6467711-21eb-4e78-804c-1db8393f93fb\", \"surveyRef\" : \"str1234\", \"exerciseDateTime\" : \"201.000+0000\" }";
+  private static final String SAMPLE_SUMMARIES_TO_COUNT_ONE =
+      "{ \"sampleSummaryUUIDList\" : [\"c6467711-21eb-4e78-804c-1db8392f93fb\"] }";
+  private static final String SAMPLE_SUMMARIES_TO_COUNT_TWO =
+      "{ \"sampleSummaryUUIDList\" : [\"c6467711-21eb-4e78-804c-1db8392f93fb\",\"66467711-66eb-4e78-666c-1db8392f9666\"] }";
 
   @InjectMocks private SampleEndpoint sampleEndpoint;
 
@@ -167,5 +171,29 @@ public class SampleEndpointUnitTest {
     getAttribs.andExpect(status().isOk());
 
     assertThat(sampleAttributesDTO.getId()).isEqualTo(id);
+  }
+
+  @Test
+  public void getSampleUnitSizeOneSummary() throws Exception {
+    when(sampleService.getSampleSummaryUnitCount(any())).thenReturn(666);
+
+    ResultActions actions =
+        mockMvc.perform(
+            postJson(String.format("/samples/sampleunitsize"), SAMPLE_SUMMARIES_TO_COUNT_ONE));
+
+    actions.andExpect(status().isOk());
+    actions.andExpect(jsonPath("$.sampleUnitsTotal", is(666)));
+  }
+
+  @Test
+  public void getSampleUnitSizeTwoSummaries() throws Exception {
+    when(sampleService.getSampleSummaryUnitCount(any())).thenReturn(33).thenReturn(66);
+
+    ResultActions actions =
+        mockMvc.perform(
+            postJson(String.format("/samples/sampleunitsize"), SAMPLE_SUMMARIES_TO_COUNT_TWO));
+
+    actions.andExpect(status().isOk());
+    actions.andExpect(jsonPath("$.sampleUnitsTotal", is(99)));
   }
 }

@@ -36,6 +36,7 @@ import uk.gov.ons.ctp.response.sample.representation.SampleAttributesDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
 import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
 import uk.gov.ons.tools.rabbit.Rabbitmq;
 import uk.gov.ons.tools.rabbit.SimpleMessageListener;
@@ -385,6 +386,34 @@ public class SampleEndpointIT {
 
     // Then
     assertThat(sampleUnitResponse.getStatus()).isEqualTo(404);
+  }
+
+  @Test
+  public void getSampleUnitSizeHappyPath() throws UnirestException, InterruptedException {
+    final String sampleFile = "/csv/business-survey-sample-multiple.csv";
+    HttpResponse<SampleSummary> sampleSummary =
+        Unirest.post("http://localhost:" + port + "/samples/B/fileupload")
+            .basicAuth("admin", "secret")
+            .field(
+                "file",
+                getClass().getResourceAsStream(sampleFile),
+                ContentType.MULTIPART_FORM_DATA,
+                "file")
+            .asObject(SampleSummary.class);
+
+    String sampleUnitId = sampleSummary.getBody().getId().toString();
+
+    uploadFinishedMessageListener.take();
+
+    HttpResponse<SampleUnitsRequestDTO> response =
+        Unirest.post(String.format("http://localhost:%d/samples/sampleunitsize", port))
+            .header("Content-Type", "application/json")
+            .basicAuth("admin", "secret")
+            .body(String.format("{ \"sampleSummaryUUIDList\" : [\"%s\"] }", sampleUnitId))
+            .asObject(SampleUnitsRequestDTO.class);
+
+    assertThat(response.getStatus()).isEqualTo(200);
+    assertThat(response.getBody().getSampleUnitsTotal()).isEqualTo(4);
   }
 
   private SampleSummaryDTO loadSocialSample(String sampleFile)
