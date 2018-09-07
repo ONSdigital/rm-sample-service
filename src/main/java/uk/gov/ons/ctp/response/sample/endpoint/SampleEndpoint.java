@@ -113,7 +113,8 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       consumes = "application/json")
   public ResponseEntity<SampleUnitsRequestDTO> getSampleUnitSize(
       final @Valid @RequestBody SampleUnitSizeRequestDTO sampleUnitSizeRequestDTO,
-      BindingResult bindingResult) throws InvalidRequestException {
+      BindingResult bindingResult)
+      throws InvalidRequestException {
     log.with("sample_unit_size_request", sampleUnitSizeRequestDTO)
         .debug("Entering getSampleUnitSize");
 
