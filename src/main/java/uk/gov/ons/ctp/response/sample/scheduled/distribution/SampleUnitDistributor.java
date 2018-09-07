@@ -29,6 +29,8 @@ public class SampleUnitDistributor {
 
   private static final String LOCK_PREFIX = "SampleCollexJob-";
 
+  private static final int TRANSACTION_TIMEOUT_SECONDS = 3600;
+
   private boolean hasErrors;
 
   @Autowired private AppConfig appConfig;
@@ -47,7 +49,7 @@ public class SampleUnitDistributor {
 
   /** Scheduled job for distributing SampleUnits */
   @Scheduled(fixedDelayString = "#{appConfig.sampleUnitDistribution.delayMilliSeconds}")
-  @Transactional
+  @Transactional(timeout = TRANSACTION_TIMEOUT_SECONDS)
   public void distribute() {
     List<CollectionExerciseJob> jobs = collectionExerciseJobRepository.findByJobCompleteIsFalse();
 
@@ -57,12 +59,9 @@ public class SampleUnitDistributor {
       RLock lock = redissonClient.getFairLock(uniqueLockName);
 
       try {
-        // Wait for a lock. Automatically unlock after a certain amount of time to prevent issues
+        // Get a lock. Automatically unlock after a certain amount of time to prevent issues
         // when lock holder crashes or Redis crashes causing permanent lockout
-        if (lock.tryLock(
-            appConfig.getDataGrid().getLockTimeToWaitSeconds(),
-            appConfig.getDataGrid().getLockTimeToLiveSeconds(),
-            TimeUnit.SECONDS)) {
+        if (lock.tryLock(appConfig.getDataGrid().getLockTimeToLiveSeconds(), TimeUnit.SECONDS)) {
           try {
             processJob(job);
           } finally {

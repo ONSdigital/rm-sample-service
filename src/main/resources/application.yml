@@ -118,7 +118,6 @@ redis:
 
 data-grid:
   address: localhost:7379
-  lock-time-to-wait-seconds: 30
   lock-time-to-live-seconds: 3600
 
 messaging:
