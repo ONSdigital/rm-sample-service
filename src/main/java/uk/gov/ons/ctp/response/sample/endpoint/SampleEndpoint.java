@@ -113,8 +113,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       consumes = "application/json")
   public ResponseEntity<SampleUnitsRequestDTO> getSampleUnitSize(
       final @Valid @RequestBody SampleUnitSizeRequestDTO sampleUnitSizeRequestDTO,
-      BindingResult bindingResult)
-      throws CTPException, InvalidRequestException {
+      BindingResult bindingResult) throws InvalidRequestException {
     log.with("sample_unit_size_request", sampleUnitSizeRequestDTO)
         .debug("Entering getSampleUnitSize");
 
@@ -124,11 +123,10 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
 
     int sampleUnitsTotal = 0;
 
-    List<UUID> sampleSummaryIds = sampleUnitSizeRequestDTO.getSampleSummaryUUIDList();
-
-    for (UUID sampleSummaryID : sampleSummaryIds) {
+    for (UUID sampleSummaryID : sampleUnitSizeRequestDTO.getSampleSummaryUUIDList()) {
       sampleUnitsTotal += sampleService.getSampleSummaryUnitCount(sampleSummaryID);
     }
+
     SampleUnitsRequestDTO sampleUnitsRequest = new SampleUnitsRequestDTO(sampleUnitsTotal);
 
     return ResponseEntity.ok(sampleUnitsRequest);
