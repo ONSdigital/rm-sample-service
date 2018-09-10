@@ -80,11 +80,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jdbc</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-solr</artifactId>
-		</dependency>
-		
+
 		<!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-sleuth-zipkin -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
@@ -102,7 +98,7 @@
 		<dependency>
 			<groupId>uk.gov.ons.ctp.product</groupId>
 			<artifactId>samplesvc-api</artifactId>
-			<version>10.49.18</version>
+			<version>10.49.19</version>
 		</dependency>
 		<dependency>
 			<groupId>uk.gov.ons.ctp.product</groupId>
@@ -133,10 +129,6 @@
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>redis.clients</groupId>
-			<artifactId>jedis</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.liquibase</groupId>
@@ -272,7 +264,7 @@
 			<plugin>
 				<groupId>com.spotify</groupId>
 				<artifactId>dockerfile-maven-plugin</artifactId>
-				<version>1.3.4</version>
+				<version>1.4.4</version>
 				<executions>
 					<execution>
 						<goals>

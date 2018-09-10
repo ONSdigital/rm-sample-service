@@ -202,6 +202,21 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     return ResponseEntity.ok(result);
   }
 
+  @RequestMapping(value = "/count", method = RequestMethod.GET)
+  public ResponseEntity<SampleUnitsRequestDTO> getSampleSummaryUnitCount(
+      @RequestParam(value = "sampleSummaryId") List<UUID> sampleSummaryIdList) {
+
+    int sampleUnitsTotal = 0;
+
+    for (UUID sampleSummaryId : sampleSummaryIdList) {
+      sampleUnitsTotal += sampleService.getSampleSummaryUnitCount(sampleSummaryId);
+    }
+
+    SampleUnitsRequestDTO sampleUnitsRequest = new SampleUnitsRequestDTO(sampleUnitsTotal);
+
+    return ResponseEntity.ok(sampleUnitsRequest);
+  }
+
   @RequestMapping(value = "{id}", method = RequestMethod.GET)
   public ResponseEntity<SampleUnitDTO> requestSampleUnit(
       @PathVariable("id") final UUID sampleUnitId) throws CTPException {
