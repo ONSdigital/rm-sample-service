@@ -316,4 +316,30 @@ public class SampleServiceTest {
     // Then
     verify(sampleOutboundPublisher, times(1)).sampleUploadStarted(any());
   }
+
+  @Test
+  public void getSampleSummaryUnitCountHappyPath() {
+    SampleSummary newSummary = createSampleSummary(5, 2);
+    when(sampleSummaryRepository.findById(any())).thenReturn(newSummary);
+
+    int actualResult = sampleService.getSampleSummaryUnitCount(newSummary.getId());
+
+    assertEquals(5, actualResult);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void getSampleSummaryUnitCountSampleSummaryNonExistent() {
+    when(sampleSummaryRepository.findById(any())).thenReturn(null);
+
+    sampleService.getSampleSummaryUnitCount(UUID.randomUUID());
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void getSampleSummaryUnitCountSampleSummaryNullSize() {
+    SampleSummary newSummary = createSampleSummary(5, 2);
+    newSummary.setTotalSampleUnits(null);
+    when(sampleSummaryRepository.findById(any())).thenReturn(newSummary);
+
+    sampleService.getSampleSummaryUnitCount(newSummary.getId());
+  }
 }

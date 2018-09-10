@@ -2,10 +2,7 @@ package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 
 import com.godaddy.logging.Logger;
 import com.godaddy.logging.LoggerFactory;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 import org.redisson.api.RLock;
@@ -32,6 +29,10 @@ public class SampleUnitDistributor {
 
   private static final String LOCK_PREFIX = "SampleCollexJob-";
 
+  private static final int TRANSACTION_TIMEOUT_SECONDS = 3600;
+
+  private boolean hasErrors;
+
   @Autowired private AppConfig appConfig;
 
   @Autowired private SampleUnitSender sampleUnitSender;
@@ -48,7 +49,7 @@ public class SampleUnitDistributor {
 
   /** Scheduled job for distributing SampleUnits */
   @Scheduled(fixedDelayString = "#{appConfig.sampleUnitDistribution.delayMilliSeconds}")
-  @Transactional
+  @Transactional(timeout = TRANSACTION_TIMEOUT_SECONDS)
   public void distribute() {
     List<CollectionExerciseJob> jobs = collectionExerciseJobRepository.findByJobCompleteIsFalse();
 
@@ -58,12 +59,9 @@ public class SampleUnitDistributor {
       RLock lock = redissonClient.getFairLock(uniqueLockName);
 
       try {
-        // Wait for a lock. Automatically unlock after a certain amount of time to prevent issues
+        // Get a lock. Automatically unlock after a certain amount of time to prevent issues
         // when lock holder crashes or Redis crashes causing permanent lockout
-        if (lock.tryLock(
-            appConfig.getDataGrid().getLockTimeToWaitSeconds(),
-            appConfig.getDataGrid().getLockTimeToLiveSeconds(),
-            TimeUnit.SECONDS)) {
+        if (lock.tryLock(appConfig.getDataGrid().getLockTimeToLiveSeconds(), TimeUnit.SECONDS)) {
           try {
             processJob(job);
           } finally {
@@ -78,18 +76,27 @@ public class SampleUnitDistributor {
   }
 
   private void processJob(CollectionExerciseJob job) {
-    List<SampleUnit> mappedSampleUnits =
-        getMappedSampleUnits(job.getSampleSummaryId(), job.getCollectionExerciseId().toString());
+    SampleSummary sampleSummary = sampleSummaryRepository.findById(job.getSampleSummaryId());
 
-    boolean hasErrors = false;
+    hasErrors = false;
 
-    for (SampleUnit msu : mappedSampleUnits) {
-      try {
-        sampleUnitSender.sendSampleUnit(msu);
-      } catch (CTPException e) {
-        hasErrors = true;
-        log.with("sample_unit_id", msu.getId())
-            .error("Failed to send a sample unit to queue and update state with ID", e);
+    if (sampleSummary.getState() == SampleState.ACTIVE) {
+      try (Stream<uk.gov.ons.ctp.response.sample.domain.model.SampleUnit> sampleUnits =
+          sampleUnitRepository.findBySampleSummaryFKAndState(
+              sampleSummary.getSampleSummaryPK(), SampleUnitState.PERSISTED)) {
+        sampleUnits.forEach(
+            su -> {
+              SampleUnit mappedSampleUnit =
+                  sampleUnitMapper.mapSampleUnit(su, job.getCollectionExerciseId().toString());
+
+              try {
+                sampleUnitSender.sendSampleUnit(mappedSampleUnit);
+              } catch (CTPException e) {
+                hasErrors = true;
+                log.with("sample_unit_id", mappedSampleUnit.getId())
+                    .error("Failed to send a sample unit to queue and update state", e);
+              }
+            });
       }
     }
 
@@ -97,28 +104,5 @@ public class SampleUnitDistributor {
       job.setJobComplete(true);
       collectionExerciseJobRepository.saveAndFlush(job);
     }
-  }
-
-  private List<SampleUnit> getMappedSampleUnits(UUID sampleSummaryId, String collectionExerciseId) {
-    SampleSummary sampleSummary = sampleSummaryRepository.findById(sampleSummaryId);
-
-    if (sampleSummary.getState() != SampleState.ACTIVE) {
-      return Collections.EMPTY_LIST;
-    }
-
-    List<SampleUnit> mappedSampleUnits = new LinkedList<>();
-
-    try (Stream<uk.gov.ons.ctp.response.sample.domain.model.SampleUnit> sampleUnits =
-        sampleUnitRepository.findBySampleSummaryFKAndState(
-            sampleSummary.getSampleSummaryPK(), SampleUnitState.PERSISTED)) {
-      sampleUnits.forEach(
-          su -> {
-            SampleUnit mappedSampleUnit = sampleUnitMapper.mapSampleUnit(su, collectionExerciseId);
-
-            mappedSampleUnits.add(mappedSampleUnit);
-          });
-    }
-
-    return mappedSampleUnits;
   }
 }

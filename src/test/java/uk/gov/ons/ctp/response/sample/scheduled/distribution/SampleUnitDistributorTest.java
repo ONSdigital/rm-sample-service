@@ -62,13 +62,12 @@ public class SampleUnitDistributorTest {
     MockitoAnnotations.initMocks(this);
 
     DataGrid dataGrid = new DataGrid();
-    dataGrid.setLockTimeToLiveSeconds(30);
-    dataGrid.setLockTimeToWaitSeconds(600);
+    dataGrid.setLockTimeToLiveSeconds(60);
     when(appConfig.getDataGrid()).thenReturn(dataGrid);
 
     lock = mock(RLock.class);
     when(redissonClient.getFairLock(any())).thenReturn(lock);
-    when(lock.tryLock(anyLong(), anyLong(), any(TimeUnit.class))).thenReturn(true);
+    when(lock.tryLock(anyLong(), any(TimeUnit.class))).thenReturn(true);
   }
 
   @Test

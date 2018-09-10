@@ -168,4 +168,31 @@ public class SampleEndpointUnitTest {
 
     assertThat(sampleAttributesDTO.getId()).isEqualTo(id);
   }
+
+  @Test
+  public void getSampleUnitSizeOneSummary() throws Exception {
+    when(sampleService.getSampleSummaryUnitCount(any())).thenReturn(666);
+
+    String url = String.format("/samples/count?sampleSummaryId=%s", UUID.randomUUID().toString());
+
+    ResultActions actions = mockMvc.perform(get(url));
+
+    actions.andExpect(status().isOk());
+    actions.andExpect(jsonPath("$.sampleUnitsTotal", is(666)));
+  }
+
+  @Test
+  public void getSampleUnitSizeTwoSummaries() throws Exception {
+    when(sampleService.getSampleSummaryUnitCount(any())).thenReturn(33).thenReturn(66);
+
+    String url =
+        String.format(
+            "/samples/count?sampleSummaryId=%s&sampleSummaryId=%s",
+            UUID.randomUUID().toString(), UUID.randomUUID().toString());
+
+    ResultActions actions = mockMvc.perform(get(url));
+
+    actions.andExpect(status().isOk());
+    actions.andExpect(jsonPath("$.sampleUnitsTotal", is(99)));
+  }
 }
