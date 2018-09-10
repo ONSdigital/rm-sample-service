@@ -36,7 +36,6 @@ import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreati
 import uk.gov.ons.ctp.response.sample.representation.SampleAttributesDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
-import uk.gov.ons.ctp.response.sample.representation.SampleUnitSizeRequestDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import validation.BusinessSampleUnit;
@@ -105,32 +104,6 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
             .toString();
 
     return ResponseEntity.created(URI.create(newResourceUrl)).body(sampleUnitsRequest);
-  }
-
-  @RequestMapping(
-      value = "/sampleunitsize",
-      method = RequestMethod.POST,
-      consumes = "application/json")
-  public ResponseEntity<SampleUnitsRequestDTO> getSampleUnitSize(
-      final @Valid @RequestBody SampleUnitSizeRequestDTO sampleUnitSizeRequestDTO,
-      BindingResult bindingResult)
-      throws InvalidRequestException {
-    log.with("sample_unit_size_request", sampleUnitSizeRequestDTO)
-        .debug("Entering getSampleUnitSize");
-
-    if (bindingResult.hasErrors()) {
-      throw new InvalidRequestException("Binding errors for create action: ", bindingResult);
-    }
-
-    int sampleUnitsTotal = 0;
-
-    for (UUID sampleSummaryID : sampleUnitSizeRequestDTO.getSampleSummaryUUIDList()) {
-      sampleUnitsTotal += sampleService.getSampleSummaryUnitCount(sampleSummaryID);
-    }
-
-    SampleUnitsRequestDTO sampleUnitsRequest = new SampleUnitsRequestDTO(sampleUnitsTotal);
-
-    return ResponseEntity.ok(sampleUnitsRequest);
   }
 
   /**
@@ -227,6 +200,21 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     SampleSummaryDTO result = mapperFacade.map(sampleSummary, SampleSummaryDTO.class);
 
     return ResponseEntity.ok(result);
+  }
+
+  @RequestMapping(value = "/samplecount", method = RequestMethod.GET)
+  public ResponseEntity<SampleUnitsRequestDTO> getSampleSummaryUnitCount(
+      @RequestParam(value = "sampleSummaryId") List<UUID> sampleSummaryIdList) {
+
+    int sampleUnitsTotal = 0;
+
+    for (UUID sampleSummaryId : sampleSummaryIdList) {
+      sampleUnitsTotal += sampleService.getSampleSummaryUnitCount(sampleSummaryId);
+    }
+
+    SampleUnitsRequestDTO sampleUnitsRequest = new SampleUnitsRequestDTO(sampleUnitsTotal);
+
+    return ResponseEntity.ok(sampleUnitsRequest);
   }
 
   @RequestMapping(value = "{id}", method = RequestMethod.GET)

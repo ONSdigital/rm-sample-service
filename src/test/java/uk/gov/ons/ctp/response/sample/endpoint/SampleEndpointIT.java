@@ -401,15 +401,18 @@ public class SampleEndpointIT {
                 "file")
             .asObject(SampleSummary.class);
 
-    String sampleUnitId = sampleSummary.getBody().getId().toString();
+    String sampleSummaryId = sampleSummary.getBody().getId().toString();
 
     uploadFinishedMessageListener.take();
 
+    String url =
+        String.format(
+            "http://localhost:%d/samples/samplecount?sampleSummaryId=%s", port, sampleSummaryId);
+
     HttpResponse<SampleUnitsRequestDTO> response =
-        Unirest.post(String.format("http://localhost:%d/samples/sampleunitsize", port))
+        Unirest.get(url)
             .header("Content-Type", "application/json")
             .basicAuth("admin", "secret")
-            .body(String.format("{ \"sampleSummaryUUIDList\" : [\"%s\"] }", sampleUnitId))
             .asObject(SampleUnitsRequestDTO.class);
 
     assertThat(response.getStatus()).isEqualTo(200);
@@ -419,7 +422,7 @@ public class SampleEndpointIT {
   private SampleSummaryDTO loadSocialSample(String sampleFile)
       throws UnirestException, IOException, InterruptedException {
     HttpResponse<SampleSummary> sampleSummaryResponse =
-        Unirest.post("http://localhost:" + port + "/samples/SOCIAL/fileupload")
+        Unirest.post(String.format("http://localhost:%d/samples/SOCIAL/fileupload", port))
             .basicAuth("admin", "secret")
             .field(
                 "file",
