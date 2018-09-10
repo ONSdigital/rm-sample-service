@@ -407,7 +407,7 @@ public class SampleEndpointIT {
 
     String url =
         String.format(
-            "http://localhost:%d/samples/samplecount?sampleSummaryId=%s", port, sampleSummaryId);
+            "http://localhost:%d/samples/count?sampleSummaryId=%s", port, sampleSummaryId);
 
     HttpResponse<SampleUnitsRequestDTO> response =
         Unirest.get(url)

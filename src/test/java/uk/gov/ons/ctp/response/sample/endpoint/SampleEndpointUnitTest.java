@@ -173,8 +173,7 @@ public class SampleEndpointUnitTest {
   public void getSampleUnitSizeOneSummary() throws Exception {
     when(sampleService.getSampleSummaryUnitCount(any())).thenReturn(666);
 
-    String url =
-        String.format("/samples/samplecount?sampleSummaryId=%s", UUID.randomUUID().toString());
+    String url = String.format("/samples/count?sampleSummaryId=%s", UUID.randomUUID().toString());
 
     ResultActions actions = mockMvc.perform(get(url));
 
@@ -188,7 +187,7 @@ public class SampleEndpointUnitTest {
 
     String url =
         String.format(
-            "/samples/samplecount?sampleSummaryId=%s&sampleSummaryId=%s",
+            "/samples/count?sampleSummaryId=%s&sampleSummaryId=%s",
             UUID.randomUUID().toString(), UUID.randomUUID().toString());
 
     ResultActions actions = mockMvc.perform(get(url));

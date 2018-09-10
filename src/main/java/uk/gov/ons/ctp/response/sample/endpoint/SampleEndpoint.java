@@ -202,7 +202,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     return ResponseEntity.ok(result);
   }
 
-  @RequestMapping(value = "/samplecount", method = RequestMethod.GET)
+  @RequestMapping(value = "/count", method = RequestMethod.GET)
   public ResponseEntity<SampleUnitsRequestDTO> getSampleSummaryUnitCount(
       @RequestParam(value = "sampleSummaryId") List<UUID> sampleSummaryIdList) {
 

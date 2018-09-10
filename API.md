@@ -39,8 +39,8 @@ This page documents the Sample service API endpoints. Apart from the Service Inf
 
 An `HTTP 201 Created` status code is returned if the sample unit request creation was a success. An `HTTP 400 Bad Request` is returned if any of the required parameters are missing, or if a sample unit request already exists for the same criteria.
 
-## Get Sample Summary Size Request
-* `GET /samples/samplecount?sampleSummaryId={id}` gets the total number of sample units.
+## Get Sample Summary Unit Count Request
+* `GET /samples/count?sampleSummaryId={id}` gets the total number of sample units.
 
 ### Example JSON Response
 ```json
