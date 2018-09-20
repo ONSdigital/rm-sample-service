@@ -342,4 +342,9 @@ public class SampleServiceTest {
 
     sampleService.getSampleSummaryUnitCount(newSummary.getId());
   }
+
+  @Test
+  public void failingTestTest() {
+    assertTrue(2 == 1);
+  }
 }
