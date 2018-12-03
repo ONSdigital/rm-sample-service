@@ -8,6 +8,8 @@ import static org.mockito.Mockito.verify;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -36,6 +38,9 @@ public class CsvIngesterCensusTest {
   @InjectMocks private SampleEndpoint sampleEndpoint;
 
   @Mock private SampleService sampleService;
+
+  @Spy
+  private Validator csvIngestValidator = Validation.buildDefaultValidatorFactory().getValidator();
 
   @Rule public ExpectedException thrown = ExpectedException.none();
 

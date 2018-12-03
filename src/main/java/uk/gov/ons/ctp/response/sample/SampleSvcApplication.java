@@ -2,6 +2,9 @@ package uk.gov.ons.ctp.response.sample;
 
 import com.godaddy.logging.LoggingConfigs;
 import javax.annotation.PostConstruct;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import net.sourceforge.cobertura.CoverageIgnore;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
@@ -145,5 +148,11 @@ public class SampleSvcApplication {
   @Primary
   public CustomObjectMapper customObjectMapper() {
     return new CustomObjectMapper();
+  }
+
+  @Bean
+  public Validator csvIngestValidator() {
+    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+    return factory.getValidator();
   }
 }

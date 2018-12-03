@@ -10,14 +10,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
 import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import liquibase.util.csv.opencsv.CSVReader;
 import liquibase.util.csv.opencsv.bean.ColumnPositionMappingStrategy;
 import liquibase.util.csv.opencsv.bean.CsvToBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.common.error.CTPException;
@@ -88,6 +85,7 @@ public class CsvIngesterCensus extends CsvToBean<CensusSampleUnit> {
       };
 
   @Autowired private SampleService sampleService;
+  @Autowired private Validator csvIngestValidator;
 
   private ColumnPositionMappingStrategy<CensusSampleUnit> columnPositionMappingStrategy;
 
@@ -95,17 +93,6 @@ public class CsvIngesterCensus extends CsvToBean<CensusSampleUnit> {
     columnPositionMappingStrategy = new ColumnPositionMappingStrategy<>();
     columnPositionMappingStrategy.setType(CensusSampleUnit.class);
     columnPositionMappingStrategy.setColumnMapping(COLUMNS);
-  }
-
-  /**
-   * Lazy create a reusable validator
-   *
-   * @return the cached validator
-   */
-  @Cacheable(cacheNames = "csvIngestValidator")
-  private Validator getValidator() {
-    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-    return factory.getValidator();
   }
 
   public SampleSummary ingest(final SampleSummary sampleSummary, final MultipartFile file)
@@ -119,8 +106,14 @@ public class CsvIngesterCensus extends CsvToBean<CensusSampleUnit> {
     // census is onboarded expectedCI should be calculated
 
     while ((nextLine = csvReader.readNext()) != null) {
+      CensusSampleUnit censusSampleUnit = null;
 
-      CensusSampleUnit censusSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
+      // Liquibase OpenCSV parser is not thread-safe. It's also slow. We should use something
+      // better.
+      synchronized (columnPositionMappingStrategy) {
+        censusSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
+      }
+
       Optional<String> namesOfInvalidColumns = validateLine(censusSampleUnit);
       if (namesOfInvalidColumns.isPresent()) {
         log.with("line", Arrays.toString(nextLine))
@@ -148,7 +141,8 @@ public class CsvIngesterCensus extends CsvToBean<CensusSampleUnit> {
    * @return the errored column names separated by '_'
    */
   private Optional<String> validateLine(CensusSampleUnit csvLine) {
-    Set<ConstraintViolation<CensusSampleUnit>> violations = getValidator().validate(csvLine);
+    Set<ConstraintViolation<CensusSampleUnit>> violations = csvIngestValidator.validate(csvLine);
+
     String invalidColumns =
         violations
             .stream()
