@@ -10,15 +10,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
 import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import liquibase.util.StringUtils;
 import liquibase.util.csv.opencsv.CSVReader;
 import liquibase.util.csv.opencsv.bean.ColumnPositionMappingStrategy;
 import liquibase.util.csv.opencsv.bean.CsvToBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.common.error.CTPException;
@@ -98,23 +95,14 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
 
   @Autowired private PartyPublisher partyPublisher;
 
+  @Autowired private Validator csvIngestValidator;
+
   private ColumnPositionMappingStrategy<BusinessSampleUnit> columnPositionMappingStrategy;
 
   public CsvIngesterBusiness() {
     columnPositionMappingStrategy = new ColumnPositionMappingStrategy<>();
     columnPositionMappingStrategy.setType(BusinessSampleUnit.class);
     columnPositionMappingStrategy.setColumnMapping(COLUMNS);
-  }
-
-  /**
-   * Lazy create a reusable validator
-   *
-   * @return the cached validator
-   */
-  @Cacheable(cacheNames = "csvIngestValidator")
-  public Validator getValidator() {
-    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-    return factory.getValidator();
   }
 
   public SampleSummary ingest(final SampleSummary sampleSummary, final MultipartFile file)
@@ -144,7 +132,13 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
   private BusinessSampleUnit parseLine(String[] nextLine, Set<String> unitRefs)
       throws IllegalAccessException, java.lang.reflect.InvocationTargetException,
           InstantiationException, java.beans.IntrospectionException, CTPException {
-    BusinessSampleUnit businessSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
+    BusinessSampleUnit businessSampleUnit = null;
+
+    // Liquibase OpenCSV parser is not thread-safe. It's also slow. We should use something better.
+    synchronized (columnPositionMappingStrategy) {
+      businessSampleUnit = processLine(columnPositionMappingStrategy, nextLine);
+    }
+
     List<String> namesOfInvalidColumns = validateLine(businessSampleUnit);
 
     // If a unit ref is already registered
@@ -173,7 +167,7 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
   }
 
   private List<String> validateLine(BusinessSampleUnit csvLine) {
-    Set<ConstraintViolation<BusinessSampleUnit>> violations = getValidator().validate(csvLine);
+    Set<ConstraintViolation<BusinessSampleUnit>> violations = csvIngestValidator.validate(csvLine);
     List<String> invalidFields =
         violations.stream().map(v -> v.getPropertyPath().toString()).collect(Collectors.toList());
     if (StringUtils.isEmpty(csvLine.getSampleUnitRef())) {

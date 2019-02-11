@@ -11,6 +11,8 @@ import static uk.gov.ons.ctp.response.sample.TestFiles.getTestFileFromString;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -45,6 +47,9 @@ public class CsvIngesterBusinessTest {
   @Mock private SampleService sampleService;
 
   @Mock private PartyPublisher partyPublisher;
+
+  @Spy
+  private Validator csvIngestValidator = Validation.buildDefaultValidatorFactory().getValidator();
 
   @Captor public ArgumentCaptor<List<BusinessSampleUnit>> argumentCaptor;
 
