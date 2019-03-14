@@ -3,11 +3,16 @@ package uk.gov.ons.ctp.response.sample.ingest;
 import com.godaddy.logging.Logger;
 import com.godaddy.logging.LoggerFactory;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -30,7 +35,10 @@ import validation.SampleUnitBase;
 
 @Service
 public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
+
   private static final Logger log = LoggerFactory.getLogger(CsvIngesterBusiness.class);
+
+  private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(200);
 
   private static final String SAMPLEUNITREF = "sampleUnitRef";
   private static final String FORMTYPE = "formType";
@@ -110,18 +118,38 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
 
     CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()), ':');
     String[] nextLine;
-    List<BusinessSampleUnit> sampleUnitList = new ArrayList<>();
-    Set<String> unitRefs = new HashSet<>();
+    List<Callable<BusinessSampleUnit>> callables = new LinkedList<>();
+    Set<String> unitRefs = ConcurrentHashMap.newKeySet();
+    int currentLineNumber = 1;
 
     while ((nextLine = csvReader.readNext()) != null) {
+      final String[] finalNextLine = nextLine;
+      final int finalLineNumber = currentLineNumber++;
+
+      callables.add(
+          () -> {
+            try {
+              return parseLine(finalNextLine, unitRefs);
+            } catch (CTPException e) {
+              String newMessage = String.format("Line %d: %s", finalLineNumber, e.getMessage());
+              throw new CTPException(e.getFault(), e, newMessage);
+            }
+          });
+    }
+
+    List<Future<BusinessSampleUnit>> futures = EXECUTOR_SERVICE.invokeAll(callables);
+
+    List<BusinessSampleUnit> sampleUnitList = new LinkedList<>();
+    for (Future<BusinessSampleUnit> future : futures) {
       try {
-        sampleUnitList.add(parseLine(nextLine, unitRefs));
-      } catch (CTPException e) {
-        String newMessage =
-            String.format("Line %d: %s", csvReader.getRecordsRead(), e.getMessage());
-        throw new CTPException(e.getFault(), e, newMessage);
+        sampleUnitList.add(future.get());
+      } catch (ExecutionException executionException) {
+        if (executionException.getCause().getClass().equals(CTPException.class)) {
+          throw (CTPException) executionException.getCause();
+        }
       }
     }
+
     SampleSummary sampleSummaryWithCICount =
         sampleService.saveSample(sampleSummary, sampleUnitList, SampleUnitState.INIT);
     publishToPartyQueue(sampleUnitList, sampleSummary.getId().toString());
@@ -141,17 +169,19 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
 
     List<String> namesOfInvalidColumns = validateLine(businessSampleUnit);
 
-    // If a unit ref is already registered
-    if (unitRefs.contains(businessSampleUnit.getSampleUnitRef())) {
-      log.with("sample_unit_ref", businessSampleUnit.getSampleUnitRef())
-          .warn("sample unit ref is duplicated in the file.");
-      throw new CTPException(
-          CTPException.Fault.VALIDATION_FAILED,
-          String.format(
-              "This sample unit ref %s is duplicated in the file.",
-              businessSampleUnit.getSampleUnitRef()));
+    synchronized (unitRefs) {
+      // If a unit ref is already registered
+      if (unitRefs.contains(businessSampleUnit.getSampleUnitRef())) {
+        log.with("sample_unit_ref", businessSampleUnit.getSampleUnitRef())
+            .warn("sample unit ref is duplicated in the file.");
+        throw new CTPException(
+            CTPException.Fault.VALIDATION_FAILED,
+            String.format(
+                "This sample unit ref %s is duplicated in the file.",
+                businessSampleUnit.getSampleUnitRef()));
+      }
+      unitRefs.add(businessSampleUnit.getSampleUnitRef());
     }
-    unitRefs.add(businessSampleUnit.getSampleUnitRef());
 
     if (!namesOfInvalidColumns.isEmpty()) {
       String errorMessage =
