@@ -161,3 +161,21 @@ A `HTTP 201 Created` status code is returned if the sample csv is successfully u
     }
 }
 ```
+
+## Find Sample Units by Postcode
+* `GET /samples/sampleunits?postcode={postcode}` get Sample Units by Postcode
+
+### Example JSON Response
+```json
+[
+
+    {
+    "error":{
+    "code":"SYSTEM_ERROR",
+    "timestamp":"20190522122749865",
+    "message":"Required String parameter 'postcode' is not present"}
+    }
+]
+```
+
+NOTE: This endpoint wants a postcode as a query. However, the database does not appear to keep any valid postcodes. As such, this endpoint seems to only return errors, and may be redundant.
