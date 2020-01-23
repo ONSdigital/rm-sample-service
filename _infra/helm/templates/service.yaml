@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: samplesvc
+spec:
+  type: ClusterIP
+  ports:
+  - port: {{ .Values.service.port }}
+    protocol: TCP
+    targetPort: {{ .Values.service.port }}
+  selector:
+    app: {{ include "common.name" . }}
