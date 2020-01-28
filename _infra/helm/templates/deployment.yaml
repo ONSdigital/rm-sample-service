@@ -6,8 +6,8 @@ spec:
   replicas: 1
   strategy:
     rollingUpdate:
-      maxSurge:
-      maxUnavailable:
+      maxSurge: 1
+      maxUnavailable: 1
     type: RollingUpdate
   selector:
     matchLabels:
@@ -110,9 +110,9 @@ spec:
           - name: SFTP_PORT
             value: "$(SFTP_SERVICE_PORT)"
           - name: PARTY_SVC_CONNECTION_CONFIG_HOST
-            value: "$(RAS_PARTY_SERVICE_HOST)"
+            value: "$(PARTY_SERVICE_HOST)"
           - name: PARTY_SVC_CONNECTION_CONFIG_PORT
-            value: "$(RAS_PARTY_SERVICE_PORT)"
+            value: "$(PARTY_SERVICE_PORT)"
           - name: PARTY_SVC_CONNECTION_CONFIG_USERNAME
             value: "$(SECURITY_USER_NAME)"
           - name: PARTY_SVC_CONNECTION_CONFIG_PASSWORD
@@ -132,9 +132,4 @@ spec:
           - name: SPRING_ZIPKIN_BASEURL
             value: "http://$(ZIPKIN_SERVICE_HOST):$(ZIPKIN_SERVICE_PORT)/"
           resources:
-            limits:
-              cpu: 1000m
-              memory: 2056Mi
-            requests:
-              cpu: 500m
-              memory: 1028Mi
+            {{ toYaml .Values.resources | nindent 12 }}
