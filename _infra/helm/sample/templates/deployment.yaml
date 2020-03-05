@@ -172,6 +172,16 @@ spec:
             value: "$(SFTP_SERVICE_HOST)"
           - name: SFTP_PORT
             value: "$(SFTP_SERVICE_PORT)"
+          - name: SFTP_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: sftp-secret
+                key: sftp-sample-user
+          - name: SFTP_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: sftp-secret
+                key: sftp-sample-password
           - name: PARTY_SVC_CONNECTION_CONFIG_HOST
             value: "$(PARTY_SERVICE_HOST)"
           - name: PARTY_SVC_CONNECTION_CONFIG_PORT
