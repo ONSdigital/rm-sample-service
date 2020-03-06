@@ -27,3 +27,7 @@ service:
 resources:
   requests:
     memory: "512Mi"
+
+sftp:
+  test:
+    enabled: true
