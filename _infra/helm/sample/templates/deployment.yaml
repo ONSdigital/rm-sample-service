@@ -169,9 +169,13 @@ spec:
           - name: DATA_GRID_ADDRESS
             value: "$(REDIS_HOST):$(REDIS_PORT)"
           - name: SFTP_HOST
+            {{- if .Values.sftp.test.enabled }}
             value: "$(SFTP_SERVICE_HOST)"
+            {{- else }}
+            value: {{ .Values.sftp.host }}
+            {{- end }}
           - name: SFTP_PORT
-            value: "$(SFTP_SERVICE_PORT)"
+            value: "22"
           - name: SFTP_USERNAME
             valueFrom:
               secretKeyRef:
