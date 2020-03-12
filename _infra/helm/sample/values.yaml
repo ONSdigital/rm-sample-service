@@ -31,3 +31,6 @@ resources:
 sftp:
   test:
     enabled: true
+
+managedRabbitMQ:
+  enabled: false
