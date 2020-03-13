@@ -60,7 +60,7 @@ spec:
         {{- end }}
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.name }}/{{ .Chart.Name }}:{{ .Chart.AppVersion }}"
-          imagePullPolicy:
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http-server
               containerPort: {{ .Values.container.port }}
