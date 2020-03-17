@@ -34,3 +34,6 @@ sftp:
 
 managedRabbitMQ:
   enabled: false
+
+export:
+  cron: "0 0/5 * * * ?"

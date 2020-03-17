@@ -199,6 +199,8 @@ spec:
               secretKeyRef:
                 name: sftp-secret
                 key: sftp-sample-password
+          - name: EXPORT_SCHEDULE_CRON_EXPRESSION
+            value: "{{ .Values.export.cron }}"
           - name: PARTY_SVC_CONNECTION_CONFIG_HOST
             value: "$(PARTY_SERVICE_HOST)"
           - name: PARTY_SVC_CONNECTION_CONFIG_PORT
