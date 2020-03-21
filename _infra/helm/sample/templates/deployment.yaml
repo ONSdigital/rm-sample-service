@@ -212,9 +212,17 @@ spec:
           - name: EXPORT_SCHEDULE_CRON_EXPRESSION
             value: "{{ .Values.export.cron }}"
           - name: PARTY_SVC_CONNECTION_CONFIG_HOST
+            {{- if .Values.dns.enabled }}
+            value: "party.{{ .Values.namespace }}.svc.cluster.local"
+            {{- else }}
             value: "$(PARTY_SERVICE_HOST)"
+            {{- end }}
           - name: PARTY_SVC_CONNECTION_CONFIG_PORT
+            {{- if .Values.dns.enabled }}
+            value: "{{ .Values.dns.wellKnownPort }}"
+            {{- else }}
             value: "$(PARTY_SERVICE_PORT)"
+            {{- end }}
           - name: PARTY_SVC_CONNECTION_CONFIG_USERNAME
             value: "$(SECURITY_USER_NAME)"
           - name: PARTY_SVC_CONNECTION_CONFIG_PASSWORD
