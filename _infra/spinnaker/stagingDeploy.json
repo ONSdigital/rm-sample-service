@@ -9,8 +9,10 @@
   },
   "variables": {
     "namespace": "staging",
+    "configNamespace": "staging",
     "environment": "dev",
-    "service": "sample"
+    "service": "sample",
+    "bucket": "ras-rm-configuration"
   },
   "exclude": [],
   "triggers": [],
