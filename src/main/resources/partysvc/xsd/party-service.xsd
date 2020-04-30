@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://ons.gov.uk/ctp/response/party/definition"
+           targetNamespace="http://ons.gov.uk/ctp/response/party/definition">
+  
+  <xs:element name="partyCreationRequestDTO" type="PartyCreationRequestDTO" />
+
+  <xs:complexType name="PartyCreationRequestDTO">
+    <xs:sequence>
+      <xs:element name="sampleUnitRef" type="xs:string" minOccurs="1" maxOccurs="1" />
+      <xs:element name="sampleSummaryId" type="xs:string" minOccurs="1" maxOccurs="1" />
+      <xs:element name="sampleUnitType" minOccurs="1" maxOccurs="1">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="H" />
+            <xs:enumeration value="HI" />
+            <xs:enumeration value="C" />
+            <xs:enumeration value="CI" />
+            <xs:enumeration value="B" />
+            <xs:enumeration value="BI" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="attributes" type="PartyCreationRequestAttributesDTO" minOccurs="1" maxOccurs="1" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="sampleLinkCreationRequestDTO" type="SampleLinkCreationRequestDTO"/>
+
+  <xs:complexType name="SampleLinkCreationRequestDTO">
+    <xs:sequence>
+    <xs:element name="collectionExerciseId" type="xs:string" minOccurs="1" maxOccurs="1" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Association">
+    <xs:sequence>
+      <xs:element name="partyId" type="xs:string" minOccurs="1" maxOccurs="1" />    
+      <xs:element name="enrolments" type="Enrolment" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Enrolment">
+    <xs:sequence>
+      <xs:element name="enrolmentStatus" type="xs:string" minOccurs="1" maxOccurs="1" />    
+      <xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1" />
+      <xs:element name="surveyId" type="xs:string" minOccurs="1" maxOccurs="1" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PartyCreationRequestAttributesDTO">
+        <xs:sequence>
+          <xs:element name="checkletter" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="frosic92" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="rusic92" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="frosic2007" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="rusic2007" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="froempment" type="xs:int" minOccurs="1" maxOccurs="1" />
+          <xs:element name="frotover" type="xs:int" minOccurs="1" maxOccurs="1" />
+          <xs:element name="entref" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="legalstatus" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1" />         
+          <xs:element name="entrepmkr" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="region" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="birthdate" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="entname1" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="entname2" type="xs:string" minOccurs="0" maxOccurs="1" />
+          <xs:element name="entname3" type="xs:string" minOccurs="0" maxOccurs="1" />
+          <xs:element name="runame1" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="runame2" type="xs:string" minOccurs="0" maxOccurs="1" />
+          <xs:element name="runame3" type="xs:string" minOccurs="0" maxOccurs="1" />
+          <xs:element name="tradstyle1" type="xs:string" minOccurs="0" maxOccurs="1" />
+          <xs:element name="tradstyle2" type="xs:string" minOccurs="0" maxOccurs="1" />
+          <xs:element name="tradstyle3" type="xs:string" minOccurs="0" maxOccurs="1" />
+          <xs:element name="seltype" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="inclexcl" type="xs:string" minOccurs="0" maxOccurs="1" />
+          <xs:element name="cell_no" type="xs:int" minOccurs="1" maxOccurs="1"/>
+          <xs:element name="formtype" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="currency" type="xs:string" minOccurs="0" maxOccurs="1" />
+          <xs:element name="sampleUnitId" type="xs:string" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>

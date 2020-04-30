@@ -17,9 +17,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import uk.gov.ons.ctp.common.rest.RestUtility;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
-import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.message.EventPublisher;
+import uk.gov.ons.ctp.response.sample.party.PartyDTO;
 
 @Service
 public class PartySvcClientService {
