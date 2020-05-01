@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.response.sample.party;
+package uk.gov.ons.ctp.response.libs.party.representation;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

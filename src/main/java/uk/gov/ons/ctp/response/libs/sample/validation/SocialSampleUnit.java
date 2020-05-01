@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.response.sample.validation;
+package uk.gov.ons.ctp.response.libs.sample.validation;
 
 import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;

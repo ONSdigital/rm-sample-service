@@ -5,7 +5,7 @@ import com.godaddy.logging.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
-import uk.gov.ons.ctp.response.libs.PartyCreationRequestDTO;
+import uk.gov.ons.ctp.response.libs.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 @MessageEndpoint

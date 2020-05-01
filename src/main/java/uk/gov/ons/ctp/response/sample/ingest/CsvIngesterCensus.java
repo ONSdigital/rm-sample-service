@@ -18,10 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.common.error.CTPException;
+import uk.gov.ons.ctp.response.libs.sample.validation.CensusSampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
-import uk.gov.ons.ctp.response.sample.validation.CensusSampleUnit;
 
 @Service
 public class CsvIngesterCensus extends CsvToBean<CensusSampleUnit> {

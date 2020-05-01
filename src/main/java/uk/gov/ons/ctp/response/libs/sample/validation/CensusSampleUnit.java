@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.response.sample.validation;
+package uk.gov.ons.ctp.response.libs.sample.validation;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;

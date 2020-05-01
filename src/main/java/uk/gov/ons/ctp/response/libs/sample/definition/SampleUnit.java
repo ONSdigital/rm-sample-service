@@ -6,7 +6,7 @@
 // Generated on: 2020.04.29 at 12:26:07 PM BST
 //
 
-package uk.gov.ons.ctp.response.libs;
+package uk.gov.ons.ctp.response.libs.sample.definition;
 
 import com.kscs.util.jaxb.Buildable;
 import com.kscs.util.jaxb.PropertyTree;

@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.response.sample.party;
+package uk.gov.ons.ctp.response.libs.party.representation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;

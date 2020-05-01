@@ -85,8 +85,8 @@ public class SampleUnitDistributorTest {
 
     SampleUnit sampleUnit = new SampleUnit();
 
-    uk.gov.ons.ctp.response.libs.SampleUnit mappedSampleUnit =
-        new uk.gov.ons.ctp.response.libs.SampleUnit();
+    uk.gov.ons.ctp.response.libs.sample.definition.SampleUnit mappedSampleUnit =
+        new uk.gov.ons.ctp.response.libs.sample.definition.SampleUnit();
 
     when(collectionExerciseJobRepository.findByJobCompleteIsFalse())
         .thenReturn(Collections.singletonList(collectionExerciseJob));
@@ -127,8 +127,8 @@ public class SampleUnitDistributorTest {
     SampleUnit sampleUnit = new SampleUnit();
     sampleUnit.setId(sampleUnitId);
 
-    uk.gov.ons.ctp.response.libs.SampleUnit mappedSampleUnit =
-        new uk.gov.ons.ctp.response.libs.SampleUnit();
+    uk.gov.ons.ctp.response.libs.sample.definition.SampleUnit mappedSampleUnit =
+        new uk.gov.ons.ctp.response.libs.sample.definition.SampleUnit();
 
     when(collectionExerciseJobRepository.findByJobCompleteIsFalse())
         .thenReturn(Collections.singletonList(collectionExerciseJob));

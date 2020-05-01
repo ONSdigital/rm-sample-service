@@ -18,7 +18,9 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.common.time.DateTimeUtil;
-import uk.gov.ons.ctp.response.libs.PartyCreationRequestDTO;
+import uk.gov.ons.ctp.response.libs.party.definition.PartyCreationRequestDTO;
+import uk.gov.ons.ctp.response.libs.party.representation.PartyDTO;
+import uk.gov.ons.ctp.response.libs.sample.validation.SampleUnitBase;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
@@ -31,12 +33,10 @@ import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterCensus;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterSocial;
 import uk.gov.ons.ctp.response.sample.message.EventPublisher;
 import uk.gov.ons.ctp.response.sample.message.SampleOutboundPublisher;
-import uk.gov.ons.ctp.response.sample.party.PartyDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
-import uk.gov.ons.ctp.response.sample.validation.SampleUnitBase;
 
 @Service
 @Configuration

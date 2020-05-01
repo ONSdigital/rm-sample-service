@@ -1,10 +1,10 @@
 package uk.gov.ons.ctp.response.sample.party;
 
 import org.apache.commons.lang3.StringUtils;
-import uk.gov.ons.ctp.response.libs.PartyCreationRequestAttributesDTO;
-import uk.gov.ons.ctp.response.libs.PartyCreationRequestDTO;
-import uk.gov.ons.ctp.response.sample.validation.BusinessSampleUnit;
-import uk.gov.ons.ctp.response.sample.validation.SampleUnitBase;
+import uk.gov.ons.ctp.response.libs.party.definition.PartyCreationRequestAttributesDTO;
+import uk.gov.ons.ctp.response.libs.party.definition.PartyCreationRequestDTO;
+import uk.gov.ons.ctp.response.libs.sample.validation.BusinessSampleUnit;
+import uk.gov.ons.ctp.response.libs.sample.validation.SampleUnitBase;
 
 /** Util for the Party Service */
 public class PartyUtil {
