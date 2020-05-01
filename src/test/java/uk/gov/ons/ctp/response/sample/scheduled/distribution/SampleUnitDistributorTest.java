@@ -13,6 +13,8 @@ import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
+import libs.common.error.CTPException;
+import libs.common.error.CTPException.Fault;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,8 +25,6 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import uk.gov.ons.ctp.response.libs.common.error.CTPException;
-import uk.gov.ons.ctp.response.libs.common.error.CTPException.Fault;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.config.DataGrid;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
@@ -85,8 +85,8 @@ public class SampleUnitDistributorTest {
 
     SampleUnit sampleUnit = new SampleUnit();
 
-    uk.gov.ons.ctp.response.libs.sample.definition.SampleUnit mappedSampleUnit =
-        new uk.gov.ons.ctp.response.libs.sample.definition.SampleUnit();
+    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit =
+        new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit();
 
     when(collectionExerciseJobRepository.findByJobCompleteIsFalse())
         .thenReturn(Collections.singletonList(collectionExerciseJob));
@@ -127,8 +127,8 @@ public class SampleUnitDistributorTest {
     SampleUnit sampleUnit = new SampleUnit();
     sampleUnit.setId(sampleUnitId);
 
-    uk.gov.ons.ctp.response.libs.sample.definition.SampleUnit mappedSampleUnit =
-        new uk.gov.ons.ctp.response.libs.sample.definition.SampleUnit();
+    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit =
+        new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit();
 
     when(collectionExerciseJobRepository.findByJobCompleteIsFalse())
         .thenReturn(Collections.singletonList(collectionExerciseJob));

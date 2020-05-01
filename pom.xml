@@ -213,11 +213,15 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>uk.gov.ons.ctp.common</groupId>
-			<artifactId>test-framework</artifactId>
-			<version>10.49.12</version>
-			<scope>test</scope>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
 		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>uk.gov.ons.ctp.common</groupId>-->
+<!--			<artifactId>test-framework</artifactId>-->
+<!--			<version>10.49.12</version>-->
+<!--			<scope>test</scope>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -353,13 +357,13 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<configuration>
-					<excludes>**/uk/gov/ons/ctp/response/libs/**/*</excludes>
-				</configuration>
-			</plugin>
+<!--			<plugin>-->
+<!--				<groupId>org.apache.maven.plugins</groupId>-->
+<!--				<artifactId>maven-checkstyle-plugin</artifactId>-->
+<!--				<configuration>-->
+<!--					<excludes>**/libs/**/*</excludes>-->
+<!--				</configuration>-->
+<!--			</plugin>-->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>buildnumber-maven-plugin</artifactId>

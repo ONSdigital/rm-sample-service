@@ -27,8 +27,8 @@ public class SampleUnitMapperTest {
     SampleAttributes sampleAttributes = new SampleAttributes(sampleUnit.getId(), attributesMap);
     sampleUnit.setSampleAttributes(sampleAttributes);
 
-    uk.gov.ons.ctp.response.libs.sample.definition.SampleUnit desinationSampleUnit =
-        new uk.gov.ons.ctp.response.libs.sample.definition.SampleUnit();
+    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit desinationSampleUnit =
+        new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit();
 
     // When
     sampleUnitMapper.mapAtoB(sampleUnit, desinationSampleUnit, null);
@@ -49,8 +49,8 @@ public class SampleUnitMapperTest {
   public void testMappingNullSampleAttributes() {
     // Given
     SampleUnit sampleUnit = new SampleUnit();
-    uk.gov.ons.ctp.response.libs.sample.definition.SampleUnit desinationSampleUnit =
-        new uk.gov.ons.ctp.response.libs.sample.definition.SampleUnit();
+    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit desinationSampleUnit =
+        new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit();
 
     // When
     sampleUnitMapper.mapAtoB(sampleUnit, desinationSampleUnit, null);

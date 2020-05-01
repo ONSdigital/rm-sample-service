@@ -1,8 +1,8 @@
 package uk.gov.ons.ctp.response.sample.config;
 
+import libs.common.rest.RestUtilityConfig;
 import lombok.Data;
 import net.sourceforge.cobertura.CoverageIgnore;
-import uk.gov.ons.ctp.response.libs.common.rest.RestUtilityConfig;
 
 /** Application config bean for the connection details to the party Service. */
 @CoverageIgnore

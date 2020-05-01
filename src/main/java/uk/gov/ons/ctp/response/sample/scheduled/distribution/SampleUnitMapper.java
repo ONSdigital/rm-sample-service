@@ -3,9 +3,9 @@ package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 import java.util.Map;
 import ma.glasnost.orika.MapperFacade;
 import org.springframework.stereotype.Component;
-import uk.gov.ons.ctp.response.libs.sample.definition.SampleUnit;
-import uk.gov.ons.ctp.response.libs.sample.definition.SampleUnit.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesRepository;
+import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
+import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit.SampleAttributes;
 
 /** Maps a SampleUnit JPA entity to SampleUnit which can be sent via Rabbit queue */
 @Component

@@ -36,7 +36,7 @@
    <bean id="partyInMarshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
       <property name="contextPath" value="uk.gov.ons.ctp.response.party.definition" />
    </bean>
-   <int:channel id="partyTransformed" datatype="uk.gov.ons.ctp.response.libs.party.definition.PartyCreationRequestDTO" />
+   <int:channel id="partyTransformed" datatype="libs.party.definition.PartyCreationRequestDTO" />
    <int-xml:unmarshalling-transformer
            input-channel="partyXmlValid" output-channel="partyTransformed"
            unmarshaller="partyInMarshaller" />
@@ -68,7 +68,7 @@
          </bean>
       </property>
       <property name="retryPolicy">
-         <bean class="uk.gov.ons.ctp.response.libs.common.retry.CTPUnknownHostRetryPolicy">
+         <bean class="libs.common.retry.CTPUnknownHostRetryPolicy">
             <constructor-arg type="int">
                <value>${messaging.maxAttempts}</value>
             </constructor-arg>
