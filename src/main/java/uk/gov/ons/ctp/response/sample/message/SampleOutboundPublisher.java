@@ -8,7 +8,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.integration.annotation.MessageEndpoint;
-import uk.gov.ons.ctp.common.error.CTPException;
+import uk.gov.ons.ctp.response.libs.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 
 /** Publisher of messages about samples uploaded */

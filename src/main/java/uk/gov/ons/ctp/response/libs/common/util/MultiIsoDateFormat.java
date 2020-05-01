@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.common.util;
+package uk.gov.ons.ctp.response.libs.common.util;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

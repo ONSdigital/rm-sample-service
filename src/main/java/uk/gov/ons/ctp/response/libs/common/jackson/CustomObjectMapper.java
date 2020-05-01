@@ -1,9 +1,9 @@
-package uk.gov.ons.ctp.common.jackson;
+package uk.gov.ons.ctp.response.libs.common.jackson;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import uk.gov.ons.ctp.common.util.MultiIsoDateFormat;
+import uk.gov.ons.ctp.response.libs.common.util.MultiIsoDateFormat;
 
 /** Custom Object Mapper */
 public class CustomObjectMapper extends ObjectMapper {

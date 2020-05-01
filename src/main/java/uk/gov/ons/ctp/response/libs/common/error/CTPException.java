@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.common.error;
+package uk.gov.ons.ctp.response.libs.common.error;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;

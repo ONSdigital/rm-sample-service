@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.common.rest;
+package uk.gov.ons.ctp.response.libs.common.rest;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

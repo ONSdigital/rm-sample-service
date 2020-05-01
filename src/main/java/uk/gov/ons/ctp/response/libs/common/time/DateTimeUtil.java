@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.common.time;
+package uk.gov.ons.ctp.response.libs.common.time;
 
 import com.godaddy.logging.Logger;
 import com.godaddy.logging.LoggerFactory;

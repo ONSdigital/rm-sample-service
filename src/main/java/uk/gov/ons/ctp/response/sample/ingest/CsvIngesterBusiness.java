@@ -23,7 +23,7 @@ import liquibase.util.csv.opencsv.bean.CsvToBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import uk.gov.ons.ctp.common.error.CTPException;
+import uk.gov.ons.ctp.response.libs.common.error.CTPException;
 import uk.gov.ons.ctp.response.libs.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.libs.sample.validation.BusinessSampleUnit;
 import uk.gov.ons.ctp.response.libs.sample.validation.SampleUnitBase;

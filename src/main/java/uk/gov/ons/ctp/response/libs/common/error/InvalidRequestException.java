@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.common.error;
+package uk.gov.ons.ctp.response.libs.common.error;
 
 import net.sourceforge.cobertura.CoverageIgnore;
 import org.springframework.validation.Errors;

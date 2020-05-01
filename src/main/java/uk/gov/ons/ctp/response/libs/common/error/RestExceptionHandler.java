@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.common.error;
+package uk.gov.ons.ctp.response.libs.common.error;
 
 import com.godaddy.logging.Logger;
 import com.godaddy.logging.LoggerFactory;
@@ -31,8 +31,9 @@ public class RestExceptionHandler {
    * @param exception CTPException
    * @return ResponseEntity containing exception and associated HttpStatus
    */
-  @ExceptionHandler(CTPException.class)
-  public ResponseEntity<?> handleCTPException(CTPException exception) {
+  @ExceptionHandler(uk.gov.ons.ctp.response.libs.common.error.CTPException.class)
+  public ResponseEntity<?> handleCTPException(
+      uk.gov.ons.ctp.response.libs.common.error.CTPException exception) {
     log.with("fault", exception.getFault())
         .with("exception_message", exception.getMessage())
         .error("Uncaught CTPException", exception);
@@ -73,7 +74,10 @@ public class RestExceptionHandler {
   public ResponseEntity<?> handleGeneralException(Throwable t) {
     log.error("Uncaught Throwable", t);
     return new ResponseEntity<>(
-        new CTPException(CTPException.Fault.SYSTEM_ERROR, t, t.getMessage()),
+        new uk.gov.ons.ctp.response.libs.common.error.CTPException(
+            uk.gov.ons.ctp.response.libs.common.error.CTPException.Fault.SYSTEM_ERROR,
+            t,
+            t.getMessage()),
         HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
@@ -83,7 +87,7 @@ public class RestExceptionHandler {
    * @return ResponseEntity containing CTPException
    */
   @ResponseBody
-  @ExceptionHandler(InvalidRequestException.class)
+  @ExceptionHandler(uk.gov.ons.ctp.response.libs.common.error.InvalidRequestException.class)
   public ResponseEntity<?> handleInvalidRequestException(InvalidRequestException ex) {
 
     String errors =
@@ -96,8 +100,10 @@ public class RestExceptionHandler {
     log.with("validation_errors", errors)
         .with("source_message", ex.getSourceMessage())
         .error("Unhandled InvalidRequestException", ex);
-    CTPException ourException =
-        new CTPException(CTPException.Fault.VALIDATION_FAILED, INVALID_JSON);
+    uk.gov.ons.ctp.response.libs.common.error.CTPException ourException =
+        new uk.gov.ons.ctp.response.libs.common.error.CTPException(
+            uk.gov.ons.ctp.response.libs.common.error.CTPException.Fault.VALIDATION_FAILED,
+            INVALID_JSON);
     return new ResponseEntity<>(ourException, HttpStatus.BAD_REQUEST);
   }
 
@@ -117,7 +123,10 @@ public class RestExceptionHandler {
             ? PROVIDED_XML_INCORRECT
             : PROVIDED_JSON_INCORRECT;
 
-    CTPException ourException = new CTPException(CTPException.Fault.VALIDATION_FAILED, message);
+    uk.gov.ons.ctp.response.libs.common.error.CTPException ourException =
+        new uk.gov.ons.ctp.response.libs.common.error.CTPException(
+            uk.gov.ons.ctp.response.libs.common.error.CTPException.Fault.VALIDATION_FAILED,
+            message);
 
     return new ResponseEntity<>(ourException, HttpStatus.BAD_REQUEST);
   }
@@ -134,8 +143,9 @@ public class RestExceptionHandler {
       MethodArgumentNotValidException ex) {
     log.with("parameter", ex.getParameter().getParameterName())
         .error("Uncaught MethodArgumentNotValidException", ex);
-    CTPException ourException =
-        new CTPException(CTPException.Fault.VALIDATION_FAILED, INVALID_JSON);
+    uk.gov.ons.ctp.response.libs.common.error.CTPException ourException =
+        new uk.gov.ons.ctp.response.libs.common.error.CTPException(
+            CTPException.Fault.VALIDATION_FAILED, INVALID_JSON);
     return new ResponseEntity<>(ourException, HttpStatus.BAD_REQUEST);
   }
 }

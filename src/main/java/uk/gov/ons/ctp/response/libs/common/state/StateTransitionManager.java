@@ -1,7 +1,7 @@
-package uk.gov.ons.ctp.common.state;
+package uk.gov.ons.ctp.response.libs.common.state;
 
 import java.util.Map;
-import uk.gov.ons.ctp.common.error.CTPException;
+import uk.gov.ons.ctp.response.libs.common.error.CTPException;
 
 /**
  * A template interface for a state transition manager that will map valid transitions from one

@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.common.retry;
+package uk.gov.ons.ctp.response.libs.common.retry;
 
 import com.godaddy.logging.Logger;
 import com.godaddy.logging.LoggerFactory;

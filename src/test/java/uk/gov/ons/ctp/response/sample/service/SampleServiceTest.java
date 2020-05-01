@@ -20,7 +20,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.common.FixtureHelper;
-import uk.gov.ons.ctp.common.state.StateTransitionManager;
+import uk.gov.ons.ctp.response.libs.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.response.libs.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.libs.party.representation.PartyDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;

@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.common.state;
+package uk.gov.ons.ctp.response.libs.common.state;
 
 /**
  * Simple interface to accomodate later refactoring - allows Case And Action services to refer to an

@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.ons.ctp.common.error.CTPException;
+import uk.gov.ons.ctp.response.libs.common.error.CTPException;
 import uk.gov.ons.ctp.response.libs.sample.definition.SampleUnit;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;

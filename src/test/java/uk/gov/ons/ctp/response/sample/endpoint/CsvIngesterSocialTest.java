@@ -20,7 +20,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import uk.gov.ons.ctp.common.error.CTPException;
+import uk.gov.ons.ctp.response.libs.common.error.CTPException;
 import uk.gov.ons.ctp.response.libs.sample.validation.SocialSampleUnit;
 import uk.gov.ons.ctp.response.sample.TestFiles;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;

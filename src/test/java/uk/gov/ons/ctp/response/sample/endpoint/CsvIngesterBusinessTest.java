@@ -24,7 +24,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.mock.web.MockMultipartFile;
-import uk.gov.ons.ctp.common.error.CTPException;
+import uk.gov.ons.ctp.response.libs.common.error.CTPException;
 import uk.gov.ons.ctp.response.libs.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.libs.sample.validation.BusinessSampleUnit;
 import uk.gov.ons.ctp.response.sample.TestFiles;
