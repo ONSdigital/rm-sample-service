@@ -25,7 +25,7 @@ import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.mock.web.MockMultipartFile;
 import uk.gov.ons.ctp.common.error.CTPException;
-import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
+import uk.gov.ons.ctp.response.libs.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.TestFiles;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
@@ -34,7 +34,7 @@ import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
 import uk.gov.ons.ctp.response.sample.party.PartyUtil;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
-import validation.BusinessSampleUnit;
+import uk.gov.ons.ctp.response.sample.validation.BusinessSampleUnit;
 
 /** Test the CsvIngester distributor */
 @RunWith(MockitoJUnitRunner.class)

@@ -28,7 +28,7 @@ import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesReposito
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterSocial;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
-import validation.SocialSampleUnit;
+import uk.gov.ons.ctp.response.sample.validation.SocialSampleUnit;
 
 /** Test the CsvIngester distributor */
 @RunWith(MockitoJUnitRunner.class)

@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.common.time.DateTimeUtil;
-import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
+import uk.gov.ons.ctp.response.libs.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
@@ -36,7 +36,7 @@ import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEven
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
-import validation.SampleUnitBase;
+import uk.gov.ons.ctp.response.sample.validation.SampleUnitBase;
 
 @Service
 @Configuration

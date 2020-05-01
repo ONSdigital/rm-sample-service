@@ -38,7 +38,7 @@ import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
-import validation.BusinessSampleUnit;
+import uk.gov.ons.ctp.response.sample.validation.BusinessSampleUnit;
 
 /** The REST endpoint controller for Sample Service. */
 @RestController

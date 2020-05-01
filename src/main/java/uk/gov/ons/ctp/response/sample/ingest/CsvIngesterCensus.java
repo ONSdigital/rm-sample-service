@@ -21,7 +21,7 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
-import validation.CensusSampleUnit;
+import uk.gov.ons.ctp.response.sample.validation.CensusSampleUnit;
 
 @Service
 public class CsvIngesterCensus extends CsvToBean<CensusSampleUnit> {

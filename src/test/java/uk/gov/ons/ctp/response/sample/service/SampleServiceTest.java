@@ -21,7 +21,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.state.StateTransitionManager;
-import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
+import uk.gov.ons.ctp.response.libs.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
@@ -38,7 +38,7 @@ import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleStat
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
-import validation.BusinessSurveySample;
+import uk.gov.ons.ctp.response.sample.validation.BusinessSurveySample;
 
 /** tests */
 @RunWith(MockitoJUnitRunner.class)

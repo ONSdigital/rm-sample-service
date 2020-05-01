@@ -25,7 +25,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterCensus;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
-import validation.CensusSampleUnit;
+import uk.gov.ons.ctp.response.sample.validation.CensusSampleUnit;
 
 /** Test the CsvIngester distributor */
 @RunWith(MockitoJUnitRunner.class)

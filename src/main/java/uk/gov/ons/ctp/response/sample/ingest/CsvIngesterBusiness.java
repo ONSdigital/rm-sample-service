@@ -24,14 +24,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.common.error.CTPException;
-import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
+import uk.gov.ons.ctp.response.libs.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
 import uk.gov.ons.ctp.response.sample.party.PartyUtil;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
-import validation.BusinessSampleUnit;
-import validation.SampleUnitBase;
+import uk.gov.ons.ctp.response.sample.validation.BusinessSampleUnit;
+import uk.gov.ons.ctp.response.sample.validation.SampleUnitBase;
 
 @Service
 public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {

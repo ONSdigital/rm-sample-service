@@ -25,7 +25,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesRepository;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
-import validation.SocialSampleUnit;
+import uk.gov.ons.ctp.response.sample.validation.SocialSampleUnit;
 
 @Service
 public class CsvIngesterSocial extends CsvToBean<SocialSampleUnit> {

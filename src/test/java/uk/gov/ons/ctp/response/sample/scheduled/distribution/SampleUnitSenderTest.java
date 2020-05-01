@@ -37,8 +37,8 @@ public class SampleUnitSenderTest {
     SampleUnit sampleUnit = new SampleUnit();
     sampleUnit.setState(SampleUnitState.PERSISTED);
 
-    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit =
-        new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit();
+    uk.gov.ons.ctp.response.libs.SampleUnit mappedSampleUnit =
+        new uk.gov.ons.ctp.response.libs.SampleUnit();
     mappedSampleUnit.setId(UUID.randomUUID().toString());
 
     when(sampleUnitRepository.findById(any())).thenReturn(sampleUnit);
