@@ -9,10 +9,6 @@
 package uk.gov.ons.ctp.response.party.definition;
 
 import javax.xml.bind.annotation.XmlRegistry;
-import libs.party.definition.Enrolment;
-import libs.party.definition.PartyCreationRequestAttributesDTO;
-import libs.party.definition.PartyCreationRequestDTO;
-import libs.party.definition.SampleLinkCreationRequestDTO;
 
 /**
  * This object contains factory methods for each Java content interface and Java element interface
