@@ -2,10 +2,10 @@ package uk.gov.ons.ctp.response.sample.service.state;
 
 import java.util.HashMap;
 import java.util.Map;
+import libs.common.state.BasicStateTransitionManager;
+import libs.common.state.StateTransitionManager;
+import libs.common.state.StateTransitionManagerFactory;
 import org.springframework.stereotype.Component;
-import uk.gov.ons.ctp.common.state.BasicStateTransitionManager;
-import uk.gov.ons.ctp.common.state.StateTransitionManager;
-import uk.gov.ons.ctp.common.state.StateTransitionManagerFactory;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEvent;

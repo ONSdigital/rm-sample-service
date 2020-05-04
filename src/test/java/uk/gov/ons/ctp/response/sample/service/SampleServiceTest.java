@@ -11,6 +11,9 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.UUID;
+import libs.common.FixtureHelper;
+import libs.common.state.StateTransitionManager;
+import libs.party.representation.PartyDTO;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,10 +22,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
-import uk.gov.ons.ctp.common.FixtureHelper;
-import uk.gov.ons.ctp.common.state.StateTransitionManager;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
-import uk.gov.ons.ctp.response.party.representation.PartyDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
@@ -38,7 +38,7 @@ import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleStat
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
-import validation.BusinessSurveySample;
+import uk.gov.ons.ctp.response.sample.validation.BusinessSurveySample;
 
 /** tests */
 @RunWith(MockitoJUnitRunner.class)
