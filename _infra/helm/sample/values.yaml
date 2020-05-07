@@ -25,6 +25,9 @@ container:
   port: 8080
 service:
   port: 8080
+  
+zipkin:
+  enabled: false
 
 resources:
   requests:
