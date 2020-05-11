@@ -68,30 +68,6 @@
       <level>DEBUG</level>
     </filter>
   </appender>
-
-  <appender name="DEV" class="ch.qos.logback.core.ConsoleAppender">
-    <encoder>
-      <pattern>${CONSOLE_LOG_PATTERN}</pattern>
-    </encoder>
-    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <level>DEBUG</level>
-    </filter>
-  </appender>
-
-  <appender name="SYSLOG" class="ch.qos.logback.classic.net.SyslogAppender">
-    <syslogHost>localhost</syslogHost>
-    <facility>DAEMON</facility>
-    <suffixPattern>{
-      "created": "%date{ISO8601}",
-      "service": "SampleSvc",
-      "level": "%level",
-      "event": "%message"
-      }</suffixPattern>
-    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <level>TRACE</level>
-    </filter>
-  </appender>
-
   <root level="WARN">
     <appender-ref ref="STDOUT"/>
   </root>
