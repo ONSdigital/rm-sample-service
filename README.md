@@ -19,7 +19,6 @@ There are two ways of running this service
 * The easiest way is via docker (https://github.com/ONSdigital/ras-rm-docker-dev)
 * Alternatively running the service up in isolation
     ```bash
-    cp .maven.settings.xml ~/.m2/settings.xml  # This only needs to be done once to set up mavens settings file
     mvn clean install
     mvn spring-boot:run
     ```
