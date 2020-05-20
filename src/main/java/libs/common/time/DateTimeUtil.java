@@ -1,6 +1,5 @@
 package libs.common.time;
 
-import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -80,7 +79,7 @@ public class DateTimeUtil {
       gregorianCalendar.setTime(date);
       result = DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar);
     } catch (ParseException e) {
-      log.error("Failed to parse date", kv("exception", e));
+      log.error("Failed to parse date", e);
       result = DateTimeUtil.giveMeCalendarForNow();
     }
 

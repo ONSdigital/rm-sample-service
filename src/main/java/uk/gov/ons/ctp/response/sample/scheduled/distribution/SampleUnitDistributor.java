@@ -98,7 +98,8 @@ public class SampleUnitDistributor {
                 log.error(
                     "Failed to send a sample unit to queue and update state",
                     kv("sample_unit_id", mappedSampleUnit.getId()),
-                    kv("exception", e));
+                    "exception",
+                    e);
               }
             });
       }

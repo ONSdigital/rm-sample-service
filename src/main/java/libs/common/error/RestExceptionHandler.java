@@ -35,7 +35,7 @@ public class RestExceptionHandler {
    */
   @ExceptionHandler(CTPException.class)
   public ResponseEntity<?> handleCTPException(CTPException exception) {
-    log.error("Uncaught CTPException", kv("exception", exception));
+    log.error("Uncaught CTPException", exception);
 
     HttpStatus status;
     switch (exception.getFault()) {
@@ -93,8 +93,7 @@ public class RestExceptionHandler {
             .map(e -> String.format("field=%s message=%s", e.getField(), e.getDefaultMessage()))
             .collect(Collectors.joining(","));
 
-    log.error(
-        "Unhandled InvalidRequestException", kv("validation_errors", errors), kv("exception", ex));
+    log.error("Unhandled InvalidRequestException", kv("validation_errors", errors), ex);
     CTPException ourException =
         new CTPException(CTPException.Fault.VALIDATION_FAILED, INVALID_JSON);
     return new ResponseEntity<>(ourException, HttpStatus.BAD_REQUEST);
@@ -134,7 +133,7 @@ public class RestExceptionHandler {
     log.error(
         "Uncaught MethodArgumentNotValidException",
         kv("parameter", ex.getParameter().getParameterName()),
-        kv("exception", ex));
+        ex);
     CTPException ourException =
         new CTPException(CTPException.Fault.VALIDATION_FAILED, INVALID_JSON);
     return new ResponseEntity<>(ourException, HttpStatus.BAD_REQUEST);

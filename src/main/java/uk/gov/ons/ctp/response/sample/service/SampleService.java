@@ -255,7 +255,7 @@ public class SampleService {
       log.error(
           "Failed to put sample summary into FAILED state",
           kv("sample_summary", sampleSummary.getId()),
-          kv("exception", e));
+          e);
 
       return Optional.empty();
     } catch (RuntimeException e) {
