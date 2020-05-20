@@ -1,7 +1,7 @@
 package uk.gov.ons.ctp.response.sample.service;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +13,8 @@ import libs.common.state.StateTransitionManager;
 import libs.common.time.DateTimeUtil;
 import libs.party.representation.PartyDTO;
 import libs.sample.validation.SampleUnitBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
@@ -250,8 +252,10 @@ public class SampleService {
 
       return Optional.of(persisted);
     } catch (CTPException e) {
-      log.with("sample_summary", sampleSummary.getId())
-          .error("Failed to put sample summary into FAILED state", e);
+      log.error(
+          "Failed to put sample summary into FAILED state",
+          kv("sample_summary", sampleSummary.getId()),
+          kv("exception", e));
 
       return Optional.empty();
     } catch (RuntimeException e) {

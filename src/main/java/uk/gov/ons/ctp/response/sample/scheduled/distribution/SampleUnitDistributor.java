@@ -1,13 +1,15 @@
 package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 import libs.common.error.CTPException;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -93,8 +95,10 @@ public class SampleUnitDistributor {
                 sampleUnitSender.sendSampleUnit(mappedSampleUnit);
               } catch (CTPException e) {
                 hasErrors = true;
-                log.with("sample_unit_id", mappedSampleUnit.getId())
-                    .error("Failed to send a sample unit to queue and update state", e);
+                log.error(
+                    "Failed to send a sample unit to queue and update state",
+                    kv("sample_unit_id", mappedSampleUnit.getId()),
+                    kv("exception", e));
               }
             });
       }
