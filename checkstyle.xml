@@ -11,6 +11,9 @@
 <module name="Checker">
     <property name="severity" value="warning"/>
     <property name="fileExtensions" value="java, properties, xml"/>
+    <module name="LineLength">
+        <property name="max" value="120"/>
+    </module>
     <module name="TreeWalker">
         <module name="JavadocMethod"/>
         <module name="JavadocType"/>
@@ -34,9 +37,6 @@
             <property name="processJavadoc" value="false"/>
         </module>
         <module name="MethodLength"/>
-        <module name="LineLength">
-            <property name="max" value="120"/>
-        </module>
         <module name="ParameterNumber"/>
         <module name="EmptyForIteratorPad"/>
         <module name="GenericWhitespace"/>
