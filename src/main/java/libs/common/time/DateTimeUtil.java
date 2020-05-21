@@ -1,7 +1,5 @@
 package libs.common.time;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -11,6 +9,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import net.sourceforge.cobertura.CoverageIgnore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Centralized DateTime handling for CTP */
 @CoverageIgnore
