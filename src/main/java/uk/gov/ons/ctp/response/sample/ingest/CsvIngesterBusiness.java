@@ -1,7 +1,7 @@
 package uk.gov.ons.ctp.response.sample.ingest;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -23,6 +23,8 @@ import liquibase.util.StringUtils;
 import liquibase.util.csv.opencsv.CSVReader;
 import liquibase.util.csv.opencsv.bean.ColumnPositionMappingStrategy;
 import liquibase.util.csv.opencsv.bean.CsvToBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -172,8 +174,9 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
     synchronized (unitRefs) {
       // If a unit ref is already registered
       if (unitRefs.contains(businessSampleUnit.getSampleUnitRef())) {
-        log.with("sample_unit_ref", businessSampleUnit.getSampleUnitRef())
-            .warn("sample unit ref is duplicated in the file.");
+        log.warn(
+            "sample unit ref is duplicated in the file.",
+            kv("sample_unit_ref", businessSampleUnit.getSampleUnitRef()));
         throw new CTPException(
             CTPException.Fault.VALIDATION_FAILED,
             String.format(

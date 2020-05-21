@@ -1,10 +1,12 @@
 package uk.gov.ons.ctp.response.sample.message;
 
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
 import libs.common.error.CTPException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -36,9 +38,8 @@ public class SampleOutboundPublisher {
   private void sendMessage(String routingKey, SampleSummary sampleSummary) throws CTPException {
     try {
       String message = this.objectMapper.writeValueAsString(sampleSummary);
-      log.with("routing_key", routingKey)
-          .with("message", message)
-          .debug("Sending message to routing key");
+      log.debug(
+          "Sending message to routing key", kv("routing_key", routingKey), kv("message", message));
       rabbitTemplate.convertAndSend(routingKey, message);
     } catch (JsonProcessingException e) {
       throw new CTPException(

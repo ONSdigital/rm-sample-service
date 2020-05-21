@@ -1,7 +1,5 @@
 package uk.gov.ons.ctp.response.sample.ingest;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
 import com.google.common.collect.Sets;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -16,6 +14,8 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;

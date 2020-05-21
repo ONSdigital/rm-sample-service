@@ -1,7 +1,7 @@
 package uk.gov.ons.ctp.response.sample.endpoint;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +17,8 @@ import libs.common.time.DateTimeUtil;
 import libs.sample.validation.BusinessSampleUnit;
 import liquibase.util.csv.opencsv.bean.CsvToBean;
 import ma.glasnost.orika.MapperFacade;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
@@ -77,8 +79,9 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
               collectionExerciseJobCreationRequestDTO,
       BindingResult bindingResult)
       throws CTPException, InvalidRequestException {
-    log.with("collection_exercise_job_creation_request", collectionExerciseJobCreationRequestDTO)
-        .debug("Entering createCollectionExerciseJob ");
+    log.debug(
+        "Entering createCollectionExerciseJob ",
+        kv("collection_exercise_job_creation_request", collectionExerciseJobCreationRequestDTO));
     if (bindingResult.hasErrors()) {
       throw new InvalidRequestException("Binding errors for create action: ", bindingResult);
     }
@@ -123,7 +126,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
           try {
             return Optional.of(this.sampleService.ingest(newSummary, file, type));
           } catch (Exception e) {
-            log.with("sample_id", newSummary.getId()).error("Failed to ingest sample", e);
+            log.error("Failed to ingest sample", kv("sample_id", newSummary.getId()), e);
             return this.sampleService.failSampleSummary(newSummary, e);
           }
         };
@@ -140,7 +143,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   public ResponseEntity<SampleSummary> uploadSampleFile(
       @PathVariable("type") final String type, @RequestParam("file") MultipartFile file)
       throws CTPException {
-    log.with("sample_type", type).debug("Entering Sample file upload");
+    log.debug("Entering Sample file upload", kv("sample_type", type));
     if (!Arrays.asList("B", "CENSUS", "SOCIAL").contains(type.toUpperCase())) {
       return ResponseEntity.badRequest().build();
     }

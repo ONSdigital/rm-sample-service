@@ -1,11 +1,13 @@
 package uk.gov.ons.ctp.response.sample.service;
 
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
 import java.io.IOException;
 import libs.common.rest.RestUtility;
 import libs.party.representation.PartyDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
@@ -61,7 +63,7 @@ public class PartySvcClientService {
         log.error("Unable to read party response", e);
       }
     }
-    log.with("party", party).debug("Successfully retrieved party");
+    log.debug("Successfully retrieved party", kv("party", party));
     eventPublisher.publishEvent("Sample PERSISTED");
     return party;
   }
