@@ -312,6 +312,7 @@
 
 	<build>
 		<defaultGoal>clean install</defaultGoal>
+		<finalName>samplesvc</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
