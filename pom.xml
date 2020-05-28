@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>uk.gov.ons.ctp.product</groupId>
 	<artifactId>samplesvc</artifactId>
-	<version>10.49.24-SNAPSHOT</version>
+	<version>UNVERSIONED</version>
 	<packaging>jar</packaging>
 	<name>CTP : SampleService</name>
 	<description>CTP : SampleService</description>
@@ -312,6 +312,7 @@
 
 	<build>
 		<defaultGoal>clean install</defaultGoal>
+		<finalName>samplesvc</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
