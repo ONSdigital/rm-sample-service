@@ -12,7 +12,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.validation.Valid;
 import libs.common.error.CTPException;
-import libs.common.error.InvalidRequestException;
 import libs.common.time.DateTimeUtil;
 import libs.sample.validation.BusinessSampleUnit;
 import liquibase.util.csv.opencsv.bean.CsvToBean;
@@ -20,6 +19,7 @@ import ma.glasnost.orika.MapperFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
@@ -78,12 +79,13 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       final @Valid @RequestBody CollectionExerciseJobCreationRequestDTO
               collectionExerciseJobCreationRequestDTO,
       BindingResult bindingResult)
-      throws CTPException, InvalidRequestException {
+      throws CTPException {
     log.debug(
         "Entering createCollectionExerciseJob ",
         kv("collection_exercise_job_creation_request", collectionExerciseJobCreationRequestDTO));
     if (bindingResult.hasErrors()) {
-      throw new InvalidRequestException("Binding errors for create action: ", bindingResult);
+      log.error("Binding errors for create action", kv("bindingResult", bindingResult));
+      throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
     }
     CollectionExerciseJob cej = new CollectionExerciseJob();
     Integer sampleUnitsTotal = 0;

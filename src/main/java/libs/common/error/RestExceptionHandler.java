@@ -13,6 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.HttpClientErrorException;
 
 /** Rest Exception Handler */
 @CoverageIgnore
@@ -83,8 +84,8 @@ public class RestExceptionHandler {
    * @return ResponseEntity containing CTPException
    */
   @ResponseBody
-  @ExceptionHandler(InvalidRequestException.class)
-  public ResponseEntity<?> handleInvalidRequestException(InvalidRequestException ex) {
+  @ExceptionHandler(HttpClientErrorException.class)
+  public ResponseEntity<?> handleInvalidRequestException(HttpClientErrorException ex) {
 
     String errors =
         ex.getErrors()
