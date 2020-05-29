@@ -24,8 +24,6 @@ public class RestExceptionHandler {
   public static final String PROVIDED_JSON_INCORRECT = "Provided json is incorrect.";
   public static final String PROVIDED_XML_INCORRECT = "Provided xml is incorrect.";
 
-  private static final String XML_ERROR_MESSAGE = "Could not unmarshal to";
-
   /**
    * CTPException Handler
    *
@@ -87,14 +85,8 @@ public class RestExceptionHandler {
   public ResponseEntity<?> handleHttpMessageNotReadableException(
       HttpMessageNotReadableException ex) {
     log.error("Uncaught HttpMessageNotReadableException", ex);
-    String message =
-        ex.getMessage().startsWith(XML_ERROR_MESSAGE)
-            ? PROVIDED_XML_INCORRECT
-            : PROVIDED_JSON_INCORRECT;
 
-    CTPException ourException = new CTPException(CTPException.Fault.VALIDATION_FAILED, message);
-
-    return new ResponseEntity<>(ourException, HttpStatus.BAD_REQUEST);
+    return new ResponseEntity<>(ex, HttpStatus.BAD_REQUEST);
   }
 
   /**
@@ -111,8 +103,6 @@ public class RestExceptionHandler {
         "Uncaught MethodArgumentNotValidException",
         kv("parameter", ex.getParameter().getParameterName()),
         ex);
-    CTPException ourException =
-        new CTPException(CTPException.Fault.VALIDATION_FAILED, INVALID_JSON);
-    return new ResponseEntity<>(ourException, HttpStatus.BAD_REQUEST);
+    return new ResponseEntity<>(ex, HttpStatus.BAD_REQUEST);
   }
 }

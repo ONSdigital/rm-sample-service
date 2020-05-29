@@ -4,7 +4,6 @@ import static libs.common.MvcHelper.postJson;
 import static libs.common.utility.MockMvcControllerAdviceHelper.mockAdviceFor;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.isA;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -18,7 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import libs.common.FixtureHelper;
-import libs.common.error.CTPException;
 import libs.common.error.RestExceptionHandler;
 import libs.common.jackson.CustomObjectMapper;
 import ma.glasnost.orika.MapperFacade;
@@ -123,11 +121,7 @@ public class SampleEndpointUnitTest {
     ResultActions actions =
         mockMvc.perform(postJson(String.format("/samples/sampleunitrequests"), SAMPLE_INVALIDJSON));
 
-    actions
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.error.code", is(CTPException.Fault.VALIDATION_FAILED.name())))
-        .andExpect(jsonPath("$.error.timestamp", isA(String.class)))
-        .andExpect(jsonPath("$.error.message", is("Provided json is incorrect.")));
+    actions.andExpect(status().isBadRequest());
   }
 
   @Test(expected = HttpClientErrorException.class)
