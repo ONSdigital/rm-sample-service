@@ -2,7 +2,6 @@ package libs.common.error;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
-import java.util.stream.Collectors;
 import net.sourceforge.cobertura.CoverageIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.client.HttpClientErrorException;
 
 /** Rest Exception Handler */
 @CoverageIgnore
@@ -76,28 +74,6 @@ public class RestExceptionHandler {
     return new ResponseEntity<>(
         new CTPException(CTPException.Fault.SYSTEM_ERROR, t, t.getMessage()),
         HttpStatus.INTERNAL_SERVER_ERROR);
-  }
-
-  /**
-   * Handler for Invalid Request Exceptions
-   *
-   * @return ResponseEntity containing CTPException
-   */
-  @ResponseBody
-  @ExceptionHandler(HttpClientErrorException.class)
-  public ResponseEntity<?> handleInvalidRequestException(HttpClientErrorException ex) {
-
-    String errors =
-        ex.getErrors()
-            .getFieldErrors()
-            .stream()
-            .map(e -> String.format("field=%s message=%s", e.getField(), e.getDefaultMessage()))
-            .collect(Collectors.joining(","));
-
-    log.error("Unhandled InvalidRequestException", kv("validation_errors", errors), ex);
-    CTPException ourException =
-        new CTPException(CTPException.Fault.VALIDATION_FAILED, INVALID_JSON);
-    return new ResponseEntity<>(ourException, HttpStatus.BAD_REQUEST);
   }
 
   /**

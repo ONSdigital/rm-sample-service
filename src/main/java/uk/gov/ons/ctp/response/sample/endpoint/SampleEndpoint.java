@@ -85,6 +85,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
         kv("collection_exercise_job_creation_request", collectionExerciseJobCreationRequestDTO));
     if (bindingResult.hasErrors()) {
       log.error("Binding errors for create action", kv("bindingResult", bindingResult));
+
       throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
     }
     CollectionExerciseJob cej = new CollectionExerciseJob();

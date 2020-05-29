@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.UUID;
 import libs.common.FixtureHelper;
 import libs.common.error.CTPException;
-import libs.common.error.InvalidRequestException;
 import libs.common.error.RestExceptionHandler;
 import libs.common.jackson.CustomObjectMapper;
 import ma.glasnost.orika.MapperFacade;
@@ -34,6 +33,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
@@ -130,7 +130,7 @@ public class SampleEndpointUnitTest {
         .andExpect(jsonPath("$.error.message", is("Provided json is incorrect.")));
   }
 
-  @Test(expected = InvalidRequestException.class)
+  @Test(expected = HttpClientErrorException.class)
   public void verifyBadBindingResultThrowsException() throws Exception {
     BindingResult bindingResult = mock(BindingResult.class);
     when(bindingResult.hasErrors()).thenReturn(true);
