@@ -2,6 +2,9 @@ package uk.gov.ons.ctp.response.sample.ingest;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
+import com.opencsv.CSVReader;
+import com.opencsv.bean.ColumnPositionMappingStrategy;
+import com.opencsv.bean.CsvToBean;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,9 +16,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import libs.common.error.CTPException;
 import libs.sample.validation.CensusSampleUnit;
-import liquibase.util.csv.opencsv.CSVReader;
-import liquibase.util.csv.opencsv.bean.ColumnPositionMappingStrategy;
-import liquibase.util.csv.opencsv.bean.CsvToBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

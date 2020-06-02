@@ -1,6 +1,7 @@
 package uk.gov.ons.ctp.response.sample.ingest;
 
 import com.google.common.collect.Sets;
+import com.opencsv.bean.CsvToBean;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -8,7 +9,6 @@ import java.util.List;
 import java.util.Set;
 import libs.common.error.CTPException;
 import libs.sample.validation.SocialSampleUnit;
-import liquibase.util.csv.opencsv.bean.CsvToBean;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;

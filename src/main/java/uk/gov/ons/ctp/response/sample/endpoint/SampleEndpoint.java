@@ -2,6 +2,7 @@ package uk.gov.ons.ctp.response.sample.endpoint;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
+import com.opencsv.bean.CsvToBean;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +16,6 @@ import libs.common.error.CTPException;
 import libs.common.error.InvalidRequestException;
 import libs.common.time.DateTimeUtil;
 import libs.sample.validation.BusinessSampleUnit;
-import liquibase.util.csv.opencsv.bean.CsvToBean;
 import ma.glasnost.orika.MapperFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
