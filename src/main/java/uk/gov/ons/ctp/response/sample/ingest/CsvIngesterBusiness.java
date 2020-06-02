@@ -25,7 +25,7 @@ import javax.validation.Validator;
 import libs.common.error.CTPException;
 import libs.sample.validation.BusinessSampleUnit;
 import libs.sample.validation.SampleUnitBase;
-import liquibase.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
