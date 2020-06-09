@@ -1,8 +1,10 @@
 package uk.gov.ons.ctp.response.sample.message;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 import net.sourceforge.cobertura.CoverageIgnore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,7 +27,7 @@ public class SampleUnitPublisher {
    * @param sampleUnit to be sent
    */
   public void send(SampleUnit sampleUnit) {
-    log.with("sample_unit", sampleUnit).debug("send to queue sampleDelivery");
+    log.debug("send to queue sampleDelivery", kv("sample_unit", sampleUnit));
     rabbitTemplate.convertAndSend(sampleUnit);
   }
 }

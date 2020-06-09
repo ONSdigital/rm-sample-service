@@ -1,8 +1,7 @@
 package uk.gov.ons.ctp.response.sample.ingest;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
 import com.google.common.collect.Sets;
+import com.opencsv.bean.CsvToBean;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -10,12 +9,13 @@ import java.util.List;
 import java.util.Set;
 import libs.common.error.CTPException;
 import libs.sample.validation.SocialSampleUnit;
-import liquibase.util.csv.opencsv.bean.CsvToBean;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;

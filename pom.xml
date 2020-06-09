@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>uk.gov.ons.ctp.product</groupId>
 	<artifactId>samplesvc</artifactId>
-	<version>10.49.24-SNAPSHOT</version>
+	<version>UNVERSIONED</version>
 	<packaging>jar</packaging>
 	<name>CTP : SampleService</name>
 	<description>CTP : SampleService</description>
@@ -156,6 +156,11 @@
 			<artifactId>javax.servlet-api</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>3.8</version>
+		</dependency>
+		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
 		</dependency>
@@ -191,11 +196,6 @@
 			<groupId>com.vladmihalcea</groupId>
 			<artifactId>hibernate-types-5</artifactId>
 			<version>2.2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>com.godaddy</groupId>
-			<artifactId>logging</artifactId>
-			<version>1.2.5</version>
 		</dependency>
 		<!-- END -->
 
@@ -317,6 +317,7 @@
 
 	<build>
 		<defaultGoal>clean install</defaultGoal>
+		<finalName>samplesvc</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

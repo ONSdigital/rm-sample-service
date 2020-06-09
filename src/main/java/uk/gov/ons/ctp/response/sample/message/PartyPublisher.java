@@ -1,7 +1,9 @@
 package uk.gov.ons.ctp.response.sample.message;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,7 +19,7 @@ public class PartyPublisher {
   private RabbitTemplate rabbitTemplate;
 
   public void publish(PartyCreationRequestDTO party) {
-    log.with("party", party).debug("send to queue to be sent to partySvc");
+    log.debug("send to queue to be sent to partySvc", kv("party", party));
     rabbitTemplate.convertAndSend(party);
   }
 }

@@ -1,7 +1,13 @@
 package uk.gov.ons.ctp.response.sample.ingest;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
+import com.opencsv.CSVReader;
+import com.opencsv.bean.ColumnPositionMappingStrategy;
+import com.opencsv.bean.CsvToBean;
+import com.opencsv.exceptions.CsvConstraintViolationException;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -19,10 +25,9 @@ import javax.validation.Validator;
 import libs.common.error.CTPException;
 import libs.sample.validation.BusinessSampleUnit;
 import libs.sample.validation.SampleUnitBase;
-import liquibase.util.StringUtils;
-import liquibase.util.csv.opencsv.CSVReader;
-import liquibase.util.csv.opencsv.bean.ColumnPositionMappingStrategy;
-import liquibase.util.csv.opencsv.bean.CsvToBean;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -159,7 +164,9 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
 
   private BusinessSampleUnit parseLine(String[] nextLine, Set<String> unitRefs)
       throws IllegalAccessException, java.lang.reflect.InvocationTargetException,
-          InstantiationException, java.beans.IntrospectionException, CTPException {
+          InstantiationException, java.beans.IntrospectionException, CTPException,
+          CsvRequiredFieldEmptyException, CsvConstraintViolationException,
+          CsvDataTypeMismatchException {
     BusinessSampleUnit businessSampleUnit = null;
 
     // Liquibase OpenCSV parser is not thread-safe. It's also slow. We should use something better.
@@ -172,8 +179,9 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
     synchronized (unitRefs) {
       // If a unit ref is already registered
       if (unitRefs.contains(businessSampleUnit.getSampleUnitRef())) {
-        log.with("sample_unit_ref", businessSampleUnit.getSampleUnitRef())
-            .warn("sample unit ref is duplicated in the file.");
+        log.warn(
+            "sample unit ref is duplicated in the file.",
+            kv("sample_unit_ref", businessSampleUnit.getSampleUnitRef()));
         throw new CTPException(
             CTPException.Fault.VALIDATION_FAILED,
             String.format(

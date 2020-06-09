@@ -1,7 +1,9 @@
 package uk.gov.ons.ctp.response.sample.message;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
@@ -16,7 +18,7 @@ public class PartyReceiver {
 
   @ServiceActivator(inputChannel = "partyTransformed", adviceChain = "partyRetryAdvice")
   public void acceptParty(PartyCreationRequestDTO party) throws Exception {
-    log.with("party", party).debug("acceptParty");
+    log.debug("acceptParty", kv("party", party));
     sampleService.sendToPartyService(party);
   }
 }

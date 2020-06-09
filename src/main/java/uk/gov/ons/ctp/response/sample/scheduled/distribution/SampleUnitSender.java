@@ -1,10 +1,10 @@
 package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
 import java.util.UUID;
 import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;

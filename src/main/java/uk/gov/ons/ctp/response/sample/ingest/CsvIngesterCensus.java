@@ -1,7 +1,10 @@
 package uk.gov.ons.ctp.response.sample.ingest;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
+import com.opencsv.CSVReader;
+import com.opencsv.bean.ColumnPositionMappingStrategy;
+import com.opencsv.bean.CsvToBean;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,9 +16,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import libs.common.error.CTPException;
 import libs.sample.validation.CensusSampleUnit;
-import liquibase.util.csv.opencsv.CSVReader;
-import liquibase.util.csv.opencsv.bean.ColumnPositionMappingStrategy;
-import liquibase.util.csv.opencsv.bean.CsvToBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -116,9 +118,10 @@ public class CsvIngesterCensus extends CsvToBean<CensusSampleUnit> {
 
       Optional<String> namesOfInvalidColumns = validateLine(censusSampleUnit);
       if (namesOfInvalidColumns.isPresent()) {
-        log.with("line", Arrays.toString(nextLine))
-            .with("invalid_columns", namesOfInvalidColumns.get())
-            .error("Problem parsing line, entire ingest aborted");
+        log.error(
+            "Problem parsing line, entire ingest aborted",
+            kv("line", Arrays.toString(nextLine)),
+            kv("invalid_columns", namesOfInvalidColumns.get()));
         throw new CTPException(
             CTPException.Fault.VALIDATION_FAILED,
             String.format(

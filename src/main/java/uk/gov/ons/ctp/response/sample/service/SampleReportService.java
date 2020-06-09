@@ -1,7 +1,9 @@
 package uk.gov.ons.ctp.response.sample.service;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleReportRepository;
@@ -21,6 +23,6 @@ public class SampleReportService {
     log.debug("Entering createReport...");
 
     boolean reportResult = sampleReportRepository.chasingReportStoredProcedure();
-    log.with("report_result", reportResult).debug("Just ran the chasing report and got result");
+    log.debug("Just ran the chasing report and got result", kv("report_result", reportResult));
   }
 }

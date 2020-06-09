@@ -1,7 +1,5 @@
 package uk.gov.ons.ctp.response.sample;
 
-import com.godaddy.logging.LoggingConfigs;
-import javax.annotation.PostConstruct;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -58,13 +56,6 @@ public class SampleSvcApplication {
    */
   public static void main(final String[] args) {
     SpringApplication.run(SampleSvcApplication.class, args);
-  }
-
-  @PostConstruct
-  public void initJsonLogging() {
-    if (appConfig.getLogging().isUseJson()) {
-      LoggingConfigs.setCurrent(LoggingConfigs.getCurrent().useJson());
-    }
   }
 
   /**
