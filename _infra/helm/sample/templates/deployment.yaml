@@ -205,10 +205,6 @@ spec:
                 key: sftp-sample-password
           - name: SFTP_DIRECTORY_BUSINESS
             value: "{{ .Values.sftp.directory.business }}"
-          - name: SFTP_DIRECTORY_SOCIAL
-            value: "{{ .Values.sftp.directory.social }}"
-          - name: SFTP_DIRECTORY_CENSUS
-            value: "{{ .Values.sftp.directory.census }}"
           - name: SFTP_DIRECTORY_DOCUMENTS
             value: "{{ .Values.sftp.directory.documents }}"
           - name: SFTP_CRON

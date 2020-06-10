@@ -33,8 +33,6 @@ mvn clean install -Ddocker.skip -DskipITs
 * In Documents create the following directory structure:
 
         sftp/business-sftp/
-            /census-sftp/
-            /social-sftp/
 
   These will act as a mock remote file store
 

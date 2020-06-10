@@ -1,7 +1,6 @@
 package uk.gov.ons.ctp.response.sample.party;
 
 import libs.sample.validation.BusinessSampleUnit;
-import libs.sample.validation.SampleUnitBase;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestAttributesDTO;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
@@ -17,7 +16,7 @@ public class PartyUtil {
    * @param unit the SampleUnitBase subtype for a Census, Business or Social SampleUnit
    * @return the created Party object
    */
-  public static PartyCreationRequestDTO convertToParty(SampleUnitBase unit) {
+  public static PartyCreationRequestDTO convertToParty(BusinessSampleUnit unit) {
     PartyCreationRequestDTO party = new PartyCreationRequestDTO();
     party.setSampleUnitType(unit.getSampleUnitType());
     party.setSampleUnitRef(unit.getSampleUnitRef());

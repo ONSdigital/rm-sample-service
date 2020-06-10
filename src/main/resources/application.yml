@@ -93,9 +93,7 @@ sftp:
   username: centos
   password: "JLibV2&XD,"
   directory:
-    social: Documents/sftp/Sample-Files/SSD/
     business: Documents/sftp/Sample-Files/BSD/
-    census: Documents/sftp/Sample-Files/CTP/
     Documents: Documents/sftp/Sample-Files/
   localdirectory: /tmp/samplesvc
   cron: "* * * * * ?"

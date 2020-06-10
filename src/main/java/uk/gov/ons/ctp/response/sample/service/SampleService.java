@@ -12,7 +12,7 @@ import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
 import libs.common.time.DateTimeUtil;
 import libs.party.representation.PartyDTO;
-import libs.sample.validation.SampleUnitBase;
+import libs.sample.validation.BusinessSampleUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +31,6 @@ import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesReposito
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
-import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterCensus;
-import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterSocial;
 import uk.gov.ons.ctp.response.sample.message.EventPublisher;
 import uk.gov.ons.ctp.response.sample.message.SampleOutboundPublisher;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
@@ -65,10 +63,6 @@ public class SampleService {
   @Autowired private CollectionExerciseJobService collectionExerciseJobService;
 
   @Autowired private CsvIngesterBusiness csvIngesterBusiness;
-
-  @Autowired private CsvIngesterCensus csvIngesterCensus;
-
-  @Autowired private CsvIngesterSocial csvIngesterSocial;
   @Autowired private EventPublisher eventPublisher;
   @Autowired private SampleAttributesRepository sampleAttributesRepository;
 
@@ -83,7 +77,7 @@ public class SampleService {
   @Transactional(propagation = Propagation.REQUIRED)
   public SampleSummary saveSample(
       SampleSummary sampleSummary,
-      List<? extends SampleUnitBase> samplingUnitList,
+      List<BusinessSampleUnit> samplingUnitList,
       SampleUnitState sampleUnitState) {
     int expectedCI = calculateExpectedCollectionInstruments(samplingUnitList);
 
@@ -96,11 +90,11 @@ public class SampleService {
   }
 
   private Integer calculateExpectedCollectionInstruments(
-      List<? extends SampleUnitBase> samplingUnitList) {
+      List<BusinessSampleUnit> samplingUnitList) {
     // TODO: get survey classifiers from survey service, currently using formtype for all business
     // surveys
     Set<String> formTypes = new HashSet<>();
-    for (SampleUnitBase businessSampleUnit : samplingUnitList) {
+    for (BusinessSampleUnit businessSampleUnit : samplingUnitList) {
       formTypes.add(businessSampleUnit.getFormType());
     }
     return formTypes.size();
@@ -117,10 +111,10 @@ public class SampleService {
   }
 
   private void saveSampleUnits(
-      List<? extends SampleUnitBase> samplingUnitList,
+      List<BusinessSampleUnit> samplingUnitList,
       SampleSummary sampleSummary,
       SampleUnitState sampleUnitState) {
-    for (SampleUnitBase sampleUnitBase : samplingUnitList) {
+    for (BusinessSampleUnit sampleUnitBase : samplingUnitList) {
       SampleUnit sampleUnit = new SampleUnit();
       sampleUnit.setSampleSummaryFK(sampleSummary.getSampleSummaryPK());
       sampleUnit.setSampleUnitRef(sampleUnitBase.getSampleUnitRef());
@@ -227,12 +221,6 @@ public class SampleService {
     switch (type.toUpperCase()) {
       case "B":
         result = csvIngesterBusiness.ingest(sampleSummary, file);
-        break;
-      case "CENSUS":
-        result = csvIngesterCensus.ingest(sampleSummary, file);
-        break;
-      case "SOCIAL":
-        result = csvIngesterSocial.ingest(sampleSummary, file);
         break;
       default:
         throw new UnsupportedOperationException(String.format("Type %s not implemented", type));
