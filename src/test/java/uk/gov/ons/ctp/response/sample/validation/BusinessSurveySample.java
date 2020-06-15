@@ -1,9 +1,7 @@
 package uk.gov.ons.ctp.response.sample.validation;
 
 import java.util.List;
-
 import javax.validation.constraints.NotNull;
-
 import libs.sample.validation.BusinessSampleUnit;
 import lombok.Data;
 import lombok.Getter;
