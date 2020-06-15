@@ -24,7 +24,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import libs.common.error.CTPException;
 import libs.sample.validation.BusinessSampleUnit;
-import libs.sample.validation.SampleUnitBase;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -218,8 +217,8 @@ public class CsvIngesterBusiness extends CsvToBean<BusinessSampleUnit> {
   }
 
   private void publishToPartyQueue(
-      List<? extends SampleUnitBase> samplingUnitList, String sampleSummaryId) {
-    for (SampleUnitBase sampleUnitBase : samplingUnitList) {
+      List<BusinessSampleUnit> samplingUnitList, String sampleSummaryId) {
+    for (BusinessSampleUnit sampleUnitBase : samplingUnitList) {
       PartyCreationRequestDTO party = PartyUtil.convertToParty(sampleUnitBase);
       party.getAttributes().setSampleUnitId(sampleUnitBase.getSampleUnitId().toString());
       party.setSampleSummaryId(sampleSummaryId);

@@ -33,8 +33,6 @@ resources:
 sftp:
   directory:
     business: /home/demo/sftp/BSD/
-    census: /home/demo/sftp/CTP/
-    social: /home/demo/sftp/SSD/
     documents: /home/demo/sftp/
   cron: "* * * * * ?"
   test:

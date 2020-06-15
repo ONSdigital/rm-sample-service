@@ -4,7 +4,6 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import com.opencsv.bean.CsvToBean;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -144,7 +143,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       @PathVariable("type") final String type, @RequestParam("file") MultipartFile file)
       throws CTPException {
     log.debug("Entering Sample file upload", kv("sample_type", type));
-    if (!Arrays.asList("B", "CENSUS", "SOCIAL").contains(type.toUpperCase())) {
+    if (!"B".equals(type.toUpperCase())) {
       return ResponseEntity.badRequest().build();
     }
 

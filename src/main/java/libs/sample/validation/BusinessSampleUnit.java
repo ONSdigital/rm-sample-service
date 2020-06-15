@@ -1,5 +1,6 @@
 package libs.sample.validation;
 
+import java.util.UUID;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -10,7 +11,7 @@ import net.sourceforge.cobertura.CoverageIgnore;
 @CoverageIgnore
 @Data
 @Getter
-public class BusinessSampleUnit extends SampleUnitBase {
+public class BusinessSampleUnit {
 
   private static final String NON_BLANK_INTEGER_RE = "[+-]?[\\d]+|^$";
   private static final String DATE_REGEX =
@@ -92,4 +93,12 @@ public class BusinessSampleUnit extends SampleUnitBase {
 
   @Size(min = 0, max = 1)
   String currency;
+
+  String sampleUnitRef;
+
+  String sampleUnitType;
+
+  String formType;
+
+  UUID sampleUnitId = UUID.randomUUID();
 }
