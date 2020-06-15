@@ -51,5 +51,38 @@ To view the Swagger Specifications for the Sample Service, run the service and n
 ## Code Styler
 To use the code styler please goto this url (https://github.com/google/google-java-format) and follow the Intellij instructions or Eclipse depending on what you use
 
+## Future changes
+The following changes can be safely made to the service/database
+- Remove the mi stored procedure, its not used or called by anything.
+- Remove the `Report` table
+- Remove the Metadata tables, ras-rm is not configurable at all so having metadata tables causes more confusion than its worth.
+- Remove the SampleOutboundPublisher, all it does is send messages to a routing key that has no bindings -> nothing is listening to these messages.
+- rethink how we process a sample file, we are attempting to do it asynchronously but then instantly syncronising becuase opencsv is not threadsafe, not only does that make the code difficult to understand but it offers absolutely no performance gain. Its very confusing having the sample service publish a message to a queue that the sample service is itself listening to.
+- This service needs a complete redesign and rewrite.
+
+
+## Communicates with
+- Party via a rest call `/party-api/v1/parties` for creating a new business
+- Collection-exercise via rabbit for both `INIT` and `PERSISTED` sample units
+
+## What it does
+On file upload it creates a new SampleSummary entry in the database with State = INIT
+
+SampleOuboundPublisher - It will then asynchronously parse the sample file and send a message with the routing key `Sample.SampleUploadStarted.binding`
+However this routing key doesnt match the binding key `Sample.SampleDelivery.binding` for the `sample-outbound-exchange` so presumably this message will be descarded (Further analysis required). Collection exercise is listening to the `Sample.SampleDelivery` queue
+
+CsvIngesterBusiness - Providing the SampleSummary type is "B" it will attempt to parse the uploaded CSV. Foreach line in the sample file create a new callable so this can all be sone asyncronously, pass in a new empty keyset. Our asyncronous callable is now syncronised because opencsv is not actually threadsafe!?!? The empty keyset is then used to store sample units where exceptions are thrown for duplicates.
+We're converting each sample file line into a business sample unit. We construct a list of samples, calculate the size of the collection instrument (number of unique formtypes) then save each sample unit to the database and update the SampleSummary with the total number of collection instruments and total number of sample units.
+For each sample unit; we create a Party Creation request and ship it off to the `Sample.Party` queue. Sample itself if listening on that queue and will pick up its own message to send to party via a rest call, then it sends an event to the event exchange where the event is `sample PERSISTED` (This exchange has no bindings associated with it so im guess this is just completely ignored and not required?).
+
+SampleUnitDistributor - For each collection exercise job that has not been completed (jobcomplete=false), look for active sample summaries and send the `PERSISTED` sample unit to the `Sample.SampleDelivery` queue.
+A lock is put on the Redis database because it can only be done synchronously - lock the redis database so we can safely query the postgres database, this is another massive smell that needs a redesign.
+
+## Quick guide
+
+- Sample Unit: A single row within the sample file
+- Sample Summary: The entire collection of Sample Units in a sample file (Counting unique refs only, duplicates are discarded, only the first is kept)
+
+
 ## Copyright
 Copyright (C) 2017 Crown Copyright (Office for National Statistics)
