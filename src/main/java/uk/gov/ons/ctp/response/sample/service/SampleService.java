@@ -216,7 +216,13 @@ public class SampleService {
       final SampleSummary sampleSummary, final MultipartFile file, final String type)
       throws Exception {
     this.sampleOutboundPublisher.sampleUploadStarted(sampleSummary);
-    return csvIngesterBusiness.ingest(sampleSummary, file);
+    
+    switch (type.toUpperCase()) {
+      case "B":
+        return csvIngesterBusiness.ingest(sampleSummary, file);
+      default:
+        throw new UnsupportedOperationException(String.format("Type %s not implemented", type));
+    }
   }
 
   public Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, String message) {
