@@ -216,7 +216,7 @@ public class SampleService {
       final SampleSummary sampleSummary, final MultipartFile file, final String type)
       throws Exception {
     this.sampleOutboundPublisher.sampleUploadStarted(sampleSummary);
-    
+
     switch (type.toUpperCase()) {
       case "B":
         return csvIngesterBusiness.ingest(sampleSummary, file);
