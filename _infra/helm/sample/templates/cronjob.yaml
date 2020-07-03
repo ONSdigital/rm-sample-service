@@ -5,6 +5,7 @@ metadata:
   name: sample-export
 spec:
   schedule: "{{ .Values.cron.kubernetesCron }}"
+  concurrencyPolicy: Forbid
   jobTemplate:
     spec:
       template:
