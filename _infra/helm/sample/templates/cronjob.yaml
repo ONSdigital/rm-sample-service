@@ -11,7 +11,7 @@ spec:
         spec:
           containers:
           - name: curl
-            image: alpine:3.12.0
+            image: curlimages/curl:7.71.0
             command: ["/bin/sh", "-c"]
             args:
               - |
