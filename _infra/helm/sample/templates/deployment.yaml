@@ -210,7 +210,7 @@ spec:
           - name: SFTP_CRON
             value: "{{ .Values.sftp.cron }}"
           - name: EXPORT_SCHEDULE_CRON_EXPRESSION
-            value: "{{ .Values.export.cron }}"
+            value: "{{ .Values.cron.springCron }}"
           - name: PARTY_SVC_CONNECTION_CONFIG_HOST
             {{- if .Values.dns.enabled }}
             value: "party.{{ .Values.namespace }}.svc.cluster.local"
@@ -228,7 +228,7 @@ spec:
           - name: PARTY_SVC_CONNECTION_CONFIG_PASSWORD
             value: "$(SECURITY_USER_PASSWORD)"
           - name: KUBERNETES_CRON_ENABLED
-            value: "{{ .Values.export.enabled }}"
+            value: "{{ .Values.cron.kubernetesEnabled }}"
           - name: SAMPLE_UNIT_DISTRIBUTION_DELAY_MILLI_SECONDS
             value: "1000"
           - name: LIQUIBASE_USER

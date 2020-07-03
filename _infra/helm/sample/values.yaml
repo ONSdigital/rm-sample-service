@@ -41,9 +41,10 @@ sftp:
 managedRabbitMQ:
   enabled: false
 
-export:
-  enabled: false
-  cron: "0 0/5 * * * ?"
+cron:
+  kubernetesEnabled: false
+  kubernetesCron: "@300"
+  springCron: "0 0/5 * * * ?"
 
 dns:
   enabled: false

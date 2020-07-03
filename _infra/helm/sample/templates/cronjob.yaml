@@ -1,10 +1,10 @@
-{{ if .Values.export.enabled }}
+{{ if .Values.cron.kubernetesEnabled }}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: sample-export
 spec:
-  schedule: {{ .Values.export.cron }}
+  schedule: "{{ .Values.cron.kubernetesCron }}"
   jobTemplate:
     spec:
       template:
