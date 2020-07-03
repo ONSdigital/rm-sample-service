@@ -15,7 +15,7 @@ spec:
             command: ["/bin/sh", "-c"]
             args:
               - |
-                curl -X POST "http://{{ .Chart.name }}:{{ .Values.dns.wellKnownPort }}/export" -H "accept: application/json"
+                curl -X POST "http://{{ .Chart.Name }}:{{ .Values.dns.wellKnownPort }}/export" -H "accept: application/json"
           restartPolicy: OnFailure
       backoffLimit: 5
 {{ end }}
