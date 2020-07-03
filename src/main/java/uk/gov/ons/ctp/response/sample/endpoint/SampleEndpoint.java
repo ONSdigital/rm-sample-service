@@ -39,6 +39,7 @@ import uk.gov.ons.ctp.response.sample.representation.SampleAttributesDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
+import uk.gov.ons.ctp.response.sample.scheduled.distribution.SampleUnitDistributor;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 
 /** The REST endpoint controller for Sample Service. */
@@ -52,11 +53,14 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       Executors.newFixedThreadPool(NUM_UPLOAD_THREADS);
   private SampleService sampleService;
   private MapperFacade mapperFacade;
+  private SampleUnitDistributor distributor;
 
   @Autowired
-  public SampleEndpoint(SampleService sampleService, MapperFacade mapperFacade) {
+  public SampleEndpoint(
+      SampleService sampleService, MapperFacade mapperFacade, SampleUnitDistributor distributor) {
     this.sampleService = sampleService;
     this.mapperFacade = mapperFacade;
+    this.distributor = distributor;
   }
 
   /**
@@ -269,5 +273,11 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     throw new CTPException(
         CTPException.Fault.BAD_REQUEST,
         String.format("No sample units were found for sample summary %s", sampleSummaryId));
+  }
+
+  @RequestMapping(value = "export", method = RequestMethod.POST)
+  public ResponseEntity<Void> exportSamples() {
+    distributor.distributeJobs();
+    return ResponseEntity.noContent().build();
   }
 }

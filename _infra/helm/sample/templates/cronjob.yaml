@@ -1,0 +1,21 @@
+{{ if .Values.cron.enabled }}
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: sample-export
+spec:
+  schedule: {{ .Values.export.cron }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: curl
+            image: alpine:3.12.0
+            command: ["/bin/sh", "-c"]
+            args:
+              - |
+                curl -X POST "http://{{ .Chart.name }}:{{ .Values.dns.wellKnownPort }}/export" -H "accept: application/json"
+          restartPolicy: OnFailure
+      backoffLimit: 5
+{{ end }}

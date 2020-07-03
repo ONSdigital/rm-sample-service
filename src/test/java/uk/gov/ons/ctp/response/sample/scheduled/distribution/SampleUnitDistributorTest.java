@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import libs.common.error.CTPException;
 import libs.common.error.CTPException.Fault;
@@ -53,6 +54,8 @@ public class SampleUnitDistributorTest {
 
   @Mock private RedissonClient redissonClient;
 
+  @Mock private Supplier<Boolean> kubeCronEnabled;
+
   @InjectMocks private SampleUnitDistributor sampleUnitDistributor;
 
   private RLock lock;
@@ -68,6 +71,7 @@ public class SampleUnitDistributorTest {
     lock = mock(RLock.class);
     when(redissonClient.getFairLock(any())).thenReturn(lock);
     when(lock.tryLock(anyLong(), any(TimeUnit.class))).thenReturn(true);
+    when(kubeCronEnabled.get()).thenReturn(false);
   }
 
   @Test
@@ -95,7 +99,7 @@ public class SampleUnitDistributorTest {
         .thenReturn(Stream.of(sampleUnit));
     when(sampleUnitMapper.mapSampleUnit(any(), any())).thenReturn(mappedSampleUnit);
 
-    sampleUnitDistributor.distribute();
+    sampleUnitDistributor.distributeJobs();
 
     verify(sampleUnitRepository).findBySampleSummaryFKAndState(666, SampleUnitState.PERSISTED);
 
@@ -138,7 +142,7 @@ public class SampleUnitDistributorTest {
     when(sampleUnitMapper.mapSampleUnit(any(), any())).thenReturn(mappedSampleUnit);
     doThrow(new CTPException(Fault.SYSTEM_ERROR)).when(sampleUnitSender).sendSampleUnit(any());
 
-    sampleUnitDistributor.distribute();
+    sampleUnitDistributor.distributeJobs();
 
     verify(sampleUnitSender).sendSampleUnit(mappedSampleUnit);
     verify(collectionExerciseJobRepository, never()).saveAndFlush(any());
@@ -150,7 +154,7 @@ public class SampleUnitDistributorTest {
     when(collectionExerciseJobRepository.findByJobCompleteIsFalse())
         .thenReturn(Collections.emptyList());
 
-    sampleUnitDistributor.distribute();
+    sampleUnitDistributor.distributeJobs();
 
     verify(collectionExerciseJobRepository).findByJobCompleteIsFalse();
     verify(redissonClient, never()).getFairLock(any());
@@ -177,7 +181,7 @@ public class SampleUnitDistributorTest {
     when(sampleUnitRepository.findBySampleSummaryFKAndState(any(), any()))
         .thenReturn(Stream.empty());
 
-    sampleUnitDistributor.distribute();
+    sampleUnitDistributor.distributeJobs();
 
     verify(sampleUnitSender, never()).sendSampleUnit(any());
 
@@ -208,7 +212,7 @@ public class SampleUnitDistributorTest {
     when(sampleUnitRepository.findBySampleSummaryFKAndState(any(), any()))
         .thenReturn(Stream.empty());
 
-    sampleUnitDistributor.distribute();
+    sampleUnitDistributor.distributeJobs();
 
     verify(sampleUnitSender, never()).sendSampleUnit(any());
 
@@ -218,5 +222,46 @@ public class SampleUnitDistributorTest {
     assertEquals(true, argumentCaptor.getValue().isJobComplete());
     assertEquals(collexID, argumentCaptor.getValue().getCollectionExerciseId());
     verify(lock).unlock();
+  }
+
+  @Test
+  public void willProcessCollectionExerciseJobIfKubernetesCronIsEnabled() throws CTPException {
+    UUID collexID = UUID.randomUUID();
+    UUID sampleSummaryId = UUID.randomUUID();
+
+    CollectionExerciseJob collectionExerciseJob = new CollectionExerciseJob();
+    collectionExerciseJob.setCollectionExerciseId(collexID);
+    collectionExerciseJob.setSampleSummaryId(sampleSummaryId);
+
+    SampleSummary sampleSummary = new SampleSummary();
+    sampleSummary.setSampleSummaryPK(666);
+    sampleSummary.setState(SampleState.ACTIVE);
+
+    SampleUnit sampleUnit = new SampleUnit();
+
+    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit =
+        new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit();
+
+    when(kubeCronEnabled.get()).thenReturn(true);
+    when(collectionExerciseJobRepository.findByJobCompleteIsFalse())
+        .thenReturn(Collections.singletonList(collectionExerciseJob));
+    when(sampleSummaryRepository.findById(any())).thenReturn(sampleSummary);
+    when(sampleUnitRepository.findBySampleSummaryFKAndState(any(), any()))
+        .thenReturn(Stream.of(sampleUnit));
+    when(sampleUnitMapper.mapSampleUnit(any(), any())).thenReturn(mappedSampleUnit);
+
+    sampleUnitDistributor.distributeJobs();
+
+    verify(sampleUnitRepository).findBySampleSummaryFKAndState(666, SampleUnitState.PERSISTED);
+
+    ArgumentCaptor<CollectionExerciseJob> collexJobArgCap =
+        ArgumentCaptor.forClass(CollectionExerciseJob.class);
+    verify(collectionExerciseJobRepository).saveAndFlush(collexJobArgCap.capture());
+    assertEquals(collectionExerciseJob, collexJobArgCap.getValue());
+    assertEquals(true, collexJobArgCap.getValue().isJobComplete());
+
+    verify(sampleUnitSender).sendSampleUnit(mappedSampleUnit);
+
+    verify(lock, never()).unlock();
   }
 }

@@ -4,6 +4,7 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import libs.common.error.CTPException;
 import org.redisson.api.RLock;
@@ -49,10 +50,24 @@ public class SampleUnitDistributor {
 
   @Autowired private SampleUnitMapper sampleUnitMapper;
 
+  @Autowired private Supplier<Boolean> kubeCronEnabled;
+
   /** Scheduled job for distributing SampleUnits */
   @Scheduled(fixedDelayString = "#{appConfig.sampleUnitDistribution.delayMilliSeconds}")
   @Transactional(timeout = TRANSACTION_TIMEOUT_SECONDS)
-  public void distribute() {
+  public void distributeJobs() {
+    if (kubeCronEnabled.get()) {
+      log.debug("Processing collection exercise jobs triggered by kubernetes");
+      collectionExerciseJobRepository.findByJobCompleteIsFalse()
+        .stream()
+        .forEach(this::processJob);
+    } else {
+      log.debug("Processing collection exercise jobs triggered by Spring Scheduler");
+      distribute();
+    }
+  }
+
+  private void distribute() {
     List<CollectionExerciseJob> jobs = collectionExerciseJobRepository.findByJobCompleteIsFalse();
 
     for (CollectionExerciseJob job : jobs) {

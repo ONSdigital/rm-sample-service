@@ -138,3 +138,7 @@ swagger-settings:
 retries:
   maxAttempts: 3
   backoff: 5000
+
+kubernetes:
+  cron:
+    enabled: false
