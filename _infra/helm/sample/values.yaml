@@ -43,7 +43,7 @@ managedRabbitMQ:
 
 cron:
   kubernetesEnabled: false
-  kubernetesCron: "@300"
+  kubernetesCron: "0/5 * * * *"
   springCron: "0 0/5 * * * ?"
 
 dns:
