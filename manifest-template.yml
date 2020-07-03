@@ -8,7 +8,6 @@ applications:
   timeout: 180
   services:
     - DATABASE
-    - rm-redis
     - rm-rabbitmq
   env:
     partySvc_connectionConfig_host: ras-party-service-SPACE.DOMAIN

@@ -7,5 +7,4 @@ applications:
   timeout: 180
   services:
     - rm-pg-db
-    - rm-redis
     - rm-rabbitmq

@@ -19,7 +19,6 @@ database:
     usernameKey: username
     passwordKey: password
     nameKey: db-name
-  managedRedis: false
 
 container:
   port: 8080
@@ -41,10 +40,7 @@ sftp:
 managedRabbitMQ:
   enabled: false
 
-cron:
-  kubernetesEnabled: false
-  kubernetesCron: "0/5 * * * *"
-  springCron: "0 0/5 * * * ?"
+cron: "0/5 * * * *"
 
 dns:
   enabled: false

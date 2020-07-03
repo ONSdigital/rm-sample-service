@@ -2,20 +2,15 @@ package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
-import libs.common.error.CTPException;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.ons.ctp.response.sample.config.AppConfig;
+
+import libs.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.repository.CollectionExerciseJobRepository;
@@ -30,13 +25,9 @@ import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
 public class SampleUnitDistributor {
   private static final Logger log = LoggerFactory.getLogger(SampleUnitDistributor.class);
 
-  private static final String LOCK_PREFIX = "SampleCollexJob-";
-
   private static final int TRANSACTION_TIMEOUT_SECONDS = 3600;
 
   private boolean hasErrors;
-
-  @Autowired private AppConfig appConfig;
 
   @Autowired private SampleUnitSender sampleUnitSender;
 
@@ -46,50 +37,15 @@ public class SampleUnitDistributor {
 
   @Autowired private SampleSummaryRepository sampleSummaryRepository;
 
-  @Autowired private RedissonClient redissonClient;
-
   @Autowired private SampleUnitMapper sampleUnitMapper;
 
-  @Autowired private Supplier<Boolean> kubeCronEnabled;
-
   /** Scheduled job for distributing SampleUnits */
-  @Scheduled(fixedDelayString = "#{appConfig.sampleUnitDistribution.delayMilliSeconds}")
   @Transactional(timeout = TRANSACTION_TIMEOUT_SECONDS)
   public void distributeJobs() {
-    if (kubeCronEnabled.get()) {
-      log.debug("Processing collection exercise jobs triggered by kubernetes");
-      collectionExerciseJobRepository.findByJobCompleteIsFalse()
-        .stream()
-        .forEach(this::processJob);
-    } else {
-      log.debug("Processing collection exercise jobs triggered by Spring Scheduler");
-      distribute();
-    }
-  }
-
-  private void distribute() {
-    List<CollectionExerciseJob> jobs = collectionExerciseJobRepository.findByJobCompleteIsFalse();
-
-    for (CollectionExerciseJob job : jobs) {
-      String uniqueLockName = LOCK_PREFIX + job.getCollectionExerciseJobPK();
-
-      RLock lock = redissonClient.getFairLock(uniqueLockName);
-
-      try {
-        // Get a lock. Automatically unlock after a certain amount of time to prevent issues
-        // when lock holder crashes or Redis crashes causing permanent lockout
-        if (lock.tryLock(appConfig.getDataGrid().getLockTimeToLiveSeconds(), TimeUnit.SECONDS)) {
-          try {
-            processJob(job);
-          } finally {
-            // Always unlock the distributed lock
-            lock.unlock();
-          }
-        }
-      } catch (InterruptedException e) {
-        // Ignored - process stopped while waiting for lock
-      }
-    }
+    log.debug("Processing collection exercise jobs triggered by kubernetes");
+    collectionExerciseJobRepository.findByJobCompleteIsFalse()
+      .stream()
+      .forEach(this::processJob);
   }
 
   private void processJob(CollectionExerciseJob job) {

@@ -19,9 +19,3 @@ party-svc:
 
 rabbitmq:
   port: 36672
-
-redis:
-  port: 37379
-
-data-grid:
-  address: localhost:37379

@@ -76,7 +76,6 @@ We're converting each sample file line into a business sample unit. We construct
 For each sample unit; we create a Party Creation request and ship it off to the `Sample.Party` queue. Sample itself if listening on that queue and will pick up its own message to send to party via a rest call, then it sends an event to the event exchange where the event is `sample PERSISTED` (This exchange has no bindings associated with it so im guess this is just completely ignored and not required?).
 
 SampleUnitDistributor - For each collection exercise job that has not been completed (jobcomplete=false), look for active sample summaries and send the `PERSISTED` sample unit to the `Sample.SampleDelivery` queue.
-A lock is put on the Redis database because it can only be done synchronously - lock the redis database so we can safely query the postgres database, this is another massive smell that needs a redesign.
 
 ## Quick guide
 

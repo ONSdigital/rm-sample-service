@@ -107,14 +107,6 @@ rabbitmq:
   virtualhost: /
   cron: "* * * * * ?"
 
-redis:
-  host: localhost
-  port: 7379
-
-data-grid:
-  address: localhost:7379
-  lock-time-to-live-seconds: 3600
-
 messaging:
   backoffInitial: 5000
   backoffMultiplier: 3
@@ -124,9 +116,6 @@ messaging:
   prefetchCount: 10
   txSize: 1
   pubMaxAttempts: 3
-
-sample-unit-distribution:
-  delay-milli-seconds: 60000
 
 swagger-settings:
   swagger-ui-active: true
@@ -138,7 +127,3 @@ swagger-settings:
 retries:
   maxAttempts: 3
   backoff: 5000
-
-kubernetes:
-  cron:
-    enabled: false

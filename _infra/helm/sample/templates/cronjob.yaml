@@ -1,10 +1,9 @@
-{{ if .Values.cron.kubernetesEnabled }}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: sample-export
 spec:
-  schedule: "{{ .Values.cron.kubernetesCron }}"
+  schedule: "{{ .Values.cron }}"
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
@@ -19,4 +18,3 @@ spec:
                 curl -X POST "http://{{ .Chart.Name }}:{{ .Values.dns.wellKnownPort }}/export" -H "accept: application/json"
           restartPolicy: OnFailure
       backoffLimit: 5
-{{ end }}

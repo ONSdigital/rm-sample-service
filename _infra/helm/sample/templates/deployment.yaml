@@ -165,26 +165,6 @@ spec:
             {{- end }}
           - name: liquibase_url
             value: "jdbc:postgresql://$(DB_HOST):$(DB_PORT)/$(DB_NAME)"
-          - name: REDIS_HOST
-            {{- if .Values.database.managedRedis }}
-            valueFrom:
-              configMapKeyRef:
-                name: redis-config
-                key: redis-host
-            {{- else }}
-            value: "$(REDIS_MASTER_SERVICE_HOST)"
-            {{- end }}
-          - name: REDIS_PORT
-            {{- if .Values.database.managedRedis }}
-            valueFrom:
-              configMapKeyRef:
-                name: redis-config
-                key: redis-port
-            {{- else }}
-            value: "$(REDIS_MASTER_SERVICE_PORT)"
-            {{- end}}
-          - name: DATA_GRID_ADDRESS
-            value: "$(REDIS_HOST):$(REDIS_PORT)"
           - name: SFTP_HOST
             {{- if .Values.sftp.test.enabled }}
             value: "$(SFTP_SERVICE_HOST)"
@@ -227,8 +207,6 @@ spec:
             value: "$(SECURITY_USER_NAME)"
           - name: PARTY_SVC_CONNECTION_CONFIG_PASSWORD
             value: "$(SECURITY_USER_PASSWORD)"
-          - name: KUBERNETES_CRON_ENABLED
-            value: "{{ .Values.cron.kubernetesEnabled }}"
           - name: SAMPLE_UNIT_DISTRIBUTION_DELAY_MILLI_SECONDS
             value: "1000"
           - name: LIQUIBASE_USER

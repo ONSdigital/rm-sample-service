@@ -10,9 +10,6 @@ import libs.common.rest.RestUtility;
 import libs.common.state.StateTransitionManager;
 import libs.common.state.StateTransitionManagerFactory;
 import net.sourceforge.cobertura.CoverageIgnore;
-import org.redisson.Redisson;
-import org.redisson.api.RedissonClient;
-import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,21 +55,6 @@ public class SampleSvcApplication {
    */
   public static void main(final String[] args) {
     SpringApplication.run(SampleSvcApplication.class, args);
-  }
-
-  /**
-   * Bean used to create and configure Redisson Client
-   *
-   * @return the Redisson client
-   */
-  @Bean
-  public RedissonClient redissonClient() {
-    Config config = new Config();
-    config
-        .useSingleServer()
-        .setAddress(appConfig.getDataGrid().getAddress())
-        .setPassword(appConfig.getDataGrid().getPassword());
-    return Redisson.create(config);
   }
 
   /**
@@ -147,11 +129,5 @@ public class SampleSvcApplication {
   public Validator csvIngestValidator() {
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     return factory.getValidator();
-  }
-
-  @Bean
-  public Supplier<Boolean> kubernetesCronEnabled(
-      @Value("${kubernetes.cron.enabled}") boolean kubeCronEnabled) {
-    return () -> kubeCronEnabled;
   }
 }

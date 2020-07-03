@@ -16,7 +16,6 @@ import uk.gov.ons.ctp.response.lib.rabbit.Rabbitmq;
 public class AppConfig {
 
   private PartySvc partySvc;
-  private SampleUnitDistribution sampleUnitDistribution;
   private Rabbitmq rabbitmq;
   private DataGrid dataGrid;
   private SwaggerSettings swaggerSettings;

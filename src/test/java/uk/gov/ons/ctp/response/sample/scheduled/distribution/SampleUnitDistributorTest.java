@@ -1,21 +1,16 @@
 package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
-import libs.common.error.CTPException;
-import libs.common.error.CTPException.Fault;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,10 +19,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
-import uk.gov.ons.ctp.response.sample.config.AppConfig;
-import uk.gov.ons.ctp.response.sample.config.DataGrid;
+
+import libs.common.error.CTPException;
+import libs.common.error.CTPException.Fault;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
@@ -40,7 +34,6 @@ import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitSta
 /** Test the Sample Unit Distributor */
 @RunWith(MockitoJUnitRunner.class)
 public class SampleUnitDistributorTest {
-  @Mock private AppConfig appConfig;
 
   @Mock private SampleUnitSender sampleUnitSender;
 
@@ -52,26 +45,11 @@ public class SampleUnitDistributorTest {
 
   @Mock private SampleUnitMapper sampleUnitMapper;
 
-  @Mock private RedissonClient redissonClient;
-
-  @Mock private Supplier<Boolean> kubeCronEnabled;
-
   @InjectMocks private SampleUnitDistributor sampleUnitDistributor;
-
-  private RLock lock;
 
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-
-    DataGrid dataGrid = new DataGrid();
-    dataGrid.setLockTimeToLiveSeconds(60);
-    when(appConfig.getDataGrid()).thenReturn(dataGrid);
-
-    lock = mock(RLock.class);
-    when(redissonClient.getFairLock(any())).thenReturn(lock);
-    when(lock.tryLock(anyLong(), any(TimeUnit.class))).thenReturn(true);
-    when(kubeCronEnabled.get()).thenReturn(false);
   }
 
   @Test
@@ -110,8 +88,6 @@ public class SampleUnitDistributorTest {
     assertEquals(true, collexJobArgCap.getValue().isJobComplete());
 
     verify(sampleUnitSender).sendSampleUnit(mappedSampleUnit);
-
-    verify(lock).unlock();
   }
 
   @Test
@@ -146,7 +122,6 @@ public class SampleUnitDistributorTest {
 
     verify(sampleUnitSender).sendSampleUnit(mappedSampleUnit);
     verify(collectionExerciseJobRepository, never()).saveAndFlush(any());
-    verify(lock).unlock();
   }
 
   @Test
@@ -157,10 +132,7 @@ public class SampleUnitDistributorTest {
     sampleUnitDistributor.distributeJobs();
 
     verify(collectionExerciseJobRepository).findByJobCompleteIsFalse();
-    verify(redissonClient, never()).getFairLock(any());
-    verify(lock, never()).tryLock(anyLong(), anyLong(), any(TimeUnit.class));
     verify(collectionExerciseJobRepository, never()).saveAndFlush(any());
-    verify(lock, never()).unlock();
   }
 
   @Test
@@ -190,7 +162,6 @@ public class SampleUnitDistributorTest {
     verify(collectionExerciseJobRepository).saveAndFlush(argumentCaptor.capture());
     assertEquals(true, argumentCaptor.getValue().isJobComplete());
     assertEquals(collexID, argumentCaptor.getValue().getCollectionExerciseId());
-    verify(lock).unlock();
   }
 
   @Test
@@ -221,7 +192,6 @@ public class SampleUnitDistributorTest {
     verify(collectionExerciseJobRepository).saveAndFlush(argumentCaptor.capture());
     assertEquals(true, argumentCaptor.getValue().isJobComplete());
     assertEquals(collexID, argumentCaptor.getValue().getCollectionExerciseId());
-    verify(lock).unlock();
   }
 
   @Test
@@ -242,7 +212,6 @@ public class SampleUnitDistributorTest {
     uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit =
         new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit();
 
-    when(kubeCronEnabled.get()).thenReturn(true);
     when(collectionExerciseJobRepository.findByJobCompleteIsFalse())
         .thenReturn(Collections.singletonList(collectionExerciseJob));
     when(sampleSummaryRepository.findById(any())).thenReturn(sampleSummary);
@@ -261,7 +230,5 @@ public class SampleUnitDistributorTest {
     assertEquals(true, collexJobArgCap.getValue().isJobComplete());
 
     verify(sampleUnitSender).sendSampleUnit(mappedSampleUnit);
-
-    verify(lock, never()).unlock();
   }
 }
