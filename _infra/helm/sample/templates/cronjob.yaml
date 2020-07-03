@@ -1,4 +1,4 @@
-{{ if .Values.cron.enabled }}
+{{ if .Values.export.enabled }}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:

@@ -227,6 +227,8 @@ spec:
             value: "$(SECURITY_USER_NAME)"
           - name: PARTY_SVC_CONNECTION_CONFIG_PASSWORD
             value: "$(SECURITY_USER_PASSWORD)"
+          - name: KUBERNETES_CRON_ENABLED
+            value: {{ .Values.export.enabled }}
           - name: SAMPLE_UNIT_DISTRIBUTION_DELAY_MILLI_SECONDS
             value: "1000"
           - name: LIQUIBASE_USER
