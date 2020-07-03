@@ -189,8 +189,6 @@ spec:
             value: "{{ .Values.sftp.directory.documents }}"
           - name: SFTP_CRON
             value: "{{ .Values.sftp.cron }}"
-          - name: EXPORT_SCHEDULE_CRON_EXPRESSION
-            value: "{{ .Values.cron.springCron }}"
           - name: PARTY_SVC_CONNECTION_CONFIG_HOST
             {{- if .Values.dns.enabled }}
             value: "party.{{ .Values.namespace }}.svc.cluster.local"
