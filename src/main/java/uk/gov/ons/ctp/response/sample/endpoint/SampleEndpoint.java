@@ -277,7 +277,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
 
   @RequestMapping(value = "export", method = RequestMethod.POST)
   public ResponseEntity<Void> exportSamples() {
-    distributor.distributeJobs();
+    distributor.distribute();
     return ResponseEntity.noContent().build();
   }
 }

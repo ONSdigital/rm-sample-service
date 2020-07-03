@@ -41,7 +41,7 @@ public class SampleUnitDistributor {
 
   /** Scheduled job for distributing SampleUnits */
   @Transactional(timeout = TRANSACTION_TIMEOUT_SECONDS)
-  public void distributeJobs() {
+  public void distribute() {
     log.debug("Processing collection exercise jobs triggered by kubernetes");
     collectionExerciseJobRepository.findByJobCompleteIsFalse()
       .stream()
