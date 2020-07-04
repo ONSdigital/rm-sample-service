@@ -2,7 +2,6 @@ package libs.common.state;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import libs.common.error.CTPException;

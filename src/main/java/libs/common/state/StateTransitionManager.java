@@ -1,6 +1,5 @@
 package libs.common.state;
 
-import java.util.Map;
 import libs.common.error.CTPException;
 
 /**
