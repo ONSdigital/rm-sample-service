@@ -17,6 +17,5 @@ public class AppConfig {
 
   private PartySvc partySvc;
   private Rabbitmq rabbitmq;
-  private SwaggerSettings swaggerSettings;
   private Logging logging;
 }
