@@ -1,7 +1,11 @@
 package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 import java.util.Map;
 import ma.glasnost.orika.MapperFacade;
+
+import org.mortbay.log.Log;
 import org.springframework.stereotype.Component;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesRepository;
 import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
@@ -23,7 +27,9 @@ public class SampleUnitMapper {
   public SampleUnit mapSampleUnit(
       uk.gov.ons.ctp.response.sample.domain.model.SampleUnit sampleUnit,
       String collectionExerciseId) {
+    Log.debug("Mapping SampleUnit from domain model", kv("SampleUnit", sampleUnit));
     SampleUnit mappedSampleUnit = mapperFacade.map(sampleUnit, SampleUnit.class);
+    Log.info("SampleUnit mapped from domain model", kv("MappedSampleUnit", mappedSampleUnit));
 
     uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes sampleAttributes =
         sampleAttributesRepository.findOne(sampleUnit.getId());
