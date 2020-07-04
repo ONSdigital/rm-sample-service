@@ -136,4 +136,19 @@ public class SampleEndpointIT {
     assertThat(response.getStatus()).isEqualTo(200);
     assertThat(response.getBody().getSampleUnitsTotal()).isEqualTo(4);
   }
+
+  @Test
+  public void willReturn204OnExport() throws UnirestException, InterruptedException {
+    String url =
+        String.format(
+            "http://localhost:%d/samples/export", port);
+
+    HttpResponse<String> response =
+        Unirest.post(url)
+            .header("Content-Type", "application/json")
+            .basicAuth("admin", "secret")
+            .asString();
+
+    assertThat(response.getStatus()).isEqualTo(204);
+  }
 }
