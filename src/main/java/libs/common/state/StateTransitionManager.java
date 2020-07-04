@@ -22,11 +22,4 @@ public interface StateTransitionManager<S, E> {
    * @throws CTPException an illegal event was applied to the source state
    */
   S transition(S sourceState, E event) throws CTPException;
-
-  /**
-   * @param sourceState the initial state it is in
-   * @return the available states that an initial state can move to and the events required to get
-   *     there
-   */
-  Map<E, S> getAvailableTransitions(S sourceState);
 }

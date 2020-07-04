@@ -1,5 +1,7 @@
 package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 import java.util.UUID;
 import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
@@ -46,8 +48,11 @@ public class SampleUnitSender {
         sampleUnitRepository.findById(UUID.fromString(mappedSampleUnit.getId()));
 
     if (sampleUnit.getState() == SampleUnitState.PERSISTED) {
+      log.debug("Publishing mapped sampleUnit", kv("MappedSampleUnit", mappedSampleUnit));
       sampleUnitPublisher.send(mappedSampleUnit);
 
+      log.debug("Transitioning state of sampleUnit", kv("SampleUnit", sampleUnit), 
+        kv("from", sampleUnit.getState()), kv("to", SampleUnitDTO.SampleUnitEvent.DELIVERING));
       SampleUnitDTO.SampleUnitState newState =
           sampleUnitStateTransitionManager.transition(
               sampleUnit.getState(), SampleUnitDTO.SampleUnitEvent.DELIVERING);

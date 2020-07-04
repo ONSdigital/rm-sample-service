@@ -56,13 +56,4 @@ public class BasicStateTransitionManager<S, E> implements StateTransitionManager
     }
     return destinationState;
   }
-
-  @Override
-  public Map<E, S> getAvailableTransitions(final S sourceState) {
-    Map<E, S> outputMap = transitions.get(sourceState);
-    if (outputMap != null) {
-      return outputMap;
-    }
-    return Collections.emptyMap();
-  }
 }
