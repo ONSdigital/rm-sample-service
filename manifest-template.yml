@@ -16,10 +16,6 @@ applications:
     partySvc_connectionConfig_username: REPLACE_BA_USERNAME
     partySvc_connectionConfig_password: REPLACE_BA_PASSWORD
     exportSchedule_cronExpression: "0 0/5 * * * ?"
-    sftp_username: REPLACE_USER
-    sftp_port: "22"
-    sftp_password: REPLACE_PASSWORD
-    sftp_host: REPLACE_URL
     endpoints_enabled: ENDPOINT_ENABLED
     security_user_name: REPLACE_BA_USERNAME
     security_user_password: REPLACE_BA_PASSWORD

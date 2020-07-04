@@ -87,18 +87,6 @@ party-svc:
     username: admin
     password: secret
 
-sftp:
-  host: localhost
-  port: 122
-  username: centos
-  password: "JLibV2&XD,"
-  directory:
-    business: Documents/sftp/Sample-Files/BSD/
-    Documents: Documents/sftp/Sample-Files/
-  localdirectory: /tmp/samplesvc
-  cron: "* * * * * ?"
-  filepattern: "*.xml"
-
 rabbitmq:
   username: guest
   password: guest

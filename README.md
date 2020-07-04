@@ -30,14 +30,6 @@ mvn clean install -Ddocker.skip -DskipITs
 ```
 
 ## Testing
-* In Documents create the following directory structure:
-
-        sftp/business-sftp/
-
-  These will act as a mock remote file store
-
-* Add the xml files found in rm-sample-service/samplesvc-api/src/test/resources/xml to the corresponding sftp directories
-
 * to add a collectionExerciseJob to the postgres database
 
       curl -H "Content-Type: application/json" -X POST -d '{ "collectionExerciseJobPK" : "4","surveyRef" : "str1234","exerciseDateTime" : "2012-12-13T12:12:12.000+00" }' http://localhost:8125/samples/sampleunitrequests
