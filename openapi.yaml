@@ -13,6 +13,8 @@ tags:
     description: Informational endpoints.
   - name: samples
     description: Endpoints for interacting with samples.
+  - name: scheduled
+    description: tasks that run on a schedule
 
 paths:
   /samples/count:
@@ -32,6 +34,17 @@ paths:
                   sampleUnitsTotal:
                     type: integer
                     example: 1
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /samples/export:
+    post:
+      summary: Export collection exercise jobs
+      description: A kubernetes cron job will call this endpoint to export collection exercise jobs. This is not strictly a Restful operation but allows us to completely remove the redis database lock that was in its place. A full api redesign will liikely remove the need for scheduled exports altogether.
+      tags:
+        - scheduled
+      responses:
+        '204':
+          description: Collection exercise job have been exported.
         '401':
           $ref: '#/components/responses/UnauthorizedError'
   /samples/samplesummaries:
