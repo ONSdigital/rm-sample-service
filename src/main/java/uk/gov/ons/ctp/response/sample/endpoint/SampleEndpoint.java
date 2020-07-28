@@ -34,12 +34,14 @@ import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
+import uk.gov.ons.ctp.response.sample.representation.BusinessSampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleAttributesDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
+import uk.gov.ons.ctp.response.sample.service.UnknownSampleSummaryException;
 
 /** The REST endpoint controller for Sample Service. */
 @RestController
@@ -269,5 +271,26 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     throw new CTPException(
         CTPException.Fault.BAD_REQUEST,
         String.format("No sample units were found for sample summary %s", sampleSummaryId));
+  }
+
+  @RequestMapping(value = "{sampleSummaryId}/sampleunits/", method = RequestMethod.POST)
+  public ResponseEntity<SampleUnitDTO[]> createSampleUnitsForSampleSummary(
+      @PathVariable("sampleSummaryId") final UUID sampleSummaryId,
+      final @Valid @RequestBody BusinessSampleUnitDTO sampleUnitDTO,
+      BindingResult bindingResult)
+      throws CTPException, InvalidRequestException {
+
+    if (bindingResult.hasErrors()) {
+      throw new InvalidRequestException("Binding errors for create action: ", bindingResult);
+    }
+    BusinessSampleUnit sampleUnit = mapperFacade.map(sampleUnitDTO, BusinessSampleUnit.class);
+    try {
+      sampleService.createSampleUnit(
+          sampleSummaryId, sampleUnit, SampleUnitDTO.SampleUnitState.INIT);
+    } catch (UnknownSampleSummaryException e) {
+      // todo structured logging
+      log.error("unknown sample summary id", e);
+    }
+    return null;
   }
 }

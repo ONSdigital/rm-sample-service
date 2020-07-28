@@ -89,6 +89,19 @@ public class SampleService {
     return savedSampleSummary;
   }
 
+  @Transactional(propagation = Propagation.REQUIRED)
+  public void createSampleUnit(
+      UUID sampleSummaryId, BusinessSampleUnit samplingUnit, SampleUnitState sampleUnitState)
+      throws UnknownSampleSummaryException {
+
+    SampleSummary sampleSummary = sampleSummaryRepository.findById(sampleSummaryId);
+    if (sampleSummary != null) {
+      createAndSaveSampleUnit(sampleSummary, sampleUnitState, samplingUnit);
+    } else {
+      throw new UnknownSampleSummaryException();
+    }
+  }
+
   private Integer calculateExpectedCollectionInstruments(
       List<BusinessSampleUnit> samplingUnitList) {
     // TODO: get survey classifiers from survey service, currently using formtype for all business
@@ -115,16 +128,23 @@ public class SampleService {
       SampleSummary sampleSummary,
       SampleUnitState sampleUnitState) {
     for (BusinessSampleUnit sampleUnitBase : samplingUnitList) {
-      SampleUnit sampleUnit = new SampleUnit();
-      sampleUnit.setSampleSummaryFK(sampleSummary.getSampleSummaryPK());
-      sampleUnit.setSampleUnitRef(sampleUnitBase.getSampleUnitRef());
-      sampleUnit.setSampleUnitType(sampleUnitBase.getSampleUnitType());
-      sampleUnit.setFormType(sampleUnitBase.getFormType());
-      sampleUnit.setState(sampleUnitState);
-      sampleUnit.setId(sampleUnitBase.getSampleUnitId());
-      eventPublisher.publishEvent("Sample Init");
-      sampleUnitRepository.save(sampleUnit);
+      createAndSaveSampleUnit(sampleSummary, sampleUnitState, sampleUnitBase);
     }
+  }
+
+  private void createAndSaveSampleUnit(
+      SampleSummary sampleSummary,
+      SampleUnitState sampleUnitState,
+      BusinessSampleUnit sampleUnitBase) {
+    SampleUnit sampleUnit = new SampleUnit();
+    sampleUnit.setSampleSummaryFK(sampleSummary.getSampleSummaryPK());
+    sampleUnit.setSampleUnitRef(sampleUnitBase.getSampleUnitRef());
+    sampleUnit.setSampleUnitType(sampleUnitBase.getSampleUnitType());
+    sampleUnit.setFormType(sampleUnitBase.getFormType());
+    sampleUnit.setState(sampleUnitState);
+    sampleUnit.setId(sampleUnitBase.getSampleUnitId());
+    eventPublisher.publishEvent("Sample Init");
+    sampleUnitRepository.save(sampleUnit);
   }
 
   /**
