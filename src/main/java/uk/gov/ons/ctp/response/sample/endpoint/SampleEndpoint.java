@@ -283,14 +283,22 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     if (bindingResult.hasErrors()) {
       throw new InvalidRequestException("Binding errors for create action: ", bindingResult);
     }
+    log.debug(
+        "create sample unit request received", kv("businessSampleUnitDTO", businessSampleUnitDTO));
     BusinessSampleUnit businessSampleUnit =
         mapperFacade.map(businessSampleUnitDTO, BusinessSampleUnit.class);
+
+    log.debug("business sample constructed", kv("businessSample", businessSampleUnit));
     try {
       SampleUnit sampleUnit =
           sampleService.createSampleUnit(
               sampleSummaryId, businessSampleUnit, SampleUnitDTO.SampleUnitState.INIT);
+      log.debug("sample created");
       SampleUnitDTO sampleUnitDTO = mapperFacade.map(sampleUnit, SampleUnitDTO.class);
-      return ResponseEntity.ok(sampleUnitDTO);
+      log.debug("created SampleUnitDTO", kv("sampleUnitDTO", sampleUnitDTO));
+      return ResponseEntity.created(
+              URI.create(String.format("/samples/%s", sampleUnit.getSampleUnitPK())))
+          .build();
     } catch (UnknownSampleSummaryException e) {
       log.error("unknown sample summary id", kv("sampleSummaryId", sampleSummaryId), e);
       return ResponseEntity.badRequest().build();

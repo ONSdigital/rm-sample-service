@@ -209,7 +209,7 @@ public class SampleEndpointUnitTest {
 
     ResultActions actions =
         mockMvc.perform(post(url).contentType("application/json").content(body));
-    actions.andExpect(status().isOk());
+    actions.andExpect(status().isCreated());
 
     verify(sampleService, times(1)).createSampleUnit(any(), any(), any());
   }
