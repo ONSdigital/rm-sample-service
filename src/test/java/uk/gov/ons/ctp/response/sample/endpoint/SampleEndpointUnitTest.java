@@ -201,23 +201,7 @@ public class SampleEndpointUnitTest {
   @Test
   public void addSingleSample() throws Exception {
     BusinessSampleUnitDTO businessSampleUnitDTO = new BusinessSampleUnitDTO();
-    String body = marshallToJson(businessSampleUnitDTO);
-
-    when(sampleService.createSampleUnit(any(), any(), any())).thenReturn(new SampleUnit());
-
-    String url = String.format("/samples/%s/sampleunits/", UUID.randomUUID());
-
-    ResultActions actions =
-        mockMvc.perform(post(url).contentType("application/json").content(body));
-    actions.andExpect(status().isCreated());
-
-    verify(sampleService, times(1)).createSampleUnit(any(), any(), any());
-  }
-
-  @Test
-  public void addSingleSampleWithValues() throws Exception {
-    BusinessSampleUnitDTO businessSampleUnitDTO = new BusinessSampleUnitDTO();
-    businessSampleUnitDTO.setEntname1("Test");
+    businessSampleUnitDTO.setEntname1("test1");
     String body = marshallToJson(businessSampleUnitDTO);
 
     when(sampleService.createSampleUnit(any(), any(), any())).thenReturn(new SampleUnit());
@@ -237,6 +221,7 @@ public class SampleEndpointUnitTest {
         .thenThrow(new UnknownSampleSummaryException());
 
     BusinessSampleUnitDTO businessSampleUnitDTO = new BusinessSampleUnitDTO();
+    businessSampleUnitDTO.setEntname1("test2");
     String body = marshallToJson(businessSampleUnitDTO);
 
     String url = String.format("/samples/%s/sampleunits/", UUID.randomUUID());

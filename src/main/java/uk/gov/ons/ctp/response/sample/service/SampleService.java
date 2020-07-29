@@ -96,6 +96,8 @@ public class SampleService {
 
     SampleSummary sampleSummary = sampleSummaryRepository.findById(sampleSummaryId);
     if (sampleSummary != null) {
+      // the csv ingester does this so it's needed here
+      samplingUnit.setSampleUnitType("B");
       return createAndSaveSampleUnit(sampleSummary, sampleUnitState, samplingUnit);
     } else {
       throw new UnknownSampleSummaryException();
