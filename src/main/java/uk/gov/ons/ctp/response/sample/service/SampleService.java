@@ -31,7 +31,6 @@ import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesReposito
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
-import uk.gov.ons.ctp.response.sample.message.EventPublisher;
 import uk.gov.ons.ctp.response.sample.message.SampleOutboundPublisher;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
@@ -63,7 +62,6 @@ public class SampleService {
   @Autowired private CollectionExerciseJobService collectionExerciseJobService;
 
   @Autowired private CsvIngesterBusiness csvIngesterBusiness;
-  @Autowired private EventPublisher eventPublisher;
   @Autowired private SampleAttributesRepository sampleAttributesRepository;
 
   public List<SampleSummary> findAllSampleSummaries() {
@@ -122,7 +120,6 @@ public class SampleService {
       sampleUnit.setFormType(sampleUnitBase.getFormType());
       sampleUnit.setState(sampleUnitState);
       sampleUnit.setId(sampleUnitBase.getSampleUnitId());
-      eventPublisher.publishEvent("Sample Init");
       sampleUnitRepository.save(sampleUnit);
     }
   }
