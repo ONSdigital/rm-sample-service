@@ -215,6 +215,23 @@ public class SampleEndpointUnitTest {
   }
 
   @Test
+  public void addSingleSampleWithValues() throws Exception {
+    BusinessSampleUnitDTO businessSampleUnitDTO = new BusinessSampleUnitDTO();
+    businessSampleUnitDTO.setEntname1("Test");
+    String body = marshallToJson(businessSampleUnitDTO);
+
+    when(sampleService.createSampleUnit(any(), any(), any())).thenReturn(new SampleUnit());
+
+    String url = String.format("/samples/%s/sampleunits/", UUID.randomUUID());
+
+    ResultActions actions =
+        mockMvc.perform(post(url).contentType("application/json").content(body));
+    actions.andExpect(status().isCreated());
+
+    verify(sampleService, times(1)).createSampleUnit(any(), any(), any());
+  }
+
+  @Test
   public void addSingleSampleInvalidSampleSummaryReturnsBadRequest() throws Exception {
     when(sampleService.createSampleUnit(any(), any(), any()))
         .thenThrow(new UnknownSampleSummaryException());

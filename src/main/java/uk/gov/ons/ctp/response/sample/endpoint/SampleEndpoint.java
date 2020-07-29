@@ -19,6 +19,7 @@ import ma.glasnost.orika.MapperFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
@@ -298,7 +299,8 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       log.debug("created SampleUnitDTO", kv("sampleUnitDTO", sampleUnitDTO));
       return ResponseEntity.created(
               URI.create(String.format("/samples/%s", sampleUnit.getSampleUnitPK())))
-          .build();
+          .contentType(MediaType.APPLICATION_JSON)
+          .body(sampleUnitDTO);
     } catch (UnknownSampleSummaryException e) {
       log.error("unknown sample summary id", kv("sampleSummaryId", sampleSummaryId), e);
       return ResponseEntity.badRequest().build();
