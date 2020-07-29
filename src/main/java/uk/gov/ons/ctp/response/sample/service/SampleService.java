@@ -90,13 +90,13 @@ public class SampleService {
   }
 
   @Transactional(propagation = Propagation.REQUIRED)
-  public void createSampleUnit(
+  public SampleUnit createSampleUnit(
       UUID sampleSummaryId, BusinessSampleUnit samplingUnit, SampleUnitState sampleUnitState)
       throws UnknownSampleSummaryException {
 
     SampleSummary sampleSummary = sampleSummaryRepository.findById(sampleSummaryId);
     if (sampleSummary != null) {
-      createAndSaveSampleUnit(sampleSummary, sampleUnitState, samplingUnit);
+      return createAndSaveSampleUnit(sampleSummary, sampleUnitState, samplingUnit);
     } else {
       throw new UnknownSampleSummaryException();
     }
@@ -132,7 +132,7 @@ public class SampleService {
     }
   }
 
-  private void createAndSaveSampleUnit(
+  private SampleUnit createAndSaveSampleUnit(
       SampleSummary sampleSummary,
       SampleUnitState sampleUnitState,
       BusinessSampleUnit sampleUnitBase) {
@@ -145,6 +145,7 @@ public class SampleService {
     sampleUnit.setId(sampleUnitBase.getSampleUnitId());
     eventPublisher.publishEvent("Sample Init");
     sampleUnitRepository.save(sampleUnit);
+    return sampleUnit;
   }
 
   /**

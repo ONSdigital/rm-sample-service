@@ -274,23 +274,26 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   }
 
   @RequestMapping(value = "{sampleSummaryId}/sampleunits/", method = RequestMethod.POST)
-  public ResponseEntity<SampleUnitDTO[]> createSampleUnitsForSampleSummary(
+  public ResponseEntity<SampleUnitDTO> createSampleUnitsForSampleSummary(
       @PathVariable("sampleSummaryId") final UUID sampleSummaryId,
-      final @Valid @RequestBody BusinessSampleUnitDTO sampleUnitDTO,
+      final @Valid @RequestBody BusinessSampleUnitDTO businessSampleUnitDTO,
       BindingResult bindingResult)
-      throws CTPException, InvalidRequestException {
+      throws InvalidRequestException {
 
     if (bindingResult.hasErrors()) {
       throw new InvalidRequestException("Binding errors for create action: ", bindingResult);
     }
-    BusinessSampleUnit sampleUnit = mapperFacade.map(sampleUnitDTO, BusinessSampleUnit.class);
+    BusinessSampleUnit businessSampleUnit =
+        mapperFacade.map(businessSampleUnitDTO, BusinessSampleUnit.class);
     try {
-      sampleService.createSampleUnit(
-          sampleSummaryId, sampleUnit, SampleUnitDTO.SampleUnitState.INIT);
+      SampleUnit sampleUnit =
+          sampleService.createSampleUnit(
+              sampleSummaryId, businessSampleUnit, SampleUnitDTO.SampleUnitState.INIT);
+      SampleUnitDTO sampleUnitDTO = mapperFacade.map(sampleUnit, SampleUnitDTO.class);
+      return ResponseEntity.ok(sampleUnitDTO);
     } catch (UnknownSampleSummaryException e) {
-      // todo structured logging
-      log.error("unknown sample summary id", e);
+      log.error("unknown sample summary id", kv("sampleSummaryId", sampleSummaryId), e);
+      return ResponseEntity.badRequest().build();
     }
-    return null;
   }
 }

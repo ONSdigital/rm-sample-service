@@ -350,8 +350,8 @@ public class SampleServiceTest {
     when(sampleSummaryRepository.findById(any())).thenReturn(newSummary);
     BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();
     sampleService.createSampleUnit(newSummary.getId(), businessSampleUnit, SampleUnitState.INIT);
-
     verify(sampleUnitRepository, times(1)).save(any(SampleUnit.class));
+    verify(eventPublisher, times(1)).publishEvent("Sample Init");
   }
 
   @Test(expected = UnknownSampleSummaryException.class)
