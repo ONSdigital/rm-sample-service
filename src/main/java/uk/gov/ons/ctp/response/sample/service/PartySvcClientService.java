@@ -36,7 +36,6 @@ public class PartySvcClientService {
 
   @Autowired private ObjectMapper objectMapper;
 
-
   @Retryable(
       value = {RestClientException.class},
       maxAttemptsExpression = "#{${retries.maxAttempts}}",
