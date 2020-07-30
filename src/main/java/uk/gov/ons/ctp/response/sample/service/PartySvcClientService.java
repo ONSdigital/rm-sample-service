@@ -21,7 +21,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
-import uk.gov.ons.ctp.response.sample.message.EventPublisher;
 
 @Service
 public class PartySvcClientService {
@@ -36,8 +35,6 @@ public class PartySvcClientService {
   private RestUtility restUtility;
 
   @Autowired private ObjectMapper objectMapper;
-
-  @Autowired private EventPublisher eventPublisher;
 
   @Retryable(
       value = {RestClientException.class},
@@ -64,7 +61,6 @@ public class PartySvcClientService {
       }
     }
     log.debug("Successfully retrieved party", kv("party", party));
-    eventPublisher.publishEvent("Sample PERSISTED");
     return party;
   }
 }

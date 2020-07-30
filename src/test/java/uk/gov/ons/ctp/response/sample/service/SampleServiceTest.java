@@ -30,7 +30,6 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
-import uk.gov.ons.ctp.response.sample.message.EventPublisher;
 import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
 import uk.gov.ons.ctp.response.sample.message.SampleOutboundPublisher;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
@@ -68,8 +67,6 @@ public class SampleServiceTest {
   @Mock private SampleOutboundPublisher sampleOutboundPublisher;
 
   @Mock private CollectionExerciseJobService collectionExerciseJobService;
-
-  @Mock private EventPublisher eventPublisher;
 
   @Mock private CsvIngesterBusiness csvIngesterBusiness;
 
@@ -351,7 +348,6 @@ public class SampleServiceTest {
     BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();
     sampleService.createSampleUnit(newSummary.getId(), businessSampleUnit, SampleUnitState.INIT);
     verify(sampleUnitRepository, times(1)).save(any(SampleUnit.class));
-    verify(eventPublisher, times(1)).publishEvent("Sample Init");
   }
 
   @Test(expected = UnknownSampleSummaryException.class)
