@@ -19,6 +19,7 @@ import ma.glasnost.orika.MapperFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
@@ -34,12 +35,14 @@ import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
+import uk.gov.ons.ctp.response.sample.representation.BusinessSampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleAttributesDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
+import uk.gov.ons.ctp.response.sample.service.UnknownSampleSummaryException;
 
 /** The REST endpoint controller for Sample Service. */
 @RestController
@@ -269,5 +272,38 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     throw new CTPException(
         CTPException.Fault.BAD_REQUEST,
         String.format("No sample units were found for sample summary %s", sampleSummaryId));
+  }
+
+  @RequestMapping(value = "{sampleSummaryId}/sampleunits/", method = RequestMethod.POST)
+  public ResponseEntity<SampleUnitDTO> createSampleUnitsForSampleSummary(
+      @PathVariable("sampleSummaryId") final UUID sampleSummaryId,
+      final @Valid @RequestBody BusinessSampleUnitDTO businessSampleUnitDTO,
+      BindingResult bindingResult)
+      throws InvalidRequestException {
+
+    if (bindingResult.hasErrors()) {
+      throw new InvalidRequestException("Binding errors for create action: ", bindingResult);
+    }
+    log.debug(
+        "create sample unit request received", kv("businessSampleUnitDTO", businessSampleUnitDTO));
+    BusinessSampleUnit businessSampleUnit =
+        mapperFacade.map(businessSampleUnitDTO, BusinessSampleUnit.class);
+
+    log.debug("business sample constructed", kv("businessSample", businessSampleUnit));
+    try {
+      SampleUnit sampleUnit =
+          sampleService.createSampleUnit(
+              sampleSummaryId, businessSampleUnit, SampleUnitDTO.SampleUnitState.INIT);
+      log.debug("sample created");
+      SampleUnitDTO sampleUnitDTO = mapperFacade.map(sampleUnit, SampleUnitDTO.class);
+      log.debug("created SampleUnitDTO", kv("sampleUnitDTO", sampleUnitDTO));
+      return ResponseEntity.created(
+              URI.create(String.format("/samples/%s", sampleUnit.getSampleUnitPK())))
+          .contentType(MediaType.APPLICATION_JSON)
+          .body(sampleUnitDTO);
+    } catch (UnknownSampleSummaryException e) {
+      log.error("unknown sample summary id", kv("sampleSummaryId", sampleSummaryId), e);
+      return ResponseEntity.badRequest().build();
+    }
   }
 }
