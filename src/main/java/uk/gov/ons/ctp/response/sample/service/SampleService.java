@@ -143,7 +143,6 @@ public class SampleService {
     sampleUnit.setFormType(sampleUnitBase.getFormType());
     sampleUnit.setState(sampleUnitState);
     sampleUnit.setId(sampleUnitBase.getSampleUnitId());
-    eventPublisher.publishEvent("Sample Init");
     sampleUnitRepository.save(sampleUnit);
     return sampleUnit;
   }
