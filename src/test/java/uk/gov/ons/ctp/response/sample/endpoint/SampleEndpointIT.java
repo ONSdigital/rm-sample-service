@@ -136,4 +136,7 @@ public class SampleEndpointIT {
     assertThat(response.getStatus()).isEqualTo(200);
     assertThat(response.getBody().getSampleUnitsTotal()).isEqualTo(4);
   }
+
+  @Test
+  public void testAddSample() {}
 }

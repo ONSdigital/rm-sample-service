@@ -14,6 +14,7 @@ import java.util.UUID;
 import libs.common.FixtureHelper;
 import libs.common.state.StateTransitionManager;
 import libs.party.representation.PartyDTO;
+import libs.sample.validation.BusinessSampleUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -338,5 +339,21 @@ public class SampleServiceTest {
     when(sampleSummaryRepository.findById(any())).thenReturn(newSummary);
 
     sampleService.getSampleSummaryUnitCount(newSummary.getId());
+  }
+
+  @Test
+  public void createSampleUnit() throws UnknownSampleSummaryException {
+    SampleSummary newSummary = createSampleSummary(5, 2);
+    when(sampleSummaryRepository.findById(any())).thenReturn(newSummary);
+    BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();
+    sampleService.createSampleUnit(newSummary.getId(), businessSampleUnit, SampleUnitState.INIT);
+    verify(sampleUnitRepository, times(1)).save(any(SampleUnit.class));
+    verify(eventPublisher, times(1)).publishEvent("Sample Init");
+  }
+
+  @Test(expected = UnknownSampleSummaryException.class)
+  public void createSampleUnitWithUnknownSampleSummary() throws UnknownSampleSummaryException {
+    BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();
+    sampleService.createSampleUnit(UUID.randomUUID(), businessSampleUnit, SampleUnitState.INIT);
   }
 }

@@ -6,11 +6,13 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import lombok.Data;
 import lombok.Getter;
+import lombok.ToString;
 import net.sourceforge.cobertura.CoverageIgnore;
 
 @CoverageIgnore
 @Data
 @Getter
+@ToString
 public class BusinessSampleUnit {
 
   private static final String NON_BLANK_INTEGER_RE = "[+-]?[\\d]+|^$";

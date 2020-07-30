@@ -3,16 +3,16 @@ package uk.gov.ons.ctp.response.sample.endpoint;
 import static libs.common.MvcHelper.postJson;
 import static libs.common.utility.MockMvcControllerAdviceHelper.mockAdviceFor;
 import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Java6Assertions.fail;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.isA;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,9 +38,11 @@ import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
+import uk.gov.ons.ctp.response.sample.representation.BusinessSampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleAttributesDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
+import uk.gov.ons.ctp.response.sample.service.UnknownSampleSummaryException;
 
 public class SampleEndpointUnitTest {
   private static final String SAMPLE_VALIDJSON =
@@ -194,5 +196,50 @@ public class SampleEndpointUnitTest {
 
     actions.andExpect(status().isOk());
     actions.andExpect(jsonPath("$.sampleUnitsTotal", is(99)));
+  }
+
+  @Test
+  public void addSingleSample() throws Exception {
+    BusinessSampleUnitDTO businessSampleUnitDTO = new BusinessSampleUnitDTO();
+    businessSampleUnitDTO.setEntname1("test1");
+    String body = marshallToJson(businessSampleUnitDTO);
+
+    when(sampleService.createSampleUnit(any(), any(), any())).thenReturn(new SampleUnit());
+
+    String url = String.format("/samples/%s/sampleunits/", UUID.randomUUID());
+
+    ResultActions actions =
+        mockMvc.perform(post(url).contentType("application/json").content(body));
+    actions.andExpect(status().isCreated());
+
+    verify(sampleService, times(1)).createSampleUnit(any(), any(), any());
+  }
+
+  @Test
+  public void addSingleSampleInvalidSampleSummaryReturnsBadRequest() throws Exception {
+    when(sampleService.createSampleUnit(any(), any(), any()))
+        .thenThrow(new UnknownSampleSummaryException());
+
+    BusinessSampleUnitDTO businessSampleUnitDTO = new BusinessSampleUnitDTO();
+    businessSampleUnitDTO.setEntname1("test2");
+    String body = marshallToJson(businessSampleUnitDTO);
+
+    String url = String.format("/samples/%s/sampleunits/", UUID.randomUUID());
+
+    ResultActions actions =
+        mockMvc.perform(post(url).contentType("application/json").content(body));
+    actions.andExpect(status().isBadRequest());
+
+    verify(sampleService, times(1)).createSampleUnit(any(), any(), any());
+  }
+
+  private String marshallToJson(BusinessSampleUnitDTO businessSampleUnitDTO) {
+    String result = null;
+    try {
+      result = new ObjectMapper().writeValueAsString(businessSampleUnitDTO);
+    } catch (JsonProcessingException exc) {
+      fail("Unable to convert DTO to JSON");
+    }
+    return result;
   }
 }
