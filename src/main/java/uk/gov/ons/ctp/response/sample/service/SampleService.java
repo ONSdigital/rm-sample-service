@@ -31,7 +31,6 @@ import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesReposito
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
-import uk.gov.ons.ctp.response.sample.message.SampleOutboundPublisher;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEvent;
@@ -56,8 +55,6 @@ public class SampleService {
       sampleSvcUnitStateTransitionManager;
 
   @Autowired private PartySvcClientService partySvcClient;
-
-  @Autowired private SampleOutboundPublisher sampleOutboundPublisher;
 
   @Autowired private CollectionExerciseJobService collectionExerciseJobService;
 
@@ -162,8 +159,6 @@ public class SampleService {
     targetSampleSummary.setState(newState);
     targetSampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
     sampleSummaryRepository.saveAndFlush(targetSampleSummary);
-    // Notify the outside world the sample upload has finished
-    this.sampleOutboundPublisher.sampleUploadFinished(targetSampleSummary);
 
     return targetSampleSummary;
   }
@@ -235,7 +230,6 @@ public class SampleService {
   public SampleSummary ingest(
       final SampleSummary sampleSummary, final MultipartFile file, final String type)
       throws Exception {
-    this.sampleOutboundPublisher.sampleUploadStarted(sampleSummary);
 
     switch (type.toUpperCase()) {
       case "B":

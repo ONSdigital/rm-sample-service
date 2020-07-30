@@ -31,7 +31,6 @@ import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
 import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
-import uk.gov.ons.ctp.response.sample.message.SampleOutboundPublisher;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
@@ -63,8 +62,6 @@ public class SampleServiceTest {
   @Mock private PartySvcClientService partySvcClient;
 
   @Mock private PartyPublisher partyPublisher;
-
-  @Mock private SampleOutboundPublisher sampleOutboundPublisher;
 
   @Mock private CollectionExerciseJobService collectionExerciseJobService;
 
@@ -297,22 +294,6 @@ public class SampleServiceTest {
 
     // When
     SampleSummary finalSummary = sampleService.ingest(summary, file, invalidType);
-  }
-
-  @Test
-  public void testIngestMessagesSent() throws Exception {
-    // Given
-    MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
-
-    SampleSummary summary = createSampleSummary(5, 10);
-    when(csvIngesterBusiness.ingest(any(SampleSummary.class), any(MultipartFile.class)))
-        .thenReturn(summary);
-
-    // When
-    sampleService.ingest(summary, file, "B");
-
-    // Then
-    verify(sampleOutboundPublisher, times(1)).sampleUploadStarted(any());
   }
 
   @Test
