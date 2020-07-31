@@ -40,9 +40,8 @@ public class SampleFileUploaderClientService {
       backoff = @Backoff(delayExpression = "#{${retries.backoff}}"))
   public boolean sendSampleFile(final MultipartFile file, final String sampleSummaryId) {
 
-    String uri =
-        String.format(appConfig.getSampleFileUploader().getSampleUploadPath(), sampleSummaryId);
-
+    String uri = String.format(appConfig.getSampleFileUploader().getSampleUploadPath(), sampleSummaryId);
+    log.debug("Uri is " + uri);
     UriComponents uriComponents = restUtility.createUriComponents(uri, null);
 
     HttpHeaders headers = new HttpHeaders();
