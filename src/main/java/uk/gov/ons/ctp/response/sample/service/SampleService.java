@@ -24,10 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
-import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
-import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
@@ -62,7 +60,6 @@ public class SampleService {
   @Autowired private CollectionExerciseJobService collectionExerciseJobService;
 
   @Autowired private CsvIngesterBusiness csvIngesterBusiness;
-  @Autowired private SampleAttributesRepository sampleAttributesRepository;
 
   public List<SampleSummary> findAllSampleSummaries() {
     return sampleSummaryRepository.findAll();
@@ -281,12 +278,7 @@ public class SampleService {
   // returned by sampleUnitRepository.findById
   public SampleUnit findSampleUnit(UUID id) {
     SampleUnit su = sampleUnitRepository.findById(id);
-    su.setSampleAttributes(sampleAttributesRepository.findOne(id));
     return su;
-  }
-
-  public SampleAttributes findSampleAttributes(UUID id) {
-    return sampleAttributesRepository.findOne(id);
   }
 
   public SampleUnit findSampleUnitBySampleUnitId(UUID sampleUnitId) {
@@ -298,19 +290,4 @@ public class SampleService {
     return sampleUnitRepository.findBySampleSummaryFK(ss.getSampleSummaryPK());
   }
 
-  public List<SampleAttributes> findSampleAttributesByPostcode(String postcode) {
-    return sampleAttributesRepository.findByPostcode(postcode);
-  }
-
-  public List<SampleUnit> findSampleUnitsByPostcode(String postcode) {
-    return findSampleAttributesByPostcode(postcode)
-        .stream()
-        .map(
-            attrs -> {
-              SampleUnit su = findSampleUnitBySampleUnitId(attrs.getSampleUnitFK());
-              su.setSampleAttributes(attrs);
-              return su;
-            })
-        .collect(Collectors.toList());
-  }
 }

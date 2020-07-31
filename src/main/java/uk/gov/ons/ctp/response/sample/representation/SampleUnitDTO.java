@@ -81,7 +81,4 @@ public class SampleUnitDTO {
   private SampleUnitState state;
 
   private String id;
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  private SampleAttributesDTO sampleAttributes;
 }

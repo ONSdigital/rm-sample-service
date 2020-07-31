@@ -16,13 +16,10 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.ons.ctp.response.sample.SampleBeanMapper;
-import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
-import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesRepository;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SampleUnitMapperTest {
-  @Mock private SampleAttributesRepository sampleAttributesRepository;
 
   @Spy private MapperFacade mapperFacade = new SampleBeanMapper();
 
@@ -43,20 +40,11 @@ public class SampleUnitMapperTest {
     SampleUnit sampleUnit = new SampleUnit();
     sampleUnit.setId(sampleUnitId);
 
-    SampleAttributes sampleAttributes = new SampleAttributes();
-    sampleAttributes.setAttributes(Collections.singletonMap(attributeKey, attributeValue));
-
-    when(sampleAttributesRepository.findOne(any(UUID.class))).thenReturn(sampleAttributes);
-
     uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit =
         sampleUnitMapper.mapSampleUnit(sampleUnit, collexID.toString());
 
     assertEquals(sampleUnit.getId().toString(), mappedSampleUnit.getId());
     assertEquals(collexID.toString(), mappedSampleUnit.getCollectionExerciseId());
-    assertEquals(1, mappedSampleUnit.getSampleAttributes().getEntries().size());
-    assertEquals(attributeKey, mappedSampleUnit.getSampleAttributes().getEntries().get(0).getKey());
-    assertEquals(
-        attributeValue, mappedSampleUnit.getSampleAttributes().getEntries().get(0).getValue());
   }
 
   @Test
@@ -67,13 +55,10 @@ public class SampleUnitMapperTest {
     SampleUnit sampleUnit = new SampleUnit();
     sampleUnit.setId(sampleUnitId);
 
-    when(sampleAttributesRepository.findOne(any(UUID.class))).thenReturn(null);
-
     uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit =
         sampleUnitMapper.mapSampleUnit(sampleUnit, collexID.toString());
 
     assertEquals(sampleUnit.getId().toString(), mappedSampleUnit.getId());
     assertEquals(collexID.toString(), mappedSampleUnit.getCollectionExerciseId());
-    assertEquals(null, mappedSampleUnit.getSampleAttributes());
   }
 }
