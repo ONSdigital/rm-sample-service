@@ -38,7 +38,7 @@ public class SampleFileUploaderClientService {
       value = {RestClientException.class},
       maxAttemptsExpression = "#{${retries.maxAttempts}}",
       backoff = @Backoff(delayExpression = "#{${retries.backoff}}"))
-  public boolean sendSampleFile(final MultipartFile file, final String sampleSummaryId) {
+  public boolean sendSampleFile(final String file, final String sampleSummaryId) {
 
     UriComponents uriComponents =
         restUtility.createUriComponents(
