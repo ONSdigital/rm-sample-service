@@ -29,7 +29,7 @@ public class SampleFileUploaderClientService {
 
   @Autowired private RestTemplate restTemplate;
 
-  @Qualifier("partyRestUtility")
+  @Qualifier("sampleFileUploaderRestUtility")
   @Autowired
   private RestUtility restUtility;
 
