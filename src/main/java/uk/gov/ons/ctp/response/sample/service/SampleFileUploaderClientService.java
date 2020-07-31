@@ -18,7 +18,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponents;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 

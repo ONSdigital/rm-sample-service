@@ -126,7 +126,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       throws Exception {
     String content = new String(file.getBytes());
 
-    boolean sent = sampleFileUploaderClientService.sendSampleFile(contents, summaryId);
+    boolean sent = sampleFileUploaderClientService.sendSampleFile(content, summaryId);
     if (!sent) {
       throw new Exception("Unable to upload file");
     }
