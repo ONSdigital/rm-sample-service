@@ -21,4 +21,5 @@ public class AppConfig {
   private DataGrid dataGrid;
   private SwaggerSettings swaggerSettings;
   private Logging logging;
+  private SampleFileUploader sampleFileUploader;
 }

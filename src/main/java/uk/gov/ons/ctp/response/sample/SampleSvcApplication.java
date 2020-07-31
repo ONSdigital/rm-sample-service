@@ -96,6 +96,17 @@ public class SampleSvcApplication {
   }
 
   /**
+   * The RestUtility bean for the Action service
+   *
+   * @return the RestUtility bean for the Action service
+   */
+  @Bean
+  @Qualifier("sampleFileUploadUtility")
+  public RestUtility sampleFileUploadUtility() {
+    return new RestUtility(appConfig.getSampleFileUploader().getConnectionConfig());
+  }
+
+  /**
    * Bean to allow application to make controlled state transitions of Samples
    *
    * @return the state transition manager specifically for Samples

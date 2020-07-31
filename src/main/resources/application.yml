@@ -87,6 +87,15 @@ party-svc:
     username: admin
     password: secret
 
+sample-file-uploader:
+  sample-upload-path: /sample-summary/{samplesummary}/samples/fileupload
+  connection-config:
+    scheme: http
+    host: localhost
+    port: 8081
+    username: admin
+    password: secret
+
 sftp:
   host: localhost
   port: 122

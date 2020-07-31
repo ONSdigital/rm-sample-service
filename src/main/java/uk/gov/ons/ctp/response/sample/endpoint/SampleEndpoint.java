@@ -41,6 +41,7 @@ import uk.gov.ons.ctp.response.sample.representation.SampleAttributesDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
+import uk.gov.ons.ctp.response.sample.service.SampleFileUploaderClientService;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import uk.gov.ons.ctp.response.sample.service.UnknownSampleSummaryException;
 
@@ -55,11 +56,16 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       Executors.newFixedThreadPool(NUM_UPLOAD_THREADS);
   private SampleService sampleService;
   private MapperFacade mapperFacade;
+  private SampleFileUploaderClientService sampleFileUploaderClientService;
 
   @Autowired
-  public SampleEndpoint(SampleService sampleService, MapperFacade mapperFacade) {
+  public SampleEndpoint(
+      SampleService sampleService,
+      SampleFileUploaderClientService sampleFileUploaderClientService,
+      MapperFacade mapperFacade) {
     this.sampleService = sampleService;
     this.mapperFacade = mapperFacade;
+    this.sampleFileUploaderClientService = sampleFileUploaderClientService;
   }
 
   /**
@@ -111,6 +117,16 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     return ResponseEntity.created(URI.create(newResourceUrl)).body(sampleUnitsRequest);
   }
 
+  public SampleSummary sendToSampleServiceFileUploader(
+      final SampleSummary sampleSummary, final MultipartFile file, final String summaryId)
+      throws Exception {
+    boolean sent = sampleFileUploaderClientService.sendSampleFile(file, summaryId);
+    if (!sent) {
+      throw new Exception("Unable to upload file");
+    }
+    return sampleSummary;
+  }
+
   /**
    * Method to kick off a task to ingest a sample file
    *
@@ -126,7 +142,8 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     Callable<Optional<SampleSummary>> callable =
         () -> {
           try {
-            return Optional.of(this.sampleService.ingest(newSummary, file, type));
+            //            return Optional.of(this.sampleService.ingest(newSummary, file, type));
+            return Optional.of(sendToSampleServiceFileUploader(newSummary, file, type));
           } catch (Exception e) {
             log.error("Failed to ingest sample", kv("sample_id", newSummary.getId()), e);
             return this.sampleService.failSampleSummary(newSummary, e);
