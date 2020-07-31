@@ -89,6 +89,7 @@ party-svc:
 
 sample-file-uploader:
   sample-upload-path: /sample-summary/{samplesummary}/samples/fileupload
+  enabled: false
   connection-config:
     scheme: http
     host: localhost

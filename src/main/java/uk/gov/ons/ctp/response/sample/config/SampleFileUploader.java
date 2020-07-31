@@ -10,4 +10,5 @@ import net.sourceforge.cobertura.CoverageIgnore;
 public class SampleFileUploader {
   private RestUtilityConfig connectionConfig;
   private String sampleUploadPath;
+  private boolean enabled;
 }

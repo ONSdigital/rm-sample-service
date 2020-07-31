@@ -227,6 +227,24 @@ spec:
             value: "$(SECURITY_USER_NAME)"
           - name: PARTY_SVC_CONNECTION_CONFIG_PASSWORD
             value: "$(SECURITY_USER_PASSWORD)"
+          - name: SAMPLE_FILE_UPLOADER_CONNECTION_CONFIG_HOST
+            {{- if .Values.dns.enabled }}
+            value: "sample-file-uploader.{{ .Values.namespace }}.svc.cluster.local"
+            {{- else }}
+            value: "$(SAMPLE_FILE_UPLOADER_SERVICE_HOST)"
+            {{- end }}
+          - name: SAMPLE_FILE_UPLOADER_CONNECTION_CONFIG_PORT
+            {{- if .Values.dns.enabled }}
+            value: "{{ .Values.dns.wellKnownPort }}"
+            {{- else }}
+            value: "$(SAMPLE_FILE_UPLOADER_SERVICE_PORT)"
+            {{- end }}
+          - name: SAMPLE_FILE_UPLOADER_CONNECTION_CONFIG_USERNAME
+            value: "$(SECURITY_USER_NAME)"
+          - name: SAMPLE_FILE_UPLOADER_CONNECTION_CONFIG_PASSWORD
+            value: "$(SECURITY_USER_PASSWORD)"
+          - name: SAMPLE_FILE_UPLOADER_ENABLED
+            value: "{{ .Values.sample.file.uploader.enabled}}"
           - name: SAMPLE_UNIT_DISTRIBUTION_DELAY_MILLI_SECONDS
             value: "1000"
           - name: LIQUIBASE_USER

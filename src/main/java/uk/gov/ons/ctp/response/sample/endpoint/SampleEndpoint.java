@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
@@ -57,15 +58,18 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   private SampleService sampleService;
   private MapperFacade mapperFacade;
   private SampleFileUploaderClientService sampleFileUploaderClientService;
+  private AppConfig appConfig;
 
   @Autowired
   public SampleEndpoint(
       SampleService sampleService,
       SampleFileUploaderClientService sampleFileUploaderClientService,
-      MapperFacade mapperFacade) {
+      MapperFacade mapperFacade,
+      AppConfig appConfig) {
     this.sampleService = sampleService;
     this.mapperFacade = mapperFacade;
     this.sampleFileUploaderClientService = sampleFileUploaderClientService;
+    this.appConfig = appConfig;
   }
 
   /**
@@ -142,8 +146,11 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     Callable<Optional<SampleSummary>> callable =
         () -> {
           try {
-            //            return Optional.of(this.sampleService.ingest(newSummary, file, type));
-            return Optional.of(sendToSampleServiceFileUploader(newSummary, file, type));
+            if (appConfig.getSampleFileUploader().isEnabled()) {
+              return Optional.of(sendToSampleServiceFileUploader(newSummary, file, type));
+            } else {
+              return Optional.of(this.sampleService.ingest(newSummary, file, type));
+            }
           } catch (Exception e) {
             log.error("Failed to ingest sample", kv("sample_id", newSummary.getId()), e);
             return this.sampleService.failSampleSummary(newSummary, e);

@@ -47,3 +47,8 @@ export:
 dns:
   enabled: false
   wellKnownPort: 8080
+
+sample:
+  file:
+    uploader:
+      enabled: false
