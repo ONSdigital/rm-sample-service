@@ -51,6 +51,10 @@ public class SampleFileUploaderClientService {
 
     HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
+    String url = uriComponents.toUriString();
+
+    log.info("About to send to " + url);
+
     ResponseEntity<String> response =
         restTemplate.postForEntity(uriComponents.toUri(), requestEntity, String.class);
     if (response != null && response.getStatusCode().is2xxSuccessful()) {
