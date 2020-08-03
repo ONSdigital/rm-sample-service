@@ -9,7 +9,6 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.BlockingQueue;
 import libs.common.UnirestInitialiser;
 import org.apache.http.entity.ContentType;
 import org.junit.After;
@@ -28,7 +27,6 @@ import uk.gov.ons.ctp.response.lib.rabbit.Rabbitmq;
 import uk.gov.ons.ctp.response.lib.rabbit.SimpleMessageListener;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
-import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
 
@@ -46,27 +44,12 @@ public class SampleEndpointIT {
   @Autowired private ObjectMapper mapper;
   private SimpleMessageListener sml;
 
-  private BlockingQueue<String> uploadFinishedMessageListener;
-  private BlockingQueue<String> sampleDeliveryMessageListener;
-
   @Before
   public void setUp() {
     Rabbitmq config = this.appConfig.getRabbitmq();
     sml =
         new SimpleMessageListener(
             config.getHost(), config.getPort(), config.getUsername(), config.getPassword());
-
-    uploadFinishedMessageListener =
-        sml.listen(
-            SimpleMessageListener.ExchangeType.Direct,
-            "sample-outbound-exchange",
-            "Sample.SampleUploadFinished.binding");
-
-    sampleDeliveryMessageListener =
-        sml.listen(
-            SimpleMessageListener.ExchangeType.Direct,
-            "sample-outbound-exchange",
-            "Sample.SampleDelivery.binding");
 
     UnirestInitialiser.initialise(mapper);
   }
@@ -98,12 +81,6 @@ public class SampleEndpointIT {
     SampleSummary sampleSummary =
         mapper.readValue(sampleSummaryResponse.getBody(), new TypeReference<SampleSummary>() {});
     assertThat(sampleSummary.getState()).isEqualTo(SampleState.INIT);
-
-    String message = uploadFinishedMessageListener.take();
-    SampleSummaryDTO active = mapper.readValue(message, SampleSummaryDTO.class);
-
-    assertThat(active.getExpectedCollectionInstruments()).isEqualTo(1);
-    assertThat(active.getTotalSampleUnits()).isEqualTo(1);
   }
 
   @Test
@@ -120,8 +97,6 @@ public class SampleEndpointIT {
             .asObject(SampleSummary.class);
 
     String sampleSummaryId = sampleSummary.getBody().getId().toString();
-
-    uploadFinishedMessageListener.take();
 
     String url =
         String.format(

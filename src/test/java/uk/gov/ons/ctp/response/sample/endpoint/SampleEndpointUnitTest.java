@@ -39,6 +39,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.representation.BusinessSampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import uk.gov.ons.ctp.response.sample.service.UnknownSampleSummaryException;
 
@@ -207,5 +208,20 @@ public class SampleEndpointUnitTest {
       fail("Unable to convert DTO to JSON");
     }
     return result;
+  }
+
+  @Test
+  public void createSampleSummary() throws Exception {
+    SampleSummary sampleSummary = new SampleSummary();
+    sampleSummary.setState(SampleSummaryDTO.SampleState.INIT);
+    sampleSummary.setId(UUID.randomUUID());
+
+    when(sampleService.createAndSaveSampleSummary()).thenReturn(sampleSummary);
+
+    ResultActions actions =
+        mockMvc.perform(post("/samples/samplesummary").contentType("application/json"));
+    actions.andExpect(status().isCreated());
+
+    verify(sampleService, times(1)).createAndSaveSampleSummary();
   }
 }
