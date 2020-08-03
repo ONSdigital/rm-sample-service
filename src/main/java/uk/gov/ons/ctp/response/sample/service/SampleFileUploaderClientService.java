@@ -55,6 +55,8 @@ public class SampleFileUploaderClientService {
 
     log.info("About to send to " + url);
 
+    log.info("Request entity " + requestEntity);
+
     ResponseEntity<String> response =
         restTemplate.postForEntity(uriComponents.toUri(), requestEntity, String.class);
     if (response != null && response.getStatusCode().is2xxSuccessful()) {
