@@ -2,7 +2,6 @@ package uk.gov.ons.ctp.response.sample.endpoint;
 
 import static libs.common.MvcHelper.postJson;
 import static libs.common.utility.MockMvcControllerAdviceHelper.mockAdviceFor;
-import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.assertj.core.api.Java6Assertions.fail;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.isA;
@@ -14,8 +13,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import libs.common.FixtureHelper;
 import libs.common.error.CTPException;

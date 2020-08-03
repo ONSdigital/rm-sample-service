@@ -1,6 +1,5 @@
 package uk.gov.ons.ctp.response.sample.representation;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;

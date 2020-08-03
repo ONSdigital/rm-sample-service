@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
 import libs.common.time.DateTimeUtil;
@@ -289,5 +288,4 @@ public class SampleService {
     SampleSummary ss = sampleSummaryRepository.findById(sampleSummaryId);
     return sampleUnitRepository.findBySampleSummaryFK(ss.getSampleSummaryPK());
   }
-
 }
