@@ -306,4 +306,16 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       return ResponseEntity.badRequest().build();
     }
   }
+
+  @RequestMapping(value = "/samplesummary", method = RequestMethod.POST)
+  public ResponseEntity<SampleSummaryDTO> createSampleSummary() {
+    SampleSummary sampleSummary = sampleService.createAndSaveSampleSummary();
+
+    SampleSummaryDTO sampleSummaryDTO = mapperFacade.map(sampleSummary, SampleSummaryDTO.class);
+
+    return ResponseEntity.created(
+            URI.create(String.format("/samplesummary/%s", sampleSummary.getId())))
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(sampleSummaryDTO);
+  }
 }
