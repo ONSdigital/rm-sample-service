@@ -32,12 +32,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
-import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.representation.BusinessSampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
-import uk.gov.ons.ctp.response.sample.representation.SampleAttributesDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
@@ -232,27 +230,6 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
           String.format("Sample Unit not found for sampleUnitId %s", sampleUnitId));
     }
     SampleUnitDTO result = mapperFacade.map(sampleUnit, SampleUnitDTO.class);
-
-    return ResponseEntity.ok(result);
-  }
-
-  @RequestMapping(value = "{id}/attributes", method = RequestMethod.GET)
-  public ResponseEntity<SampleAttributesDTO> requestSampleAttributes(
-      @PathVariable("id") final UUID sampleUnitId) throws CTPException {
-    SampleUnit sampleUnit = sampleService.findSampleUnitBySampleUnitId(sampleUnitId);
-
-    if (sampleUnit == null || sampleUnit.getId() == null) {
-      throw new CTPException(
-          CTPException.Fault.RESOURCE_NOT_FOUND,
-          String.format("Sample was not found for sample unit ref %s", sampleUnitId));
-    }
-
-    SampleAttributes sampleAttribs = sampleService.findSampleAttributes(sampleUnit.getId());
-
-    if (sampleAttribs == null) {
-      sampleAttribs = new SampleAttributes();
-    }
-    SampleAttributesDTO result = mapperFacade.map(sampleAttribs, SampleAttributesDTO.class);
 
     return ResponseEntity.ok(result);
   }

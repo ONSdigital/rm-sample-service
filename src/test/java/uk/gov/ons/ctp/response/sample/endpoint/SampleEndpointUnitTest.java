@@ -2,7 +2,6 @@ package uk.gov.ons.ctp.response.sample.endpoint;
 
 import static libs.common.MvcHelper.postJson;
 import static libs.common.utility.MockMvcControllerAdviceHelper.mockAdviceFor;
-import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.assertj.core.api.Java6Assertions.fail;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.isA;
@@ -14,8 +13,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import libs.common.FixtureHelper;
 import libs.common.error.CTPException;
@@ -35,12 +32,10 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.BindingResult;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
-import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.representation.BusinessSampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
-import uk.gov.ons.ctp.response.sample.representation.SampleAttributesDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import uk.gov.ons.ctp.response.sample.service.UnknownSampleSummaryException;
@@ -138,38 +133,6 @@ public class SampleEndpointUnitTest {
     BindingResult bindingResult = mock(BindingResult.class);
     when(bindingResult.hasErrors()).thenReturn(true);
     sampleEndpoint.createSampleUnitRequest(null, bindingResult);
-  }
-
-  @Test
-  public void ensureAttAttribributesReturnedById() throws Exception {
-
-    UUID id = UUID.randomUUID();
-    SampleUnit sampleUnit = new SampleUnit();
-    SampleAttributes sampleAttribs = new SampleAttributes();
-    SampleAttributesDTO sampleAttributesDTO = new SampleAttributesDTO();
-    Map<String, String> attribs = new HashMap<>();
-
-    attribs.put("Reference", "LMS0001");
-    sampleAttribs.setSampleUnitFK(id);
-    sampleAttribs.setAttributes(attribs);
-
-    sampleAttributesDTO.setId(id);
-    sampleAttributesDTO.setAttributes(attribs);
-
-    sampleUnit.setId(id);
-    sampleUnit.setSampleAttributes(sampleAttribs);
-
-    when(sampleService.findSampleUnitBySampleUnitId(any())).thenReturn(sampleUnit);
-    when(sampleService.findSampleAttributes(any())).thenReturn(sampleAttribs);
-    when(mapperFacade.map(sampleAttribs, SampleAttributesDTO.class))
-        .thenReturn(sampleAttributesDTO);
-
-    ResultActions getAttribs =
-        mockMvc.perform(get(String.format("/samples/%s/attributes", id.toString())));
-
-    getAttribs.andExpect(status().isOk());
-
-    assertThat(sampleAttributesDTO.getId()).isEqualTo(id);
   }
 
   @Test
