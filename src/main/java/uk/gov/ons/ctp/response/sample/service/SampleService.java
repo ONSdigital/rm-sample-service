@@ -28,6 +28,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEvent;
@@ -112,6 +113,18 @@ public class SampleService {
 
     sampleSummary.setState(SampleState.INIT);
     sampleSummary.setId(UUID.randomUUID());
+
+    return sampleSummaryRepository.save(sampleSummary);
+  }
+
+  @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+  public SampleSummary createAndSaveSampleSummary(SampleSummaryDTO summaryDTO) {
+    SampleSummary sampleSummary = new SampleSummary();
+
+    sampleSummary.setState(SampleState.INIT);
+    sampleSummary.setId(UUID.randomUUID());
+    sampleSummary.setTotalSampleUnits(summaryDTO.getTotalSampleUnits());
+    sampleSummary.setExpectedCollectionInstruments(summaryDTO.getExpectedCollectionInstruments());
 
     return sampleSummaryRepository.save(sampleSummary);
   }
