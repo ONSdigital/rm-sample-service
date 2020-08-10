@@ -11,7 +11,7 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @ToString
 public class BusinessSampleUnitDTO {
-  private String checkLetter;
+  private String checkletter;
 
   private String frosic92;
 
@@ -27,7 +27,7 @@ public class BusinessSampleUnitDTO {
 
   private String entref;
 
-  private String legalStatus;
+  private String legalstatus;
 
   private String entrepmkr;
 
