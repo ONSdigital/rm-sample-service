@@ -28,6 +28,8 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
+import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
+import uk.gov.ons.ctp.response.sample.party.PartyUtil;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
@@ -57,6 +59,8 @@ public class SampleService {
   @Autowired private CollectionExerciseJobService collectionExerciseJobService;
 
   @Autowired private CsvIngesterBusiness csvIngesterBusiness;
+
+  @Autowired private PartyPublisher partyPublisher;
 
   public List<SampleSummary> findAllSampleSummaries() {
     return sampleSummaryRepository.findAll();
@@ -94,6 +98,13 @@ public class SampleService {
     } else {
       throw new UnknownSampleSummaryException();
     }
+  }
+
+  public void publishSampleToParty(UUID sampleSummaryId, BusinessSampleUnit samplingUnit) {
+    PartyCreationRequestDTO party = PartyUtil.convertToParty(samplingUnit);
+    party.getAttributes().setSampleUnitId(samplingUnit.getSampleUnitId().toString());
+    party.setSampleSummaryId(sampleSummaryId.toString());
+    partyPublisher.publish(party);
   }
 
   private Integer calculateExpectedCollectionInstruments(
