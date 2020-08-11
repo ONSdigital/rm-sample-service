@@ -23,6 +23,7 @@ import ma.glasnost.orika.MapperFacade;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -213,7 +214,8 @@ public class SampleEndpointUnitTest {
     sampleSummary.setState(SampleSummaryDTO.SampleState.INIT);
     sampleSummary.setId(UUID.randomUUID());
 
-    when(sampleService.createAndSaveSampleSummary()).thenReturn(sampleSummary);
+    when(sampleService.createAndSaveSampleSummary(Matchers.any(SampleSummaryDTO.class)))
+        .thenReturn(sampleSummary);
 
     ResultActions actions =
         mockMvc.perform(
@@ -227,6 +229,6 @@ public class SampleEndpointUnitTest {
     dto.setTotalSampleUnits(5);
     dto.setExpectedCollectionInstruments(1);
 
-    verify(sampleService, times(1)).createAndSaveSampleSummary();
+    verify(sampleService, times(1)).createAndSaveSampleSummary(dto);
   }
 }
