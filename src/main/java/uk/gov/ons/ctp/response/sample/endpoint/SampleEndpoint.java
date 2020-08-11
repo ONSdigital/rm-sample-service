@@ -286,9 +286,8 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   }
 
   @RequestMapping(value = "/samplesummary", method = RequestMethod.POST)
-  public ResponseEntity<SampleSummaryDTO> createSampleSummary(
-      final @RequestBody SampleSummaryDTO requestSummary) {
-    SampleSummary sampleSummary = sampleService.createAndSaveSampleSummary(requestSummary);
+  public ResponseEntity<SampleSummaryDTO> createSampleSummary() {
+    SampleSummary sampleSummary = sampleService.createAndSaveSampleSummary();
 
     SampleSummaryDTO sampleSummaryDTO = mapperFacade.map(sampleSummary, SampleSummaryDTO.class);
 
@@ -296,5 +295,16 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
             URI.create(String.format("/samplesummary/%s", sampleSummary.getId())))
         .contentType(MediaType.APPLICATION_JSON)
         .body(sampleSummaryDTO);
+  }
+
+  @RequestMapping(value = "/samplesummary/{sampleSummaryId}", method = RequestMethod.PUT)
+  public ResponseEntity<SampleSummaryDTO> createSampleSummary(
+      @PathVariable("sampleSummaryId") final UUID sampleSummaryId,
+      final @Valid @RequestBody SampleSummaryDTO requestDTO) {
+    SampleSummary sampleSummary = sampleService.updateSampleSummary(requestDTO, sampleSummaryId);
+
+    SampleSummaryDTO sampleSummaryDTO = mapperFacade.map(sampleSummary, SampleSummaryDTO.class);
+
+    return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(sampleSummaryDTO);
   }
 }

@@ -129,11 +129,8 @@ public class SampleService {
   }
 
   @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
-  public SampleSummary createAndSaveSampleSummary(SampleSummaryDTO summaryDTO) {
-    SampleSummary sampleSummary = new SampleSummary();
-
-    sampleSummary.setState(SampleState.INIT);
-    sampleSummary.setId(UUID.randomUUID());
+  public SampleSummary updateSampleSummary(SampleSummaryDTO summaryDTO, UUID sampleSummaryId) {
+    SampleSummary sampleSummary = sampleSummaryRepository.findById(sampleSummaryId);
     sampleSummary.setTotalSampleUnits(summaryDTO.getTotalSampleUnits());
     sampleSummary.setExpectedCollectionInstruments(summaryDTO.getExpectedCollectionInstruments());
 
