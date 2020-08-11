@@ -44,6 +44,9 @@ managedRabbitMQ:
 export:
   cron: "0 0/5 * * * ?"
 
+distribution:
+  delay: 1000
+
 dns:
   enabled: false
   wellKnownPort: 8080
