@@ -272,6 +272,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
           sampleService.createSampleUnit(
               sampleSummaryId, businessSampleUnit, SampleUnitDTO.SampleUnitState.INIT);
       log.debug("sample created");
+      sampleService.publishSampleToParty(sampleSummaryId, businessSampleUnit);
       SampleUnitDTO sampleUnitDTO = mapperFacade.map(sampleUnit, SampleUnitDTO.class);
       log.debug("created SampleUnitDTO", kv("sampleUnitDTO", sampleUnitDTO));
       return ResponseEntity.created(
@@ -285,8 +286,9 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   }
 
   @RequestMapping(value = "/samplesummary", method = RequestMethod.POST)
-  public ResponseEntity<SampleSummaryDTO> createSampleSummary() {
-    SampleSummary sampleSummary = sampleService.createAndSaveSampleSummary();
+  public ResponseEntity<SampleSummaryDTO> createSampleSummary(
+      final @RequestBody SampleSummaryDTO requestSummary) {
+    SampleSummary sampleSummary = sampleService.createAndSaveSampleSummary(requestSummary);
 
     SampleSummaryDTO sampleSummaryDTO = mapperFacade.map(sampleSummary, SampleSummaryDTO.class);
 

@@ -228,7 +228,7 @@ spec:
           - name: PARTY_SVC_CONNECTION_CONFIG_PASSWORD
             value: "$(SECURITY_USER_PASSWORD)"
           - name: SAMPLE_UNIT_DISTRIBUTION_DELAY_MILLI_SECONDS
-            value: "1000"
+            value: "{{ .Values.distribution.delay }}"
           - name: LIQUIBASE_USER
             value: "$(DB_USERNAME)"
           - name: LIQUIBASE_PASSWORD
