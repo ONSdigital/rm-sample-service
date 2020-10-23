@@ -27,7 +27,6 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -81,40 +80,6 @@ public class SampleEndpointUnitTest {
 
     actions.andExpect(status().isCreated());
     actions.andExpect(jsonPath("$.sampleUnitsTotal", is(4)));
-  }
-
-  @Test
-  public void uploadSampleFile() throws Exception {
-    // Given
-    String type = "B";
-    MockMultipartFile file = new MockMultipartFile("file", "filename.txt".getBytes());
-    SampleSummary summary = new SampleSummary();
-    summary.setId(UUID.randomUUID());
-
-    // when(this.sampleService.ingest(any(SampleSummary.class), any(MultipartFile.class),
-    // anyString())).thenReturn(new SampleSummary());
-    when(this.sampleService.createAndSaveSampleSummary()).thenReturn(summary);
-
-    // When
-    ResultActions actions =
-        mockMvc.perform(fileUpload(String.format("/samples/%s/fileupload", type)).file(file));
-
-    // Then
-    actions.andExpect(status().isCreated());
-  }
-
-  @Test
-  public void notFoundWhenUploadSampleFileWithInvalidType() throws Exception {
-    // Given
-    String type = "invalid-type";
-    MockMultipartFile file = new MockMultipartFile("file", "filename.txt".getBytes());
-
-    // When
-    ResultActions actions =
-        mockMvc.perform(fileUpload(String.format("/samples/%s/fileupload", type)).file(file));
-
-    // Then
-    actions.andExpect(status().isBadRequest());
   }
 
   @Test

@@ -136,37 +136,6 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     return newSummary;
   }
 
-  @RequestMapping(
-      value = "/{type}/fileupload",
-      method = RequestMethod.POST,
-      consumes = "multipart/form-data")
-  public ResponseEntity<SampleSummary> uploadSampleFile(
-      @PathVariable("type") final String type, @RequestParam("file") MultipartFile file)
-      throws CTPException {
-    log.debug("Entering Sample file upload", kv("sample_type", type));
-    if (!"B".equals(type.toUpperCase())) {
-      return ResponseEntity.badRequest().build();
-    }
-
-    try {
-      SampleSummary result = ingest(file, type);
-
-      URI location =
-          ServletUriComponentsBuilder.fromCurrentServletMapping()
-              .path("/samples/samplesummary/{id}")
-              .buildAndExpand(result.getId())
-              .toUri();
-
-      return ResponseEntity.created(location).body(result);
-    } catch (Exception e) {
-      throw new CTPException(
-          CTPException.Fault.VALIDATION_FAILED,
-          e,
-          "Error ingesting file %s",
-          file.getOriginalFilename());
-    }
-  }
-
   /**
    * GET endpoint for retrieving a list of all existing SampleSummaries
    *
