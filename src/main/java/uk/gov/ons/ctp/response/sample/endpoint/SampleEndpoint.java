@@ -5,9 +5,7 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 import com.opencsv.bean.CsvToBean;
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.validation.Valid;
@@ -29,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
@@ -107,33 +104,6 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
             .toString();
 
     return ResponseEntity.created(URI.create(newResourceUrl)).body(sampleUnitsRequest);
-  }
-
-  /**
-   * Method to kick off a task to ingest a sample file
-   *
-   * @param file Multipart File of SurveySample to be used
-   * @param type Type of Survey to be used
-   * @return a newly created sample summary that won't have samples or collection instruments
-   *     populated
-   * @throws CTPException thrown if upload started message cannot be sent
-   */
-  public SampleSummary ingest(final MultipartFile file, final String type) throws CTPException {
-    final SampleSummary newSummary = this.sampleService.createAndSaveSampleSummary();
-
-    Callable<Optional<SampleSummary>> callable =
-        () -> {
-          try {
-            return Optional.of(this.sampleService.ingest(newSummary, file, type));
-          } catch (Exception e) {
-            log.error("Failed to ingest sample", kv("sample_id", newSummary.getId()), e);
-            return this.sampleService.failSampleSummary(newSummary, e);
-          }
-        };
-
-    EXECUTOR_SERVICE.submit(callable);
-
-    return newSummary;
   }
 
   /**

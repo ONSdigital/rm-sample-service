@@ -20,7 +20,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
@@ -245,18 +244,6 @@ public class SampleService {
     int sampleUnitsTotal = sampleSummary.getTotalSampleUnits().intValue();
 
     return sampleUnitsTotal;
-  }
-
-  public SampleSummary ingest(
-      final SampleSummary sampleSummary, final MultipartFile file, final String type)
-      throws Exception {
-
-    switch (type.toUpperCase()) {
-      case "B":
-        return csvIngesterBusiness.ingest(sampleSummary, file);
-      default:
-        throw new UnsupportedOperationException(String.format("Type %s not implemented", type));
-    }
   }
 
   public Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, String message) {
