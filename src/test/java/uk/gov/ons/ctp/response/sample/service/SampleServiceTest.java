@@ -21,8 +21,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
@@ -244,56 +242,6 @@ public class SampleServiceTest {
         sampleService.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(0)).storeCollectionExerciseJob(any());
     assertThat(sampleUnitsTotal, is(0));
-  }
-
-  @Test
-  public void testIngestBTypeSample() throws Exception {
-    // Given
-    MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
-
-    SampleSummary summary = createSampleSummary(5, 10);
-    when(csvIngesterBusiness.ingest(any(SampleSummary.class), any(MultipartFile.class)))
-        .thenReturn(summary);
-
-    // When
-    SampleSummary result = sampleService.ingest(summary, file, "B");
-
-    // Then
-    verify(csvIngesterBusiness, times(1)).ingest(summary, file);
-  }
-
-  @Test
-  public void testIngestTypeSampleIsCaseInsensitive() throws Exception {
-    // Given
-    MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
-
-    SampleSummary summary = createSampleSummary(5, 10);
-    when(csvIngesterBusiness.ingest(any(SampleSummary.class), any(MultipartFile.class)))
-        .thenReturn(summary);
-
-    // When
-    SampleSummary result = sampleService.ingest(summary, file, "b");
-
-    // Then
-    verify(csvIngesterBusiness, times(1)).ingest(result, file);
-  }
-
-  @Test(expected = UnsupportedOperationException.class)
-  public void testUploadInvalidTypeSample() throws Exception {
-    when(this.sampleSvcStateTransitionManager.transition(
-            SampleState.INIT, SampleEvent.FAIL_VALIDATION))
-        .thenReturn(SampleState.FAILED);
-    // Given
-    MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
-
-    final String invalidType = "invalid-type";
-
-    SampleSummary summary = createSampleSummary(5, 10);
-    when(csvIngesterBusiness.ingest(any(SampleSummary.class), any(MultipartFile.class)))
-        .thenReturn(summary);
-
-    // When
-    SampleSummary finalSummary = sampleService.ingest(summary, file, invalidType);
   }
 
   @Test
