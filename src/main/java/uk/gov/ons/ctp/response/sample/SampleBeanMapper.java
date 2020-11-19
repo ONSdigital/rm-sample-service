@@ -6,7 +6,6 @@ import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.impl.generator.EclipseJdtCompilerStrategy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
-import uk.gov.ons.ctp.response.sample.mapper.SampleAttributeMapper;
 import uk.gov.ons.ctp.response.sample.mapper.SampleUnitMapper;
 
 /** The bean mapper to go from Entity objects to Presentation objects. */
@@ -27,6 +26,5 @@ public class SampleBeanMapper extends ConfigurableMapper {
   @Override
   protected final void configure(final MapperFactory factory) {
     factory.registerMapper(new SampleUnitMapper());
-    factory.registerMapper(new SampleAttributeMapper());
   }
 }

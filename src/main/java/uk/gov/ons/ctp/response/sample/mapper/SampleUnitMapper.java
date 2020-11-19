@@ -15,14 +15,5 @@ public class SampleUnitMapper
     sampleUnit2.setFormType(sampleUnit.getFormType());
     sampleUnit2.setSampleUnitRef(sampleUnit.getSampleUnitRef());
     sampleUnit2.setSampleUnitType(sampleUnit.getSampleUnitType());
-    if (sampleUnit.getSampleAttributes() != null) {
-      SampleUnit.SampleAttributes.Builder<Void> builder =
-          new SampleUnit.SampleAttributes().newCopyBuilder();
-      sampleUnit
-          .getSampleAttributes()
-          .getAttributes()
-          .forEach((k, v) -> builder.addEntries().withKey(k).withValue(v));
-      sampleUnit2.setSampleAttributes(builder.build());
-    }
   }
 }

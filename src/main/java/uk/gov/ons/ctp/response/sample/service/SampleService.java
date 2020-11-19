@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
 import libs.common.time.DateTimeUtil;
@@ -21,18 +20,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
-import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
-import uk.gov.ons.ctp.response.sample.domain.repository.SampleAttributesRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
-import uk.gov.ons.ctp.response.sample.message.EventPublisher;
-import uk.gov.ons.ctp.response.sample.message.SampleOutboundPublisher;
+import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
+import uk.gov.ons.ctp.response.sample.party.PartyUtil;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEvent;
@@ -58,13 +55,11 @@ public class SampleService {
 
   @Autowired private PartySvcClientService partySvcClient;
 
-  @Autowired private SampleOutboundPublisher sampleOutboundPublisher;
-
   @Autowired private CollectionExerciseJobService collectionExerciseJobService;
 
   @Autowired private CsvIngesterBusiness csvIngesterBusiness;
-  @Autowired private EventPublisher eventPublisher;
-  @Autowired private SampleAttributesRepository sampleAttributesRepository;
+
+  @Autowired private PartyPublisher partyPublisher;
 
   public List<SampleSummary> findAllSampleSummaries() {
     return sampleSummaryRepository.findAll();
@@ -89,6 +84,28 @@ public class SampleService {
     return savedSampleSummary;
   }
 
+  @Transactional(propagation = Propagation.REQUIRED)
+  public SampleUnit createSampleUnit(
+      UUID sampleSummaryId, BusinessSampleUnit samplingUnit, SampleUnitState sampleUnitState)
+      throws UnknownSampleSummaryException {
+
+    SampleSummary sampleSummary = sampleSummaryRepository.findById(sampleSummaryId);
+    if (sampleSummary != null) {
+      // the csv ingester does this so it's needed here
+      samplingUnit.setSampleUnitType("B");
+      return createAndSaveSampleUnit(sampleSummary, sampleUnitState, samplingUnit);
+    } else {
+      throw new UnknownSampleSummaryException();
+    }
+  }
+
+  public void publishSampleToParty(UUID sampleSummaryId, BusinessSampleUnit samplingUnit) {
+    PartyCreationRequestDTO party = PartyUtil.convertToParty(samplingUnit);
+    party.getAttributes().setSampleUnitId(samplingUnit.getSampleUnitId().toString());
+    party.setSampleSummaryId(sampleSummaryId.toString());
+    partyPublisher.publish(party);
+  }
+
   private Integer calculateExpectedCollectionInstruments(
       List<BusinessSampleUnit> samplingUnitList) {
     // TODO: get survey classifiers from survey service, currently using formtype for all business
@@ -110,21 +127,40 @@ public class SampleService {
     return sampleSummaryRepository.save(sampleSummary);
   }
 
+  @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+  public SampleSummary createAndSaveSampleSummary(SampleSummaryDTO summaryDTO) {
+    SampleSummary sampleSummary = new SampleSummary();
+
+    sampleSummary.setState(SampleState.INIT);
+    sampleSummary.setId(UUID.randomUUID());
+    sampleSummary.setTotalSampleUnits(summaryDTO.getTotalSampleUnits());
+    sampleSummary.setExpectedCollectionInstruments(summaryDTO.getExpectedCollectionInstruments());
+
+    return sampleSummaryRepository.save(sampleSummary);
+  }
+
   private void saveSampleUnits(
       List<BusinessSampleUnit> samplingUnitList,
       SampleSummary sampleSummary,
       SampleUnitState sampleUnitState) {
     for (BusinessSampleUnit sampleUnitBase : samplingUnitList) {
-      SampleUnit sampleUnit = new SampleUnit();
-      sampleUnit.setSampleSummaryFK(sampleSummary.getSampleSummaryPK());
-      sampleUnit.setSampleUnitRef(sampleUnitBase.getSampleUnitRef());
-      sampleUnit.setSampleUnitType(sampleUnitBase.getSampleUnitType());
-      sampleUnit.setFormType(sampleUnitBase.getFormType());
-      sampleUnit.setState(sampleUnitState);
-      sampleUnit.setId(sampleUnitBase.getSampleUnitId());
-      eventPublisher.publishEvent("Sample Init");
-      sampleUnitRepository.save(sampleUnit);
+      createAndSaveSampleUnit(sampleSummary, sampleUnitState, sampleUnitBase);
     }
+  }
+
+  private SampleUnit createAndSaveSampleUnit(
+      SampleSummary sampleSummary,
+      SampleUnitState sampleUnitState,
+      BusinessSampleUnit sampleUnitBase) {
+    SampleUnit sampleUnit = new SampleUnit();
+    sampleUnit.setSampleSummaryFK(sampleSummary.getSampleSummaryPK());
+    sampleUnit.setSampleUnitRef(sampleUnitBase.getSampleUnitRef());
+    sampleUnit.setSampleUnitType(sampleUnitBase.getSampleUnitType());
+    sampleUnit.setFormType(sampleUnitBase.getFormType());
+    sampleUnit.setState(sampleUnitState);
+    sampleUnit.setId(sampleUnitBase.getSampleUnitId());
+    sampleUnitRepository.save(sampleUnit);
+    return sampleUnit;
   }
 
   /**
@@ -142,8 +178,6 @@ public class SampleService {
     targetSampleSummary.setState(newState);
     targetSampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
     sampleSummaryRepository.saveAndFlush(targetSampleSummary);
-    // Notify the outside world the sample upload has finished
-    this.sampleOutboundPublisher.sampleUploadFinished(targetSampleSummary);
 
     return targetSampleSummary;
   }
@@ -212,19 +246,6 @@ public class SampleService {
     return sampleUnitsTotal;
   }
 
-  public SampleSummary ingest(
-      final SampleSummary sampleSummary, final MultipartFile file, final String type)
-      throws Exception {
-    this.sampleOutboundPublisher.sampleUploadStarted(sampleSummary);
-
-    switch (type.toUpperCase()) {
-      case "B":
-        return csvIngesterBusiness.ingest(sampleSummary, file);
-      default:
-        throw new UnsupportedOperationException(String.format("Type %s not implemented", type));
-    }
-  }
-
   public Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, String message) {
     try {
       SampleState newState =
@@ -261,12 +282,7 @@ public class SampleService {
   // returned by sampleUnitRepository.findById
   public SampleUnit findSampleUnit(UUID id) {
     SampleUnit su = sampleUnitRepository.findById(id);
-    su.setSampleAttributes(sampleAttributesRepository.findOne(id));
     return su;
-  }
-
-  public SampleAttributes findSampleAttributes(UUID id) {
-    return sampleAttributesRepository.findOne(id);
   }
 
   public SampleUnit findSampleUnitBySampleUnitId(UUID sampleUnitId) {
@@ -276,21 +292,5 @@ public class SampleService {
   public List<SampleUnit> findSampleUnitsBySampleSummary(UUID sampleSummaryId) {
     SampleSummary ss = sampleSummaryRepository.findById(sampleSummaryId);
     return sampleUnitRepository.findBySampleSummaryFK(ss.getSampleSummaryPK());
-  }
-
-  public List<SampleAttributes> findSampleAttributesByPostcode(String postcode) {
-    return sampleAttributesRepository.findByPostcode(postcode);
-  }
-
-  public List<SampleUnit> findSampleUnitsByPostcode(String postcode) {
-    return findSampleAttributesByPostcode(postcode)
-        .stream()
-        .map(
-            attrs -> {
-              SampleUnit su = findSampleUnitBySampleUnitId(attrs.getSampleUnitFK());
-              su.setSampleAttributes(attrs);
-              return su;
-            })
-        .collect(Collectors.toList());
   }
 }

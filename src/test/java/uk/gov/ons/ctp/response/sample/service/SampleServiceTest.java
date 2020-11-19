@@ -14,14 +14,13 @@ import java.util.UUID;
 import libs.common.FixtureHelper;
 import libs.common.state.StateTransitionManager;
 import libs.party.representation.PartyDTO;
+import libs.sample.validation.BusinessSampleUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
@@ -29,9 +28,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
-import uk.gov.ons.ctp.response.sample.message.EventPublisher;
 import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
-import uk.gov.ons.ctp.response.sample.message.SampleOutboundPublisher;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
@@ -64,11 +61,7 @@ public class SampleServiceTest {
 
   @Mock private PartyPublisher partyPublisher;
 
-  @Mock private SampleOutboundPublisher sampleOutboundPublisher;
-
   @Mock private CollectionExerciseJobService collectionExerciseJobService;
-
-  @Mock private EventPublisher eventPublisher;
 
   @Mock private CsvIngesterBusiness csvIngesterBusiness;
 
@@ -252,72 +245,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  public void testIngestBTypeSample() throws Exception {
-    // Given
-    MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
-
-    SampleSummary summary = createSampleSummary(5, 10);
-    when(csvIngesterBusiness.ingest(any(SampleSummary.class), any(MultipartFile.class)))
-        .thenReturn(summary);
-
-    // When
-    SampleSummary result = sampleService.ingest(summary, file, "B");
-
-    // Then
-    verify(csvIngesterBusiness, times(1)).ingest(summary, file);
-  }
-
-  @Test
-  public void testIngestTypeSampleIsCaseInsensitive() throws Exception {
-    // Given
-    MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
-
-    SampleSummary summary = createSampleSummary(5, 10);
-    when(csvIngesterBusiness.ingest(any(SampleSummary.class), any(MultipartFile.class)))
-        .thenReturn(summary);
-
-    // When
-    SampleSummary result = sampleService.ingest(summary, file, "b");
-
-    // Then
-    verify(csvIngesterBusiness, times(1)).ingest(result, file);
-  }
-
-  @Test(expected = UnsupportedOperationException.class)
-  public void testUploadInvalidTypeSample() throws Exception {
-    when(this.sampleSvcStateTransitionManager.transition(
-            SampleState.INIT, SampleEvent.FAIL_VALIDATION))
-        .thenReturn(SampleState.FAILED);
-    // Given
-    MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
-
-    final String invalidType = "invalid-type";
-
-    SampleSummary summary = createSampleSummary(5, 10);
-    when(csvIngesterBusiness.ingest(any(SampleSummary.class), any(MultipartFile.class)))
-        .thenReturn(summary);
-
-    // When
-    SampleSummary finalSummary = sampleService.ingest(summary, file, invalidType);
-  }
-
-  @Test
-  public void testIngestMessagesSent() throws Exception {
-    // Given
-    MockMultipartFile file = new MockMultipartFile("file", "data".getBytes());
-
-    SampleSummary summary = createSampleSummary(5, 10);
-    when(csvIngesterBusiness.ingest(any(SampleSummary.class), any(MultipartFile.class)))
-        .thenReturn(summary);
-
-    // When
-    sampleService.ingest(summary, file, "B");
-
-    // Then
-    verify(sampleOutboundPublisher, times(1)).sampleUploadStarted(any());
-  }
-
-  @Test
   public void getSampleSummaryUnitCountHappyPath() {
     SampleSummary newSummary = createSampleSummary(5, 2);
     when(sampleSummaryRepository.findById(any())).thenReturn(newSummary);
@@ -341,5 +268,20 @@ public class SampleServiceTest {
     when(sampleSummaryRepository.findById(any())).thenReturn(newSummary);
 
     sampleService.getSampleSummaryUnitCount(newSummary.getId());
+  }
+
+  @Test
+  public void createSampleUnit() throws UnknownSampleSummaryException {
+    SampleSummary newSummary = createSampleSummary(5, 2);
+    when(sampleSummaryRepository.findById(any())).thenReturn(newSummary);
+    BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();
+    sampleService.createSampleUnit(newSummary.getId(), businessSampleUnit, SampleUnitState.INIT);
+    verify(sampleUnitRepository, times(1)).save(any(SampleUnit.class));
+  }
+
+  @Test(expected = UnknownSampleSummaryException.class)
+  public void createSampleUnitWithUnknownSampleSummary() throws UnknownSampleSummaryException {
+    BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();
+    sampleService.createSampleUnit(UUID.randomUUID(), businessSampleUnit, SampleUnitState.INIT);
   }
 }

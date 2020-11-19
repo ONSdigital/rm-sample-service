@@ -32,14 +32,4 @@ public class ObjectFactory {
   public SampleUnit createSampleUnit() {
     return new SampleUnit();
   }
-
-  /** Create an instance of {@link SampleUnit.SampleAttributes } */
-  public SampleUnit.SampleAttributes createSampleUnitSampleAttributes() {
-    return new SampleUnit.SampleAttributes();
-  }
-
-  /** Create an instance of {@link SampleUnit.SampleAttributes.Entry } */
-  public SampleUnit.SampleAttributes.Entry createSampleUnitSampleAttributesEntry() {
-    return new SampleUnit.SampleAttributes.Entry();
-  }
 }

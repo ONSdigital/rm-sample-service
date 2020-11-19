@@ -1,15 +1,16 @@
 package uk.gov.ons.ctp.response.sample.representation;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /** Domain model object */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
+@ToString
 public class SampleUnitDTO {
 
   /** enum for SampleUnit state */
@@ -79,7 +80,4 @@ public class SampleUnitDTO {
   private SampleUnitState state;
 
   private String id;
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  private SampleAttributesDTO sampleAttributes;
 }

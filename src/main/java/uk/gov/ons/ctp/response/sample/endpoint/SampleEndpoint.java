@@ -5,9 +5,7 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 import com.opencsv.bean.CsvToBean;
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.validation.Valid;
@@ -19,6 +17,7 @@ import ma.glasnost.orika.MapperFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
@@ -28,19 +27,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
-import uk.gov.ons.ctp.response.sample.domain.model.SampleAttributes;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
+import uk.gov.ons.ctp.response.sample.representation.BusinessSampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
-import uk.gov.ons.ctp.response.sample.representation.SampleAttributesDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
 import uk.gov.ons.ctp.response.sample.scheduled.distribution.SampleUnitDistributor;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
+import uk.gov.ons.ctp.response.sample.service.UnknownSampleSummaryException;
 
 /** The REST endpoint controller for Sample Service. */
 @RestController
@@ -113,64 +111,6 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   }
 
   /**
-   * Method to kick off a task to ingest a sample file
-   *
-   * @param file Multipart File of SurveySample to be used
-   * @param type Type of Survey to be used
-   * @return a newly created sample summary that won't have samples or collection instruments
-   *     populated
-   * @throws CTPException thrown if upload started message cannot be sent
-   */
-  public SampleSummary ingest(final MultipartFile file, final String type) throws CTPException {
-    final SampleSummary newSummary = this.sampleService.createAndSaveSampleSummary();
-
-    Callable<Optional<SampleSummary>> callable =
-        () -> {
-          try {
-            return Optional.of(this.sampleService.ingest(newSummary, file, type));
-          } catch (Exception e) {
-            log.error("Failed to ingest sample", kv("sample_id", newSummary.getId()), e);
-            return this.sampleService.failSampleSummary(newSummary, e);
-          }
-        };
-
-    EXECUTOR_SERVICE.submit(callable);
-
-    return newSummary;
-  }
-
-  @RequestMapping(
-      value = "/{type}/fileupload",
-      method = RequestMethod.POST,
-      consumes = "multipart/form-data")
-  public ResponseEntity<SampleSummary> uploadSampleFile(
-      @PathVariable("type") final String type, @RequestParam("file") MultipartFile file)
-      throws CTPException {
-    log.debug("Entering Sample file upload", kv("sample_type", type));
-    if (!"B".equals(type.toUpperCase())) {
-      return ResponseEntity.badRequest().build();
-    }
-
-    try {
-      SampleSummary result = ingest(file, type);
-
-      URI location =
-          ServletUriComponentsBuilder.fromCurrentServletMapping()
-              .path("/samples/samplesummary/{id}")
-              .buildAndExpand(result.getId())
-              .toUri();
-
-      return ResponseEntity.created(location).body(result);
-    } catch (Exception e) {
-      throw new CTPException(
-          CTPException.Fault.VALIDATION_FAILED,
-          e,
-          "Error ingesting file %s",
-          file.getOriginalFilename());
-    }
-  }
-
-  /**
    * GET endpoint for retrieving a list of all existing SampleSummaries
    *
    * @return a list of all existing SampleSummaries
@@ -237,27 +177,6 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     return ResponseEntity.ok(result);
   }
 
-  @RequestMapping(value = "{id}/attributes", method = RequestMethod.GET)
-  public ResponseEntity<SampleAttributesDTO> requestSampleAttributes(
-      @PathVariable("id") final UUID sampleUnitId) throws CTPException {
-    SampleUnit sampleUnit = sampleService.findSampleUnitBySampleUnitId(sampleUnitId);
-
-    if (sampleUnit == null || sampleUnit.getId() == null) {
-      throw new CTPException(
-          CTPException.Fault.RESOURCE_NOT_FOUND,
-          String.format("Sample was not found for sample unit ref %s", sampleUnitId));
-    }
-
-    SampleAttributes sampleAttribs = sampleService.findSampleAttributes(sampleUnit.getId());
-
-    if (sampleAttribs == null) {
-      sampleAttribs = new SampleAttributes();
-    }
-    SampleAttributesDTO result = mapperFacade.map(sampleAttribs, SampleAttributesDTO.class);
-
-    return ResponseEntity.ok(result);
-  }
-
   @RequestMapping(value = "{sampleSummaryId}/sampleunits", method = RequestMethod.GET)
   public ResponseEntity<SampleUnitDTO[]> requestSampleUnitsForSampleSummary(
       @PathVariable("sampleSummaryId") final UUID sampleSummaryId) throws CTPException {
@@ -279,5 +198,52 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   public ResponseEntity<Void> exportSamples() {
     distributor.distribute();
     return ResponseEntity.noContent().build();
+  }
+
+  @RequestMapping(value = "{sampleSummaryId}/sampleunits/", method = RequestMethod.POST)
+  public ResponseEntity<SampleUnitDTO> createSampleUnitsForSampleSummary(
+      @PathVariable("sampleSummaryId") final UUID sampleSummaryId,
+      final @Valid @RequestBody BusinessSampleUnitDTO businessSampleUnitDTO,
+      BindingResult bindingResult)
+      throws InvalidRequestException {
+
+    if (bindingResult.hasErrors()) {
+      throw new InvalidRequestException("Binding errors for create action: ", bindingResult);
+    }
+    log.debug(
+        "create sample unit request received", kv("businessSampleUnitDTO", businessSampleUnitDTO));
+    BusinessSampleUnit businessSampleUnit =
+        mapperFacade.map(businessSampleUnitDTO, BusinessSampleUnit.class);
+
+    log.debug("business sample constructed", kv("businessSample", businessSampleUnit));
+    try {
+      SampleUnit sampleUnit =
+          sampleService.createSampleUnit(
+              sampleSummaryId, businessSampleUnit, SampleUnitDTO.SampleUnitState.INIT);
+      log.debug("sample created");
+      sampleService.publishSampleToParty(sampleSummaryId, businessSampleUnit);
+      SampleUnitDTO sampleUnitDTO = mapperFacade.map(sampleUnit, SampleUnitDTO.class);
+      log.debug("created SampleUnitDTO", kv("sampleUnitDTO", sampleUnitDTO));
+      return ResponseEntity.created(
+              URI.create(String.format("/samples/%s", sampleUnit.getSampleUnitPK())))
+          .contentType(MediaType.APPLICATION_JSON)
+          .body(sampleUnitDTO);
+    } catch (UnknownSampleSummaryException e) {
+      log.error("unknown sample summary id", kv("sampleSummaryId", sampleSummaryId), e);
+      return ResponseEntity.badRequest().build();
+    }
+  }
+
+  @RequestMapping(value = "/samplesummary", method = RequestMethod.POST)
+  public ResponseEntity<SampleSummaryDTO> createSampleSummary(
+      final @RequestBody SampleSummaryDTO requestSummary) {
+    SampleSummary sampleSummary = sampleService.createAndSaveSampleSummary(requestSummary);
+
+    SampleSummaryDTO sampleSummaryDTO = mapperFacade.map(sampleSummary, SampleSummaryDTO.class);
+
+    return ResponseEntity.created(
+            URI.create(String.format("/samplesummary/%s", sampleSummary.getId())))
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(sampleSummaryDTO);
   }
 }
