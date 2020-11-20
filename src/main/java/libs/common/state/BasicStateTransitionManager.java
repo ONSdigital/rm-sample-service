@@ -44,11 +44,11 @@ public class BasicStateTransitionManager<S, E> implements StateTransitionManager
       destinationState = outputMap.get(event);
     }
     if (destinationState == null) {
-      log.warn("No valid transition", kv("from", sourceState), kv("event", event));
+      log.error("No valid transition", kv("from", sourceState), kv("event", event));
       throw new CTPException(
           CTPException.Fault.BAD_REQUEST, String.format(TRANSITION_ERROR_MSG, sourceState, event));
     } else {
-      log.warn(
+      log.info(
           "Transitioning state",
           kv("from", sourceState),
           kv("to", destinationState),
