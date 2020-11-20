@@ -47,6 +47,8 @@ paths:
           description: Collection exercise job have been exported.
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          description: Some sample units have failed transition
   /samples/samplesummaries:
     get:
       summary: List sample summaries.

@@ -187,8 +187,8 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       return ResponseEntity.noContent().build();
     } catch (SampleDistributionException e) {
       log.error(e.getMessage(), kv("CollectionExerciseJob", e.getCollectionExerciseJob()),
-         kv("Samples", e.getSampleUnits()));
-      return ResponseEntity.badRequest().build();
+         kv("Samples", e.getSampleUnits()), kv("status", 500));
+      return ResponseEntity.status(500).build();
     }
   }
 
