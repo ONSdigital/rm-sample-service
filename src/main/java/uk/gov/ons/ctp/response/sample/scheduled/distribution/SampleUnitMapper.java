@@ -2,7 +2,6 @@ package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
-import java.util.Map;
 import ma.glasnost.orika.MapperFacade;
 
 import org.slf4j.Logger;
@@ -15,7 +14,6 @@ import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
 public class SampleUnitMapper {
   private static final Logger log = LoggerFactory.getLogger(SampleUnitMapper.class);
 
-  private SampleAttributesRepository sampleAttributesRepository;
   private MapperFacade mapperFacade;
 
   public SampleUnitMapper(MapperFacade mapperFacade) {
