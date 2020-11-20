@@ -11,7 +11,9 @@ import java.util.Collections;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -43,10 +45,13 @@ public class SampleUnitDistributorTest {
 
   @Mock private SampleUnitMapper sampleUnitMapper;
 
+  @Rule
+  public ExpectedException exceptionRule = ExpectedException.none();
+
   @InjectMocks private SampleUnitDistributor sampleUnitDistributor;
 
   @Test
-  public void testDistributeSuccess() throws CTPException {
+  public void testDistributeSuccess() throws CTPException, SampleDistributionException {
     UUID collexID = UUID.randomUUID();
     UUID sampleSummaryId = UUID.randomUUID();
 
@@ -84,7 +89,7 @@ public class SampleUnitDistributorTest {
   }
 
   @Test
-  public void testDistributeFail() throws CTPException {
+  public void testDistributeFail() throws CTPException, SampleDistributionException {
     UUID collexID = UUID.randomUUID();
     UUID sampleSummaryId = UUID.randomUUID();
     UUID sampleUnitId = UUID.randomUUID();
@@ -111,6 +116,9 @@ public class SampleUnitDistributorTest {
     when(sampleUnitMapper.mapSampleUnit(any(), any())).thenReturn(mappedSampleUnit);
     doThrow(new CTPException(Fault.SYSTEM_ERROR)).when(sampleUnitSender).sendSampleUnit(any());
 
+    exceptionRule.expect(SampleDistributionException.class);
+    exceptionRule.expectMessage("Some samples have failed transition for collection exericse Job");
+
     sampleUnitDistributor.distribute();
 
     verify(sampleUnitSender).sendSampleUnit(mappedSampleUnit);
@@ -118,7 +126,7 @@ public class SampleUnitDistributorTest {
   }
 
   @Test
-  public void testDistributeNoJobs() throws InterruptedException {
+  public void testDistributeNoJobs() throws InterruptedException, SampleDistributionException {
     when(collectionExerciseJobRepository.findByJobCompleteIsFalse())
         .thenReturn(Collections.emptyList());
 
@@ -129,7 +137,7 @@ public class SampleUnitDistributorTest {
   }
 
   @Test
-  public void testDistributeNoSampleUnits() throws CTPException {
+  public void testDistributeNoSampleUnits() throws CTPException, SampleDistributionException {
     UUID collexID = UUID.randomUUID();
     UUID sampleSummaryId = UUID.randomUUID();
 
@@ -158,7 +166,7 @@ public class SampleUnitDistributorTest {
   }
 
   @Test
-  public void testDistributeSummaryFailed() throws CTPException {
+  public void testDistributeSummaryFailed() throws CTPException, SampleDistributionException {
     UUID collexID = UUID.randomUUID();
     UUID sampleSummaryId = UUID.randomUUID();
 

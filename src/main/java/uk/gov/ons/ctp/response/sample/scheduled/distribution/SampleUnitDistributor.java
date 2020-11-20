@@ -42,51 +42,50 @@ public class SampleUnitDistributor {
 
   /** Scheduled job for distributing SampleUnits */
   @Transactional(timeout = TRANSACTION_TIMEOUT_SECONDS)
-  public void distribute() {
+  public void distribute() throws SampleDistributionException {
     log.debug("Collection exercise job distribution has been triggered.");
-    collectionExerciseJobRepository.findByJobCompleteIsFalse()
-      .stream()
-      .forEach(this::processJob);
+    List<CollectionExerciseJob> jobs = collectionExerciseJobRepository.findByJobCompleteIsFalse();
+    for(CollectionExerciseJob job: jobs) {
+      processJob(job);
+    }
   }
 
-  private void processJob(CollectionExerciseJob job) {
+  private void processJob(CollectionExerciseJob job) throws SampleDistributionException {
     List<SampleUnit> invalidSamples = Optional.of(sampleSummaryRepository.findById(job.getSampleSummaryId()))
       .filter(sampleSummary -> sampleSummary.getState() == SampleState.ACTIVE)
       .map(sampleSummary -> sampleUnitRepository.findBySampleSummaryFKAndState(
         sampleSummary.getSampleSummaryPK(), SampleUnitState.PERSISTED))
       .orElseGet(Stream::empty)
       .map(sampleUnit -> sampleUnitMapper.mapSampleUnit(sampleUnit, job.getCollectionExerciseId().toString()))
-      .filter(attemptSamplePublish())
+      .filter(publishSample().negate())
       .collect(Collectors.toList());
       
-    if (invalidSamples.isEmpty()) {
-      log.info("All samples have been published successfully", kv("CollectionExerciseJob", job));
-      job.setJobComplete(true);
-      collectionExerciseJobRepository.saveAndFlush(job);
-      return;
+    if (!invalidSamples.isEmpty()) {
+      throw new SampleDistributionException("Some samples have failed transition for collection exericse Job", job, invalidSamples);
     }
-    log.warn("Some samples have failed transition for collection exericse Job", kv("CollectionExerciseJob", job),
-      kv("Samples", invalidSamples));
+    log.info("All samples have been published successfully", kv("CollectionExerciseJob", job));
+    job.setJobComplete(true);
+    collectionExerciseJobRepository.saveAndFlush(job);
   }
 
   /**
-   * Attempt to publish a SampleUnit. If it fails then return true, otherwise false.
+   * Publish a SampleUnit. If it passes then return true otherwise false.
    * This will mimick the previous functionality and allow us to obtain a collection of the
    * Sample units that fail for better logging.
    * @return Predicate<SampleUnit>
    */
-  private Predicate<SampleUnit> attemptSamplePublish() {
+  private Predicate<SampleUnit> publishSample() {
     return mappedSampleUnit -> {
       try {
         sampleUnitSender.sendSampleUnit(mappedSampleUnit);
-        return false;
+        return true;
       } catch (CTPException e) {
         log.error(
           "Failed to send a sample unit to queue and update state",
           kv("sample_unit_id", mappedSampleUnit.getId()),
           "exception",
           e);
-        return true;
+        return false;
       }
     };
   }
