@@ -179,6 +179,8 @@ spec:
             {{- end }}
           - name: PARTY_SVC_CONNECTION_CONFIG_USERNAME
             value: "$(SECURITY_USER_NAME)"
+          - name: EXPORT_SPRING_TEST_CRON
+            value: "{{ .Values.export.springTestCron }}"
           - name: PARTY_SVC_CONNECTION_CONFIG_PASSWORD
             value: "$(SECURITY_USER_PASSWORD)"
           - name: SAMPLE_UNIT_DISTRIBUTION_DELAY_MILLI_SECONDS
