@@ -34,7 +34,6 @@ managedRabbitMQ:
 
 export:
   cron: "* * * * *"
-  springTestCron: "-"
 
 distribution:
   delay: 1000

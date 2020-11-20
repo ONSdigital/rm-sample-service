@@ -11,7 +11,6 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +42,6 @@ public class SampleUnitDistributor {
 
   /** Scheduled job for distributing SampleUnits */
   @Transactional(timeout = TRANSACTION_TIMEOUT_SECONDS)
-  @Scheduled(cron = "${export.springTestCron}")
   public void distribute() throws SampleDistributionException {
     log.debug("Collection exercise job distribution has been triggered.");
     List<CollectionExerciseJob> jobs = collectionExerciseJobRepository.findByJobCompleteIsFalse();

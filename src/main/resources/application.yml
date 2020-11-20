@@ -95,10 +95,6 @@ rabbitmq:
   virtualhost: /
   cron: "* * * * * ?"
 
-export:
-  # springTestCronShould be off by default
-  springTestCron: "-"
-
 messaging:
   backoffInitial: 5000
   backoffMultiplier: 3
