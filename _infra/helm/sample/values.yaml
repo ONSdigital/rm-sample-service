@@ -32,7 +32,8 @@ resources:
 managedRabbitMQ:
   enabled: false
 
-cron: "0/5 * * * *"
+export:
+  cron: "* * * * *"
 
 distribution:
   delay: 1000
