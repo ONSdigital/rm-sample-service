@@ -2,7 +2,6 @@ package libs.common.state;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import libs.common.error.CTPException;
@@ -55,14 +54,5 @@ public class BasicStateTransitionManager<S, E> implements StateTransitionManager
           kv("event", event));
     }
     return destinationState;
-  }
-
-  @Override
-  public Map<E, S> getAvailableTransitions(final S sourceState) {
-    Map<E, S> outputMap = transitions.get(sourceState);
-    if (outputMap != null) {
-      return outputMap;
-    }
-    return Collections.emptyMap();
   }
 }

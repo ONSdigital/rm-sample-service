@@ -19,7 +19,6 @@ database:
     usernameKey: username
     passwordKey: password
     nameKey: db-name
-  managedRedis: false
 
 container:
   port: 8080
@@ -30,19 +29,11 @@ resources:
   requests:
     memory: "512Mi"
 
-sftp:
-  directory:
-    business: /home/demo/sftp/BSD/
-    documents: /home/demo/sftp/
-  cron: "* * * * * ?"
-  test:
-    enabled: true
-
 managedRabbitMQ:
   enabled: false
 
 export:
-  cron: "0 0/5 * * * ?"
+  cron: "* * * * *"
 
 distribution:
   delay: 1000

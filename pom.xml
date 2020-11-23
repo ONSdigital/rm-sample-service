@@ -43,10 +43,6 @@
 			<artifactId>spring-boot-starter-jetty</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-redis</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
@@ -66,15 +62,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
-			<artifactId>spring-integration-sftp</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.integration</groupId>
 			<artifactId>spring-integration-xml</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.integration</groupId>
-			<artifactId>spring-integration-redis</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
@@ -117,20 +105,6 @@
 			<artifactId>orika-eclipse-tools</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.redisson</groupId>
-			<artifactId>redisson</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>javax.cache</groupId>
-					<artifactId>cache-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-swagger2</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>net.codesup.util</groupId>
 			<artifactId>jaxb2-rich-contract-plugin</artifactId>
 		</dependency>
@@ -167,10 +141,6 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-swagger-ui</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.cobertura</groupId>
@@ -259,24 +229,6 @@
 				<groupId>net.logstash.logback</groupId>
 				<artifactId>logstash-logback-encoder</artifactId>
 				<version>4.11</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.redisson</groupId>
-				<artifactId>redisson</artifactId>
-				<version>3.2.0</version>
-			</dependency>
-
-			<dependency>
-				<groupId>io.springfox</groupId>
-				<artifactId>springfox-swagger2</artifactId>
-				<version>2.7.0</version>
-			</dependency>
-
-			<dependency>
-				<groupId>io.springfox</groupId>
-				<artifactId>springfox-swagger-ui</artifactId>
-				<version>2.7.0</version>
 			</dependency>
 
 			<dependency>
@@ -369,10 +321,6 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>com.coveo</groupId>
-				<artifactId>fmt-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
 				<groupId>com.spotify</groupId>
@@ -481,48 +429,6 @@
 						<source>${java.version}</source>
 						<target>${java.version}</target>
 					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-checkstyle-plugin</artifactId>
-					<version>3.1.1</version>
-					<configuration>
-						<sourceDirectories>${project.build.sourceDirectory}</sourceDirectories>
-					</configuration>
-					<dependencies>
-						<dependency>
-							<groupId>com.puppycrawl.tools</groupId>
-							<artifactId>checkstyle</artifactId>
-							<version>8.29</version>
-						</dependency>
-					</dependencies>
-					<executions>
-						<execution>
-							<id>checkstyle</id>
-							<phase>test</phase>
-							<goals>
-								<goal>check</goal>
-							</goals>
-							<configuration>
-								<configLocation>checkstyle/ons-checkstyle-config.xml</configLocation>
-								<encoding>UTF-8</encoding>
-								<consoleOutput>true</consoleOutput>
-								<violationSeverity>info</violationSeverity>
-							</configuration>
-						</execution>
-					</executions>
-				</plugin>
-				<plugin>
-					<groupId>com.coveo</groupId>
-					<artifactId>fmt-maven-plugin</artifactId>
-					<version>2.5.0</version>
-					<executions>
-						<execution>
-							<goals>
-								<goal>format</goal>
-							</goals>
-						</execution>
-					</executions>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>

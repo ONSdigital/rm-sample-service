@@ -1,32 +1,27 @@
 package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
-import libs.common.error.CTPException;
-import libs.common.error.CTPException.Fault;
-import org.junit.Before;
+
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
-import uk.gov.ons.ctp.response.sample.config.AppConfig;
-import uk.gov.ons.ctp.response.sample.config.DataGrid;
+
+import libs.common.error.CTPException;
+import libs.common.error.CTPException.Fault;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
@@ -39,7 +34,6 @@ import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitSta
 /** Test the Sample Unit Distributor */
 @RunWith(MockitoJUnitRunner.class)
 public class SampleUnitDistributorTest {
-  @Mock private AppConfig appConfig;
 
   @Mock private SampleUnitSender sampleUnitSender;
 
@@ -51,27 +45,13 @@ public class SampleUnitDistributorTest {
 
   @Mock private SampleUnitMapper sampleUnitMapper;
 
-  @Mock private RedissonClient redissonClient;
+  @Rule
+  public ExpectedException exceptionRule = ExpectedException.none();
 
   @InjectMocks private SampleUnitDistributor sampleUnitDistributor;
 
-  private RLock lock;
-
-  @Before
-  public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
-    DataGrid dataGrid = new DataGrid();
-    dataGrid.setLockTimeToLiveSeconds(60);
-    when(appConfig.getDataGrid()).thenReturn(dataGrid);
-
-    lock = mock(RLock.class);
-    when(redissonClient.getFairLock(any())).thenReturn(lock);
-    when(lock.tryLock(anyLong(), any(TimeUnit.class))).thenReturn(true);
-  }
-
   @Test
-  public void testDistributeSuccess() throws CTPException {
+  public void testDistributeSuccess() throws CTPException, SampleDistributionException {
     UUID collexID = UUID.randomUUID();
     UUID sampleSummaryId = UUID.randomUUID();
 
@@ -106,12 +86,10 @@ public class SampleUnitDistributorTest {
     assertEquals(true, collexJobArgCap.getValue().isJobComplete());
 
     verify(sampleUnitSender).sendSampleUnit(mappedSampleUnit);
-
-    verify(lock).unlock();
   }
 
   @Test
-  public void testDistributeFail() throws CTPException {
+  public void testDistributeFail() throws CTPException, SampleDistributionException {
     UUID collexID = UUID.randomUUID();
     UUID sampleSummaryId = UUID.randomUUID();
     UUID sampleUnitId = UUID.randomUUID();
@@ -138,29 +116,28 @@ public class SampleUnitDistributorTest {
     when(sampleUnitMapper.mapSampleUnit(any(), any())).thenReturn(mappedSampleUnit);
     doThrow(new CTPException(Fault.SYSTEM_ERROR)).when(sampleUnitSender).sendSampleUnit(any());
 
+    exceptionRule.expect(SampleDistributionException.class);
+    exceptionRule.expectMessage("Some samples have failed transition for collection exericse Job");
+
     sampleUnitDistributor.distribute();
 
     verify(sampleUnitSender).sendSampleUnit(mappedSampleUnit);
     verify(collectionExerciseJobRepository, never()).saveAndFlush(any());
-    verify(lock).unlock();
   }
 
   @Test
-  public void testDistributeNoJobs() throws InterruptedException {
+  public void testDistributeNoJobs() throws InterruptedException, SampleDistributionException {
     when(collectionExerciseJobRepository.findByJobCompleteIsFalse())
         .thenReturn(Collections.emptyList());
 
     sampleUnitDistributor.distribute();
 
     verify(collectionExerciseJobRepository).findByJobCompleteIsFalse();
-    verify(redissonClient, never()).getFairLock(any());
-    verify(lock, never()).tryLock(anyLong(), anyLong(), any(TimeUnit.class));
     verify(collectionExerciseJobRepository, never()).saveAndFlush(any());
-    verify(lock, never()).unlock();
   }
 
   @Test
-  public void testDistributeNoSampleUnits() throws CTPException {
+  public void testDistributeNoSampleUnits() throws CTPException, SampleDistributionException {
     UUID collexID = UUID.randomUUID();
     UUID sampleSummaryId = UUID.randomUUID();
 
@@ -186,11 +163,10 @@ public class SampleUnitDistributorTest {
     verify(collectionExerciseJobRepository).saveAndFlush(argumentCaptor.capture());
     assertEquals(true, argumentCaptor.getValue().isJobComplete());
     assertEquals(collexID, argumentCaptor.getValue().getCollectionExerciseId());
-    verify(lock).unlock();
   }
 
   @Test
-  public void testDistributeSummaryFailed() throws CTPException {
+  public void testDistributeSummaryFailed() throws CTPException, SampleDistributionException {
     UUID collexID = UUID.randomUUID();
     UUID sampleSummaryId = UUID.randomUUID();
 
@@ -217,6 +193,5 @@ public class SampleUnitDistributorTest {
     verify(collectionExerciseJobRepository).saveAndFlush(argumentCaptor.capture());
     assertEquals(true, argumentCaptor.getValue().isJobComplete());
     assertEquals(collexID, argumentCaptor.getValue().getCollectionExerciseId());
-    verify(lock).unlock();
   }
 }

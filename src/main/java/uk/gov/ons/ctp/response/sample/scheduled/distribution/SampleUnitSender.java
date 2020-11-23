@@ -1,5 +1,7 @@
 package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 import java.util.UUID;
 import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
@@ -45,14 +47,12 @@ public class SampleUnitSender {
     uk.gov.ons.ctp.response.sample.domain.model.SampleUnit sampleUnit =
         sampleUnitRepository.findById(UUID.fromString(mappedSampleUnit.getId()));
 
-    // Highly unlikely, but do a quick (and inexpensive) check to make sure we haven't already
-    // delivered this Sample Unit - could happen if there's a problem with the locking/Redis
-    // timing out and releasing the lock due to the delivery process taking a long time.
     if (sampleUnit.getState() == SampleUnitState.PERSISTED) {
-      // Send to Rabbit queue
+      log.debug("Publishing mapped sampleUnit", kv("MappedSampleUnit", mappedSampleUnit));
       sampleUnitPublisher.send(mappedSampleUnit);
 
-      // Because we've now successfully queued the message we can change the state in the DB
+      log.debug("Transitioning state of sampleUnit", kv("SampleUnit", sampleUnit), 
+        kv("from", sampleUnit.getState()), kv("to", SampleUnitDTO.SampleUnitEvent.DELIVERING));
       SampleUnitDTO.SampleUnitState newState =
           sampleUnitStateTransitionManager.transition(
               sampleUnit.getState(), SampleUnitDTO.SampleUnitEvent.DELIVERING);

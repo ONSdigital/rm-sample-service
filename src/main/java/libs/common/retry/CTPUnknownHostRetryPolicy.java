@@ -2,7 +2,6 @@ package libs.common.retry;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
-import com.google.common.base.Joiner;
 import java.util.Collections;
 import java.util.List;
 import net.sourceforge.cobertura.CoverageIgnore;
@@ -127,7 +126,7 @@ public class CTPUnknownHostRetryPolicy implements RetryPolicy {
         }
       }
     } catch (ClassNotFoundException e) {
-      log.error("Invalid classname", kv("class_names", Joiner.on(",").join(retryableExceptions)));
+      log.error("Invalid classname", kv("class_names", retryableExceptions));
     }
     return false;
   }
@@ -148,7 +147,7 @@ public class CTPUnknownHostRetryPolicy implements RetryPolicy {
         }
       }
     } catch (ClassNotFoundException e) {
-      log.error("Invalid classname", kv("class_names", Joiner.on(",").join(retryableExceptions)));
+      log.error("Invalid classname", kv("class_names", retryableExceptions));
     }
 
     return false;
