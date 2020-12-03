@@ -27,7 +27,21 @@ service:
 
 resources:
   requests:
-    memory: "512Mi"
+    memory: "250Mi"
+    cpu: "50m"
+  limits:
+    cpu: "200m"
+    memory: "1500Mi"
+
+autoscaling: false
+scaleAt:
+  # These are expressed as a percentage of resources.requests, not resources.limits
+  memoryPercentage: 300
+  cpuPercentage: 200
+replicas: 1
+rollingUpdate:
+  maxSurge: 1
+  maxUnavailable: 1
 
 managedRabbitMQ:
   enabled: false
