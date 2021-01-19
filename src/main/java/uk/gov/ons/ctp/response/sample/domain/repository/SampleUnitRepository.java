@@ -48,7 +48,7 @@ public interface SampleUnitRepository extends JpaRepository<SampleUnit, Integer>
    */
   SampleUnit findBySampleUnitRef(String sampleUnitRef);
 
-  SampleUnit findBySampleUnitRefAndSampleSummaryFK(String sampleUnitRef, Integer sampleSummary);
+  boolean existsBySampleUnitRefAndSampleSummaryFK(String sampleUnitRef, Integer sampleSummary);
 
   /**
    * Find how many SampleUnits from a given SampleSummary have been POSTed to Party and are now

@@ -97,8 +97,8 @@ public class SampleService {
       /**
        * a sample unit should be unique inside a sample summary, so check if we already have it.
        */
-      SampleUnit sampleUnit = sampleUnitRepository.findBySampleUnitRefAndSampleSummaryFK(samplingUnit.getSampleUnitRef(), sampleSummary.getSampleSummaryPK());
-      if (sampleUnit == null) {
+      boolean exists = sampleUnitRepository.existsBySampleUnitRefAndSampleSummaryFK(samplingUnit.getSampleUnitRef(), sampleSummary.getSampleSummaryPK());
+      if (!exists) {
         return createAndSaveSampleUnit(sampleSummary, sampleUnitState, samplingUnit);
       } else {
         throw new IllegalStateException("sample unit already exists");
