@@ -285,7 +285,7 @@ public class SampleServiceTest {
     when(sampleSummaryRepository.findById(any())).thenReturn(newSummary);
     BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();
     SampleUnit sampleUnit = sampleService.createSampleUnit(newSummary.getId(), businessSampleUnit, SampleUnitState.INIT);
-    when(sampleUnitRepository.findBySampleUnitRefAndSampleSummaryFK(businessSampleUnit.getSampleUnitRef(), newSummary.getSampleSummaryPK())).thenReturn(sampleUnit);
+    when(sampleUnitRepository.existsBySampleUnitRefAndSampleSummaryFK(businessSampleUnit.getSampleUnitRef(), newSummary.getSampleSummaryPK())).thenReturn(true);
 
     try {
       sampleService.createSampleUnit(newSummary.getId(), businessSampleUnit, SampleUnitState.INIT);
