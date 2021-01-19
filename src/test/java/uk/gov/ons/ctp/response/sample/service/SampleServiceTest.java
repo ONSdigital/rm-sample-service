@@ -279,6 +279,24 @@ public class SampleServiceTest {
     verify(sampleUnitRepository, times(1)).save(any(SampleUnit.class));
   }
 
+  @Test
+  public void createDuplicateSampleUnitThrowsIllegalStateException() throws UnknownSampleSummaryException {
+    SampleSummary newSummary = createSampleSummary(5, 2);
+    when(sampleSummaryRepository.findById(any())).thenReturn(newSummary);
+    BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();
+    SampleUnit sampleUnit = sampleService.createSampleUnit(newSummary.getId(), businessSampleUnit, SampleUnitState.INIT);
+    when(sampleUnitRepository.findBySampleUnitRefAndSampleSummaryFK(businessSampleUnit.getSampleUnitRef(), newSummary.getSampleSummaryPK())).thenReturn(sampleUnit);
+
+    try {
+      sampleService.createSampleUnit(newSummary.getId(), businessSampleUnit, SampleUnitState.INIT);
+      fail("second attempt to create the same sample should fail");
+    } catch (IllegalStateException e) {
+      //expected exception
+    }
+    // confirm it was only saved once
+    verify(sampleUnitRepository, times(1)).save(any(SampleUnit.class));
+  }
+
   @Test(expected = UnknownSampleSummaryException.class)
   public void createSampleUnitWithUnknownSampleSummary() throws UnknownSampleSummaryException {
     BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();

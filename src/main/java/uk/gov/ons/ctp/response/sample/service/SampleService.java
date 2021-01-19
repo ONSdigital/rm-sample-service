@@ -93,7 +93,16 @@ public class SampleService {
     if (sampleSummary != null) {
       // the csv ingester does this so it's needed here
       samplingUnit.setSampleUnitType("B");
-      return createAndSaveSampleUnit(sampleSummary, sampleUnitState, samplingUnit);
+
+      /**
+       * a sample unit should be unique inside a sample summary, so check if we already have it.
+       */
+      SampleUnit sampleUnit = sampleUnitRepository.findBySampleUnitRefAndSampleSummaryFK(samplingUnit.getSampleUnitRef(), sampleSummary.getSampleSummaryPK());
+      if (sampleUnit == null) {
+        return createAndSaveSampleUnit(sampleSummary, sampleUnitState, samplingUnit);
+      } else {
+        throw new IllegalStateException("sample unit already exists");
+      }
     } else {
       throw new UnknownSampleSummaryException();
     }
