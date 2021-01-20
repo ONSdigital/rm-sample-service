@@ -9,10 +9,8 @@
     <int:annotation-config/>
 
     <import resource="sample-unit-outbound-flow.xml"/>
-    <import resource="sample-outbound-flow.xml"/>
     <import resource="party-creation-out.xml"/>
     <import resource="party-creation-in.xml"/>
-    <import resource="sample-event-messager.xml"/>
 
 </beans>
 
