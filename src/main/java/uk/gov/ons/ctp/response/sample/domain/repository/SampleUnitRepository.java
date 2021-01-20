@@ -31,23 +31,6 @@ public interface SampleUnitRepository extends JpaRepository<SampleUnit, Integer>
   Stream<SampleUnit> findBySampleSummaryFKAndState(
       Integer sampleSummaryFK, SampleUnitDTO.SampleUnitState state);
 
-  /**
-   * find SampleUnit by sampleUnitRef and sampleUnitType from Party object
-   *
-   * @param sampleUnitRef sampleUnitRef of Party
-   * @param sampleUnitType sampleUnitType of Party
-   * @return SampleUnit with required type/ref combo
-   */
-  SampleUnit findBySampleUnitRefAndAndSampleUnitType(String sampleUnitRef, String sampleUnitType);
-
-  /**
-   * Get the sample unit object based on the sample unit reference
-   *
-   * @param sampleUnitRef
-   * @return
-   */
-  SampleUnit findBySampleUnitRef(String sampleUnitRef);
-
   boolean existsBySampleUnitRefAndSampleSummaryFK(String sampleUnitRef, Integer sampleSummary);
 
   /**
