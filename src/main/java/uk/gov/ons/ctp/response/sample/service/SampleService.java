@@ -26,7 +26,6 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
-import uk.gov.ons.ctp.response.sample.ingest.CsvIngesterBusiness;
 import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
 import uk.gov.ons.ctp.response.sample.party.PartyUtil;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
@@ -56,8 +55,6 @@ public class SampleService {
   @Autowired private PartySvcClientService partySvcClient;
 
   @Autowired private CollectionExerciseJobService collectionExerciseJobService;
-
-  @Autowired private CsvIngesterBusiness csvIngesterBusiness;
 
   @Autowired private PartyPublisher partyPublisher;
 
