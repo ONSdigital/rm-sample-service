@@ -1,6 +1,6 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/ddd594229c8641afae64acdb31c69745)](https://www.codacy.com/app/sdcplatform/rm-sample-service?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ONSdigital/rm-sample-service&amp;utm_campaign=Badge_Grade) [![Docker Pulls](https://img.shields.io/docker/pulls/sdcplatform/samplesvc.svg)]()
-[![Build Status](https://travis-ci.org/ONSdigital/rm-sample-service.svg?branch=master)](https://travis-ci.org/ONSdigital/rm-sample-service)
-[![codecov](https://codecov.io/gh/ONSdigital/rm-sample-service/branch/master/graph/badge.svg)](https://codecov.io/gh/ONSdigital/rm-sample-service)
+[![Build Status](https://travis-ci.org/ONSdigital/rm-sample-service.svg?branch=main)](https://travis-ci.org/ONSdigital/rm-sample-service)
+[![codecov](https://codecov.io/gh/ONSdigital/rm-sample-service/branch/main/graph/badge.svg)](https://codecov.io/gh/ONSdigital/rm-sample-service)
 
 # Sample Service
 This repository contains the Sample service. This microservice is a RESTful web service implemented using [Spring Boot](http://projects.spring.io/spring-boot/) and has the following responsibilities:
@@ -35,7 +35,7 @@ mvn clean install -Ddocker.skip -DskipITs
       curl -H "Content-Type: application/json" -X POST -d '{ "collectionExerciseJobPK" : "4","surveyRef" : "str1234","exerciseDateTime" : "2012-12-13T12:12:12.000+00" }' http://localhost:8125/samples/sampleunitrequests
 
 ## API
-See [API.md](https://github.com/ONSdigital/rm-sample-service/blob/master/API.md) for API documentation.
+See [API.md](https://github.com/ONSdigital/rm-sample-service/blob/main/API.md) for API documentation.
 
 ## Swagger Specifications
 To view the Swagger Specifications for the Sample Service, run the service and navigate to http://localhost:8125/swagger-ui.html.

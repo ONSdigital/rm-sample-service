@@ -1,5 +1,5 @@
 curl http://localhost:8125/info -v -X GET
-200 {"name":"samplesvc","version":"10.44.0-SNAPSHOT","origin":"git@github.com:ONSdigital/rm-sample-service.git","commit":"0d5ebe966d2fabe2f2d67f54c35d6542c5a8e86f","branch":"master","built":"2017-08-02T14:50:00Z"}
+200 {"name":"samplesvc","version":"10.44.0-SNAPSHOT","origin":"git@github.com:ONSdigital/rm-sample-service.git","commit":"0d5ebe966d2fabe2f2d67f54c35d6542c5a8e86f","branch":"main","built":"2017-08-02T14:50:00Z"}
 
 
 curl -H "Accept: application/json" -H "Content-Type: application/json" http://localhost:8125/samples/sampleunitrequests -v -X POST -d "{\"collectionExerciseId\":\"14fb3e68-4dca-46db-bf49-04b84e07e77c\", \"surveyRef\":\"221\", \"exerciseDateTime\":\"2017-08-29T23:00:00.000+0000\"}"
