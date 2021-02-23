@@ -4,6 +4,6 @@ skinparam state {
 }
 
 [*] --> INIT
-INIT --> ACTIVE : activated [[https://github.com/ONSdigital/rm-sample-service/blob/master/src/main/java/uk/gov/ons/ctp/response/sample/service/impl/SampleServiceImpl.java#L180 *]]
-INIT --> FAILED : fail_validation [[https://github.com/ONSdigital/rm-sample-service/blob/master/src/main/java/uk/gov/ons/ctp/response/sample/service/impl/SampleServiceImpl.java#L286 *]]
+INIT --> ACTIVE : activated [[https://github.com/ONSdigital/rm-sample-service/blob/main/src/main/java/uk/gov/ons/ctp/response/sample/service/impl/SampleServiceImpl.java#L180 *]]
+INIT --> FAILED : fail_validation [[https://github.com/ONSdigital/rm-sample-service/blob/main/src/main/java/uk/gov/ons/ctp/response/sample/service/impl/SampleServiceImpl.java#L286 *]]
 @enduml
