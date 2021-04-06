@@ -17,6 +17,21 @@ logging:
   profile: DEV
   useJson: false
 
+liquibase:
+  user: samplesvc
+  password: samplesvc
+  default-schema: sample
+  url: jdbc:postgresql://localhost:5432/postgres
+  changeLog: classpath:/database/changelog-master.yml
+
+security:
+  basic:
+    enabled: true
+    realm: sdc
+  user:
+    name: admin
+    password: secret
+
 management:
   security:
     roles: SUPERUSER
@@ -24,11 +39,15 @@ management:
 
 server:
   port: 8125
+  servlet-path: /
+
+endpoints:
+  info:
+    enabled: true
+    sensitive: false
+  enabled: true
 
 spring:
-  main:
-    # Added as part of upgrade to 2.1 to quiet a an error where the 'restExceptionHandler' bean is defined twice.
-    allow-bean-definition-overriding: true
   output:
     ansi:
       enabled: never
@@ -36,8 +55,8 @@ spring:
     name: ONS SampleService
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: postgres
+    username: samplesvc
+    password: samplesvc
     driverClassName: org.postgresql.Driver
     continue-on-error: true
     tomcat:
@@ -45,7 +64,6 @@ spring:
       max-active: 10
       max-idle: 5
       min-idle: 3
-    initialization-mode: always
   http:
     multipart:
       max-file-size: 50MB
@@ -53,20 +71,11 @@ spring:
       file-size-threshold: 0
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQL94Dialect
+    show-sql: false
     properties:
       hibernate:
         ddl-auto: update
         default_schema: sample
-    open-in-view: true
-  liquibase:
-    user: postgres
-    password: postgres
-    default-schema: sample
-    url: jdbc:postgresql://localhost:5432/postgres
-    changeLog: classpath:/database/changelog-master.yml
-  security:
-    user: admin
-    password: secret
 
 party-svc:
   sample-path: /events
@@ -93,6 +102,7 @@ messaging:
   consumingThreads: 1
   maxAttempts: 3
   prefetchCount: 10
+  txSize: 1
   pubMaxAttempts: 3
 
 retries:
