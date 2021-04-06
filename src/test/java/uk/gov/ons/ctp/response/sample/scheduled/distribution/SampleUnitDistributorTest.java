@@ -1,7 +1,7 @@
 package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -18,7 +18,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import libs.common.error.CTPException;
 import libs.common.error.CTPException.Fault;
@@ -70,7 +70,7 @@ public class SampleUnitDistributorTest {
 
     when(collectionExerciseJobRepository.findByJobCompleteIsFalse())
         .thenReturn(Collections.singletonList(collectionExerciseJob));
-    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(sampleSummary);
+    when(sampleSummaryRepository.findById(any())).thenReturn(sampleSummary);
     when(sampleUnitRepository.findBySampleSummaryFKAndState(any(), any()))
         .thenReturn(Stream.of(sampleUnit));
     when(sampleUnitMapper.mapSampleUnit(any(), any())).thenReturn(mappedSampleUnit);
@@ -110,7 +110,7 @@ public class SampleUnitDistributorTest {
 
     when(collectionExerciseJobRepository.findByJobCompleteIsFalse())
         .thenReturn(Collections.singletonList(collectionExerciseJob));
-    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(sampleSummary);
+    when(sampleSummaryRepository.findById(any())).thenReturn(sampleSummary);
     when(sampleUnitRepository.findBySampleSummaryFKAndState(any(), any()))
         .thenReturn(Stream.of(sampleUnit));
     when(sampleUnitMapper.mapSampleUnit(any(), any())).thenReturn(mappedSampleUnit);
@@ -150,7 +150,9 @@ public class SampleUnitDistributorTest {
 
     when(collectionExerciseJobRepository.findByJobCompleteIsFalse())
         .thenReturn(Collections.singletonList(collectionExerciseJob));
-    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(sampleSummary);
+    when(sampleSummaryRepository.findById(any())).thenReturn(sampleSummary);
+    when(sampleUnitRepository.findBySampleSummaryFKAndState(any(), any()))
+        .thenReturn(Stream.empty());
 
     sampleUnitDistributor.distribute();
 
@@ -178,7 +180,9 @@ public class SampleUnitDistributorTest {
 
     when(collectionExerciseJobRepository.findByJobCompleteIsFalse())
         .thenReturn(Collections.singletonList(collectionExerciseJob));
-    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(sampleSummary);
+    when(sampleSummaryRepository.findById(any())).thenReturn(sampleSummary);
+    when(sampleUnitRepository.findBySampleSummaryFKAndState(any(), any()))
+        .thenReturn(Stream.empty());
 
     sampleUnitDistributor.distribute();
 

@@ -1,7 +1,7 @@
 package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.message.SampleUnitPublisher;
@@ -41,7 +41,7 @@ public class SampleUnitSenderTest {
         new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit();
     mappedSampleUnit.setId(UUID.randomUUID().toString());
 
-    when(sampleUnitRepository.findById(any(UUID.class))).thenReturn(sampleUnit);
+    when(sampleUnitRepository.findById(any())).thenReturn(sampleUnit);
     when(sampleUnitStateTransitionManager.transition(any(), any()))
         .thenReturn(SampleUnitState.DELIVERED);
 

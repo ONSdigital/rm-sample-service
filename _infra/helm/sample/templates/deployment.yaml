@@ -72,7 +72,7 @@ spec:
               containerPort: {{ .Values.container.port }}
           readinessProbe:
             httpGet:
-              path: /actuator/info
+              path: /info
               port: {{ .Values.container.port }}
             periodSeconds: 5
             failureThreshold: 3
@@ -80,7 +80,7 @@ spec:
             timeoutSeconds: 5
           livenessProbe:
             httpGet:
-              path: /actuator/info
+              path: /info
               port: {{ .Values.container.port }}
             initialDelaySeconds: 300
             periodSeconds: 20
@@ -185,9 +185,9 @@ spec:
             value: "$(SECURITY_USER_PASSWORD)"
           - name: SAMPLE_UNIT_DISTRIBUTION_DELAY_MILLI_SECONDS
             value: "{{ .Values.distribution.delay }}"
-          - name: SPRING_LIQUIBASE_USER
+          - name: LIQUIBASE_USER
             value: "$(DB_USERNAME)"
-          - name: SPRING_LIQUIBASE_PASSWORD
+          - name: LIQUIBASE_PASSWORD
             value: "$(DB_PASSWORD)"
           - name: SPRING_DATASOURCE_USERNAME
             value: "$(DB_USERNAME)"
