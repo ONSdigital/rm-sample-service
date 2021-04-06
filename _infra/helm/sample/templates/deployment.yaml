@@ -165,7 +165,7 @@ spec:
             {{- else }}
             value: "jdbc:postgresql://$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable"
             {{- end }}
-          - name: SPRING_LIQUIBASE_URL
+          - name: liquibase_url
             value: "jdbc:postgresql://$(DB_HOST):$(DB_PORT)/$(DB_NAME)"
           - name: PARTY_SVC_CONNECTION_CONFIG_HOST
             {{- if .Values.dns.enabled }}
