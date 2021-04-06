@@ -172,12 +172,12 @@ public class SampleService {
   /**
    * Effect a state transition for the target SampleSummary if one is required
    *
-   * @param sampleSummaryPK the sampleSummaryPK to be updated
+   * @param sampleSummaryID the sampleSummaryID to be updated
    * @return SampleSummary the updated SampleSummary
    * @throws CTPException if transition errors
    */
-  public SampleSummary activateSampleSummaryState(Integer sampleSummaryPK) throws CTPException {
-    SampleSummary targetSampleSummary = sampleSummaryRepository.findOne(sampleSummaryPK);
+  public SampleSummary activateSampleSummaryState(UUID sampleSummaryID) throws CTPException {
+    SampleSummary targetSampleSummary = sampleSummaryRepository.findById(sampleSummaryID);
     SampleState newState =
         sampleSvcStateTransitionManager.transition(
             targetSampleSummary.getState(), SampleEvent.ACTIVATED);
@@ -213,7 +213,7 @@ public class SampleService {
             sampleUnit.getSampleSummaryFK(), SampleUnitState.PERSISTED);
     int total = sampleUnitRepository.countBySampleSummaryFK(sampleUnit.getSampleSummaryFK());
     if (total == partied) {
-      activateSampleSummaryState(sampleUnit.getSampleSummaryFK());
+      activateSampleSummaryState(sampleUnit.getId());
     }
   }
 
