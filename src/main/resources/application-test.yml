@@ -3,6 +3,7 @@ spring:
     url: jdbc:postgresql://localhost:36432/postgres
   liquibase:
     url: jdbc:postgresql://localhost:36432/postgres
+    default-schema: sample
 
 sample-unit-distribution:
   delay-milli-seconds: 1000

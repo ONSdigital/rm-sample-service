@@ -61,9 +61,10 @@ spring:
   liquibase:
     user: postgres
     password: postgres
-    default-schema: sample
     url: jdbc:postgresql://localhost:5432/postgres
     changeLog: classpath:/database/changelog-master.yml
+    liquibase-schema: sample
+
   security:
     user: admin
     password: secret
