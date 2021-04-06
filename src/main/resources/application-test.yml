@@ -1,13 +1,7 @@
-liquibase:
-  user: postgres
-  password: postgres
-  url: jdbc:postgresql://localhost:36432/postgres
-
 spring:
   datasource:
-    schema: classpath:/schema.sql
-    username: postgres
-    password: postgres
+    url: jdbc:postgresql://localhost:36432/postgres
+  liquibase:
     url: jdbc:postgresql://localhost:36432/postgres
 
 sample-unit-distribution:
