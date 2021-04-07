@@ -11,7 +11,7 @@ import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 
 /** JPA Data Repository needed to persist Survey Sample Units */
 @Repository
-public interface SampleUnitRepository extends JpaRepository<SampleUnit, Integer> {
+public interface SampleUnitRepository extends JpaRepository<SampleUnit, UUID> {
 
   /**
    * Find SampleUnit entity by samplesummaryfk
