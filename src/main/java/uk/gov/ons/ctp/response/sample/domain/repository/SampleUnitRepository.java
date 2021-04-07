@@ -1,6 +1,7 @@
 package uk.gov.ons.ctp.response.sample.domain.repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -43,5 +44,5 @@ public interface SampleUnitRepository extends JpaRepository<SampleUnit, Integer>
    */
   int countBySampleSummaryFKAndState(Integer sampleSummaryFK, SampleUnitDTO.SampleUnitState state);
 
-  SampleUnit findById(UUID id);
+  Optional<SampleUnit> findById(UUID id);
 }

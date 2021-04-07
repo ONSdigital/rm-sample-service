@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
 import java.util.UUID;
 import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
@@ -41,7 +42,7 @@ public class SampleUnitSenderTest {
         new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit();
     mappedSampleUnit.setId(UUID.randomUUID().toString());
 
-    when(sampleUnitRepository.findById(any(UUID.class))).thenReturn(sampleUnit);
+    when(sampleUnitRepository.findById(any(UUID.class))).thenReturn(Optional.of(sampleUnit));
     when(sampleUnitStateTransitionManager.transition(any(), any()))
         .thenReturn(SampleUnitState.DELIVERED);
 
