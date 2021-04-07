@@ -8,7 +8,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 
 /** JPA Data Repository needed to persist Survey SampleSummarys */
 @Repository
-public interface SampleSummaryRepository extends JpaRepository<SampleSummary, UUID> {
+public interface SampleSummaryRepository extends JpaRepository<SampleSummary, Integer> {
 
   /**
    * Find SampleSummary by UUID
