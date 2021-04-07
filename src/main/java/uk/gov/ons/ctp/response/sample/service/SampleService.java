@@ -168,14 +168,14 @@ public class SampleService {
   /**
    * Effect a state transition for the target SampleSummary if one is required
    *
-   * @param sampleSummaryID the sampleSummaryID to be updated
+   * @param sampleSummaryPK the sampleSummaryPK to be updated
    * @return SampleSummary the updated SampleSummary
    * @throws CTPException if transition errors
    */
-  public SampleSummary activateSampleSummaryState(UUID sampleSummaryID) throws CTPException {
-    log.debug("attempting to find sample summary", kv("sampleSummaryId", sampleSummaryID));
+  public SampleSummary activateSampleSummaryState(Integer sampleSummaryPK) throws CTPException {
+        log.debug("attempting to find sample summary", kv("sampleSummaryPK", sampleSummaryPK));
     try {
-      SampleSummary targetSampleSummary = sampleSummaryRepository.findById(sampleSummaryID).orElseThrow();
+      SampleSummary targetSampleSummary = sampleSummaryRepository.findBySampleSummaryPK(sampleSummaryPK).orElseThrow();
       SampleState newState =
               sampleSvcStateTransitionManager.transition(
                       targetSampleSummary.getState(), SampleEvent.ACTIVATED);
@@ -184,7 +184,7 @@ public class SampleService {
       sampleSummaryRepository.saveAndFlush(targetSampleSummary);
       return targetSampleSummary;
     } catch (NoSuchElementException e) {
-      log.error("unable to find sample summary", kv("sampleSummaryId", sampleSummaryID));
+      log.error("unable to find sample summary", kv("sampleSummaryPK", sampleSummaryPK));
       throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND);
     }
   }
@@ -220,7 +220,7 @@ public class SampleService {
             sampleUnit.getSampleSummaryFK(), SampleUnitState.PERSISTED);
     int total = sampleUnitRepository.countBySampleSummaryFK(sampleUnit.getSampleSummaryFK());
     if (total == partied) {
-      activateSampleSummaryState(sampleUnit.getId());
+      activateSampleSummaryState(sampleUnit.getSampleSummaryFK());
     }
   }
 

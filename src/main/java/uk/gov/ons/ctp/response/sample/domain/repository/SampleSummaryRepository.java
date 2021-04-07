@@ -17,4 +17,6 @@ public interface SampleSummaryRepository extends JpaRepository<SampleSummary, In
    * @return SampleSummary object
    */
   Optional<SampleSummary> findById(UUID id);
+
+  Optional<SampleSummary> findBySampleSummaryPK(Integer sampleSummaryPK);
 }

@@ -134,7 +134,7 @@ public class SampleServiceTest {
     when(sampleSvcUnitStateTransitionManager.transition(
             SampleUnitState.INIT, SampleUnitEvent.PERSISTING))
         .thenReturn(SampleUnitState.PERSISTED);
-    when(sampleSummaryRepository.findById(UUID.fromString(SAMPLEUNIT_ID))).thenReturn(Optional.of(sampleSummaryList.get(0)));
+    when(sampleSummaryRepository.findBySampleSummaryPK(1)).thenReturn(Optional.of(sampleSummaryList.get(0)));
     when(sampleSvcStateTransitionManager.transition(SampleState.INIT, SampleEvent.ACTIVATED))
         .thenReturn(SampleState.ACTIVE);
 
