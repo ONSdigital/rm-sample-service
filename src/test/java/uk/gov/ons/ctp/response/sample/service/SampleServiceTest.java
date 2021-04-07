@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import libs.common.FixtureHelper;
 import libs.common.state.StateTransitionManager;
@@ -129,11 +130,11 @@ public class SampleServiceTest {
   public void postPartyDTOToPartyServiceAndUpdateStatesTest() throws Exception {
     when(partySvcClient.postParty(any())).thenReturn(partyDTO.get(0));
     when(sampleUnitRepository.findById(UUID.fromString(SAMPLEUNIT_ID)))
-        .thenReturn(sampleUnit.get(0));
+        .thenReturn(Optional.of(sampleUnit.get(0)));
     when(sampleSvcUnitStateTransitionManager.transition(
             SampleUnitState.INIT, SampleUnitEvent.PERSISTING))
         .thenReturn(SampleUnitState.PERSISTED);
-    when(sampleSummaryRepository.findById(UUID.fromString(SAMPLEUNIT_ID))).thenReturn(sampleSummaryList.get(0));
+    when(sampleSummaryRepository.findById(UUID.fromString(SAMPLEUNIT_ID))).thenReturn(Optional.of(sampleSummaryList.get(0)));
     when(sampleSvcStateTransitionManager.transition(SampleState.INIT, SampleEvent.ACTIVATED))
         .thenReturn(SampleState.ACTIVE);
 
@@ -154,7 +155,7 @@ public class SampleServiceTest {
   public void sendToPartyServiceTestNotAllSampleUnitsPosted() throws Exception {
     when(partySvcClient.postParty(any())).thenReturn(partyDTO.get(0));
     when(sampleUnitRepository.findById(UUID.fromString(SAMPLEUNIT_ID)))
-        .thenReturn(sampleUnit.get(0));
+        .thenReturn(Optional.of(sampleUnit.get(0)));
     when(sampleSvcUnitStateTransitionManager.transition(
             SampleUnitState.INIT, SampleUnitEvent.PERSISTING))
         .thenReturn(SampleUnitState.PERSISTED);
@@ -190,7 +191,7 @@ public class SampleServiceTest {
   @Test
   public void testOneCollectionExerciseJobIsStoredWhenSampleUnitsAreFound() throws Exception {
     SampleSummary newSummary = createSampleSummary(5, 2);
-    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(newSummary);
+    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.of(newSummary));
     Integer sampleUnitsTotal =
         sampleService.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(1)).storeCollectionExerciseJob(any());
@@ -215,7 +216,7 @@ public class SampleServiceTest {
   @Test
   public void testNoCollectionExerciseJobIsStoredWhenNoSampleUnitsAreFound() throws Exception {
     SampleSummary newSummary = createSampleSummary(0, 2);
-    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(newSummary);
+    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.of(newSummary));
     Integer sampleUnitsTotal =
         sampleService.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(0)).storeCollectionExerciseJob(any());
@@ -231,17 +232,17 @@ public class SampleServiceTest {
   @Test
   public void testNoCollectionExerciseJobIsStoredWhenNoSampleSummaryIsFound() throws Exception {
     SampleSummary sampleSummary = null;
-    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(sampleSummary);
+    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(sampleSummary));
     Integer sampleUnitsTotal =
         sampleService.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(0)).storeCollectionExerciseJob(any());
-    assertThat(sampleUnitsTotal, is(0));
+    assertEquals(0, sampleUnitsTotal.intValue());
   }
 
   @Test
   public void getSampleSummaryUnitCountHappyPath() {
     SampleSummary newSummary = createSampleSummary(5, 2);
-    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(newSummary);
+    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.of(newSummary));
 
     int actualResult = sampleService.getSampleSummaryUnitCount(newSummary.getId());
 
@@ -250,7 +251,7 @@ public class SampleServiceTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void getSampleSummaryUnitCountSampleSummaryNonExistent() {
-    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(null);
+    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(null));
 
     sampleService.getSampleSummaryUnitCount(UUID.randomUUID());
   }
@@ -259,7 +260,7 @@ public class SampleServiceTest {
   public void getSampleSummaryUnitCountSampleSummaryNullSize() {
     SampleSummary newSummary = createSampleSummary(5, 2);
     newSummary.setTotalSampleUnits(null);
-    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(newSummary);
+    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.of(newSummary));
 
     sampleService.getSampleSummaryUnitCount(newSummary.getId());
   }
@@ -267,7 +268,7 @@ public class SampleServiceTest {
   @Test
   public void createSampleUnit() throws UnknownSampleSummaryException {
     SampleSummary newSummary = createSampleSummary(5, 2);
-    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(newSummary);
+    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.of(newSummary));
     BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();
     sampleService.createSampleUnit(newSummary.getId(), businessSampleUnit, SampleUnitState.INIT);
     verify(sampleUnitRepository, times(1)).save(any(SampleUnit.class));
@@ -276,7 +277,7 @@ public class SampleServiceTest {
   @Test
   public void createDuplicateSampleUnitThrowsIllegalStateException() throws UnknownSampleSummaryException {
     SampleSummary newSummary = createSampleSummary(5, 2);
-    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(newSummary);
+    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.of(newSummary));
     BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();
     SampleUnit sampleUnit = sampleService.createSampleUnit(newSummary.getId(), businessSampleUnit, SampleUnitState.INIT);
     when(sampleUnitRepository.existsBySampleUnitRefAndSampleSummaryFK(businessSampleUnit.getSampleUnitRef(), newSummary.getSampleSummaryPK())).thenReturn(true);

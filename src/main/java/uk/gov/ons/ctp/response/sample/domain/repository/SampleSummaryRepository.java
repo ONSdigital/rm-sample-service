@@ -1,5 +1,6 @@
 package uk.gov.ons.ctp.response.sample.domain.repository;
 
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -15,5 +16,5 @@ public interface SampleSummaryRepository extends JpaRepository<SampleSummary, In
    * @param id the UUID of the sampleSummary
    * @return SampleSummary object
    */
-  SampleSummary findById(UUID id);
+  Optional<SampleSummary> findById(UUID id);
 }

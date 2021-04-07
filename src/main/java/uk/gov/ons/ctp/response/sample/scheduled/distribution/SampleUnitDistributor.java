@@ -2,8 +2,7 @@ package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -51,21 +50,27 @@ public class SampleUnitDistributor {
   }
 
   private void processJob(CollectionExerciseJob job) throws SampleDistributionException {
-    List<SampleUnit> invalidSamples = Optional.of(sampleSummaryRepository.findById(job.getSampleSummaryId()))
-      .filter(sampleSummary -> sampleSummary.getState() == SampleState.ACTIVE)
-      .map(sampleSummary -> sampleUnitRepository.findBySampleSummaryFKAndState(
-        sampleSummary.getSampleSummaryPK(), SampleUnitState.PERSISTED))
-      .orElseGet(Stream::empty)
-      .map(sampleUnit -> sampleUnitMapper.mapSampleUnit(sampleUnit, job.getCollectionExerciseId().toString()))
-      .filter(publishSample().negate())
-      .collect(Collectors.toList());
-      
-    if (!invalidSamples.isEmpty()) {
-      throw new SampleDistributionException("Some samples have failed transition for collection exericse Job", job, invalidSamples);
+    UUID sampleSummaryId = job.getSampleSummaryId();
+    try {
+      List<SampleUnit> invalidSamples = Optional.of(sampleSummaryRepository.findById(sampleSummaryId)).orElseThrow()
+              .filter(sampleSummary -> sampleSummary.getState() == SampleState.ACTIVE)
+              .map(sampleSummary -> sampleUnitRepository.findBySampleSummaryFKAndState(
+                      sampleSummary.getSampleSummaryPK(), SampleUnitState.PERSISTED))
+              .orElseGet(Stream::empty)
+              .map(sampleUnit -> sampleUnitMapper.mapSampleUnit(sampleUnit, job.getCollectionExerciseId().toString()))
+              .filter(publishSample().negate())
+              .collect(Collectors.toList());
+
+      if (!invalidSamples.isEmpty()) {
+        throw new SampleDistributionException("Some samples have failed transition for collection exericse Job", job, invalidSamples);
+      }
+      log.info("All samples have been published successfully", kv("CollectionExerciseJob", job));
+      job.setJobComplete(true);
+      collectionExerciseJobRepository.saveAndFlush(job);
+    } catch (NoSuchElementException e) {
+      log.error("unable to find sample summary", kv("sampleSummaryId", sampleSummaryId));
+      throw new SampleDistributionException("unable to find sample summary", job, new ArrayList<>());
     }
-    log.info("All samples have been published successfully", kv("CollectionExerciseJob", job));
-    job.setJobComplete(true);
-    collectionExerciseJobRepository.saveAndFlush(job);
   }
 
   /**

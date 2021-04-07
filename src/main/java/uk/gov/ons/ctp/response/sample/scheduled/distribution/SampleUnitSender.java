@@ -2,6 +2,7 @@ package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
@@ -44,20 +45,26 @@ public class SampleUnitSender {
   /** Send a SampleUnit */
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void sendSampleUnit(SampleUnit mappedSampleUnit) throws CTPException {
-    uk.gov.ons.ctp.response.sample.domain.model.SampleUnit sampleUnit =
-        sampleUnitRepository.findById(UUID.fromString(mappedSampleUnit.getId()));
+    String sampleUnitId = mappedSampleUnit.getId();
+    try {
+      uk.gov.ons.ctp.response.sample.domain.model.SampleUnit sampleUnit =
+              sampleUnitRepository.findById(UUID.fromString(sampleUnitId)).orElseThrow();
 
-    if (sampleUnit.getState() == SampleUnitState.PERSISTED) {
-      log.debug("Publishing mapped sampleUnit", kv("MappedSampleUnit", mappedSampleUnit));
-      sampleUnitPublisher.send(mappedSampleUnit);
+      if (sampleUnit.getState() == SampleUnitState.PERSISTED) {
+        log.debug("Publishing mapped sampleUnit", kv("MappedSampleUnit", mappedSampleUnit));
+        sampleUnitPublisher.send(mappedSampleUnit);
 
-      log.debug("Transitioning state of sampleUnit", kv("SampleUnit", sampleUnit), 
-        kv("from", sampleUnit.getState()), kv("to", SampleUnitDTO.SampleUnitEvent.DELIVERING));
-      SampleUnitDTO.SampleUnitState newState =
-          sampleUnitStateTransitionManager.transition(
-              sampleUnit.getState(), SampleUnitDTO.SampleUnitEvent.DELIVERING);
-      sampleUnit.setState(newState);
-      sampleUnitRepository.saveAndFlush(sampleUnit);
+        log.debug("Transitioning state of sampleUnit", kv("SampleUnit", sampleUnit),
+                kv("from", sampleUnit.getState()), kv("to", SampleUnitDTO.SampleUnitEvent.DELIVERING));
+        SampleUnitDTO.SampleUnitState newState =
+                sampleUnitStateTransitionManager.transition(
+                        sampleUnit.getState(), SampleUnitDTO.SampleUnitEvent.DELIVERING);
+        sampleUnit.setState(newState);
+        sampleUnitRepository.saveAndFlush(sampleUnit);
+      }
+    } catch (NoSuchElementException e) {
+      log.error("unable to find sample unit ", kv("sampleUnitId", sampleUnitId));
+      throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND);
     }
   }
 }
