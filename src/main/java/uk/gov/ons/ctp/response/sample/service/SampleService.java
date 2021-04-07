@@ -60,7 +60,7 @@ public class SampleService {
   }
 
   public SampleSummary findSampleSummary(UUID id) {
-    return sampleSummaryRepository.findSampleSummaryById(id).orElse(null);
+    return sampleSummaryRepository.findById(id).orElse(null);
   }
 
   @Transactional(propagation = Propagation.REQUIRED)
@@ -83,7 +83,7 @@ public class SampleService {
       UUID sampleSummaryId, BusinessSampleUnit samplingUnit, SampleUnitState sampleUnitState)
       throws UnknownSampleSummaryException {
 
-    SampleSummary sampleSummary = sampleSummaryRepository.findSampleSummaryById(sampleSummaryId).orElse(null);
+    SampleSummary sampleSummary = sampleSummaryRepository.findById(sampleSummaryId).orElse(null);
     if (sampleSummary != null) {
       // the csv ingester does this so it's needed here
       samplingUnit.setSampleUnitType("B");
@@ -175,7 +175,7 @@ public class SampleService {
   public SampleSummary activateSampleSummaryState(UUID sampleSummaryID) throws CTPException {
     log.debug("attempting to find sample summary", kv("sampleSummaryId", sampleSummaryID));
     try {
-      SampleSummary targetSampleSummary = sampleSummaryRepository.findSampleSummaryById(sampleSummaryID).orElseThrow();
+      SampleSummary targetSampleSummary = sampleSummaryRepository.findById(sampleSummaryID).orElseThrow();
       SampleState newState =
               sampleSvcStateTransitionManager.transition(
                       targetSampleSummary.getState(), SampleEvent.ACTIVATED);
@@ -235,7 +235,7 @@ public class SampleService {
     // Integer sampleUnitsTotal =
     // initialiseSampleUnitsForCollectionExcerciseCollection(job.getSampleSummaryId());
     Integer sampleUnitsTotal = 0;
-    SampleSummary sampleSummary = sampleSummaryRepository.findSampleSummaryById(job.getSampleSummaryId()).orElse(null);
+    SampleSummary sampleSummary = sampleSummaryRepository.findById(job.getSampleSummaryId()).orElse(null);
     if (sampleSummary != null && sampleSummary.getTotalSampleUnits() != 0) {
       sampleUnitsTotal = sampleSummary.getTotalSampleUnits();
       collectionExerciseJobService.storeCollectionExerciseJob(job);
@@ -244,7 +244,7 @@ public class SampleService {
   }
 
   public int getSampleSummaryUnitCount(UUID sampleSummaryId) {
-    SampleSummary sampleSummary = sampleSummaryRepository.findSampleSummaryById(sampleSummaryId).orElse(null);
+    SampleSummary sampleSummary = sampleSummaryRepository.findById(sampleSummaryId).orElse(null);
     if (sampleSummary == null) {
       throw new IllegalArgumentException(
           String.format("Sample summary %s cannot be found", sampleSummaryId));
@@ -299,7 +299,7 @@ public class SampleService {
 
   public List<SampleUnit> findSampleUnitsBySampleSummary(UUID sampleSummaryId) {
     try {
-      SampleSummary ss = sampleSummaryRepository.findSampleSummaryById(sampleSummaryId).orElseThrow();
+      SampleSummary ss = sampleSummaryRepository.findById(sampleSummaryId).orElseThrow();
       return sampleUnitRepository.findBySampleSummaryFK(ss.getSampleSummaryPK());
     } catch (NoSuchElementException e) {
         log.error("unable to find sample summary", kv("sampleSummaryId", sampleSummaryId));

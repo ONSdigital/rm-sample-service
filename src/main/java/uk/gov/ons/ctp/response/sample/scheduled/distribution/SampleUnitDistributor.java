@@ -52,7 +52,7 @@ public class SampleUnitDistributor {
   private void processJob(CollectionExerciseJob job) throws SampleDistributionException {
     UUID sampleSummaryId = job.getSampleSummaryId();
     try {
-      List<SampleUnit> invalidSamples = Optional.of(sampleSummaryRepository.findSampleSummaryById(sampleSummaryId)).orElseThrow()
+      List<SampleUnit> invalidSamples = Optional.of(sampleSummaryRepository.findById(sampleSummaryId)).orElseThrow()
               .filter(sampleSummary -> sampleSummary.getState() == SampleState.ACTIVE)
               .map(sampleSummary -> sampleUnitRepository.findBySampleSummaryFKAndState(
                       sampleSummary.getSampleSummaryPK(), SampleUnitState.PERSISTED))
