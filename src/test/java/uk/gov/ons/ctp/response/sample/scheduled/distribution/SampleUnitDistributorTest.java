@@ -71,7 +71,7 @@ public class SampleUnitDistributorTest {
 
     when(collectionExerciseJobRepository.findByJobCompleteIsFalse())
         .thenReturn(Collections.singletonList(collectionExerciseJob));
-    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.of(sampleSummary));
+    when(sampleSummaryRepository.findSampleSummaryById(any(UUID.class))).thenReturn(Optional.of(sampleSummary));
     when(sampleUnitRepository.findBySampleSummaryFKAndState(any(), any()))
         .thenReturn(Stream.of(sampleUnit));
     when(sampleUnitMapper.mapSampleUnit(any(), any())).thenReturn(mappedSampleUnit);
@@ -111,7 +111,7 @@ public class SampleUnitDistributorTest {
 
     when(collectionExerciseJobRepository.findByJobCompleteIsFalse())
         .thenReturn(Collections.singletonList(collectionExerciseJob));
-    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.of(sampleSummary));
+    when(sampleSummaryRepository.findSampleSummaryById(any(UUID.class))).thenReturn(Optional.of(sampleSummary));
     when(sampleUnitRepository.findBySampleSummaryFKAndState(any(), any()))
         .thenReturn(Stream.of(sampleUnit));
     when(sampleUnitMapper.mapSampleUnit(any(), any())).thenReturn(mappedSampleUnit);
@@ -151,7 +151,7 @@ public class SampleUnitDistributorTest {
 
     when(collectionExerciseJobRepository.findByJobCompleteIsFalse())
         .thenReturn(Collections.singletonList(collectionExerciseJob));
-    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.of(sampleSummary));
+    when(sampleSummaryRepository.findSampleSummaryById(any(UUID.class))).thenReturn(Optional.of(sampleSummary));
 
     sampleUnitDistributor.distribute();
 
@@ -179,7 +179,7 @@ public class SampleUnitDistributorTest {
 
     when(collectionExerciseJobRepository.findByJobCompleteIsFalse())
         .thenReturn(Collections.singletonList(collectionExerciseJob));
-    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.of(sampleSummary));
+    when(sampleSummaryRepository.findSampleSummaryById(any(UUID.class))).thenReturn(Optional.of(sampleSummary));
 
     sampleUnitDistributor.distribute();
 
