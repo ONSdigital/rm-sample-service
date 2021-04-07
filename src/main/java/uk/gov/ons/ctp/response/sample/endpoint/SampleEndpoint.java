@@ -235,7 +235,9 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   public ResponseEntity<SampleSummaryDTO> createSampleSummary(
       final @RequestBody SampleSummaryDTO requestSummary) {
     SampleSummary sampleSummary = sampleService.createAndSaveSampleSummary(requestSummary);
-
+    if (sampleSummary != null) {
+      log.debug("sample summary created", kv("sampleSummaryId", sampleSummary.getId()));
+    }
     SampleSummaryDTO sampleSummaryDTO = mapperFacade.map(sampleSummary, SampleSummaryDTO.class);
 
     return ResponseEntity.created(
