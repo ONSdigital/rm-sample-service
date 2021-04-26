@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
@@ -224,10 +225,12 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     } catch (IllegalStateException e) {
       log.error("duplicate sample", kv("sampleSummaryId", sampleSummaryId), e);
       return ResponseEntity.status(HttpStatus.CONFLICT).build();
-    }
-    catch (UnknownSampleSummaryException e) {
+    } catch (UnknownSampleSummaryException e) {
       log.error("unknown sample summary id", kv("sampleSummaryId", sampleSummaryId), e);
       return ResponseEntity.badRequest().build();
+    } catch (CTPException e) {
+      log.error("unknown sample summary id", kv("sampleSummaryId", sampleSummaryId), e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
   }
 
