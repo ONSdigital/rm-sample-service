@@ -199,11 +199,17 @@ public class SampleService {
                       UUID.fromString(sampleUnitId)).orElseThrow();
       changeSampleUnitState(sampleUnit);
       sampleSummaryStateCheck(sampleUnit);
+      addPartyIdToSample(sampleUnit, returnedParty);
       return returnedParty;
     } catch (NoSuchElementException e) {
         log.error("unable to find sample ", kv("sampleUnitId", sampleUnitId));
         throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND);
     }
+  }
+
+  private void addPartyIdToSample(SampleUnit sampleUnit, PartyDTO party) throws CTPException {
+    sampleUnit.setPartyId(party.getId());
+    sampleUnitRepository.saveAndFlush(sampleUnit);
   }
 
   private void changeSampleUnitState(SampleUnit sampleUnit) throws CTPException {

@@ -94,6 +94,8 @@ public class SampleUnit {
 
   protected SampleUnit.SampleAttributes sampleAttributes;
 
+  protected String partyId;
+
   /** Default no-arg constructor */
   public SampleUnit() {
     super();

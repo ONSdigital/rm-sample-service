@@ -1,0 +1,11 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 14-1
+      author: Adam Wilkie
+      changes:
+        - sqlFile:
+            comment: Add party id to sample unit
+            path: add_party_id_to_sample.sql
+            relativeToChangelogFile: true
+            splitStatements: false
