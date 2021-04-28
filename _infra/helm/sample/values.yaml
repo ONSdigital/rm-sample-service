@@ -59,3 +59,8 @@ distribution:
 dns:
   enabled: false
   wellKnownPort: 8080
+
+gcp:
+  project: ras-rm-dev
+  topic: test-sample-delivery
+

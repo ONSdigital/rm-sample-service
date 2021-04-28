@@ -8,8 +8,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cloud.gcp.pubsub.core.PubSubTemplate;
+import org.springframework.cloud.gcp.pubsub.integration.outbound.PubSubMessageHandler;
+import org.springframework.context.annotation.Bean;
 import org.springframework.integration.annotation.MessageEndpoint;
+import org.springframework.integration.annotation.MessagingGateway;
+import org.springframework.integration.annotation.ServiceActivator;
+import uk.gov.ons.ctp.response.sample.SampleSvcApplication;
 import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
+
+import javax.websocket.MessageHandler;
 
 /** The publisher to queues */
 @CoverageIgnore
@@ -17,9 +25,9 @@ import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
 public class SampleUnitPublisher {
   private static final Logger log = LoggerFactory.getLogger(SampleUnitPublisher.class);
 
-  @Qualifier("sampleUnitRabbitTemplate")
+
   @Autowired
-  private RabbitTemplate rabbitTemplate;
+  private PubSubConfig.PubsubOutboundGateway messagingGateway;
 
   /**
    * send sample to collection exercise queue
@@ -28,6 +36,10 @@ public class SampleUnitPublisher {
    */
   public void send(SampleUnit sampleUnit) {
     log.debug("send to queue sampleDelivery", kv("sample_unit", sampleUnit));
-    rabbitTemplate.convertAndSend(sampleUnit);
+    messagingGateway.sendToPubsub(sampleUnit);
   }
+
+
+
+
 }

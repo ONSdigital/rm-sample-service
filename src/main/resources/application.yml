@@ -64,10 +64,14 @@ spring:
     url: jdbc:postgresql://localhost:5432/postgres
     changeLog: classpath:/database/changelog-master.yml
     liquibase-schema: sample
-
   security:
     user: admin
     password: secret
+  cloud:
+    gcp:
+      project-id: ras-rm-sandbox
+#spring.cloud.gcp.project-id=[YOUR_GCP_PROJECT_ID_HERE]
+#spring.cloud.gcp.credentials.location=file:[LOCAL_FS_CREDENTIALS_PATH]
 
 party-svc:
   sample-path: /events
@@ -99,3 +103,5 @@ messaging:
 retries:
   maxAttempts: 3
   backoff: 5000
+
+

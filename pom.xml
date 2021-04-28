@@ -122,6 +122,7 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-gcp-starter-pubsub</artifactId>
+			<version>${spring.cloud.gcp.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.amqp</groupId>

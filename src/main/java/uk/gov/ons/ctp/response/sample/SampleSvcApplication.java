@@ -39,7 +39,6 @@ import uk.gov.ons.ctp.response.sample.service.state.SampleSvcStateTransitionMana
 @ComponentScan(basePackages = {"uk.gov.ons.ctp.response"})
 @EnableJpaRepositories(basePackages = {"uk.gov.ons.ctp.response"})
 @EntityScan("uk.gov.ons.ctp.response")
-@ImportResource("springintegration/main.xml")
 public class SampleSvcApplication {
 
   @Autowired private StateTransitionManagerFactory stateTransitionManager;
@@ -128,4 +127,5 @@ public class SampleSvcApplication {
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     return factory.getValidator();
   }
+
 }
