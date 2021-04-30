@@ -23,7 +23,6 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
-import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
 import uk.gov.ons.ctp.response.sample.party.PartyUtil;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
@@ -52,8 +51,6 @@ public class SampleService {
   @Autowired private PartySvcClientService partySvcClient;
 
   @Autowired private CollectionExerciseJobService collectionExerciseJobService;
-
-  @Autowired private PartyPublisher partyPublisher;
 
   public List<SampleSummary> findAllSampleSummaries() {
     return sampleSummaryRepository.findAll();
@@ -102,11 +99,11 @@ public class SampleService {
     }
   }
 
-  public void publishSampleToParty(UUID sampleSummaryId, BusinessSampleUnit samplingUnit) {
+  public void publishSampleToParty(UUID sampleSummaryId, BusinessSampleUnit samplingUnit) throws CTPException {
     PartyCreationRequestDTO party = PartyUtil.convertToParty(samplingUnit);
     party.getAttributes().setSampleUnitId(samplingUnit.getSampleUnitId().toString());
     party.setSampleSummaryId(sampleSummaryId.toString());
-    partyPublisher.publish(party);
+    sendToPartyService(party);
   }
 
   private Integer calculateExpectedCollectionInstruments(
@@ -190,7 +187,7 @@ public class SampleService {
   }
 
   public PartyDTO sendToPartyService(PartyCreationRequestDTO partyCreationRequest)
-      throws Exception {
+      throws CTPException {
     PartyDTO returnedParty = partySvcClient.postParty(partyCreationRequest);
     String sampleUnitId = partyCreationRequest.getAttributes().getSampleUnitId();
     try {
