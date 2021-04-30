@@ -74,7 +74,8 @@ import javax.xml.bind.annotation.XmlType;
       "sampleUnitType",
       "formType",
       "collectionExerciseId",
-      "sampleAttributes"
+      "sampleAttributes",
+      "partyId"
     })
 @XmlRootElement(name = "sampleUnit")
 public class SampleUnit {
