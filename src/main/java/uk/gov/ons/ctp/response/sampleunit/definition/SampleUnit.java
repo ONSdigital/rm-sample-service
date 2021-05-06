@@ -256,6 +256,24 @@ public class SampleUnit {
   }
 
   /**
+   * Gets the value of the partyId property.
+   *
+   * @return possible object is {@link String }
+   */
+  public String getPartyId() {
+    return partyId;
+  }
+
+  /**
+   * Sets the value of the partyId property.
+   *
+   * @param value allowed object is {@link String }
+   */
+  public void setPartyId(String value) {
+    this.sampleUnitType = value;
+  }
+
+  /**
    * Copies all state of this object to a builder. This method is used by the {@link #copyOf} method
    * and should not be called directly by client code.
    *
