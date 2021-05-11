@@ -74,7 +74,8 @@ import javax.xml.bind.annotation.XmlType;
       "sampleUnitType",
       "formType",
       "collectionExerciseId",
-      "sampleAttributes"
+      "sampleAttributes",
+      "partyId"
     })
 @XmlRootElement(name = "sampleUnit")
 public class SampleUnit {
@@ -93,6 +94,8 @@ public class SampleUnit {
   protected String collectionExerciseId;
 
   protected SampleUnit.SampleAttributes sampleAttributes;
+
+  protected String partyId;
 
   /** Default no-arg constructor */
   public SampleUnit() {
@@ -250,6 +253,24 @@ public class SampleUnit {
    */
   public void setSampleAttributes(SampleUnit.SampleAttributes value) {
     this.sampleAttributes = value;
+  }
+
+  /**
+   * Gets the value of the partyId property.
+   *
+   * @return possible object is {@link String }
+   */
+  public String getPartyId() {
+    return partyId;
+  }
+
+  /**
+   * Sets the value of the partyId property.
+   *
+   * @param value allowed object is {@link String }
+   */
+  public void setPartyId(String value) {
+    this.sampleUnitType = value;
   }
 
   /**
