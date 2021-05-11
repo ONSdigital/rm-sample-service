@@ -205,7 +205,8 @@ public class SampleService {
   }
 
   private void addPartyIdToSample(SampleUnit sampleUnit, PartyDTO party) throws CTPException {
-    sampleUnit.setPartyId(party.getId());
+    UUID partyId = UUID.fromString(party.getId());
+    sampleUnit.setPartyId(partyId);
     sampleUnitRepository.saveAndFlush(sampleUnit);
   }
 

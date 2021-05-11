@@ -67,5 +67,5 @@ public class SampleUnit implements Serializable {
   @Transient private SampleAttributes sampleAttributes;
 
   @Column(name = "party_id")
-  private String partyId;
+  private UUID partyId;
 }
