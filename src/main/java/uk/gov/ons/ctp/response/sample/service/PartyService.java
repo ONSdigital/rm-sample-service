@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
@@ -28,6 +30,7 @@ public class PartyService {
     SampleUnitRepository sampleUnitRepository;
 
     @Async
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void sendToPartyService(String sampleUnitId, PartyCreationRequestDTO partyCreationRequest)
             throws CTPException {
         try {
