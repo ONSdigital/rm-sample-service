@@ -103,7 +103,7 @@ public class SampleService {
     String sampleUnitId = samplingUnit.getSampleUnitId().toString();
     party.getAttributes().setSampleUnitId(sampleUnitId);
     party.setSampleSummaryId(sampleSummaryId.toString());
-    partyService.sendToPartyService(party);
+    partyService.sendToPartyService(sampleUnitId, party);
     updateSampleUnit(sampleUnitId);
   }
 
@@ -189,24 +189,15 @@ public class SampleService {
 
   public void updateSampleUnit(String sampleUnitId) throws CTPException {
     try {
-      //TODO fix me
-      PartyDTO returnedParty = null;
       SampleUnit sampleUnit =
               sampleUnitRepository.findById(
                       UUID.fromString(sampleUnitId)).orElseThrow();
       changeSampleUnitState(sampleUnit);
       sampleSummaryStateCheck(sampleUnit);
-      addPartyIdToSample(sampleUnit, returnedParty);
     } catch (NoSuchElementException e) {
       log.error("unable to find sample ", kv("sampleUnitId", sampleUnitId));
       throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND);
     }
-  }
-
-  private void addPartyIdToSample(SampleUnit sampleUnit, PartyDTO party) throws CTPException {
-    UUID partyId = UUID.fromString(party.getId());
-    sampleUnit.setPartyId(partyId);
-    sampleUnitRepository.saveAndFlush(sampleUnit);
   }
 
   private void changeSampleUnitState(SampleUnit sampleUnit) throws CTPException {

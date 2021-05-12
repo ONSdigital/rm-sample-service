@@ -12,6 +12,7 @@ import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
+import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.validation.BusinessSurveySample;
@@ -32,14 +33,19 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class PartyServiceTest {
 
+    private static final String SAMPLEUNIT_ID = "4ef7326b-4143-43f7-ba67-65056d4e20b8";
+
     @Mock
     private PartySvcClientService partySvcClient;
+
+    @Mock private SampleUnitRepository sampleUnitRepository;
 
     @InjectMocks
     private PartyService partyService;
 
     private List<PartyCreationRequestDTO> party;
     private List<PartyDTO> partyDTO;
+    private List<SampleUnit> sampleUnit;
 
     /**
      * Before the test
@@ -50,6 +56,7 @@ public class PartyServiceTest {
     public void setUp() throws Exception {
         party = FixtureHelper.loadClassFixtures(PartyCreationRequestDTO[].class);
         partyDTO = FixtureHelper.loadClassFixtures(PartyDTO[].class);
+        sampleUnit = FixtureHelper.loadClassFixtures(SampleUnit[].class);
     }
 
     /**
@@ -60,7 +67,11 @@ public class PartyServiceTest {
     @Test
     public void postPartyDTOToPartyServiceAndUpdateStatesTest() throws Exception {
         when(partySvcClient.postParty(any())).thenReturn(partyDTO.get(0));
-        partyService.sendToPartyService(party.get(0));
+        when(sampleUnitRepository.findById(UUID.fromString(SAMPLEUNIT_ID)))
+                .thenReturn(Optional.of(sampleUnit.get(0)));
+
+        partyService.sendToPartyService(SAMPLEUNIT_ID, party.get(0));
         verify(partySvcClient).postParty(any(PartyCreationRequestDTO.class));
+        verify(sampleUnitRepository).findById(UUID.fromString(SAMPLEUNIT_ID));
     }
 }
