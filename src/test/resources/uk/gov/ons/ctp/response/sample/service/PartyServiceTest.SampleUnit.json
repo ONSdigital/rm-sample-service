@@ -1,0 +1,11 @@
+[
+  {
+    "sampleUnitPK":1,
+    "id":"4ef7326b-4143-43f7-ba67-65056d4e20b8",
+    "sampleSummaryFK":1,
+    "sampleUnitRef":"sampleUnitRef",
+    "sampleUnitType":"H",
+    "formType":"CuFT",
+    "state":"INIT"
+  }
+]

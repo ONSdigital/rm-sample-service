@@ -56,15 +56,13 @@ public class SampleServiceTest {
   private StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent>
       sampleSvcUnitStateTransitionManager;
 
-  @Mock private PartySvcClientService partySvcClient;
+  @Mock private PartyService partyService;
 
   @Mock private CollectionExerciseJobService collectionExerciseJobService;
 
   @InjectMocks private SampleService sampleService;
 
   private List<BusinessSurveySample> surveySample;
-  private List<PartyCreationRequestDTO> party;
-  private List<PartyDTO> partyDTO;
   private List<SampleUnit> sampleUnit;
   private List<SampleSummary> sampleSummaryList;
   private List<CollectionExerciseJob> collectionExerciseJobs;
@@ -77,8 +75,6 @@ public class SampleServiceTest {
   @Before
   public void setUp() throws Exception {
     surveySample = FixtureHelper.loadClassFixtures(BusinessSurveySample[].class);
-    party = FixtureHelper.loadClassFixtures(PartyCreationRequestDTO[].class);
-    partyDTO = FixtureHelper.loadClassFixtures(PartyDTO[].class);
     sampleUnit = FixtureHelper.loadClassFixtures(SampleUnit[].class);
     sampleSummaryList = FixtureHelper.loadClassFixtures(SampleSummary[].class);
     collectionExerciseJobs = FixtureHelper.loadClassFixtures(CollectionExerciseJob[].class);
@@ -125,7 +121,7 @@ public class SampleServiceTest {
    */
   @Test
   public void postPartyDTOToPartyServiceAndUpdateStatesTest() throws Exception {
-    when(partySvcClient.postParty(any())).thenReturn(partyDTO.get(0));
+
     when(sampleUnitRepository.findById(UUID.fromString(SAMPLEUNIT_ID)))
         .thenReturn(Optional.of(sampleUnit.get(0)));
     when(sampleSvcUnitStateTransitionManager.transition(
@@ -135,9 +131,7 @@ public class SampleServiceTest {
     when(sampleSvcStateTransitionManager.transition(SampleState.INIT, SampleEvent.ACTIVATED))
         .thenReturn(SampleState.ACTIVE);
 
-    PartyDTO testParty = sampleService.sendToPartyService(party.get(0));
-    assertEquals(SAMPLE_SUMMARY_ID, testParty.getSampleSummaryId());
-    verify(partySvcClient).postParty(any(PartyCreationRequestDTO.class));
+    sampleService.updateSampleUnit(SAMPLEUNIT_ID);
     assertThat(sampleUnit.get(0).getState(), is(SampleUnitState.PERSISTED));
     assertThat(sampleSummaryList.get(0).getState(), is(SampleState.ACTIVE));
   }
@@ -150,7 +144,6 @@ public class SampleServiceTest {
    */
   @Test
   public void sendToPartyServiceTestNotAllSampleUnitsPosted() throws Exception {
-    when(partySvcClient.postParty(any())).thenReturn(partyDTO.get(0));
     when(sampleUnitRepository.findById(UUID.fromString(SAMPLEUNIT_ID)))
         .thenReturn(Optional.of(sampleUnit.get(0)));
     when(sampleSvcUnitStateTransitionManager.transition(
@@ -158,9 +151,7 @@ public class SampleServiceTest {
         .thenReturn(SampleUnitState.PERSISTED);
     when(sampleUnitRepository.countBySampleSummaryFK(1)).thenReturn(1);
 
-    PartyDTO testParty = sampleService.sendToPartyService(party.get(0));
-    assertEquals(SAMPLE_SUMMARY_ID, testParty.getSampleSummaryId());
-    verify(partySvcClient).postParty(any(PartyCreationRequestDTO.class));
+    sampleService.updateSampleUnit(SAMPLEUNIT_ID);
     assertThat(sampleUnit.get(0).getState(), is(SampleUnitState.PERSISTED));
     assertThat(sampleSummaryList.get(0).getState(), not(SampleState.ACTIVE));
   }
