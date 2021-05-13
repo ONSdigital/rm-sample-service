@@ -48,10 +48,14 @@ public class PartyService {
     }
 
     private void addPartyIdToSample(SampleUnit sampleUnit, PartyDTO party) throws CTPException {
-        LOG.debug("add party to sample",  kv("sampleUnitId", sampleUnit.getId()), kv("partyId", party.getId()));
-        UUID partyId = UUID.fromString(party.getId());
-        sampleUnit.setPartyId(partyId);
-        sampleUnitRepository.saveAndFlush(sampleUnit);
-        LOG.debug("party added",  kv("sampleUnitId", sampleUnit.getId()), kv("partyId", party.getId()));
+        try {
+            LOG.debug("add party to sample", kv("sampleUnitId", sampleUnit.getId()), kv("partyId", party.getId()));
+            UUID partyId = UUID.fromString(party.getId());
+            sampleUnit.setPartyId(partyId);
+            sampleUnitRepository.saveAndFlush(sampleUnit);
+            LOG.debug("party added", kv("sampleUnitId", sampleUnit.getId()), kv("partyId", party.getId()));
+        } catch (RuntimeException e) {
+            LOG.error("Unexpected exception saving party id", kv("sampleUnitId", sampleUnit.getId()), kv("partyId", party.getId()), e );
+        }
     }
 }
