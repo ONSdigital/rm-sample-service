@@ -223,7 +223,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
           .contentType(MediaType.APPLICATION_JSON)
           .body(sampleUnitDTO);
     } catch (IllegalStateException e) {
-      log.error("duplicate sample", kv("sampleSummaryId", sampleSummaryId), e);
+      log.warn("duplicate sample", kv("sampleSummaryId", sampleSummaryId), e);
       return ResponseEntity.status(HttpStatus.CONFLICT).build();
     } catch (UnknownSampleSummaryException e) {
       log.error("unknown sample summary id", kv("sampleSummaryId", sampleSummaryId), e);
