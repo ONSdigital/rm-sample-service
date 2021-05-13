@@ -43,7 +43,7 @@ public class PartyService {
 
             addPartyIdToSample(sampleUnit, party);
         } catch (CTPException | DataAccessException exc) {
-            LOG.error("unable to save party id to sample ", kv("sampleUnitId", sampleUnitId));
+            LOG.error("unable to save party id to sample", kv("sampleUnitId", sampleUnitId));
         }
     }
 
