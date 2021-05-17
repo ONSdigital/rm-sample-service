@@ -20,8 +20,7 @@ public class PartyUtil {
     PartyCreationRequestDTO party = new PartyCreationRequestDTO();
     party.setSampleUnitType(unit.getSampleUnitType());
     party.setSampleUnitRef(unit.getSampleUnitRef());
-    PartyCreationRequestAttributesDTO businessSampleUnit =
-        new PartyCreationRequestAttributesDTO();
+    PartyCreationRequestAttributesDTO businessSampleUnit = new PartyCreationRequestAttributesDTO();
     businessSampleUnit.setCheckletter(unit.getCheckletter());
     businessSampleUnit.setFrosic92(unit.getFrosic92());
     businessSampleUnit.setRusic92(unit.getRusic92());
@@ -55,7 +54,7 @@ public class PartyUtil {
     businessSampleUnit.setFormtype(unit.getFormType());
     businessSampleUnit.setCurrency(unit.getCurrency());
     party.setAttributes(businessSampleUnit);
-    
+
     return party;
   }
 }
