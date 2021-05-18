@@ -1,21 +1,18 @@
 package uk.gov.ons.ctp.response.sample.endpoint;
 
-
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import org.junit.Assert;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration
@@ -28,9 +25,7 @@ public class SampleEndpointIT {
 
   @Test
   public void willReturn204OnExport() throws UnirestException, InterruptedException {
-    String url =
-        String.format(
-            "http://localhost:%d/samples/export", port);
+    String url = String.format("http://localhost:%d/samples/export", port);
 
     HttpResponse<String> response =
         Unirest.post(url)

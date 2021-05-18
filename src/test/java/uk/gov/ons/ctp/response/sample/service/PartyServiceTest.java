@@ -1,5 +1,12 @@
 package uk.gov.ons.ctp.response.sample.service;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import libs.common.FixtureHelper;
 import libs.party.representation.PartyDTO;
 import org.junit.Before;
@@ -9,69 +16,49 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
-import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
-import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
-import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
-import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
-import uk.gov.ons.ctp.response.sample.validation.BusinessSurveySample;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.mockito.AdditionalAnswers.returnsFirstArg;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PartyServiceTest {
 
-    private static final String SAMPLEUNIT_ID = "4ef7326b-4143-43f7-ba67-65056d4e20b8";
+  private static final String SAMPLEUNIT_ID = "4ef7326b-4143-43f7-ba67-65056d4e20b8";
 
-    @Mock
-    private PartySvcClientService partySvcClient;
+  @Mock private PartySvcClientService partySvcClient;
 
-    @Mock private SampleUnitRepository sampleUnitRepository;
+  @Mock private SampleUnitRepository sampleUnitRepository;
 
-    @InjectMocks
-    private PartyService partyService;
+  @InjectMocks private PartyService partyService;
 
-    private List<PartyCreationRequestDTO> party;
-    private List<PartyDTO> partyDTO;
-    private List<SampleUnit> sampleUnit;
+  private List<PartyCreationRequestDTO> party;
+  private List<PartyDTO> partyDTO;
+  private List<SampleUnit> sampleUnit;
 
-    /**
-     * Before the test
-     *
-     * @throws Exception oops
-     */
-    @Before
-    public void setUp() throws Exception {
-        party = FixtureHelper.loadClassFixtures(PartyCreationRequestDTO[].class);
-        partyDTO = FixtureHelper.loadClassFixtures(PartyDTO[].class);
-        sampleUnit = FixtureHelper.loadClassFixtures(SampleUnit[].class);
-    }
+  /**
+   * Before the test
+   *
+   * @throws Exception oops
+   */
+  @Before
+  public void setUp() throws Exception {
+    party = FixtureHelper.loadClassFixtures(PartyCreationRequestDTO[].class);
+    partyDTO = FixtureHelper.loadClassFixtures(PartyDTO[].class);
+    sampleUnit = FixtureHelper.loadClassFixtures(SampleUnit[].class);
+  }
 
-    /**
-     * Test that when a Party is posted to Party Service the party svc client is called
-     *
-     * @throws Exception any exception fails the tests
-     */
-    @Test
-    public void postPartyDTOToPartyServiceAndUpdateStatesTest() throws Exception {
-        when(partySvcClient.postParty(any())).thenReturn(partyDTO.get(0));
-        when(sampleUnitRepository.findById(UUID.fromString(SAMPLEUNIT_ID)))
-                .thenReturn(Optional.of(sampleUnit.get(0)));
+  /**
+   * Test that when a Party is posted to Party Service the party svc client is called
+   *
+   * @throws Exception any exception fails the tests
+   */
+  @Test
+  public void postPartyDTOToPartyServiceAndUpdateStatesTest() throws Exception {
+    when(partySvcClient.postParty(any())).thenReturn(partyDTO.get(0));
+    when(sampleUnitRepository.findById(UUID.fromString(SAMPLEUNIT_ID)))
+        .thenReturn(Optional.of(sampleUnit.get(0)));
 
-        partyService.sendToPartyService(SAMPLEUNIT_ID, party.get(0));
-        verify(partySvcClient).postParty(any(PartyCreationRequestDTO.class));
-        verify(sampleUnitRepository).findById(UUID.fromString(SAMPLEUNIT_ID));
-    }
+    partyService.sendToPartyService(SAMPLEUNIT_ID, party.get(0));
+    verify(partySvcClient).postParty(any(PartyCreationRequestDTO.class));
+    verify(sampleUnitRepository).findById(UUID.fromString(SAMPLEUNIT_ID));
+  }
 }

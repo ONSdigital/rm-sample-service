@@ -3,7 +3,6 @@ package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import ma.glasnost.orika.MapperFacade;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

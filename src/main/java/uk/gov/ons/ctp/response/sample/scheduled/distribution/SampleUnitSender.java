@@ -48,17 +48,20 @@ public class SampleUnitSender {
     String sampleUnitId = mappedSampleUnit.getId();
     try {
       uk.gov.ons.ctp.response.sample.domain.model.SampleUnit sampleUnit =
-              sampleUnitRepository.findById(UUID.fromString(sampleUnitId)).orElseThrow();
+          sampleUnitRepository.findById(UUID.fromString(sampleUnitId)).orElseThrow();
 
       if (sampleUnit.getState() == SampleUnitState.PERSISTED) {
         log.debug("Publishing mapped sampleUnit", kv("MappedSampleUnit", mappedSampleUnit));
         sampleUnitPublisher.send(mappedSampleUnit);
 
-        log.debug("Transitioning state of sampleUnit", kv("SampleUnit", sampleUnit),
-                kv("from", sampleUnit.getState()), kv("to", SampleUnitDTO.SampleUnitEvent.DELIVERING));
+        log.debug(
+            "Transitioning state of sampleUnit",
+            kv("SampleUnit", sampleUnit),
+            kv("from", sampleUnit.getState()),
+            kv("to", SampleUnitDTO.SampleUnitEvent.DELIVERING));
         SampleUnitDTO.SampleUnitState newState =
-                sampleUnitStateTransitionManager.transition(
-                        sampleUnit.getState(), SampleUnitDTO.SampleUnitEvent.DELIVERING);
+            sampleUnitStateTransitionManager.transition(
+                sampleUnit.getState(), SampleUnitDTO.SampleUnitEvent.DELIVERING);
         sampleUnit.setState(newState);
         sampleUnitRepository.saveAndFlush(sampleUnit);
       }

@@ -6,14 +6,12 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+import libs.common.error.CTPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import libs.common.error.CTPException;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.repository.CollectionExerciseJobRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
@@ -44,7 +42,7 @@ public class SampleUnitDistributor {
   public void distribute() throws SampleDistributionException {
     log.debug("Collection exercise job distribution has been triggered.");
     List<CollectionExerciseJob> jobs = collectionExerciseJobRepository.findByJobCompleteIsFalse();
-    for(CollectionExerciseJob job: jobs) {
+    for (CollectionExerciseJob job : jobs) {
       processJob(job);
     }
   }
@@ -52,31 +50,41 @@ public class SampleUnitDistributor {
   private void processJob(CollectionExerciseJob job) throws SampleDistributionException {
     UUID sampleSummaryId = job.getSampleSummaryId();
     try {
-      List<SampleUnit> invalidSamples = Optional.of(sampleSummaryRepository.findById(sampleSummaryId)).orElseThrow()
+      List<SampleUnit> invalidSamples =
+          Optional.of(sampleSummaryRepository.findById(sampleSummaryId))
+              .orElseThrow()
               .filter(sampleSummary -> sampleSummary.getState() == SampleState.ACTIVE)
-              .map(sampleSummary -> sampleUnitRepository.findBySampleSummaryFKAndState(
-                      sampleSummary.getSampleSummaryPK(), SampleUnitState.PERSISTED))
+              .map(
+                  sampleSummary ->
+                      sampleUnitRepository.findBySampleSummaryFKAndState(
+                          sampleSummary.getSampleSummaryPK(), SampleUnitState.PERSISTED))
               .orElseGet(Stream::empty)
-              .map(sampleUnit -> sampleUnitMapper.mapSampleUnit(sampleUnit, job.getCollectionExerciseId().toString()))
+              .map(
+                  sampleUnit ->
+                      sampleUnitMapper.mapSampleUnit(
+                          sampleUnit, job.getCollectionExerciseId().toString()))
               .filter(publishSample().negate())
               .collect(Collectors.toList());
 
       if (!invalidSamples.isEmpty()) {
-        throw new SampleDistributionException("Some samples have failed transition for collection exericse Job", job, invalidSamples);
+        throw new SampleDistributionException(
+            "Some samples have failed transition for collection exericse Job", job, invalidSamples);
       }
       log.info("All samples have been published successfully", kv("CollectionExerciseJob", job));
       job.setJobComplete(true);
       collectionExerciseJobRepository.saveAndFlush(job);
     } catch (NoSuchElementException e) {
       log.error("unable to find sample summary", kv("sampleSummaryId", sampleSummaryId));
-      throw new SampleDistributionException("unable to find sample summary", job, new ArrayList<>());
+      throw new SampleDistributionException(
+          "unable to find sample summary", job, new ArrayList<>());
     }
   }
 
   /**
-   * Publish a SampleUnit. If it passes then return true otherwise false.
-   * This will mimick the previous functionality and allow us to obtain a collection of the
-   * Sample units that fail for better logging.
+   * Publish a SampleUnit. If it passes then return true otherwise false. This will mimick the
+   * previous functionality and allow us to obtain a collection of the Sample units that fail for
+   * better logging.
+   *
    * @return Predicate<SampleUnit>
    */
   private Predicate<SampleUnit> publishSample() {
@@ -86,10 +94,10 @@ public class SampleUnitDistributor {
         return true;
       } catch (CTPException e) {
         log.error(
-          "Failed to send a sample unit to queue and update state",
-          kv("sample_unit_id", mappedSampleUnit.getId()),
-          "exception",
-          e);
+            "Failed to send a sample unit to queue and update state",
+            kv("sample_unit_id", mappedSampleUnit.getId()),
+            "exception",
+            e);
         return false;
       }
     };

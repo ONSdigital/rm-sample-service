@@ -19,7 +19,7 @@ services:
     
  party-service:
   container_name: party-service-it
-  image: sdcplatform/ras-party
+  image: eu.gcr.io/ons-rasrmbs-management/party
   external_links:
     - postgres-it
   ports:

@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.UUID;
 import libs.common.FixtureHelper;
 import libs.common.state.StateTransitionManager;
-import libs.party.representation.PartyDTO;
 import libs.sample.validation.BusinessSampleUnit;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +21,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
@@ -127,7 +125,8 @@ public class SampleServiceTest {
     when(sampleSvcUnitStateTransitionManager.transition(
             SampleUnitState.INIT, SampleUnitEvent.PERSISTING))
         .thenReturn(SampleUnitState.PERSISTED);
-    when(sampleSummaryRepository.findBySampleSummaryPK(1)).thenReturn(Optional.of(sampleSummaryList.get(0)));
+    when(sampleSummaryRepository.findBySampleSummaryPK(1))
+        .thenReturn(Optional.of(sampleSummaryList.get(0)));
     when(sampleSvcStateTransitionManager.transition(SampleState.INIT, SampleEvent.ACTIVATED))
         .thenReturn(SampleState.ACTIVE);
 
@@ -220,7 +219,8 @@ public class SampleServiceTest {
   @Test
   public void testNoCollectionExerciseJobIsStoredWhenNoSampleSummaryIsFound() throws Exception {
     SampleSummary sampleSummary = null;
-    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(sampleSummary));
+    when(sampleSummaryRepository.findById(any(UUID.class)))
+        .thenReturn(Optional.ofNullable(sampleSummary));
     Integer sampleUnitsTotal =
         sampleService.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
     verify(collectionExerciseJobService, times(0)).storeCollectionExerciseJob(any());
@@ -263,18 +263,23 @@ public class SampleServiceTest {
   }
 
   @Test
-  public void createDuplicateSampleUnitThrowsIllegalStateException() throws UnknownSampleSummaryException {
+  public void createDuplicateSampleUnitThrowsIllegalStateException()
+      throws UnknownSampleSummaryException {
     SampleSummary newSummary = createSampleSummary(5, 2);
     when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.of(newSummary));
     BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();
-    SampleUnit sampleUnit = sampleService.createSampleUnit(newSummary.getId(), businessSampleUnit, SampleUnitState.INIT);
-    when(sampleUnitRepository.existsBySampleUnitRefAndSampleSummaryFK(businessSampleUnit.getSampleUnitRef(), newSummary.getSampleSummaryPK())).thenReturn(true);
+    SampleUnit sampleUnit =
+        sampleService.createSampleUnit(
+            newSummary.getId(), businessSampleUnit, SampleUnitState.INIT);
+    when(sampleUnitRepository.existsBySampleUnitRefAndSampleSummaryFK(
+            businessSampleUnit.getSampleUnitRef(), newSummary.getSampleSummaryPK()))
+        .thenReturn(true);
 
     try {
       sampleService.createSampleUnit(newSummary.getId(), businessSampleUnit, SampleUnitState.INIT);
       fail("second attempt to create the same sample should fail");
     } catch (IllegalStateException e) {
-      //expected exception
+      // expected exception
     }
     // confirm it was only saved once
     verify(sampleUnitRepository, times(1)).save(any(SampleUnit.class));

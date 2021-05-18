@@ -286,6 +286,18 @@
 		<finalName>samplesvc</finalName>
 		<plugins>
 			<plugin>
+				<groupId>com.coveo</groupId>
+				<artifactId>fmt-maven-plugin</artifactId>
+				<version>2.5.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>format</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
@@ -351,85 +363,39 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
-				<version>1.4.13</version>
-               <dependencies>
-                   <dependency>
-                       <groupId>javax.activation</groupId>
-                       <artifactId>javax.activation-api</artifactId>
-                       <version>1.2.0</version>
-                       <scope>compile</scope>
-                   </dependency>
-               </dependencies>
-				<executions>
-					<execution>
-						<goals>
-							<goal>build</goal>
-						</goals>
-						<phase>package</phase>
-						<configuration>
-							<repository>sdcplatform/${project.artifactId}</repository>
-							<buildArgs>
-								<JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
-							</buildArgs>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>io.fabric8</groupId>
-				<artifactId>docker-maven-plugin</artifactId>
-				<version>0.23.0</version>
+				<groupId>com.dkanejs.maven.plugins</groupId>
+				<artifactId>docker-compose-maven-plugin</artifactId>
+				<version>4.0.0</version>
 				<executions>
 					<execution>
 						<id>pre-stop</id>
-						<goals>
-							<goal>stop</goal>
-						</goals>
 						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>down</goal>
+						</goals>
 						<configuration>
-							<images>
-								<image>
-									<external>
-										<type>compose</type>
-										<basedir>${project.basedir}</basedir>
-									</external>
-								</image>
-							</images>
+							<composeFile>${project.basedir}/docker-compose.yml</composeFile>
 						</configuration>
 					</execution>
 					<execution>
-						<id>start</id>
+						<id>up</id>
+						<phase>pre-integration-test</phase>
 						<goals>
-							<goal>start</goal>
+							<goal>up</goal>
 						</goals>
 						<configuration>
-							<showLogs>false</showLogs>
-							<images>
-								<image>
-									<external>
-										<type>compose</type>
-										<basedir>${project.basedir}</basedir>
-									</external>
-								</image>
-							</images>
+							<composeFile>${project.basedir}/docker-compose.yml</composeFile>
+							<detachedMode>true</detachedMode>
 						</configuration>
 					</execution>
 					<execution>
-						<id>stop</id>
+						<id>down</id>
+						<phase>post-integration-test</phase>
 						<goals>
-							<goal>stop</goal>
+							<goal>down</goal>
 						</goals>
 						<configuration>
-							<images>
-								<image>
-									<external>
-										<type>compose</type>
-										<basedir>${project.basedir}</basedir>
-									</external>
-								</image>
-							</images>
+							<composeFile>${project.basedir}/docker-compose.yml</composeFile>
 						</configuration>
 					</execution>
 				</executions>
