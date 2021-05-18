@@ -3,6 +3,7 @@ package uk.gov.ons.ctp.response.sample.service;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import libs.common.error.CTPException;
 import libs.party.representation.PartyDTO;
 import org.slf4j.Logger;
@@ -28,22 +29,28 @@ public class PartyService {
 
   @Async
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void sendToPartyService(String sampleUnitId, PartyCreationRequestDTO partyCreationRequest)
-      throws CTPException {
-    try {
-      LOG.debug("about to send request to party service", kv("sampleUnitId", sampleUnitId));
-      PartyDTO party = partySvcClient.postParty(partyCreationRequest);
-      LOG.debug(
-          "party creation successful",
-          kv("sampleUnitId", sampleUnitId),
-          kv("partyId", party.getId()));
-      SampleUnit sampleUnit =
-          sampleUnitRepository.findById(UUID.fromString(sampleUnitId)).orElseThrow();
+  public CompletableFuture<Void> sendToPartyService(
+      String sampleUnitId, PartyCreationRequestDTO partyCreationRequest) {
+    return CompletableFuture.runAsync(
+        () -> {
+          try {
+            LOG.debug("about to send request to party service", kv("sampleUnitId", sampleUnitId));
+            PartyDTO party = partySvcClient.postParty(partyCreationRequest);
+            LOG.debug(
+                "party creation successful",
+                kv("sampleUnitId", sampleUnitId),
+                kv("partyId", party.getId()));
+            SampleUnit sampleUnit =
+                sampleUnitRepository.findById(UUID.fromString(sampleUnitId)).orElseThrow();
 
-      addPartyIdToSample(sampleUnit, party);
-    } catch (CTPException | DataAccessException exc) {
-      LOG.error("unable to save party id to sample", kv("sampleUnitId", sampleUnitId));
-    }
+            addPartyIdToSample(sampleUnit, party);
+
+          } catch (CTPException | DataAccessException exc) {
+            LOG.error("unable to save party id to sample", kv("sampleUnitId", sampleUnitId));
+          } catch (Exception exc) {
+            LOG.error("unexpected exception when calling party service", exc);
+          }
+        });
   }
 
   private void addPartyIdToSample(SampleUnit sampleUnit, PartyDTO party) throws CTPException {

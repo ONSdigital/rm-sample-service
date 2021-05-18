@@ -3,10 +3,12 @@ package uk.gov.ons.ctp.response.sample.service;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
 import libs.common.time.DateTimeUtil;
 import libs.sample.validation.BusinessSampleUnit;
+import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,7 +105,9 @@ public class SampleService {
     String sampleUnitId = samplingUnit.getSampleUnitId().toString();
     party.getAttributes().setSampleUnitId(sampleUnitId);
     party.setSampleSummaryId(sampleSummaryId.toString());
-    partyService.sendToPartyService(sampleUnitId, party);
+    Log.debug("About to schedule Party Service call", kv("sampleUnitId", sampleUnitId));
+    CompletableFuture<Void> psc = partyService.sendToPartyService(sampleUnitId, party);
+    psc.thenRun(() -> Log.debug("Party Service call complete", kv("sampleUnitId", sampleUnitId)));
     updateSampleUnit(sampleUnitId);
   }
 

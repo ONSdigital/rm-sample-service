@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import libs.common.FixtureHelper;
 import libs.party.representation.PartyDTO;
 import org.junit.Before;
@@ -57,7 +58,9 @@ public class PartyServiceTest {
     when(sampleUnitRepository.findById(UUID.fromString(SAMPLEUNIT_ID)))
         .thenReturn(Optional.of(sampleUnit.get(0)));
 
-    partyService.sendToPartyService(SAMPLEUNIT_ID, party.get(0));
+    CompletableFuture<Void> psc = partyService.sendToPartyService(SAMPLEUNIT_ID, party.get(0));
+    psc.get();
+
     verify(partySvcClient).postParty(any(PartyCreationRequestDTO.class));
     verify(sampleUnitRepository).findById(UUID.fromString(SAMPLEUNIT_ID));
   }
