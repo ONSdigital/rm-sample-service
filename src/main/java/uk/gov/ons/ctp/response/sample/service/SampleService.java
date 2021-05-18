@@ -105,9 +105,9 @@ public class SampleService {
     String sampleUnitId = samplingUnit.getSampleUnitId().toString();
     party.getAttributes().setSampleUnitId(sampleUnitId);
     party.setSampleSummaryId(sampleSummaryId.toString());
-    Log.debug("About to schedule Party Service call", kv("sampleUnitId", sampleUnitId));
+    log.debug("About to schedule Party Service call", kv("sampleUnitId", sampleUnitId));
     CompletableFuture<Void> psc = partyService.sendToPartyService(sampleUnitId, party);
-    psc.thenRun(() -> Log.debug("Party Service call complete", kv("sampleUnitId", sampleUnitId)));
+    psc.thenRun(() -> log.debug("Party Service call complete", kv("sampleUnitId", sampleUnitId)));
     updateSampleUnit(sampleUnitId);
   }
 
