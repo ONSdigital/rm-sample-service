@@ -27,7 +27,6 @@ public class PartyService {
   @Autowired SampleUnitRepository sampleUnitRepository;
 
   @Async
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public CompletableFuture<Void> sendToPartyService(
       String sampleUnitId, PartyCreationRequestDTO partyCreationRequest) {
     return CompletableFuture.runAsync(
