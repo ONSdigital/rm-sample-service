@@ -4,7 +4,6 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import libs.common.error.CTPException;
 import libs.party.representation.PartyDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,12 +39,10 @@ public class PartyService {
                 "party creation successful",
                 kv("sampleUnitId", sampleUnitId),
                 kv("partyId", party.getId()));
-            SampleUnit sampleUnit =
-                sampleUnitRepository.findById(UUID.fromString(sampleUnitId)).orElseThrow();
 
-            addPartyIdToSample(sampleUnit, party);
+            addPartyIdToSample(sampleUnitId, party);
 
-          } catch (CTPException | DataAccessException exc) {
+          } catch (DataAccessException exc) {
             LOG.error("unable to save party id to sample", kv("sampleUnitId", sampleUnitId));
           } catch (Exception exc) {
             LOG.error("unexpected exception when calling party service", exc);
@@ -53,13 +50,13 @@ public class PartyService {
         });
   }
 
-  private void addPartyIdToSample(SampleUnit sampleUnit, PartyDTO party) throws CTPException {
+  private void addPartyIdToSample(String sampleUnitId, PartyDTO party) {
     try {
       LOG.debug(
-          "add party to sample",
-          kv("sampleUnitId", sampleUnit.getId()),
-          kv("partyId", party.getId()));
+          "add party to sample", kv("sampleUnitId", sampleUnitId), kv("partyId", party.getId()));
       UUID partyId = UUID.fromString(party.getId());
+      SampleUnit sampleUnit =
+          sampleUnitRepository.findById(UUID.fromString(sampleUnitId)).orElseThrow();
       sampleUnit.setPartyId(partyId);
       sampleUnitRepository.saveAndFlush(sampleUnit);
       LOG.debug(
@@ -67,7 +64,7 @@ public class PartyService {
     } catch (RuntimeException e) {
       LOG.error(
           "Unexpected exception saving party id",
-          kv("sampleUnitId", sampleUnit.getId()),
+          kv("sampleUnitId", sampleUnitId),
           kv("partyId", party.getId()),
           e);
     }
