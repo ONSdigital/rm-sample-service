@@ -8,7 +8,6 @@ import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
 import libs.common.time.DateTimeUtil;
 import libs.sample.validation.BusinessSampleUnit;
-import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
