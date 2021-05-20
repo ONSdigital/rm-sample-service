@@ -245,9 +245,6 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     } catch (UnknownSampleSummaryException e) {
       log.error("unknown sample summary id", kv("sampleSummaryId", sampleSummaryId), e);
       return ResponseEntity.badRequest().build();
-    } catch (CTPException e) {
-      log.error("unknown sample summary id", kv("sampleSummaryId", sampleSummaryId), e);
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
   }
 
