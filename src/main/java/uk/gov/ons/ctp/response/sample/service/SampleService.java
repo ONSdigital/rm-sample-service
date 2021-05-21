@@ -6,6 +6,7 @@ import java.util.*;
 import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
 import libs.common.time.DateTimeUtil;
+import libs.party.representation.PartyDTO;
 import libs.sample.validation.BusinessSampleUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
+import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
 import uk.gov.ons.ctp.response.sample.party.PartyUtil;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
@@ -46,9 +48,11 @@ public class SampleService {
   private StateTransitionManager<SampleUnitState, SampleUnitEvent>
       sampleSvcUnitStateTransitionManager;
 
-  @Autowired private PartyService partyService;
+  @Autowired private PartySvcClientService partySvcClient;
 
   @Autowired private CollectionExerciseJobService collectionExerciseJobService;
+
+  @Autowired private PartyPublisher partyPublisher;
 
   public List<SampleSummary> findAllSampleSummaries() {
     return sampleSummaryRepository.findAll();
@@ -97,14 +101,11 @@ public class SampleService {
     }
   }
 
-  public void publishSampleToParty(UUID sampleSummaryId, BusinessSampleUnit samplingUnit)
-      throws CTPException {
+  public void publishSampleToParty(UUID sampleSummaryId, BusinessSampleUnit samplingUnit) {
     PartyCreationRequestDTO party = PartyUtil.convertToParty(samplingUnit);
-    String sampleUnitId = samplingUnit.getSampleUnitId().toString();
-    party.getAttributes().setSampleUnitId(sampleUnitId);
+    party.getAttributes().setSampleUnitId(samplingUnit.getSampleUnitId().toString());
     party.setSampleSummaryId(sampleSummaryId.toString());
-    partyService.sendToPartyService(sampleUnitId, party);
-    updateSampleUnit(sampleUnitId);
+    partyPublisher.publish(party);
   }
 
   private Integer calculateExpectedCollectionInstruments(
@@ -188,15 +189,40 @@ public class SampleService {
     }
   }
 
-  public void updateSampleUnit(String sampleUnitId) throws CTPException {
+  public PartyDTO sendToPartyService(PartyCreationRequestDTO partyCreationRequest)
+      throws Exception {
+    PartyDTO returnedParty = partySvcClient.postParty(partyCreationRequest);
+    String sampleUnitId = partyCreationRequest.getAttributes().getSampleUnitId();
     try {
       SampleUnit sampleUnit =
           sampleUnitRepository.findById(UUID.fromString(sampleUnitId)).orElseThrow();
       changeSampleUnitState(sampleUnit);
       sampleSummaryStateCheck(sampleUnit);
+      addPartyIdToSample(sampleUnit, returnedParty);
+      return returnedParty;
     } catch (NoSuchElementException e) {
       log.error("unable to find sample ", kv("sampleUnitId", sampleUnitId));
       throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND);
+    }
+  }
+
+  private void addPartyIdToSample(SampleUnit sampleUnit, PartyDTO party) {
+    try {
+      log.debug(
+          "add party to sample",
+          kv("sampleUnitId", sampleUnit.getId()),
+          kv("partyId", party.getId()));
+      UUID partyId = UUID.fromString(party.getId());
+      sampleUnit.setPartyId(partyId);
+      sampleUnitRepository.saveAndFlush(sampleUnit);
+      log.debug(
+          "party added", kv("sampleUnitId", sampleUnit.getId()), kv("partyId", party.getId()));
+    } catch (RuntimeException e) {
+      log.error(
+          "Unexpected exception saving party id",
+          kv("sampleUnitId", sampleUnit.getId()),
+          kv("partyId", party.getId()),
+          e);
     }
   }
 
