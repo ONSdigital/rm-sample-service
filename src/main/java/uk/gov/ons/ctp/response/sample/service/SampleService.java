@@ -102,10 +102,10 @@ public class SampleService {
   }
 
   public void publishSampleToParty(UUID sampleSummaryId, BusinessSampleUnit samplingUnit) {
-    PartyCreationRequestDTO party = PartyUtil.convertToParty(samplingUnit);
-    party.getAttributes().setSampleUnitId(samplingUnit.getSampleUnitId().toString());
-    party.setSampleSummaryId(sampleSummaryId.toString());
-    partyPublisher.publish(party);
+//    PartyCreationRequestDTO party = PartyUtil.convertToParty(samplingUnit);
+//    party.getAttributes().setSampleUnitId(samplingUnit.getSampleUnitId().toString());
+//    party.setSampleSummaryId(sampleSummaryId.toString());
+//    partyPublisher.publish(party);
   }
 
   private Integer calculateExpectedCollectionInstruments(
