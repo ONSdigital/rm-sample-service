@@ -23,6 +23,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
+import uk.gov.ons.ctp.response.sample.party.PartyUtil;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
@@ -101,10 +102,10 @@ public class SampleService {
   }
 
   public void publishSampleToParty(UUID sampleSummaryId, BusinessSampleUnit samplingUnit) {
-    //    PartyCreationRequestDTO party = PartyUtil.convertToParty(samplingUnit);
-    //    party.getAttributes().setSampleUnitId(samplingUnit.getSampleUnitId().toString());
-    //    party.setSampleSummaryId(sampleSummaryId.toString());
-    //    partyPublisher.publish(party);
+    PartyCreationRequestDTO party = PartyUtil.convertToParty(samplingUnit);
+    party.getAttributes().setSampleUnitId(samplingUnit.getSampleUnitId().toString());
+    party.setSampleSummaryId(sampleSummaryId.toString());
+    partyPublisher.publish(party);
   }
 
   private Integer calculateExpectedCollectionInstruments(
@@ -190,15 +191,16 @@ public class SampleService {
 
   public PartyDTO sendToPartyService(PartyCreationRequestDTO partyCreationRequest)
       throws Exception {
-    PartyDTO returnedParty = partySvcClient.postParty(partyCreationRequest);
+    // PartyDTO returnedParty = partySvcClient.postParty(partyCreationRequest);
     String sampleUnitId = partyCreationRequest.getAttributes().getSampleUnitId();
     try {
       SampleUnit sampleUnit =
           sampleUnitRepository.findById(UUID.fromString(sampleUnitId)).orElseThrow();
       changeSampleUnitState(sampleUnit);
       sampleSummaryStateCheck(sampleUnit);
-      addPartyIdToSample(sampleUnit, returnedParty);
-      return returnedParty;
+      //   addPartyIdToSample(sampleUnit, returnedParty);
+      //      return returnedParty;
+      return null;
     } catch (NoSuchElementException e) {
       log.error("unable to find sample ", kv("sampleUnitId", sampleUnitId));
       throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND);
