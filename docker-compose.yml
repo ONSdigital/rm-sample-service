@@ -28,3 +28,10 @@ services:
     - DATABASE_URI=postgresql://postgres:postgres@postgres-it:5432/postgres
     - SECURITY_USER_NAME=admin
     - SECURITY_USER_PASSWORD=secret
+ pubsub-emulator:
+   container_name: pubsub-emulator-it
+   image: eu.gcr.io/ons-rasrmbs-management/pubsub-emulator
+   ports:
+     - "18681:8681"
+   environment:
+     - PUBSUB_PROJECT1=test,test_topic:test_subscription

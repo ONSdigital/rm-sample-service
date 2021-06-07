@@ -14,3 +14,7 @@ party-svc:
 
 rabbitmq:
   port: 36672
+
+gcp:
+  project: "test"
+  sampleUnitPublisherTopic: "test_topic"

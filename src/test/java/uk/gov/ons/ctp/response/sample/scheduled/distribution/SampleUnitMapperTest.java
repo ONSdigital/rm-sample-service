@@ -36,7 +36,7 @@ public class SampleUnitMapperTest {
     SampleUnit sampleUnit = new SampleUnit();
     sampleUnit.setId(sampleUnitId);
 
-    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit =
+    uk.gov.ons.ctp.response.sample.representation.SampleUnit mappedSampleUnit =
         sampleUnitMapper.mapSampleUnit(sampleUnit, collexID.toString());
 
     assertEquals(sampleUnit.getId().toString(), mappedSampleUnit.getId());
@@ -51,7 +51,7 @@ public class SampleUnitMapperTest {
     SampleUnit sampleUnit = new SampleUnit();
     sampleUnit.setId(sampleUnitId);
 
-    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit =
+    uk.gov.ons.ctp.response.sample.representation.SampleUnit mappedSampleUnit =
         sampleUnitMapper.mapSampleUnit(sampleUnit, collexID.toString());
 
     assertEquals(sampleUnit.getId().toString(), mappedSampleUnit.getId());

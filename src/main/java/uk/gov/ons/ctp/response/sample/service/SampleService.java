@@ -3,7 +3,6 @@ package uk.gov.ons.ctp.response.sample.service;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import java.util.*;
-
 import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
 import libs.common.time.DateTimeUtil;
@@ -85,10 +84,10 @@ public class SampleService {
       // the csv ingester does this so it's needed here
       samplingUnit.setSampleUnitType("B");
 
-      /**
-       * a sample unit should be unique inside a sample summary, so check if we already have it.
-       */
-      boolean exists = sampleUnitRepository.existsBySampleUnitRefAndSampleSummaryFK(samplingUnit.getSampleUnitRef(), sampleSummary.getSampleSummaryPK());
+      /** a sample unit should be unique inside a sample summary, so check if we already have it. */
+      boolean exists =
+          sampleUnitRepository.existsBySampleUnitRefAndSampleSummaryFK(
+              samplingUnit.getSampleUnitRef(), sampleSummary.getSampleSummaryPK());
       if (!exists) {
         return createAndSaveSampleUnit(sampleSummary, sampleUnitState, samplingUnit);
       } else {
@@ -99,7 +98,8 @@ public class SampleService {
     }
   }
 
-  public void publishSampleToParty(UUID sampleSummaryId, BusinessSampleUnit samplingUnit) throws CTPException {
+  public void publishSampleToParty(UUID sampleSummaryId, BusinessSampleUnit samplingUnit)
+      throws CTPException {
     PartyCreationRequestDTO party = PartyUtil.convertToParty(samplingUnit);
     party.getAttributes().setSampleUnitId(samplingUnit.getSampleUnitId().toString());
     party.setSampleSummaryId(sampleSummaryId.toString());
@@ -170,12 +170,13 @@ public class SampleService {
    * @throws CTPException if transition errors
    */
   public SampleSummary activateSampleSummaryState(Integer sampleSummaryPK) throws CTPException {
-        log.debug("attempting to find sample summary", kv("sampleSummaryPK", sampleSummaryPK));
+    log.debug("attempting to find sample summary", kv("sampleSummaryPK", sampleSummaryPK));
     try {
-      SampleSummary targetSampleSummary = sampleSummaryRepository.findBySampleSummaryPK(sampleSummaryPK).orElseThrow();
+      SampleSummary targetSampleSummary =
+          sampleSummaryRepository.findBySampleSummaryPK(sampleSummaryPK).orElseThrow();
       SampleState newState =
-              sampleSvcStateTransitionManager.transition(
-                      targetSampleSummary.getState(), SampleEvent.ACTIVATED);
+          sampleSvcStateTransitionManager.transition(
+              targetSampleSummary.getState(), SampleEvent.ACTIVATED);
       targetSampleSummary.setState(newState);
       targetSampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
       sampleSummaryRepository.saveAndFlush(targetSampleSummary);
@@ -192,14 +193,13 @@ public class SampleService {
     String sampleUnitId = partyCreationRequest.getAttributes().getSampleUnitId();
     try {
       SampleUnit sampleUnit =
-              sampleUnitRepository.findById(
-                      UUID.fromString(sampleUnitId)).orElseThrow();
+          sampleUnitRepository.findById(UUID.fromString(sampleUnitId)).orElseThrow();
       changeSampleUnitState(sampleUnit);
       sampleSummaryStateCheck(sampleUnit);
       return returnedParty;
     } catch (NoSuchElementException e) {
-        log.error("unable to find sample ", kv("sampleUnitId", sampleUnitId));
-        throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND);
+      log.error("unable to find sample ", kv("sampleUnitId", sampleUnitId));
+      throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND);
     }
   }
 
@@ -232,7 +232,8 @@ public class SampleService {
     // Integer sampleUnitsTotal =
     // initialiseSampleUnitsForCollectionExcerciseCollection(job.getSampleSummaryId());
     Integer sampleUnitsTotal = 0;
-    SampleSummary sampleSummary = sampleSummaryRepository.findById(job.getSampleSummaryId()).orElse(null);
+    SampleSummary sampleSummary =
+        sampleSummaryRepository.findById(job.getSampleSummaryId()).orElse(null);
     if (sampleSummary != null && sampleSummary.getTotalSampleUnits() != 0) {
       sampleUnitsTotal = sampleSummary.getTotalSampleUnits();
       collectionExerciseJobService.storeCollectionExerciseJob(job);
@@ -299,8 +300,8 @@ public class SampleService {
       SampleSummary ss = sampleSummaryRepository.findById(sampleSummaryId).orElseThrow();
       return sampleUnitRepository.findBySampleSummaryFK(ss.getSampleSummaryPK());
     } catch (NoSuchElementException e) {
-        log.error("unable to find sample summary", kv("sampleSummaryId", sampleSummaryId));
-        return new ArrayList<>();
+      log.error("unable to find sample summary", kv("sampleSummaryId", sampleSummaryId));
+      return new ArrayList<>();
     }
   }
 }

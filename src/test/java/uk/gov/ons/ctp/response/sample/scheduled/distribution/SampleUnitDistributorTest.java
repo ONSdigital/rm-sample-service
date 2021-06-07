@@ -11,7 +11,8 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
-
+import libs.common.error.CTPException;
+import libs.common.error.CTPException.Fault;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -20,9 +21,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import libs.common.error.CTPException;
-import libs.common.error.CTPException.Fault;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
@@ -46,8 +44,7 @@ public class SampleUnitDistributorTest {
 
   @Mock private SampleUnitMapper sampleUnitMapper;
 
-  @Rule
-  public ExpectedException exceptionRule = ExpectedException.none();
+  @Rule public ExpectedException exceptionRule = ExpectedException.none();
 
   @InjectMocks private SampleUnitDistributor sampleUnitDistributor;
 
@@ -66,8 +63,8 @@ public class SampleUnitDistributorTest {
 
     SampleUnit sampleUnit = new SampleUnit();
 
-    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit =
-        new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit();
+    uk.gov.ons.ctp.response.sample.representation.SampleUnit mappedSampleUnit =
+        new uk.gov.ons.ctp.response.sample.representation.SampleUnit();
 
     when(collectionExerciseJobRepository.findByJobCompleteIsFalse())
         .thenReturn(Collections.singletonList(collectionExerciseJob));
@@ -106,8 +103,8 @@ public class SampleUnitDistributorTest {
     SampleUnit sampleUnit = new SampleUnit();
     sampleUnit.setId(sampleUnitId);
 
-    uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit mappedSampleUnit =
-        new uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit();
+    uk.gov.ons.ctp.response.sample.representation.SampleUnit mappedSampleUnit =
+        new uk.gov.ons.ctp.response.sample.representation.SampleUnit();
 
     when(collectionExerciseJobRepository.findByJobCompleteIsFalse())
         .thenReturn(Collections.singletonList(collectionExerciseJob));

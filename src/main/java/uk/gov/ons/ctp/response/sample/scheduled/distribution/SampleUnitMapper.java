@@ -3,11 +3,10 @@ package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import ma.glasnost.orika.MapperFacade;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnit;
 
 /** Maps a SampleUnit JPA entity to SampleUnit which can be sent via Rabbit queue */
 @Component
