@@ -118,6 +118,10 @@ spec:
               secretKeyRef:
                 name: db-credentials
                 key: {{ .Values.database.secrets.usernameKey }}
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /var/secrets/google/credentials.json
+          - name: GOOGLE_CLOUD_PROJECT
+            value: "{{ .Values.gcp.project }}"
           - name: DB_PASSWORD
             valueFrom:
               secretKeyRef:
@@ -199,10 +203,6 @@ spec:
             value: "$(DB_USERNAME)"
           - name: SPRING_DATASOURCE_PASSWORD
             value: "$(DB_PASSWORD)"
-          - name: GOOGLE_APPLICATION_CREDENTIALS
-            value: /var/secrets/google/credentials.json
-          - name: GOOGLE_CLOUD_PROJECT
-            value: "{{ .Values.gcp.project }}"
           - name: GCP_PROJECT
             value: "{{ .Values.gcp.project }}"
           - name: GCP_SAMPLEUNITPUBLISHERTOPIC
