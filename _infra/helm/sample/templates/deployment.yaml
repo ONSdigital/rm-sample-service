@@ -25,7 +25,7 @@ spec:
         - name: google-cloud-key
           secret:
             secretName: google-application-credentials
-      { { - if .Values.database.sqlProxyEnabled } }
+      {{- if .Values.database.sqlProxyEnabled }}
         - name: cloudsql-instance-credentials
           secret:
             secretName: cloudsql-proxy-credentials
