@@ -7,8 +7,6 @@
   http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd">
 
     <int:annotation-config/>
-
-    <import resource="sample-unit-outbound-flow.xml"/>
     <import resource="party-creation-out.xml"/>
     <import resource="party-creation-in.xml"/>
 
