@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Stream;
 import org.junit.Assert;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.runner.RunWith;
 import org.mockito.BDDMockito;
 import org.slf4j.Logger;
@@ -34,6 +36,10 @@ import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 @ActiveProfiles("test")
 public class SampleEndpointIT {
   private static final Logger log = LoggerFactory.getLogger(SampleEndpointIT.class);
+
+  @ClassRule
+  public static final EnvironmentVariables environmentVariables =
+      new EnvironmentVariables().set("PUBSUB_EMULATOR_HOST", "127.0.0.1:18681");
 
   @LocalServerPort private int port;
   @MockBean private CollectionExerciseJobRepository collectionExerciseJobRepository;
