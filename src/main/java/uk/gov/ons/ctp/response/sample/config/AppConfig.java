@@ -18,4 +18,5 @@ public class AppConfig {
   private PartySvc partySvc;
   private Rabbitmq rabbitmq;
   private Logging logging;
+  private GCP gcp;
 }
