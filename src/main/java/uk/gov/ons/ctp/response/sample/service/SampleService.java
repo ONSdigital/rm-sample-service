@@ -16,14 +16,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
-import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
-import uk.gov.ons.ctp.response.sample.party.PartyUtil;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
@@ -48,11 +45,7 @@ public class SampleService {
   private StateTransitionManager<SampleUnitState, SampleUnitEvent>
       sampleSvcUnitStateTransitionManager;
 
-  @Autowired private PartySvcClientService partySvcClient;
-
   @Autowired private CollectionExerciseJobService collectionExerciseJobService;
-
-  @Autowired private PartyPublisher partyPublisher;
 
   public List<SampleSummary> findAllSampleSummaries() {
     return sampleSummaryRepository.findAll();
@@ -99,13 +92,6 @@ public class SampleService {
     } else {
       throw new UnknownSampleSummaryException();
     }
-  }
-
-  public void publishSampleToParty(UUID sampleSummaryId, BusinessSampleUnit samplingUnit) {
-    PartyCreationRequestDTO party = PartyUtil.convertToParty(samplingUnit);
-    party.getAttributes().setSampleUnitId(samplingUnit.getSampleUnitId().toString());
-    party.setSampleSummaryId(sampleSummaryId.toString());
-    partyPublisher.publish(party);
   }
 
   private Integer calculateExpectedCollectionInstruments(
@@ -189,21 +175,9 @@ public class SampleService {
     }
   }
 
-  public PartyDTO sendToPartyService(PartyCreationRequestDTO partyCreationRequest)
-      throws Exception {
-    PartyDTO returnedParty = partySvcClient.postParty(partyCreationRequest);
-    String sampleUnitId = partyCreationRequest.getAttributes().getSampleUnitId();
-    try {
-      SampleUnit sampleUnit =
-          sampleUnitRepository.findById(UUID.fromString(sampleUnitId)).orElseThrow();
-      changeSampleUnitState(sampleUnit);
-      sampleSummaryStateCheck(sampleUnit);
-      addPartyIdToSample(sampleUnit, returnedParty);
-      return returnedParty;
-    } catch (NoSuchElementException e) {
-      log.error("unable to find sample ", kv("sampleUnitId", sampleUnitId));
-      throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND);
-    }
+  public void updateState(SampleUnit sampleUnit) throws CTPException {
+    changeSampleUnitState(sampleUnit);
+    sampleSummaryStateCheck(sampleUnit);
   }
 
   private void addPartyIdToSample(SampleUnit sampleUnit, PartyDTO party) {

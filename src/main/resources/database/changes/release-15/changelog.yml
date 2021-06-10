@@ -1,0 +1,11 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 15-1
+      author: Warren Bailey
+      changes:
+        - sqlFile:
+            comment: Drop party id column
+            path: drop_party_id.sql
+            relativeToChangelogFile: true
+            splitStatements: false

@@ -17,7 +17,6 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.integration.annotation.IntegrationComponentScan;
@@ -40,7 +39,6 @@ import uk.gov.ons.ctp.response.sample.service.state.SampleSvcStateTransitionMana
 @ComponentScan(basePackages = {"uk.gov.ons.ctp.response"})
 @EnableJpaRepositories(basePackages = {"uk.gov.ons.ctp.response"})
 @EntityScan("uk.gov.ons.ctp.response")
-@ImportResource("springintegration/main.xml")
 @EnableAsync
 public class SampleSvcApplication {
 
