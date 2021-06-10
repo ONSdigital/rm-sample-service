@@ -5,7 +5,6 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import libs.common.error.RestExceptionHandler;
 import libs.common.jackson.CustomObjectMapper;
-import libs.common.rest.RestUtility;
 import libs.common.state.StateTransitionManager;
 import libs.common.state.StateTransitionManagerFactory;
 import net.sourceforge.cobertura.CoverageIgnore;
@@ -63,18 +62,6 @@ public class SampleSvcApplication {
   @Bean
   public RestTemplate restTemplate() {
     return new RestTemplate();
-  }
-
-  /**
-   * The RestUtility bean for the Action service
-   *
-   * @return the RestUtility bean for the Action service
-   */
-  @Bean
-  @Qualifier("partyRestUtility")
-  public RestUtility partyServiceRestUtility() {
-    RestUtility restUtility = new RestUtility(appConfig.getPartySvc().getConnectionConfig());
-    return restUtility;
   }
 
   /**
