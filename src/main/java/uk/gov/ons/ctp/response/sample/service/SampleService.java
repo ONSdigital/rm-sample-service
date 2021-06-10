@@ -6,7 +6,6 @@ import java.util.*;
 import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
 import libs.common.time.DateTimeUtil;
-import libs.party.representation.PartyDTO;
 import libs.sample.validation.BusinessSampleUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -178,26 +177,6 @@ public class SampleService {
   public void updateState(SampleUnit sampleUnit) throws CTPException {
     changeSampleUnitState(sampleUnit);
     sampleSummaryStateCheck(sampleUnit);
-  }
-
-  private void addPartyIdToSample(SampleUnit sampleUnit, PartyDTO party) {
-    try {
-      log.debug(
-          "add party to sample",
-          kv("sampleUnitId", sampleUnit.getId()),
-          kv("partyId", party.getId()));
-      UUID partyId = UUID.fromString(party.getId());
-      sampleUnit.setPartyId(partyId);
-      sampleUnitRepository.saveAndFlush(sampleUnit);
-      log.debug(
-          "party added", kv("sampleUnitId", sampleUnit.getId()), kv("partyId", party.getId()));
-    } catch (RuntimeException e) {
-      log.error(
-          "Unexpected exception saving party id",
-          kv("sampleUnitId", sampleUnit.getId()),
-          kv("partyId", party.getId()),
-          e);
-    }
   }
 
   private void changeSampleUnitState(SampleUnit sampleUnit) throws CTPException {
