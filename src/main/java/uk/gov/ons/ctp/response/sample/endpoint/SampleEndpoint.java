@@ -198,7 +198,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   }
 
   @RequestMapping(
-      value = "{sampleSummaryId}/sampleunit/{sampleunitref}",
+      value = "{sampleSummaryId}/sampleunits/{sampleunitref}",
       method = RequestMethod.GET)
   public ResponseEntity<SampleUnitDTO> requestSampleUnitForSampleSummaryAndRuRef(
       @PathVariable("sampleSummaryId") final UUID sampleSummaryId,
