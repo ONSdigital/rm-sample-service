@@ -265,4 +265,49 @@ public class SampleServiceTest {
     BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();
     sampleService.createSampleUnit(UUID.randomUUID(), businessSampleUnit, SampleUnitState.INIT);
   }
+
+  @Test
+  public void findSampleUnitWithSampleSummary()
+      throws UnknownSampleSummaryException, UnknownSampleUnitException {
+    SampleSummary newSummary = createSampleSummary(5, 2);
+    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.of(newSummary));
+    BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();
+    when(sampleUnitRepository.findBySampleUnitRefAndSampleSummaryFK(
+            businessSampleUnit.getSampleUnitRef(), newSummary.getSampleSummaryPK()))
+        .thenReturn(sampleUnit.get(0));
+    SampleUnit unit =
+        sampleService.findSampleUnitBySampleSummaryAndSampleUnitRef(
+            newSummary.getId(), businessSampleUnit.getSampleUnitRef());
+    assertNotNull(unit);
+    verify(sampleUnitRepository, times(1))
+        .findBySampleUnitRefAndSampleSummaryFK(
+            businessSampleUnit.getSampleUnitRef(), newSummary.getSampleSummaryPK());
+  }
+
+  @Test(expected = UnknownSampleSummaryException.class)
+  public void findSampleUnitWithUnknownSampleSummary()
+      throws UnknownSampleSummaryException, UnknownSampleUnitException {
+
+    SampleSummary newSummary = createSampleSummary(5, 2);
+    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(null));
+    BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();
+    sampleService.createSampleUnit(newSummary.getId(), businessSampleUnit, SampleUnitState.INIT);
+    verify(sampleUnitRepository, times(1)).save(any(SampleUnit.class));
+
+    sampleService.findSampleUnitBySampleSummaryAndSampleUnitRef(
+        UUID.randomUUID(), businessSampleUnit.getSampleUnitRef());
+  }
+
+  @Test(expected = UnknownSampleUnitException.class)
+  public void findSampleUnitWithUnknownSampleUnitRef()
+      throws UnknownSampleSummaryException, UnknownSampleUnitException {
+    SampleSummary newSummary = createSampleSummary(5, 2);
+    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.of(newSummary));
+    BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();
+    when(sampleUnitRepository.findBySampleUnitRefAndSampleSummaryFK(
+            businessSampleUnit.getSampleUnitRef(), newSummary.getSampleSummaryPK()))
+        .thenReturn(null);
+    sampleService.findSampleUnitBySampleSummaryAndSampleUnitRef(
+        newSummary.getId(), businessSampleUnit.getSampleUnitRef());
+  }
 }

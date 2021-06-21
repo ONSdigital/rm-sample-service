@@ -32,6 +32,8 @@ public interface SampleUnitRepository extends JpaRepository<SampleUnit, Integer>
   Stream<SampleUnit> findBySampleSummaryFKAndState(
       Integer sampleSummaryFK, SampleUnitDTO.SampleUnitState state);
 
+  SampleUnit findBySampleUnitRefAndSampleSummaryFK(String sampleUnitRef, Integer sampleSummary);
+
   boolean existsBySampleUnitRefAndSampleSummaryFK(String sampleUnitRef, Integer sampleSummary);
 
   /**

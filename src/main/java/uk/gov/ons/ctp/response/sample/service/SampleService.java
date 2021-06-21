@@ -280,4 +280,23 @@ public class SampleService {
       return new ArrayList<>();
     }
   }
+
+  public SampleUnit findSampleUnitBySampleSummaryAndSampleUnitRef(
+      UUID sampleSummaryId, String sampleUnitRef)
+      throws UnknownSampleSummaryException, UnknownSampleUnitException {
+    SampleSummary sampleSummary = sampleSummaryRepository.findById(sampleSummaryId).orElse(null);
+    if (sampleSummary != null) {
+      /** a sample unit should be unique inside a sample summary, so check if we already have it. */
+      SampleUnit sampleUnit =
+          sampleUnitRepository.findBySampleUnitRefAndSampleSummaryFK(
+              sampleUnitRef, sampleSummary.getSampleSummaryPK());
+      if (sampleUnit != null) {
+        return sampleUnit;
+      } else {
+        throw new UnknownSampleUnitException();
+      }
+    } else {
+      throw new UnknownSampleSummaryException();
+    }
+  }
 }
