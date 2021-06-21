@@ -204,10 +204,19 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       @PathVariable("sampleSummaryId") final UUID sampleSummaryId,
       @PathVariable("sampleunitref") final String sampleUnitRef) {
     try {
+      log.debug(
+          "attempting to find sample unit",
+          kv("sampleSummaryId", sampleSummaryId),
+          kv("sampleUnitRef", sampleUnitRef));
       SampleUnit sampleUnit =
           sampleService.findSampleUnitBySampleSummaryAndSampleUnitRef(
               sampleSummaryId, sampleUnitRef);
       SampleUnitDTO result = mapperFacade.map(sampleUnit, SampleUnitDTO.class);
+      log.debug(
+          "found sample unit",
+          kv("sampleSummaryId", sampleSummaryId),
+          kv("sampleUnitRef", sampleUnitRef),
+          kv("sampleUnitId", sampleUnit.getId()));
       return ResponseEntity.ok(result);
     } catch (UnknownSampleUnitException e) {
       log.warn(
