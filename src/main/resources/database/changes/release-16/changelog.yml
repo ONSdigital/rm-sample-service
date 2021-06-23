@@ -1,0 +1,11 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 16-1
+      author: Matt Crocker
+      changes:
+        - sqlFile:
+            comment: Use underscores in column names for consistency
+            path: add_column_underscores.sql
+            relativeToChangelogFile: true
+            splitStatements: false
