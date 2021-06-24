@@ -5,6 +5,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import libs.common.error.RestExceptionHandler;
 import libs.common.jackson.CustomObjectMapper;
+import libs.common.rest.RestUtility;
 import libs.common.state.StateTransitionManager;
 import libs.common.state.StateTransitionManagerFactory;
 import net.sourceforge.cobertura.CoverageIgnore;
@@ -108,6 +109,17 @@ public class SampleSvcApplication {
   @Primary
   public CustomObjectMapper customObjectMapper() {
     return new CustomObjectMapper();
+  }
+
+  /**
+   * The RestUtility bean for the Party service
+   *
+   * @return the RestUtility bean for the Party service
+   */
+  @Bean
+  @Qualifier("partyRestUtility")
+  public RestUtility partyRestUtility() {
+    return new RestUtility(appConfig.getPartySvc().getConnectionConfig());
   }
 
   @Bean

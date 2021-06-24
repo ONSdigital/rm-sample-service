@@ -7,5 +7,3 @@ databaseChangeLog:
         - sqlFile:
             comment: Use underscores in column names for consistency
             path: add_column_underscores.sql
-            relativeToChangelogFile: true
-            splitStatements: false
