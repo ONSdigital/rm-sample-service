@@ -1,7 +1,6 @@
 package uk.gov.ons.ctp.response.sample.service;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.*;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
@@ -14,7 +13,6 @@ import java.util.Optional;
 import java.util.UUID;
 import libs.common.FixtureHelper;
 import libs.common.state.StateTransitionManager;
-import libs.party.representation.PartyDTO;
 import libs.sample.validation.BusinessSampleUnit;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,13 +20,11 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.gov.ons.ctp.response.party.definition.PartyCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
-import uk.gov.ons.ctp.response.sample.message.PartyPublisher;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
@@ -57,17 +53,12 @@ public class SampleServiceTest {
   private StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent>
       sampleSvcUnitStateTransitionManager;
 
-  @Mock private PartySvcClientService partySvcClient;
-
-  @Mock private PartyPublisher partyPublisher;
-
   @Mock private CollectionExerciseJobService collectionExerciseJobService;
 
   @InjectMocks private SampleService sampleService;
 
   private List<BusinessSurveySample> surveySample;
-  private List<PartyCreationRequestDTO> party;
-  private List<PartyDTO> partyDTO;
+
   private List<SampleUnit> sampleUnit;
   private List<SampleSummary> sampleSummaryList;
   private List<CollectionExerciseJob> collectionExerciseJobs;
@@ -80,8 +71,6 @@ public class SampleServiceTest {
   @Before
   public void setUp() throws Exception {
     surveySample = FixtureHelper.loadClassFixtures(BusinessSurveySample[].class);
-    party = FixtureHelper.loadClassFixtures(PartyCreationRequestDTO[].class);
-    partyDTO = FixtureHelper.loadClassFixtures(PartyDTO[].class);
     sampleUnit = FixtureHelper.loadClassFixtures(SampleUnit[].class);
     sampleSummaryList = FixtureHelper.loadClassFixtures(SampleSummary[].class);
     collectionExerciseJobs = FixtureHelper.loadClassFixtures(CollectionExerciseJob[].class);
@@ -127,10 +116,7 @@ public class SampleServiceTest {
    * @throws Exception oops
    */
   @Test
-  public void postPartyDTOToPartyServiceAndUpdateStatesTest() throws Exception {
-    when(partySvcClient.postParty(any())).thenReturn(partyDTO.get(0));
-    when(sampleUnitRepository.findById(UUID.fromString(SAMPLEUNIT_ID)))
-        .thenReturn(Optional.of(sampleUnit.get(0)));
+  public void updateStatesTest() throws Exception {
     when(sampleSvcUnitStateTransitionManager.transition(
             SampleUnitState.INIT, SampleUnitEvent.PERSISTING))
         .thenReturn(SampleUnitState.PERSISTED);
@@ -139,34 +125,9 @@ public class SampleServiceTest {
     when(sampleSvcStateTransitionManager.transition(SampleState.INIT, SampleEvent.ACTIVATED))
         .thenReturn(SampleState.ACTIVE);
 
-    PartyDTO testParty = sampleService.sendToPartyService(party.get(0));
-    assertEquals(SAMPLE_SUMMARY_ID, testParty.getSampleSummaryId());
-    verify(partySvcClient).postParty(any(PartyCreationRequestDTO.class));
+    sampleService.updateState(sampleUnit.get(0));
     assertThat(sampleUnit.get(0).getState(), is(SampleUnitState.PERSISTED));
     assertThat(sampleSummaryList.get(0).getState(), is(SampleState.ACTIVE));
-  }
-
-  /**
-   * Test that SampleSummary state is not changed to active unless all Party objects have been sent
-   * to the Party Service
-   *
-   * @throws Exception oops
-   */
-  @Test
-  public void sendToPartyServiceTestNotAllSampleUnitsPosted() throws Exception {
-    when(partySvcClient.postParty(any())).thenReturn(partyDTO.get(0));
-    when(sampleUnitRepository.findById(UUID.fromString(SAMPLEUNIT_ID)))
-        .thenReturn(Optional.of(sampleUnit.get(0)));
-    when(sampleSvcUnitStateTransitionManager.transition(
-            SampleUnitState.INIT, SampleUnitEvent.PERSISTING))
-        .thenReturn(SampleUnitState.PERSISTED);
-    when(sampleUnitRepository.countBySampleSummaryFK(1)).thenReturn(1);
-
-    PartyDTO testParty = sampleService.sendToPartyService(party.get(0));
-    assertEquals(SAMPLE_SUMMARY_ID, testParty.getSampleSummaryId());
-    verify(partySvcClient).postParty(any(PartyCreationRequestDTO.class));
-    assertThat(sampleUnit.get(0).getState(), is(SampleUnitState.PERSISTED));
-    assertThat(sampleSummaryList.get(0).getState(), not(SampleState.ACTIVE));
   }
 
   /**
@@ -303,5 +264,50 @@ public class SampleServiceTest {
   public void createSampleUnitWithUnknownSampleSummary() throws UnknownSampleSummaryException {
     BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();
     sampleService.createSampleUnit(UUID.randomUUID(), businessSampleUnit, SampleUnitState.INIT);
+  }
+
+  @Test
+  public void findSampleUnitWithSampleSummary()
+      throws UnknownSampleSummaryException, UnknownSampleUnitException {
+    SampleSummary newSummary = createSampleSummary(5, 2);
+    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.of(newSummary));
+    BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();
+    when(sampleUnitRepository.findBySampleUnitRefAndSampleSummaryFK(
+            businessSampleUnit.getSampleUnitRef(), newSummary.getSampleSummaryPK()))
+        .thenReturn(sampleUnit.get(0));
+    SampleUnit unit =
+        sampleService.findSampleUnitBySampleSummaryAndSampleUnitRef(
+            newSummary.getId(), businessSampleUnit.getSampleUnitRef());
+    assertNotNull(unit);
+    verify(sampleUnitRepository, times(1))
+        .findBySampleUnitRefAndSampleSummaryFK(
+            businessSampleUnit.getSampleUnitRef(), newSummary.getSampleSummaryPK());
+  }
+
+  @Test(expected = UnknownSampleSummaryException.class)
+  public void findSampleUnitWithUnknownSampleSummary()
+      throws UnknownSampleSummaryException, UnknownSampleUnitException {
+
+    SampleSummary newSummary = createSampleSummary(5, 2);
+    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(null));
+    BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();
+    sampleService.createSampleUnit(newSummary.getId(), businessSampleUnit, SampleUnitState.INIT);
+    verify(sampleUnitRepository, times(1)).save(any(SampleUnit.class));
+
+    sampleService.findSampleUnitBySampleSummaryAndSampleUnitRef(
+        UUID.randomUUID(), businessSampleUnit.getSampleUnitRef());
+  }
+
+  @Test(expected = UnknownSampleUnitException.class)
+  public void findSampleUnitWithUnknownSampleUnitRef()
+      throws UnknownSampleSummaryException, UnknownSampleUnitException {
+    SampleSummary newSummary = createSampleSummary(5, 2);
+    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.of(newSummary));
+    BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();
+    when(sampleUnitRepository.findBySampleUnitRefAndSampleSummaryFK(
+            businessSampleUnit.getSampleUnitRef(), newSummary.getSampleSummaryPK()))
+        .thenReturn(null);
+    sampleService.findSampleUnitBySampleSummaryAndSampleUnitRef(
+        newSummary.getId(), businessSampleUnit.getSampleUnitRef());
   }
 }

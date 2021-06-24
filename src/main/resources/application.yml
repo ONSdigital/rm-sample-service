@@ -72,16 +72,6 @@ spring:
     user: admin
     password: secret
 
-party-svc:
-  sample-path: /events
-  post-party-path: /party-api/v1/parties
-  connection-config:
-    scheme: http
-    host: localhost
-    port: 8081
-    username: admin
-    password: secret
-
 rabbitmq:
   username: guest
   password: guest

@@ -41,6 +41,7 @@ import uk.gov.ons.ctp.response.sample.scheduled.distribution.SampleDistributionE
 import uk.gov.ons.ctp.response.sample.scheduled.distribution.SampleUnitDistributor;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import uk.gov.ons.ctp.response.sample.service.UnknownSampleSummaryException;
+import uk.gov.ons.ctp.response.sample.service.UnknownSampleUnitException;
 
 /** The REST endpoint controller for Sample Service. */
 @RestController
@@ -196,6 +197,40 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
         String.format("No sample units were found for sample summary %s", sampleSummaryId));
   }
 
+  @RequestMapping(
+      value = "{sampleSummaryId}/sampleunits/{sampleunitref}",
+      method = RequestMethod.GET)
+  public ResponseEntity<SampleUnitDTO> requestSampleUnitForSampleSummaryAndRuRef(
+      @PathVariable("sampleSummaryId") final UUID sampleSummaryId,
+      @PathVariable("sampleunitref") final String sampleUnitRef) {
+    try {
+      log.debug(
+          "attempting to find sample unit",
+          kv("sampleSummaryId", sampleSummaryId),
+          kv("sampleUnitRef", sampleUnitRef));
+      SampleUnit sampleUnit =
+          sampleService.findSampleUnitBySampleSummaryAndSampleUnitRef(
+              sampleSummaryId, sampleUnitRef);
+      SampleUnitDTO result = mapperFacade.map(sampleUnit, SampleUnitDTO.class);
+      log.debug(
+          "found sample unit",
+          kv("sampleSummaryId", sampleSummaryId),
+          kv("sampleUnitRef", sampleUnitRef),
+          kv("sampleUnitId", sampleUnit.getId()));
+      return ResponseEntity.ok(result);
+    } catch (UnknownSampleUnitException e) {
+      log.warn(
+          "unknown sample unit",
+          kv("sampleSummaryId", sampleSummaryId),
+          kv("sampleUnitRef", sampleUnitRef),
+          e);
+      return ResponseEntity.badRequest().build();
+    } catch (UnknownSampleSummaryException e) {
+      log.error("unknown sample summary id", kv("sampleSummaryId", sampleSummaryId), e);
+      return ResponseEntity.badRequest().build();
+    }
+  }
+
   @RequestMapping(value = "export", method = RequestMethod.POST)
   public ResponseEntity<Void> exportSamples() {
     try {
@@ -232,7 +267,8 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
           sampleService.createSampleUnit(
               sampleSummaryId, businessSampleUnit, SampleUnitDTO.SampleUnitState.INIT);
       log.debug("sample created");
-      sampleService.publishSampleToParty(sampleSummaryId, businessSampleUnit);
+      sampleService.updateState(sampleUnit);
+
       SampleUnitDTO sampleUnitDTO = mapperFacade.map(sampleUnit, SampleUnitDTO.class);
       log.debug("created SampleUnitDTO", kv("sampleUnitDTO", sampleUnitDTO));
       return ResponseEntity.created(
@@ -245,6 +281,9 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     } catch (UnknownSampleSummaryException e) {
       log.error("unknown sample summary id", kv("sampleSummaryId", sampleSummaryId), e);
       return ResponseEntity.badRequest().build();
+    } catch (CTPException e) {
+      log.error("unexpected exception", kv("sampleSummaryId", sampleSummaryId), e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
   }
 

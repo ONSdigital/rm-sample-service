@@ -1,0 +1,1 @@
+ALTER TABLE sample.sampleunit DROP COLUMN party_id;

@@ -65,7 +65,4 @@ public class SampleUnit implements Serializable {
   private SampleUnitDTO.SampleUnitState state;
 
   @Transient private SampleAttributes sampleAttributes;
-
-  @Column(name = "party_id")
-  private UUID partyId;
 }

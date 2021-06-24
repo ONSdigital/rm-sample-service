@@ -5,7 +5,6 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import libs.common.error.RestExceptionHandler;
 import libs.common.jackson.CustomObjectMapper;
-import libs.common.rest.RestUtility;
 import libs.common.state.StateTransitionManager;
 import libs.common.state.StateTransitionManagerFactory;
 import net.sourceforge.cobertura.CoverageIgnore;
@@ -17,7 +16,6 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.integration.annotation.IntegrationComponentScan;
@@ -40,7 +38,6 @@ import uk.gov.ons.ctp.response.sample.service.state.SampleSvcStateTransitionMana
 @ComponentScan(basePackages = {"uk.gov.ons.ctp.response"})
 @EnableJpaRepositories(basePackages = {"uk.gov.ons.ctp.response"})
 @EntityScan("uk.gov.ons.ctp.response")
-@ImportResource("springintegration/main.xml")
 @EnableAsync
 public class SampleSvcApplication {
 
@@ -65,18 +62,6 @@ public class SampleSvcApplication {
   @Bean
   public RestTemplate restTemplate() {
     return new RestTemplate();
-  }
-
-  /**
-   * The RestUtility bean for the Action service
-   *
-   * @return the RestUtility bean for the Action service
-   */
-  @Bean
-  @Qualifier("partyRestUtility")
-  public RestUtility partyServiceRestUtility() {
-    RestUtility restUtility = new RestUtility(appConfig.getPartySvc().getConnectionConfig());
-    return restUtility;
   }
 
   /**
