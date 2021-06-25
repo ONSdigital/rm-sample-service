@@ -9,3 +9,13 @@ databaseChangeLog:
             path: add_party_id_to_sample.sql
             relativeToChangelogFile: true
             splitStatements: false
+   - changeSet:
+       id: 16-2
+       author: Warren Bailey
+       changes:
+         - sqlFile:
+             comment: Add active enrolment to sample unit
+             path: add_active_enrolment_to_sample.sql
+             relativeToChangelogFile: true
+             splitStatements: false
+

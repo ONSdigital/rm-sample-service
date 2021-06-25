@@ -4,6 +4,9 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import libs.party.representation.Association;
+import libs.party.representation.Enrolment;
 import libs.party.representation.PartyDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +29,8 @@ public class SampleSummaryService {
 
   private static final Logger LOG = LoggerFactory.getLogger(SampleSummaryService.class);
 
+  private static final String ENABLED = "ENABLED";
+
   @Autowired private SampleSummaryRepository sampleSummaryRepository;
 
   @Autowired private SampleUnitRepository sampleUnitRepository;
@@ -45,13 +50,18 @@ public class SampleSummaryService {
     // TODO implement a stream here
 
     for (SampleUnit sampleUnit : samples) {
-      String partyId = getPartyId(sampleUnit);
+      PartyDTO party = getParty(sampleUnit);
+      String partyId = party.getId();
       if (partyId != null) {
         sampleUnit.setPartyId(UUID.fromString(partyId));
-        sampleUnitRepository.saveAndFlush(sampleUnit);
       } else {
         // sample not valid
       }
+      if (hasActiveEnrolment(party, surveyId)) {
+        sampleUnit.setActivEnrolment(true);
+      }
+
+      sampleUnitRepository.saveAndFlush(sampleUnit);
     }
     return false;
   }
@@ -60,12 +70,12 @@ public class SampleSummaryService {
     return null;
   }
 
-  private String getPartyId(SampleUnit sampleUnit) {
+  private PartyDTO getParty(SampleUnit sampleUnit) {
     try {
       PartyDTO party =
           partySvcClient.requestParty(
               sampleUnit.getSampleUnitType(), sampleUnit.getSampleUnitRef());
-      return party.getId();
+      return party;
     } catch (HttpClientErrorException e) {
       if (e.getStatusCode() != HttpStatus.NOT_FOUND) {
         LOG.error(
@@ -80,8 +90,19 @@ public class SampleSummaryService {
     }
   }
 
-  private boolean getActiveEnrolment() {
-    return false;
+  private boolean hasActiveEnrolment(PartyDTO party, String surveyId) {
+    List<Enrolment> enrolments =
+        party.getAssociations().stream()
+            .map(Association::getEnrolments)
+            .flatMap(List::stream)
+            .collect(Collectors.toList());
+    return enrolments.stream()
+        .anyMatch(enrolment -> enrolmentIsEnabledForSurvey(enrolment, surveyId));
+  }
+
+  private boolean enrolmentIsEnabledForSurvey(final Enrolment enrolment, String surveyId) {
+    return enrolment.getSurveyId().equals(surveyId)
+        && enrolment.getEnrolmentStatus().equalsIgnoreCase(ENABLED);
   }
 
   private String getClassifiers() {

@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import libs.party.representation.Association;
+import libs.party.representation.Enrolment;
 import libs.party.representation.PartyDTO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,8 +43,7 @@ public class SampleSummaryServiceTest {
 
     String sampleUnitType = "B";
     UUID sampleUnitId = UUID.randomUUID();
-    PartyDTO partyDTO = new PartyDTO();
-    partyDTO.setId(UUID.randomUUID().toString());
+    PartyDTO partyDTO = buildPartyDTO(surveyId);
 
     SampleSummary sampleSummary = new SampleSummary();
     sampleSummary.setId(sampleSummaryId);
@@ -61,5 +62,24 @@ public class SampleSummaryServiceTest {
     when(sampleUnitRepository.findBySampleSummaryFK(1)).thenReturn(samples);
     sampleSummaryService.validate(surveyId, sampleSummaryId, collectionExerciseId);
     verify(partySvcClient, times(1)).requestParty(sampleUnitType, sampleUnitRef);
+  }
+
+  private PartyDTO buildPartyDTO(String surveyId) {
+    PartyDTO partyDTO = new PartyDTO();
+    partyDTO.setId(UUID.randomUUID().toString());
+
+    Enrolment enrolment = new Enrolment();
+    enrolment.setEnrolmentStatus("ENABLED");
+    List<Enrolment> enrolments = new ArrayList<>();
+    enrolments.add(enrolment);
+    enrolment.setSurveyId(surveyId);
+
+    Association association = new Association();
+    association.setEnrolments(enrolments);
+
+    List<Association> associations = new ArrayList<>();
+    associations.add(association);
+    partyDTO.setAssociations(associations);
+    return partyDTO;
   }
 }
