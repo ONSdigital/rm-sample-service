@@ -177,6 +177,22 @@ spec:
             {{- end }}
           - name: SPRING_LIQUIBASE_URL
             value: "jdbc:postgresql://$(DB_HOST):$(DB_PORT)/$(DB_NAME)"
+          - name: COLLECTION_INSTRUMENT_SVC_CONNECTION_CONFIG_HOST
+            {{- if .Values.dns.enabled }}
+            value: "collection-instrument.{{ .Values.namespace }}.svc.cluster.local"
+            {{- else }}
+            value: "$(COLLECTION_INSTRUMENT_SERVICE_HOST)"
+            {{- end }}
+          - name: COLLECTION_INSTRUMENT_SVC_CONNECTION_CONFIG_PORT
+            {{- if .Values.dns.enabled }}
+            value: "{{ .Values.dns.wellKnownPort }}"
+            {{- else }}
+            value: "$(COLLECTION_INSTRUMENT_SERVICE_PORT)"
+            {{- end }}
+          - name: COLLECTION_INSTRUMENT_SVC_CONNECTION_CONFIG_USERNAME
+            value: "$(SECURITY_USER_NAME)"
+          - name: COLLECTION_INSTRUMENT_SVC_CONNECTION_CONFIG_PASSWORD
+            value: "$(SECURITY_USER_PASSWORD)"
           - name: PARTY_SVC_CONNECTION_CONFIG_HOST
             {{- if .Values.dns.enabled }}
             value: "party.{{ .Values.namespace }}.svc.cluster.local"
