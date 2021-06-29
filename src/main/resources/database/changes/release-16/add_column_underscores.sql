@@ -19,7 +19,7 @@ ALTER TABLE sample.samplesummary RENAME TO sample_summary;
 ALTER TABLE sample.samplesummarystate RENAME COLUMN statepk TO state_pk;
 ALTER TABLE sample.samplesummarystate RENAME TO sample_summary_state;
 
-ALTER TABLE sample.collectionexercisejob RENAME COLUMN collectionexercisejobpk TO collection_exericse_job_pk;
+ALTER TABLE sample.collectionexercisejob RENAME COLUMN collectionexercisejobpk TO collection_exercise_job_pk;
 ALTER TABLE sample.collectionexercisejob RENAME COLUMN collectionexerciseid TO collection_exercise_id;
 ALTER TABLE sample.collectionexercisejob RENAME COLUMN surveyref TO survey_ref;
 ALTER TABLE sample.collectionexercisejob RENAME COLUMN exercisedatetime TO exercise_date_time;
