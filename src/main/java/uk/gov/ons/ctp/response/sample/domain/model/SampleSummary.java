@@ -31,7 +31,7 @@ import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 @CoverageIgnore
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@Table(name = "samplesummary", schema = "sample")
+@Table(name = "sample_summary", schema = "sample")
 public class SampleSummary implements Serializable {
 
   private static final long serialVersionUID = 7778360895016862176L;
@@ -45,7 +45,7 @@ public class SampleSummary implements Serializable {
         @Parameter(name = "sequence_name", value = "sample.samplesummaryseq"),
         @Parameter(name = "increment_size", value = "1")
       })
-  @Column(name = "samplesummarypk")
+  @Column(name = "sample_summary_pk")
   private Integer sampleSummaryPK;
 
   @Column(name = "id")
@@ -53,16 +53,16 @@ public class SampleSummary implements Serializable {
   private UUID id;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "statefk")
+  @Column(name = "state_fk")
   private SampleSummaryDTO.SampleState state;
 
-  @Column(name = "ingestdatetime")
+  @Column(name = "ingest_date_time")
   private Timestamp ingestDateTime;
 
-  @Column(name = "totalsampleunits")
+  @Column(name = "total_sample_units")
   private Integer totalSampleUnits;
 
-  @Column(name = "expectedcollectioninstruments")
+  @Column(name = "expected_collection_instruments")
   private Integer expectedCollectionInstruments;
 
   @Column(name = "notes")

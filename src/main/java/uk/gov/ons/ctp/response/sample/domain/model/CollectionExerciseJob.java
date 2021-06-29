@@ -25,7 +25,7 @@ import org.hibernate.annotations.Parameter;
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@Table(name = "collectionexercisejob", schema = "sample")
+@Table(name = "collection_exercise_job", schema = "sample")
 public class CollectionExerciseJob implements Serializable {
 
   private static final long serialVersionUID = 7778360895016862173L;
@@ -39,24 +39,24 @@ public class CollectionExerciseJob implements Serializable {
         @Parameter(name = "sequence_name", value = "sample.collectionexercisejobseq"),
         @Parameter(name = "increment_size", value = "1")
       })
-  @Column(name = "collectionexercisejobpk")
+  @Column(name = "collection_exercise_job_pk")
   private Integer collectionExerciseJobPK;
 
-  @Column(name = "collectionexerciseid")
+  @Column(name = "collection_exercise_id")
   private UUID collectionExerciseId;
 
-  @Column(name = "surveyref")
+  @Column(name = "survey_ref")
   private String surveyRef;
 
-  @Column(name = "exercisedatetime")
+  @Column(name = "exercise_date_time")
   private Timestamp exerciseDateTime;
 
-  @Column(name = "createddatetime")
+  @Column(name = "created_date_time")
   private Timestamp createdDateTime;
 
-  @Column(name = "samplesummaryid")
+  @Column(name = "sample_summary_id")
   private UUID sampleSummaryId;
 
-  @Column(name = "jobcomplete")
+  @Column(name = "job_complete")
   private boolean jobComplete;
 }

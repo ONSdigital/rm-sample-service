@@ -28,7 +28,7 @@ import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@Table(name = "sampleunit", schema = "sample")
+@Table(name = "sample_unit", schema = "sample")
 public class SampleUnit implements Serializable {
 
   private static final long serialVersionUID = 7778360895016862172L;
@@ -42,26 +42,26 @@ public class SampleUnit implements Serializable {
         @Parameter(name = "sequence_name", value = "sample.sampleunitseq"),
         @Parameter(name = "increment_size", value = "1")
       })
-  @Column(name = "sampleunitpk")
+  @Column(name = "sample_unit_pk")
   private Integer sampleUnitPK;
 
   @Column(name = "id")
   private UUID id;
 
-  @Column(name = "samplesummaryfk")
+  @Column(name = "sample_summary_fk")
   private Integer sampleSummaryFK;
 
-  @Column(name = "sampleunitref")
+  @Column(name = "sample_unit_ref")
   private String sampleUnitRef;
 
-  @Column(name = "sampleunittype")
+  @Column(name = "sample_unit_type")
   private String sampleUnitType;
 
-  @Column(name = "formtype")
+  @Column(name = "form_type")
   private String formType;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "statefk")
+  @Column(name = "state_fk")
   private SampleUnitDTO.SampleUnitState state;
 
   @Transient private SampleAttributes sampleAttributes;
