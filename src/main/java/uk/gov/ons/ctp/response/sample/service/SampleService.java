@@ -159,6 +159,7 @@ public class SampleService {
    * @return SampleSummary the updated SampleSummary
    * @throws CTPException if transition errors
    */
+  @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
   public SampleSummary activateSampleSummaryState(Integer sampleSummaryPK) throws CTPException {
     log.debug("attempting to find sample summary", kv("sampleSummaryPK", sampleSummaryPK));
     try {
@@ -179,7 +180,6 @@ public class SampleService {
 
   public void updateState(SampleUnit sampleUnit) throws CTPException {
     changeSampleUnitState(sampleUnit);
-    sampleSummaryStateCheck(sampleUnit);
   }
 
   private void changeSampleUnitState(SampleUnit sampleUnit) throws CTPException {
@@ -190,7 +190,7 @@ public class SampleService {
     sampleUnitRepository.saveAndFlush(sampleUnit);
   }
 
-  private void sampleSummaryStateCheck(SampleUnit sampleUnit) throws CTPException {
+  public void sampleSummaryStateCheck(SampleUnit sampleUnit) throws CTPException {
     int partied =
         sampleUnitRepository.countBySampleSummaryFKAndState(
             sampleUnit.getSampleSummaryFK(), SampleUnitState.PERSISTED);

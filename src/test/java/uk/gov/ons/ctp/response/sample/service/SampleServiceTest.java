@@ -127,6 +127,7 @@ public class SampleServiceTest {
         .thenReturn(SampleState.ACTIVE);
 
     sampleService.updateState(sampleUnit.get(0));
+    sampleService.activateSampleSummaryState(1);
     assertThat(sampleUnit.get(0).getState(), is(SampleUnitState.PERSISTED));
     assertThat(sampleSummaryList.get(0).getState(), is(SampleState.ACTIVE));
   }
@@ -167,7 +168,6 @@ public class SampleServiceTest {
     newSummary.setTotalSampleUnits(numSamples);
     newSummary.setExpectedCollectionInstruments(expectedInstruments);
     newSummary.setSampleSummaryPK(1);
-    when(this.sampleSummaryRepository.findBySampleSummaryPK(1)).thenReturn(Optional.of(newSummary));
     return newSummary;
   }
 
