@@ -72,7 +72,7 @@ public class SampleService {
   @Transactional(propagation = Propagation.REQUIRED)
   public SampleUnit createSampleUnit(
       UUID sampleSummaryId, BusinessSampleUnit samplingUnit, SampleUnitState sampleUnitState)
-      throws UnknownSampleSummaryException {
+      throws UnknownSampleSummaryException, CTPException {
 
     SampleSummary sampleSummary = sampleSummaryRepository.findById(sampleSummaryId).orElse(null);
     if (sampleSummary != null) {
@@ -84,7 +84,10 @@ public class SampleService {
           sampleUnitRepository.existsBySampleUnitRefAndSampleSummaryFK(
               samplingUnit.getSampleUnitRef(), sampleSummary.getSampleSummaryPK());
       if (!exists) {
-        return createAndSaveSampleUnit(sampleSummary, sampleUnitState, samplingUnit);
+        SampleUnit sampleUnit =
+            createAndSaveSampleUnit(sampleSummary, sampleUnitState, samplingUnit);
+        updateState(sampleUnit);
+        return sampleUnit;
       } else {
         throw new IllegalStateException("sample unit already exists");
       }
@@ -156,6 +159,7 @@ public class SampleService {
    * @return SampleSummary the updated SampleSummary
    * @throws CTPException if transition errors
    */
+  @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
   public SampleSummary activateSampleSummaryState(Integer sampleSummaryPK) throws CTPException {
     log.debug("attempting to find sample summary", kv("sampleSummaryPK", sampleSummaryPK));
     try {
@@ -176,7 +180,6 @@ public class SampleService {
 
   public void updateState(SampleUnit sampleUnit) throws CTPException {
     changeSampleUnitState(sampleUnit);
-    sampleSummaryStateCheck(sampleUnit);
   }
 
   private void changeSampleUnitState(SampleUnit sampleUnit) throws CTPException {
@@ -187,7 +190,7 @@ public class SampleService {
     sampleUnitRepository.saveAndFlush(sampleUnit);
   }
 
-  private void sampleSummaryStateCheck(SampleUnit sampleUnit) throws CTPException {
+  public void sampleSummaryStateCheck(SampleUnit sampleUnit) throws CTPException {
     int partied =
         sampleUnitRepository.countBySampleSummaryFKAndState(
             sampleUnit.getSampleSummaryFK(), SampleUnitState.PERSISTED);

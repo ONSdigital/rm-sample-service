@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import libs.common.FixtureHelper;
+import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
 import libs.sample.validation.BusinessSampleUnit;
 import org.junit.Before;
@@ -126,6 +127,7 @@ public class SampleServiceTest {
         .thenReturn(SampleState.ACTIVE);
 
     sampleService.updateState(sampleUnit.get(0));
+    sampleService.activateSampleSummaryState(1);
     assertThat(sampleUnit.get(0).getState(), is(SampleUnitState.PERSISTED));
     assertThat(sampleSummaryList.get(0).getState(), is(SampleState.ACTIVE));
   }
@@ -165,7 +167,7 @@ public class SampleServiceTest {
 
     newSummary.setTotalSampleUnits(numSamples);
     newSummary.setExpectedCollectionInstruments(expectedInstruments);
-
+    newSummary.setSampleSummaryPK(1);
     return newSummary;
   }
 
@@ -229,7 +231,7 @@ public class SampleServiceTest {
   }
 
   @Test
-  public void createSampleUnit() throws UnknownSampleSummaryException {
+  public void createSampleUnit() throws UnknownSampleSummaryException, CTPException {
     SampleSummary newSummary = createSampleSummary(5, 2);
     when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.of(newSummary));
     BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();
@@ -239,7 +241,7 @@ public class SampleServiceTest {
 
   @Test
   public void createDuplicateSampleUnitThrowsIllegalStateException()
-      throws UnknownSampleSummaryException {
+      throws UnknownSampleSummaryException, CTPException {
     SampleSummary newSummary = createSampleSummary(5, 2);
     when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.of(newSummary));
     BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();
@@ -261,7 +263,8 @@ public class SampleServiceTest {
   }
 
   @Test(expected = UnknownSampleSummaryException.class)
-  public void createSampleUnitWithUnknownSampleSummary() throws UnknownSampleSummaryException {
+  public void createSampleUnitWithUnknownSampleSummary()
+      throws UnknownSampleSummaryException, CTPException {
     BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();
     sampleService.createSampleUnit(UUID.randomUUID(), businessSampleUnit, SampleUnitState.INIT);
   }
@@ -286,7 +289,7 @@ public class SampleServiceTest {
 
   @Test(expected = UnknownSampleSummaryException.class)
   public void findSampleUnitWithUnknownSampleSummary()
-      throws UnknownSampleSummaryException, UnknownSampleUnitException {
+      throws UnknownSampleSummaryException, UnknownSampleUnitException, CTPException {
 
     SampleSummary newSummary = createSampleSummary(5, 2);
     when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(null));

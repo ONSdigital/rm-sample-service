@@ -263,12 +263,13 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
 
     log.debug("business sample constructed", kv("businessSample", businessSampleUnit));
     try {
+      // first create the new sample
       SampleUnit sampleUnit =
           sampleService.createSampleUnit(
               sampleSummaryId, businessSampleUnit, SampleUnitDTO.SampleUnitState.INIT);
       log.debug("sample created");
-      sampleService.updateState(sampleUnit);
-
+      // check the state of the sample summary
+      sampleService.sampleSummaryStateCheck(sampleUnit);
       SampleUnitDTO sampleUnitDTO = mapperFacade.map(sampleUnit, SampleUnitDTO.class);
       log.debug("created SampleUnitDTO", kv("sampleUnitDTO", sampleUnitDTO));
       return ResponseEntity.created(
@@ -281,7 +282,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     } catch (UnknownSampleSummaryException e) {
       log.error("unknown sample summary id", kv("sampleSummaryId", sampleSummaryId), e);
       return ResponseEntity.badRequest().build();
-    } catch (CTPException e) {
+    } catch (CTPException | RuntimeException e) {
       log.error("unexpected exception", kv("sampleSummaryId", sampleSummaryId), e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
