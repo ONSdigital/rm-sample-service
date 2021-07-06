@@ -155,27 +155,17 @@ public class SampleService {
   /**
    * Effect a state transition for the target SampleSummary if one is required
    *
-   * @param sampleSummaryPK the sampleSummaryPK to be updated
+   * @param targetSampleSummary the sampleSummary to be updated
    * @return SampleSummary the updated SampleSummary
    * @throws CTPException if transition errors
    */
-  @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
-  public SampleSummary activateSampleSummaryState(Integer sampleSummaryPK) throws CTPException {
-    log.debug("attempting to find sample summary", kv("sampleSummaryPK", sampleSummaryPK));
-    try {
-      SampleSummary targetSampleSummary =
-          sampleSummaryRepository.findBySampleSummaryPK(sampleSummaryPK).orElseThrow();
-      SampleState newState =
-          sampleSvcStateTransitionManager.transition(
-              targetSampleSummary.getState(), SampleEvent.ACTIVATED);
-      targetSampleSummary.setState(newState);
-      targetSampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
-      sampleSummaryRepository.saveAndFlush(targetSampleSummary);
-      return targetSampleSummary;
-    } catch (NoSuchElementException e) {
-      log.error("unable to find sample summary", kv("sampleSummaryPK", sampleSummaryPK));
-      throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND);
-    }
+  public void activateSampleSummaryState(SampleSummary targetSampleSummary) throws CTPException {
+    SampleState newState =
+        sampleSvcStateTransitionManager.transition(
+            targetSampleSummary.getState(), SampleEvent.ACTIVATED);
+    targetSampleSummary.setState(newState);
+    targetSampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
+    sampleSummaryRepository.saveAndFlush(targetSampleSummary);
   }
 
   public void updateState(SampleUnit sampleUnit) throws CTPException {
@@ -190,13 +180,31 @@ public class SampleService {
     sampleUnitRepository.saveAndFlush(sampleUnit);
   }
 
+  /**
+   * Check the number of sample units created and in persisted state and compare to the total number
+   * of sample units in the sample summary. If they match then the sample summary can be transition
+   * to activated.
+   *
+   * @param sampleUnit
+   * @throws CTPException
+   */
+  @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
   public void sampleSummaryStateCheck(SampleUnit sampleUnit) throws CTPException {
-    int partied =
+    Integer sampleSummaryFK = sampleUnit.getSampleSummaryFK();
+    int created =
         sampleUnitRepository.countBySampleSummaryFKAndState(
-            sampleUnit.getSampleSummaryFK(), SampleUnitState.PERSISTED);
-    int total = sampleUnitRepository.countBySampleSummaryFK(sampleUnit.getSampleSummaryFK());
-    if (total == partied) {
-      activateSampleSummaryState(sampleUnit.getSampleSummaryFK());
+            sampleSummaryFK, SampleUnitState.PERSISTED);
+    try {
+      log.debug("attempting to find sample summary", kv("sampleSummaryFK", sampleSummaryFK));
+      SampleSummary sampleSummary =
+          sampleSummaryRepository.findBySampleSummaryPK(sampleSummaryFK).orElseThrow();
+      int total = sampleSummary.getTotalSampleUnits();
+      if (total == created) {
+        activateSampleSummaryState(sampleSummary);
+      }
+    } catch (NoSuchElementException e) {
+      log.error("unable to find sample summary", kv("sampleSummaryFK", sampleSummaryFK));
+      throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND);
     }
   }
 

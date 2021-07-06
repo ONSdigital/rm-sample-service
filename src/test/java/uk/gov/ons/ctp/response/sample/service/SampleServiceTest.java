@@ -112,23 +112,35 @@ public class SampleServiceTest {
   }
 
   /**
-   * Test that when a Party is posted to Party Service the appropriate states are changed
+   * Test that when a sample unit is in the correct state
    *
    * @throws Exception oops
    */
   @Test
-  public void updateStatesTest() throws Exception {
+  public void updateStateTest() throws Exception {
     when(sampleSvcUnitStateTransitionManager.transition(
             SampleUnitState.INIT, SampleUnitEvent.PERSISTING))
         .thenReturn(SampleUnitState.PERSISTED);
+
+    sampleService.updateState(sampleUnit.get(0));
+    assertThat(sampleUnit.get(0).getState(), is(SampleUnitState.PERSISTED));
+  }
+
+  /**
+   * Test that a sample summary is activated when all sample units are created.
+   *
+   * @throws Exception oops
+   */
+  @Test
+  public void activateSampleSummaryTest() throws Exception {
+    when(sampleUnitRepository.countBySampleSummaryFKAndState(1, SampleUnitState.PERSISTED))
+        .thenReturn(1);
     when(sampleSummaryRepository.findBySampleSummaryPK(1))
         .thenReturn(Optional.of(sampleSummaryList.get(0)));
     when(sampleSvcStateTransitionManager.transition(SampleState.INIT, SampleEvent.ACTIVATED))
         .thenReturn(SampleState.ACTIVE);
 
-    sampleService.updateState(sampleUnit.get(0));
-    sampleService.activateSampleSummaryState(1);
-    assertThat(sampleUnit.get(0).getState(), is(SampleUnitState.PERSISTED));
+    sampleService.sampleSummaryStateCheck(sampleUnit.get(0));
     assertThat(sampleSummaryList.get(0).getState(), is(SampleState.ACTIVE));
   }
 
