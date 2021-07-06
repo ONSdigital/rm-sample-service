@@ -135,6 +135,17 @@ public class SampleSvcApplication {
     return new RestUtility(appConfig.getCollectionInstrumentSvc().getConnectionConfig());
   }
 
+  /**
+   * The RestUtility bean for the Survey service
+   *
+   * @return the RestUtility bean for the Survey service
+   */
+  @Bean
+  @Qualifier("surveyRestUtility")
+  public RestUtility surveyRestUtility() {
+    return new RestUtility(appConfig.getSurveySvc().getConnectionConfig());
+  }
+
   @Bean
   public Validator csvIngestValidator() {
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();

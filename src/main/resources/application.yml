@@ -72,6 +72,27 @@ spring:
     user: admin
     password: secret
 
+survey-svc:
+  request-classifier-types-list-path: /surveys/{surveyId}/classifiertypeselectors
+  request-classifier-types-path: /surveys/{surveyId}/classifiertypeselectors/{selectorId}
+  survey-detail-path: /surveys/{surveyId}
+  survey-ref-path: /surveys/ref/{surveyRef}
+  connection-config:
+    scheme: http
+    host: localhost
+    port: 8080
+    username: admin
+    password: secret
+    # how many times should we attempt connection on failure
+    retry-attempts: 5
+    # sleep between retries
+    retry-pause-milli-seconds: 5000
+    # time to estab connection
+    connect-timeout-milli-seconds: 5000
+    # time to read response
+    read-timeout-milli-seconds: 5000
+
+
 collection-instrument-svc:
   request-collection-instruments: /collection-instrument-api/1.0.2/collectioninstrument
   request-collection-instruments-count: /collection-instrument-api/1.0.2/collectioninstrument/count
