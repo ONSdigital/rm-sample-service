@@ -70,10 +70,10 @@ public class SampleSummaryService {
       if (partyId != null) {
         sampleUnit.setPartyId(UUID.fromString(partyId));
       } else {
-        // sample not valid
+        // TODO sample not valid
       }
       if (hasActiveEnrolment(party, surveyId)) {
-        sampleUnit.setActivEnrolment(true);
+        sampleUnit.setActiveEnrolment(true);
       }
 
       // now do the CI
@@ -102,7 +102,7 @@ public class SampleSummaryService {
 
       // If we could find the CI, then set it on the sample (or it will fail validation)
       if (collectionInstrumentId.isPresent()) {
-        // sampleUnit.setCollectionInstrumentId(collectionInstrumentId.get());
+        sampleUnit.setCollectionInstrumentId(collectionInstrumentId.get());
       }
 
       sampleUnitRepository.saveAndFlush(sampleUnit);

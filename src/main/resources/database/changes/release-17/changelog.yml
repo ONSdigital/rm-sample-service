@@ -18,4 +18,13 @@ databaseChangeLog:
             path: add_active_enrolment_to_sample.sql
             relativeToChangelogFile: true
             splitStatements: false
+  - changeSet:
+      id: 17-3
+      author: Warren Bailey
+      changes:
+        - sqlFile:
+            comment: Add collection instrument to sample unit
+            path: add_collection_instrument_to_sample.sql
+            relativeToChangelogFile: true
+            splitStatements: false
 
