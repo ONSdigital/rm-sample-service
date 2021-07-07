@@ -4,6 +4,7 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import libs.collection.instrument.representation.CollectionInstrumentDTO;
 import libs.party.representation.Association;
 import libs.party.representation.Enrolment;
@@ -25,16 +26,20 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.validation.CollectionInstrumentClassifierTypes;
 
 /**
  * Performs actions on a sample summary, e.g. validates its complete and updates with any additional
  * data required
+ *
+ * <p>Note: this is a rework of the Validate sample in the collection exercise and as such some of
+ * the code has been copied and adapted to fit the sample service
  */
 @Service
-public class SampleSummaryService {
+public class ValidateSampleSummaryService {
 
-  private static final Logger LOG = LoggerFactory.getLogger(SampleSummaryService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ValidateSampleSummaryService.class);
 
   private static final String ENABLED = "ENABLED";
 
@@ -53,61 +58,91 @@ public class SampleSummaryService {
   public boolean validate(String surveyId, UUID sampleSummaryId, String collectionExerciseId)
       throws UnknownSampleSummaryException {
 
+    // first find the correct sample summary
     SampleSummary sampleSummary =
         sampleSummaryRepository
             .findById(sampleSummaryId)
             .orElseThrow(() -> new UnknownSampleSummaryException());
 
-    List<SampleUnit> samples =
-        sampleUnitRepository.findBySampleSummaryFK(sampleSummary.getSampleSummaryPK());
-    // TODO implement a stream here
+    // get all the samples
+    Stream<SampleUnit> sampleUnits =
+        sampleUnitRepository.findBySampleSummaryFKAndState(
+            sampleSummary.getSampleSummaryPK(), SampleUnitDTO.SampleUnitState.PERSISTED);
 
+    // create a map to hold form types to collection instrument ids
     Map<String, Optional<UUID>> formTypeMap = new HashMap<>();
 
-    for (SampleUnit sampleUnit : samples) {
-      PartyDTO party = getParty(sampleUnit);
-      String partyId = party.getId();
-      if (partyId != null) {
-        sampleUnit.setPartyId(UUID.fromString(partyId));
-      } else {
-        // TODO sample not valid
-      }
-      if (hasActiveEnrolment(party, surveyId)) {
-        sampleUnit.setActiveEnrolment(true);
-      }
+    List<UUID> invalidSamples = new ArrayList<>();
+    sampleUnits.forEach(
+        (sampleUnit) -> {
+          UUID sampleUnitId = sampleUnit.getId();
 
-      // now do the CI
-      // If we haven't seen this form type before, add the CI to the cache if we can find it
-      Optional<UUID> collectionInstrumentId =
-          formTypeMap.computeIfAbsent(
-              sampleUnit.getFormType(),
-              key -> {
-                UUID returnValue = null;
-                List<String> classifierTypes = requestSurveyClassifiers(surveyId);
-                try {
-                  returnValue =
-                      requestCollectionInstrumentId(classifierTypes, sampleUnit, surveyId);
-                } catch (HttpClientErrorException e) {
-                  if (e.getStatusCode() != HttpStatus.NOT_FOUND) {
-                    LOG.error(
-                        "Unexpected HTTP response code from collection instrument",
-                        kv("sample_unit", sampleUnit),
-                        kv("status_code", e.getStatusCode()));
-                    throw e; // Re-throw anything that's not a 404 so that we retry
-                  }
-                }
+          // for each sample check there is a party id
+          PartyDTO party = getParty(sampleUnit);
+          if (party != null && party.getId() != null) {
+            // save the party id against the sample
+            String partyId = party.getId();
+            LOG.debug("found party id", kv("partyId", partyId), kv("sampleUnitId", sampleUnitId));
+            sampleUnit.setPartyId(UUID.fromString(partyId));
 
-                return Optional.ofNullable(returnValue);
-              });
+            // then use that party object to see if there are active enrolments
+            boolean activeEnrolment = hasActiveEnrolment(party, surveyId);
+            LOG.debug(
+                "has active enrolment",
+                kv("activeEnrolment", activeEnrolment),
+                kv("sampleId", sampleUnitId),
+                kv("partyId", partyId));
+            sampleUnit.setActiveEnrolment(activeEnrolment);
 
-      // If we could find the CI, then set it on the sample (or it will fail validation)
-      if (collectionInstrumentId.isPresent()) {
-        sampleUnit.setCollectionInstrumentId(collectionInstrumentId.get());
-      }
+          } else {
+            LOG.warn(
+                "invalid sample unable to find party id for sample ", kv("sampleId", sampleUnitId));
+            invalidSamples.add(sampleUnitId);
+          }
 
-      sampleUnitRepository.saveAndFlush(sampleUnit);
-    }
-    return false;
+          // now find the Collection instrument for this sample
+          // and if we haven't seen this form type before add it
+          // to a map so we can reuse for the next sample
+          Optional<UUID> collectionInstrumentId =
+              formTypeMap.computeIfAbsent(
+                  sampleUnit.getFormType(),
+                  key -> {
+                    UUID ciId = null;
+                    List<String> classifierTypes = requestSurveyClassifiers(surveyId);
+                    try {
+                      ciId = requestCollectionInstrumentId(classifierTypes, sampleUnit, surveyId);
+                    } catch (HttpClientErrorException e) {
+                      if (e.getStatusCode() != HttpStatus.NOT_FOUND) {
+                        LOG.error(
+                            "Unexpected HTTP response code from collection instrument",
+                            kv("sample_unit", sampleUnit),
+                            kv("status_code", e.getStatusCode()));
+                        throw e;
+                      } else {
+                        LOG.warn(
+                            "Unable to find collection instrument id",
+                            kv("sample_unit", sampleUnit),
+                            kv("status_code", e.getStatusCode()));
+                      }
+                    }
+                    return Optional.ofNullable(ciId);
+                  });
+
+          // If we could find the CI, then set it on the sample (or it will fail validation)
+          if (collectionInstrumentId.isPresent()) {
+            sampleUnit.setCollectionInstrumentId(collectionInstrumentId.get());
+          } else {
+            LOG.warn(
+                "invalid sample unable to find collection instrument id for sample ",
+                kv("sampleId", sampleUnitId));
+            invalidSamples.add(sampleUnitId);
+          }
+
+          sampleUnitRepository.saveAndFlush(sampleUnit);
+        });
+
+    // if there are invalid samples then it is not validated
+    return invalidSamples.isEmpty();
   }
 
   /**
@@ -124,6 +159,10 @@ public class SampleSummaryService {
       List<String> classifierTypes, SampleUnit sampleUnit, String surveyId) {
     Map<String, String> classifiers = new HashMap<>();
     classifiers.put("SURVEY_ID", surveyId);
+
+    // for all the classifiers returned by the survey service for this survey
+    // get the ids from the sample unit
+    // this is likely to be form type
     for (String classifier : classifierTypes) {
       try {
         CollectionInstrumentClassifierTypes classifierType =
@@ -133,23 +172,24 @@ public class SampleSummaryService {
         LOG.warn("Classifier not supported", kv("classifier", classifier), e);
       }
     }
+
+    // once we know the classifiers, e.g. survey id and form type
+    // construct a json search string and send to collection instrument
     String searchString = convertToJSON(classifiers);
     List<CollectionInstrumentDTO> collectionInstruments =
         collectionInstrumentSvcClient.requestCollectionInstruments(searchString);
-    UUID collectionInstrumentId;
-    if (collectionInstruments.isEmpty()) {
-      LOG.error("No collection instruments found", kv("search_string", searchString));
-      collectionInstrumentId = null;
-    } else if (collectionInstruments.size() > 1) {
-      LOG.warn(
-          "Multiple collection instruments found, taking most recent first",
-          kv("collection_instruments_found", collectionInstruments.size()),
-          kv("search_string", searchString));
+    UUID collectionInstrumentId = null;
+    if (!collectionInstruments.isEmpty()) {
+      if (collectionInstruments.size() > 1) {
+        LOG.warn(
+            "Multiple collection instruments found, taking most recent first",
+            kv("collectionInstrumentsFound", collectionInstruments.size()),
+            kv("searchString", searchString));
+      }
       collectionInstrumentId = collectionInstruments.get(0).getId();
     } else {
-      collectionInstrumentId = collectionInstruments.get(0).getId();
+      LOG.error("No collection instruments found", kv("search_string", searchString));
     }
-
     return collectionInstrumentId;
   }
 
@@ -164,6 +204,12 @@ public class SampleSummaryService {
     return searchString.toString();
   }
 
+  /**
+   * Return the party object for a specific sample
+   *
+   * @param sampleUnit the sample unit to find the party object for
+   * @return the party object
+   */
   private PartyDTO getParty(SampleUnit sampleUnit) {
     try {
       PartyDTO party =
@@ -207,32 +253,36 @@ public class SampleSummaryService {
    */
   private List<String> requestSurveyClassifiers(String surveyId) {
 
-    SurveyClassifierTypeDTO classifierTypeSelector;
+    SurveyClassifierTypeDTO surveyClassifierType;
 
-    // Call Survey Service
-    // Get Classifier types for Collection Instruments
-    List<SurveyClassifierDTO> classifierTypeSelectors =
+    // Call Survey Service and get classifier types
+    List<SurveyClassifierDTO> surveyClassifiers =
         surveySvcClient.requestClassifierTypeSelectors(surveyId);
-    SurveyClassifierDTO chosenSelector =
-        classifierTypeSelectors.stream()
-            .filter(classifierType -> CASE_TYPE_SELECTOR.equals(classifierType.getName()))
+
+    // select the one that matches COLLECTION_INSTRUMENT
+    SurveyClassifierDTO chosenClassifier =
+        surveyClassifiers.stream()
+            .filter(surveyClassifier -> CASE_TYPE_SELECTOR.equals(surveyClassifier.getName()))
             .findAny()
             .orElse(null);
-    if (chosenSelector != null) {
-      classifierTypeSelector =
+
+    // re call the survey service with the chosen classifier i.e. collection instrument
+    // in order to get the classifier types e.g. FORM_TYPE
+    if (chosenClassifier != null) {
+      surveyClassifierType =
           surveySvcClient.requestClassifierTypeSelector(
-              surveyId, UUID.fromString(chosenSelector.getId()));
-      if (classifierTypeSelector != null) {
-        return classifierTypeSelector.getClassifierTypes();
+              surveyId, UUID.fromString(chosenClassifier.getId()));
+      if (surveyClassifierType != null) {
+        return surveyClassifierType.getClassifierTypes();
       } else {
         LOG.error(
             "Error requesting Survey Classifier Types",
-            kv("survey_id", surveyId),
-            kv("case_type_selector_id", chosenSelector.getId()));
+            kv("surveyId", surveyId),
+            kv("classifierId", chosenClassifier.getId()));
         throw new IllegalStateException("Error requesting Survey Classifier Types");
       }
     } else {
-      LOG.error("Error requesting Survey Classifier Types", kv("survey_id", surveyId));
+      LOG.error("Error requesting Survey Classifier Types", kv("surveyId", surveyId));
       throw new IllegalStateException("Error requesting Survey Classifier Types");
     }
   }

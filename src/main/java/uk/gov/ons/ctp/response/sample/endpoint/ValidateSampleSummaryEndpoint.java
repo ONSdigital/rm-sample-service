@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.ons.ctp.response.sample.service.SampleSummaryService;
 import uk.gov.ons.ctp.response.sample.service.UnknownSampleSummaryException;
+import uk.gov.ons.ctp.response.sample.service.ValidateSampleSummaryService;
 
 @RestController
 @RequestMapping(value = "/validate", produces = "application/json")
@@ -21,7 +21,7 @@ public class ValidateSampleSummaryEndpoint {
 
   private static final Logger LOG = LoggerFactory.getLogger(ValidateSampleSummaryEndpoint.class);
 
-  @Autowired private SampleSummaryService sampleSummaryService;
+  @Autowired private ValidateSampleSummaryService validateSampleSummaryService;
 
   @RequestMapping(
       value =
@@ -40,7 +40,7 @@ public class ValidateSampleSummaryEndpoint {
 
     try {
       boolean validated =
-          sampleSummaryService.validate(surveyId, sampleSummaryId, collectionExerciseId);
+          validateSampleSummaryService.validate(surveyId, sampleSummaryId, collectionExerciseId);
       LOG.debug(
           "Validated sample summary",
           kv("sampleSummaryId", sampleSummaryId),

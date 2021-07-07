@@ -14,7 +14,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
  */
 public enum CollectionInstrumentClassifierTypes implements Function<SampleUnit, String> {
   RU_REF(SampleUnit::getSampleUnitRef),
-  FORM_TYPE(unit -> unit.getFormType());
+  FORM_TYPE(SampleUnit::getFormType);
 
   private final Function<SampleUnit, String> func;
 

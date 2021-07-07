@@ -1,6 +1,5 @@
 package uk.gov.ons.ctp.response.sample.service;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,9 +22,10 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SampleSummaryServiceTest {
+public class ValidateSampleSummaryServiceTest {
 
   @Mock private PartySvcClient partySvcClient;
 
@@ -38,7 +38,7 @@ public class SampleSummaryServiceTest {
   @Mock private SurveySvcClient surveySvcClient;
 
   // class under test
-  @InjectMocks private SampleSummaryService sampleSummaryService;
+  @InjectMocks private ValidateSampleSummaryService validateSampleSummaryService;
 
   @Test
   public void testValidate() throws UnknownSampleSummaryException {
@@ -81,8 +81,10 @@ public class SampleSummaryServiceTest {
     when(surveySvcClient.requestClassifierTypeSelector(surveyId, classifierId))
         .thenReturn(classifierTypeDTO);
     when(sampleSummaryRepository.findById(sampleSummaryId)).thenReturn(Optional.of(sampleSummary));
-    when(sampleUnitRepository.findBySampleSummaryFK(1)).thenReturn(samples);
-    sampleSummaryService.validate(surveyId, sampleSummaryId, collectionExerciseId);
+    when(sampleUnitRepository.findBySampleSummaryFKAndState(
+            1, SampleUnitDTO.SampleUnitState.PERSISTED))
+        .thenReturn(samples.stream());
+    validateSampleSummaryService.validate(surveyId, sampleSummaryId, collectionExerciseId);
     verify(partySvcClient, times(1)).requestParty(sampleUnitType, sampleUnitRef);
   }
 
