@@ -29,7 +29,7 @@ public class ValidateSampleSummaryEndpoint {
       method = RequestMethod.GET)
   public ResponseEntity<Void> validate(
       @PathVariable("surveyId") String surveyId,
-      @PathVariable("collectionExcerciseId") String collectionExerciseId,
+      @PathVariable("collectionExerciseId") String collectionExerciseId,
       @PathVariable("sampleSummaryId") UUID sampleSummaryId) {
 
     LOG.debug(
