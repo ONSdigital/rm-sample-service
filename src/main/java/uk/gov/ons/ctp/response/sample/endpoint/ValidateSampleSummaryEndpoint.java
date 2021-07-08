@@ -17,6 +17,10 @@ import uk.gov.ons.ctp.response.sample.service.ValidateSampleSummaryService;
 
 @RestController
 @RequestMapping(value = "/validate", produces = "application/json")
+/**
+ * TODO temporary end point for testing until the next phase of work completes and this is
+ * integrated with collection exercise
+ */
 public class ValidateSampleSummaryEndpoint {
 
   private static final Logger LOG = LoggerFactory.getLogger(ValidateSampleSummaryEndpoint.class);

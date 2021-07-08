@@ -78,63 +78,13 @@ public class ValidateSampleSummaryService {
           UUID sampleUnitId = sampleUnit.getId();
 
           // for each sample check there is a party id
-          PartyDTO party = getParty(sampleUnit);
-          if (party != null && party.getId() != null) {
-            // save the party id against the sample
-            String partyId = party.getId();
-            LOG.debug("found party id", kv("partyId", partyId), kv("sampleUnitId", sampleUnitId));
-            sampleUnit.setPartyId(UUID.fromString(partyId));
-
-            // then use that party object to see if there are active enrolments
-            boolean activeEnrolment = hasActiveEnrolment(party, surveyId);
-            LOG.debug(
-                "has active enrolment",
-                kv("activeEnrolment", activeEnrolment),
-                kv("sampleId", sampleUnitId),
-                kv("partyId", partyId));
-            sampleUnit.setActiveEnrolment(activeEnrolment);
-
+          boolean foundParty = findAndUpdateParty(surveyId, sampleUnit, sampleUnitId);
+          if (foundParty) {
+            boolean foundCI = findAndUpdateCollectionInstrument(surveyId, formTypeMap, sampleUnit);
+            if (!foundCI) {
+              invalidSamples.add(sampleUnitId);
+            }
           } else {
-            LOG.warn(
-                "invalid sample unable to find party id for sample ", kv("sampleId", sampleUnitId));
-            invalidSamples.add(sampleUnitId);
-          }
-
-          // now find the Collection instrument for this sample
-          // and if we haven't seen this form type before add it
-          // to a map so we can reuse for the next sample
-          Optional<UUID> collectionInstrumentId =
-              formTypeMap.computeIfAbsent(
-                  sampleUnit.getFormType(),
-                  key -> {
-                    UUID ciId = null;
-                    List<String> classifierTypes = requestSurveyClassifiers(surveyId);
-                    try {
-                      ciId = requestCollectionInstrumentId(classifierTypes, sampleUnit, surveyId);
-                    } catch (HttpClientErrorException e) {
-                      if (e.getStatusCode() != HttpStatus.NOT_FOUND) {
-                        LOG.error(
-                            "Unexpected HTTP response code from collection instrument",
-                            kv("sample_unit", sampleUnit),
-                            kv("status_code", e.getStatusCode()));
-                        throw e;
-                      } else {
-                        LOG.warn(
-                            "Unable to find collection instrument id",
-                            kv("sample_unit", sampleUnit),
-                            kv("status_code", e.getStatusCode()));
-                      }
-                    }
-                    return Optional.ofNullable(ciId);
-                  });
-
-          // If we could find the CI, then set it on the sample (or it will fail validation)
-          if (collectionInstrumentId.isPresent()) {
-            sampleUnit.setCollectionInstrumentId(collectionInstrumentId.get());
-          } else {
-            LOG.warn(
-                "invalid sample unable to find collection instrument id for sample ",
-                kv("sampleId", sampleUnitId));
             invalidSamples.add(sampleUnitId);
           }
 
@@ -143,6 +93,69 @@ public class ValidateSampleSummaryService {
 
     // if there are invalid samples then it is not validated
     return invalidSamples.isEmpty();
+  }
+
+  private boolean findAndUpdateCollectionInstrument(
+      String surveyId, Map<String, Optional<UUID>> formTypeMap, SampleUnit sampleUnit) {
+    // now find the Collection instrument for this sample
+    // and if we haven't seen this form type before add it
+    // to a map so we can reuse for the next sample
+    Optional<UUID> collectionInstrumentId =
+        formTypeMap.computeIfAbsent(
+            sampleUnit.getFormType(),
+            key -> {
+              UUID ciId = null;
+              List<String> classifierTypes = requestSurveyClassifiers(surveyId);
+              try {
+                ciId = requestCollectionInstrumentId(classifierTypes, sampleUnit, surveyId);
+              } catch (HttpClientErrorException e) {
+                if (e.getStatusCode() != HttpStatus.NOT_FOUND) {
+                  LOG.error(
+                      "Unexpected HTTP response code from collection instrument",
+                      kv("sample_unit", sampleUnit),
+                      kv("status_code", e.getStatusCode()));
+                  throw e;
+                } else {
+                  LOG.warn(
+                      "Unable to find collection instrument id",
+                      kv("sample_unit", sampleUnit),
+                      kv("status_code", e.getStatusCode()));
+                }
+              }
+              return Optional.ofNullable(ciId);
+            });
+    // If we could find the CI, then set it on the sample (or it will fail validation)
+    if (collectionInstrumentId.isPresent()) {
+      sampleUnit.setCollectionInstrumentId(collectionInstrumentId.get());
+    } else {
+      LOG.warn(
+          "invalid sample unable to find collection instrument id for sample ",
+          kv("sampleId", sampleUnit.getId()));
+    }
+    return collectionInstrumentId.isPresent();
+  }
+
+  private boolean findAndUpdateParty(String surveyId, SampleUnit sampleUnit, UUID sampleUnitId) {
+    PartyDTO party = getParty(sampleUnit);
+    boolean foundParty = (party != null && party.getId() != null);
+    if (foundParty) {
+      // save the party id against the sample
+      String partyId = party.getId();
+      LOG.debug("found party id", kv("partyId", partyId), kv("sampleUnitId", sampleUnitId));
+      sampleUnit.setPartyId(UUID.fromString(partyId));
+
+      // then use that party object to see if there are active enrolments
+      boolean activeEnrolment = hasActiveEnrolment(party, surveyId);
+      LOG.debug(
+          "has active enrolment",
+          kv("activeEnrolment", activeEnrolment),
+          kv("sampleId", sampleUnitId),
+          kv("partyId", partyId));
+      sampleUnit.setActiveEnrolment(activeEnrolment);
+    } else {
+      LOG.warn("invalid sample unable to find party id for sample ", kv("sampleId", sampleUnitId));
+    }
+    return foundParty;
   }
 
   /**
