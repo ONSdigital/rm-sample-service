@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import uk.gov.ons.ctp.response.client.CollectionInstrumentSvcClient;
@@ -55,6 +57,7 @@ public class SampleSummaryEnrichmentService {
 
   @Autowired private CollectionInstrumentSvcClient collectionInstrumentSvcClient;
 
+  @Transactional(propagation = Propagation.REQUIRED)
   public boolean enrich(String surveyId, UUID sampleSummaryId, String collectionExerciseId)
       throws UnknownSampleSummaryException {
 
