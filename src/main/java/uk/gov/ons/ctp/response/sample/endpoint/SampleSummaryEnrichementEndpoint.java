@@ -38,7 +38,7 @@ public class SampleSummaryEnrichementEndpoint {
       @PathVariable("sampleSummaryId") UUID sampleSummaryId) {
 
     LOG.debug(
-        "about to validate sample summary",
+        "about to enrich sample summary",
         kv("sampleSummaryId", sampleSummaryId),
         kv("surveyId", surveyId),
         kv("collectionExerciseId", collectionExerciseId));
@@ -47,7 +47,7 @@ public class SampleSummaryEnrichementEndpoint {
       boolean validated =
           sampleSummaryEnrichmentService.enrich(surveyId, sampleSummaryId, collectionExerciseId);
       LOG.debug(
-          "Validated sample summary",
+          "Enriched sample summary",
           kv("sampleSummaryId", sampleSummaryId),
           kv("surveyId", surveyId),
           kv("collectionExerciseId", collectionExerciseId),

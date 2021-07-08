@@ -66,12 +66,14 @@ public class SampleSummaryEnrichmentService {
         sampleSummaryRepository
             .findById(sampleSummaryId)
             .orElseThrow(() -> new UnknownSampleSummaryException());
+    LOG.debug("found sample summary", kv("sampleSummaryId", sampleSummaryId));
 
     // get all the samples
     Stream<SampleUnit> sampleUnits =
         sampleUnitRepository.findBySampleSummaryFKAndState(
             sampleSummary.getSampleSummaryPK(), SampleUnitDTO.SampleUnitState.PERSISTED);
 
+    LOG.debug("found samples for sample summary", kv("sampleSummaryId", sampleSummaryId));
     // create a map to hold form types to collection instrument ids
     Map<String, Optional<UUID>> formTypeMap = new HashMap<>();
 
@@ -79,18 +81,38 @@ public class SampleSummaryEnrichmentService {
     sampleUnits.forEach(
         (sampleUnit) -> {
           UUID sampleUnitId = sampleUnit.getId();
-
+          LOG.debug(
+              "processing sample unit",
+              kv("sampleUnitId", sampleUnitId),
+              kv("sampleSummaryId", sampleSummaryId));
           // for each sample check there is a party id
+          LOG.debug(
+              "about to find party",
+              kv("sampleUnitId", sampleUnitId),
+              kv("sampleSummaryId", sampleSummaryId));
           boolean foundParty = findAndUpdateParty(surveyId, sampleUnit, sampleUnitId);
+          LOG.debug(
+              "party found",
+              kv("sampleUnitId", sampleUnitId),
+              kv("sampleSummaryId", sampleSummaryId),
+              kv("foundParty", foundParty));
           if (foundParty) {
+            LOG.debug(
+                "about to search for collection instrument id",
+                kv("sampleUnitId", sampleUnitId),
+                kv("sampleSummaryId", sampleSummaryId));
             boolean foundCI = findAndUpdateCollectionInstrument(surveyId, formTypeMap, sampleUnit);
+            LOG.debug(
+                "CI found",
+                kv("sampleUnitId", sampleUnitId),
+                kv("sampleSummaryId", sampleSummaryId),
+                kv("foundCI", foundCI));
             if (!foundCI) {
               invalidSamples.add(sampleUnitId);
             }
           } else {
             invalidSamples.add(sampleUnitId);
           }
-
           sampleUnitRepository.saveAndFlush(sampleUnit);
         });
 
@@ -103,6 +125,7 @@ public class SampleSummaryEnrichmentService {
     // now find the Collection instrument for this sample
     // and if we haven't seen this form type before add it
     // to a map so we can reuse for the next sample
+
     Optional<UUID> collectionInstrumentId =
         formTypeMap.computeIfAbsent(
             sampleUnit.getFormType(),
