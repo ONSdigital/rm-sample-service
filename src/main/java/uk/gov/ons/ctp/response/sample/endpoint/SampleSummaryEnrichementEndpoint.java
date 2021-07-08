@@ -12,20 +12,21 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.ons.ctp.response.sample.service.SampleSummaryEnrichmentService;
 import uk.gov.ons.ctp.response.sample.service.UnknownSampleSummaryException;
-import uk.gov.ons.ctp.response.sample.service.ValidateSampleSummaryService;
 
 @RestController
-@RequestMapping(value = "/validate", produces = "application/json")
+@RequestMapping(value = "/enrich", produces = "application/json")
 /**
  * TODO temporary end point for testing until the next phase of work completes and this is
- * integrated with collection exercise
+ * integrated with collection exercise. At that point there will be a new endpoint that does
+ * everything
  */
-public class ValidateSampleSummaryEndpoint {
+public class SampleSummaryEnrichementEndpoint {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ValidateSampleSummaryEndpoint.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SampleSummaryEnrichementEndpoint.class);
 
-  @Autowired private ValidateSampleSummaryService validateSampleSummaryService;
+  @Autowired private SampleSummaryEnrichmentService sampleSummaryEnrichmentService;
 
   @RequestMapping(
       value =
@@ -44,7 +45,7 @@ public class ValidateSampleSummaryEndpoint {
 
     try {
       boolean validated =
-          validateSampleSummaryService.validate(surveyId, sampleSummaryId, collectionExerciseId);
+          sampleSummaryEnrichmentService.enrich(surveyId, sampleSummaryId, collectionExerciseId);
       LOG.debug(
           "Validated sample summary",
           kv("sampleSummaryId", sampleSummaryId),

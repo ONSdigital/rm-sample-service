@@ -31,7 +31,7 @@ import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ValidateSampleSummaryServiceTest {
+public class SampleSummaryEnrichmentServiceTest {
 
   @Mock private PartySvcClient partySvcClient;
 
@@ -44,7 +44,7 @@ public class ValidateSampleSummaryServiceTest {
   @Mock private SurveySvcClient surveySvcClient;
 
   // class under test
-  @InjectMocks private ValidateSampleSummaryService validateSampleSummaryService;
+  @InjectMocks private SampleSummaryEnrichmentService sampleSummaryEnrichmentService;
 
   /**
    * Test the happy day path
@@ -103,14 +103,14 @@ public class ValidateSampleSummaryServiceTest {
     when(sampleUnitRepository.findBySampleSummaryFKAndState(
             1, SampleUnitDTO.SampleUnitState.PERSISTED))
         .thenReturn(samples.stream());
-    boolean valid =
-        validateSampleSummaryService.validate(surveyId, sampleSummaryId, collectionExerciseId);
-    assertTrue("sample summary should be valid", valid);
+    boolean enriched =
+        sampleSummaryEnrichmentService.enrich(surveyId, sampleSummaryId, collectionExerciseId);
+    assertTrue("sample summary should be enriched", enriched);
     verify(partySvcClient, times(1)).requestParty(sampleUnitType, sampleUnitRef);
   }
 
   /**
-   * Test the validation fails if the party does not exist
+   * Test the enrichment fails if the party does not exist
    *
    * @throws UnknownSampleSummaryException fails the test
    */
@@ -141,13 +141,13 @@ public class ValidateSampleSummaryServiceTest {
     when(partySvcClient.requestParty(sampleUnitType, sampleUnitRef))
         .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND, "Not found"));
 
-    boolean valid =
-        validateSampleSummaryService.validate(surveyId, sampleSummaryId, collectionExerciseId);
-    assertFalse("sample summary ", valid);
+    boolean enriched =
+        sampleSummaryEnrichmentService.enrich(surveyId, sampleSummaryId, collectionExerciseId);
+    assertFalse("sample summary ", enriched);
   }
 
   /**
-   * Test that validation fails with unknown collection instrument
+   * Test that enrichment fails with unknown collection instrument
    *
    * @throws UnknownSampleSummaryException fails the test
    */
@@ -198,14 +198,14 @@ public class ValidateSampleSummaryServiceTest {
     when(sampleUnitRepository.findBySampleSummaryFKAndState(
             1, SampleUnitDTO.SampleUnitState.PERSISTED))
         .thenReturn(samples.stream());
-    boolean valid =
-        validateSampleSummaryService.validate(surveyId, sampleSummaryId, collectionExerciseId);
-    assertFalse("sample summary should not be valid", valid);
+    boolean enriched =
+        sampleSummaryEnrichmentService.enrich(surveyId, sampleSummaryId, collectionExerciseId);
+    assertFalse("sample summary should not be enriched", enriched);
     verify(partySvcClient, times(1)).requestParty(sampleUnitType, sampleUnitRef);
   }
 
   /**
-   * Test validation fails if the sample summary is unknown.
+   * Test enrichedation fails if the sample summary is unknown.
    *
    * @throws UnknownSampleSummaryException expected
    */
@@ -216,7 +216,7 @@ public class ValidateSampleSummaryServiceTest {
     String collectionExerciseId = UUID.randomUUID().toString();
 
     when(sampleSummaryRepository.findById(sampleSummaryId)).thenReturn(Optional.ofNullable(null));
-    validateSampleSummaryService.validate(surveyId, sampleSummaryId, collectionExerciseId);
+    sampleSummaryEnrichmentService.enrich(surveyId, sampleSummaryId, collectionExerciseId);
   }
 
   private PartyDTO buildPartyDTO(String surveyId) {

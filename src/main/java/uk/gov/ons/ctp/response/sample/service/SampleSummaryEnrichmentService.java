@@ -37,9 +37,9 @@ import uk.gov.ons.ctp.response.sample.validation.CollectionInstrumentClassifierT
  * the code has been copied and adapted to fit the sample service
  */
 @Service
-public class ValidateSampleSummaryService {
+public class SampleSummaryEnrichmentService {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ValidateSampleSummaryService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SampleSummaryEnrichmentService.class);
 
   private static final String ENABLED = "ENABLED";
 
@@ -55,7 +55,7 @@ public class ValidateSampleSummaryService {
 
   @Autowired private CollectionInstrumentSvcClient collectionInstrumentSvcClient;
 
-  public boolean validate(String surveyId, UUID sampleSummaryId, String collectionExerciseId)
+  public boolean enrich(String surveyId, UUID sampleSummaryId, String collectionExerciseId)
       throws UnknownSampleSummaryException {
 
     // first find the correct sample summary
