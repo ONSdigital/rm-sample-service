@@ -5,6 +5,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import libs.common.error.RestExceptionHandler;
 import libs.common.jackson.CustomObjectMapper;
+import libs.common.rest.RestUtility;
 import libs.common.state.StateTransitionManager;
 import libs.common.state.StateTransitionManagerFactory;
 import net.sourceforge.cobertura.CoverageIgnore;
@@ -40,6 +41,8 @@ import uk.gov.ons.ctp.response.sample.service.state.SampleSvcStateTransitionMana
 @EntityScan("uk.gov.ons.ctp.response")
 @EnableAsync
 public class SampleSvcApplication {
+
+  public static final String COLLECTION_INSTRUMENT_CACHE = "collectioninstruments";
 
   @Autowired private StateTransitionManagerFactory stateTransitionManager;
 
@@ -108,6 +111,39 @@ public class SampleSvcApplication {
   @Primary
   public CustomObjectMapper customObjectMapper() {
     return new CustomObjectMapper();
+  }
+
+  /**
+   * The RestUtility bean for the Party service
+   *
+   * @return the RestUtility bean for the Party service
+   */
+  @Bean
+  @Qualifier("partyRestUtility")
+  public RestUtility partyRestUtility() {
+    return new RestUtility(appConfig.getPartySvc().getConnectionConfig());
+  }
+
+  /**
+   * The RestUtility bean for the CollectionInstrument service
+   *
+   * @return the RestUtility bean for the CollectionInstrument service
+   */
+  @Bean
+  @Qualifier("collectionInstrumentRestUtility")
+  public RestUtility collectionInstrumentRestUtility() {
+    return new RestUtility(appConfig.getCollectionInstrumentSvc().getConnectionConfig());
+  }
+
+  /**
+   * The RestUtility bean for the Survey service
+   *
+   * @return the RestUtility bean for the Survey service
+   */
+  @Bean
+  @Qualifier("surveyRestUtility")
+  public RestUtility surveyRestUtility() {
+    return new RestUtility(appConfig.getSurveySvc().getConnectionConfig());
   }
 
   @Bean

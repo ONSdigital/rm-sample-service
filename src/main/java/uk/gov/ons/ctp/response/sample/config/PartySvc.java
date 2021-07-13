@@ -9,5 +9,5 @@ import net.sourceforge.cobertura.CoverageIgnore;
 @Data
 public class PartySvc {
   private RestUtilityConfig connectionConfig;
-  private String postPartyPath;
+  private String requestPartyPath;
 }

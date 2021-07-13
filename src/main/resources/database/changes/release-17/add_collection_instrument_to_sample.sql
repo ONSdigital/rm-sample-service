@@ -1,0 +1,1 @@
+ALTER TABLE sample.sample_unit ADD COLUMN collection_instrument_id uuid;

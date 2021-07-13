@@ -1,0 +1,30 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 17-1
+      author: Warren Bailey
+      changes:
+        - sqlFile:
+            comment: Add party id to sample unit
+            path: add_party_id_to_sample.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+  - changeSet:
+      id: 17-2
+      author: Warren Bailey
+      changes:
+        - sqlFile:
+            comment: Add active enrolment to sample unit
+            path: add_active_enrolment_to_sample.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+  - changeSet:
+      id: 17-3
+      author: Warren Bailey
+      changes:
+        - sqlFile:
+            comment: Add collection instrument to sample unit
+            path: add_collection_instrument_to_sample.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+
