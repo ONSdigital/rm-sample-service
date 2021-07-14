@@ -162,7 +162,7 @@ public class SampleSummaryEnrichmentService {
   }
 
   private boolean findAndUpdateParty(String surveyId, SampleUnit sampleUnit, UUID sampleUnitId) {
-    PartyDTO party = getParty(sampleUnit);
+    PartyDTO party = getParty(sampleUnit.getSampleUnitRef());
     boolean foundParty = (party != null && party.getId() != null);
     if (foundParty) {
       // save the party id against the sample
@@ -246,24 +246,21 @@ public class SampleSummaryEnrichmentService {
   /**
    * Return the party object for a specific sample
    *
-   * @param sampleUnit the sample unit to find the party object for
    * @return the party object
    */
-  private PartyDTO getParty(SampleUnit sampleUnit) {
+  private PartyDTO getParty(String sampleUnitRef) {
     try {
-      PartyDTO party =
-          partySvcClient.requestParty(
-              sampleUnit.getSampleUnitType(), sampleUnit.getSampleUnitRef());
+      PartyDTO party = partySvcClient.requestParty(sampleUnitRef);
       return party;
     } catch (HttpClientErrorException e) {
       if (e.getStatusCode() != HttpStatus.NOT_FOUND) {
         LOG.error(
             "Unexpected HTTP response code from party service",
-            kv("sampleUnit", sampleUnit),
+            kv("sampleUnit", sampleUnitRef),
             kv("status_code", e.getStatusCode()));
         throw e;
       } else {
-        LOG.error("party does not exist for sample", kv("sampleUnit", sampleUnit));
+        LOG.error("party does not exist for sample", kv("sampleUnit", sampleUnitRef));
         return null;
       }
     }

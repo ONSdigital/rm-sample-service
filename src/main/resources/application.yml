@@ -109,7 +109,7 @@ collection-instrument-svc:
 
 
 party-svc:
-  request-party-path: /party-api/v1/parties/type/{sampleUnitType}/ref/{sampleUnitRef}
+  request-party-path: /party-api/v1/businesses/ref/{sampleUnitRef}
   connection-config:
     scheme: http
     host: localhost

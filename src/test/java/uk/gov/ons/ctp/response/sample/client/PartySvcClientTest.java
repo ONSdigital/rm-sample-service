@@ -25,7 +25,6 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.ons.ctp.response.client.PartySvcClient;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.config.PartySvc;
-import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PartySvcClientTest {
@@ -57,7 +56,7 @@ public class PartySvcClientTest {
         .thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
 
     // When
-    partySvcClient.requestParty(SampleUnitDTO.SampleUnitType.B.toString(), SAMPLE_UNIT_REF);
+    partySvcClient.requestParty(SAMPLE_UNIT_REF);
 
     // Then
     verify(restTemplate, times(1))
@@ -72,7 +71,7 @@ public class PartySvcClientTest {
         .thenThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
 
     // When
-    partySvcClient.requestParty(SampleUnitDTO.SampleUnitType.B.toString(), SAMPLE_UNIT_REF);
+    partySvcClient.requestParty(SAMPLE_UNIT_REF);
 
     // Then
     verify(restTemplate, times(1))
