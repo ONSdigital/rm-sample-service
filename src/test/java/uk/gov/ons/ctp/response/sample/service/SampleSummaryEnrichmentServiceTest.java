@@ -93,7 +93,7 @@ public class SampleSummaryEnrichmentServiceTest {
     List<CollectionInstrumentDTO> collectionInstruments = new ArrayList<>();
     collectionInstruments.add(collectionInstrumentDTO);
 
-    when(partySvcClient.requestParty(sampleUnitType, sampleUnitRef)).thenReturn(partyDTO);
+    when(partySvcClient.requestParty(sampleUnitRef)).thenReturn(partyDTO);
     when(surveySvcClient.requestClassifierTypeSelectors(surveyId)).thenReturn(classifiers);
     when(surveySvcClient.requestClassifierTypeSelector(surveyId, classifierId))
         .thenReturn(classifierTypeDTO);
@@ -106,7 +106,7 @@ public class SampleSummaryEnrichmentServiceTest {
     boolean enriched =
         sampleSummaryEnrichmentService.enrich(surveyId, sampleSummaryId, collectionExerciseId);
     assertTrue("sample summary should be enriched", enriched);
-    verify(partySvcClient, times(1)).requestParty(sampleUnitType, sampleUnitRef);
+    verify(partySvcClient, times(1)).requestParty(sampleUnitRef);
   }
 
   /**
@@ -138,7 +138,7 @@ public class SampleSummaryEnrichmentServiceTest {
     when(sampleUnitRepository.findBySampleSummaryFKAndState(
             1, SampleUnitDTO.SampleUnitState.PERSISTED))
         .thenReturn(samples.stream());
-    when(partySvcClient.requestParty(sampleUnitType, sampleUnitRef))
+    when(partySvcClient.requestParty(sampleUnitRef))
         .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND, "Not found"));
 
     boolean enriched =
@@ -188,7 +188,7 @@ public class SampleSummaryEnrichmentServiceTest {
     classifierTypes.add("FORM_TYPE");
     classifierTypeDTO.setClassifierTypes(classifierTypes);
 
-    when(partySvcClient.requestParty(sampleUnitType, sampleUnitRef)).thenReturn(partyDTO);
+    when(partySvcClient.requestParty(sampleUnitRef)).thenReturn(partyDTO);
     when(surveySvcClient.requestClassifierTypeSelectors(surveyId)).thenReturn(classifiers);
     when(surveySvcClient.requestClassifierTypeSelector(surveyId, classifierId))
         .thenReturn(classifierTypeDTO);
@@ -201,7 +201,7 @@ public class SampleSummaryEnrichmentServiceTest {
     boolean enriched =
         sampleSummaryEnrichmentService.enrich(surveyId, sampleSummaryId, collectionExerciseId);
     assertFalse("sample summary should not be enriched", enriched);
-    verify(partySvcClient, times(1)).requestParty(sampleUnitType, sampleUnitRef);
+    verify(partySvcClient, times(1)).requestParty(sampleUnitRef);
   }
 
   /**
