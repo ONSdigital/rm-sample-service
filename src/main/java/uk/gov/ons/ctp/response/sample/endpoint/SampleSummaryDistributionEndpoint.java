@@ -14,11 +14,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.message.SampleUnitPublisher;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitParentDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import uk.gov.ons.ctp.response.sample.service.SampleSummaryEnrichmentService;
-import uk.gov.ons.ctp.response.sample.service.UnknownSampleSummaryException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -61,7 +60,7 @@ public class SampleSummaryDistributionEndpoint {
     sampleUnits.forEach(
             sampleUnit -> {
               try {
-                distributeSampleUnitGroup(exercise, sampleUnit);
+                distributeSampleUnitGroup(collectionExerciseId, sampleUnit);
               } catch (CTPException ex) {
                 log.with("sampleUnitGroupPK", sampleUnitGroup.getSampleUnitGroupPK())
                         .error("Failed to distribute sample unit group", ex);
@@ -76,17 +75,17 @@ public class SampleSummaryDistributionEndpoint {
    * PubSub and will transition the sampleUnitGroup state in collection exercise to PUBLISHED on
    * success.
    *
-   * @param exercise CollectionExercise of which sampleUnitGroup is a member
-   * @param sampleUnitGroup for which to distribute sample units
+   * @param collectionExerciseId Collection exercise id for the sample unit
+   * @param sampleUnit for which to distribute sample units
    */
   private void distributeSampleUnitGroup(
-          CollectionExercise exercise, SampleUnit sampleUnit) throws CTPException {
+          String collectionExerciseId, SampleUnit sampleUnit) throws CTPException {
     SampleUnitParentDTO sampleUnitParent;
 
     boolean activeEnrolment = sampleUnit.isActiveEnrolment();
-    sampleUnitParent = sampleUnit.toSampleUnitParent(activeEnrolment, exercise.getId());
+    sampleUnitParent = sampleUnit.toSampleUnitParent(activeEnrolment, collectionExerciseId);
 
-    publishSampleUnitToCase(sampleUnitGroup, sampleUnitParent);
+    publishSampleUnitToCase(sampleUnitParent);
   }
 
   /**
@@ -97,18 +96,16 @@ public class SampleSummaryDistributionEndpoint {
    * @param sampleUnitGroup from which publish message created and for which to transition state.
    * @param sampleUnitMessage to publish.
    */
-  private void publishSampleUnitToCase(
-          ExerciseSampleUnitGroup sampleUnitGroup, SampleUnitParentDTO sampleUnitMessage) {
+  private void publishSampleUnitToCase(SampleUnitParentDTO sampleUnitMessage) {
 
     transactionTemplate.execute(
             new TransactionCallbackWithoutResult() {
               // the code in this method executes in a transaction context
               protected void doInTransactionWithoutResult(TransactionStatus status) {
                 try {
-                  sampleUnitGroupTransitionState(sampleUnitGroup);
                   sampleUnitPublisher.sendSampleUnitToCase(sampleUnitMessage);
                 } catch (CTPException ex) {
-                  log.error("Sample Unit group state transition failed", ex);
+                  LOG.error("Sample Unit group state transition failed", ex);
                 }
               }
             });
