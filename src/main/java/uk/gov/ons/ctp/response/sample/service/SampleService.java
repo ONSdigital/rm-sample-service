@@ -20,11 +20,13 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
+import uk.gov.ons.ctp.response.sample.message.SampleUnitPublisher;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitParentDTO;
 
 @Service
 @Configuration
@@ -34,6 +36,8 @@ public class SampleService {
   @Autowired private SampleSummaryRepository sampleSummaryRepository;
 
   @Autowired private SampleUnitRepository sampleUnitRepository;
+
+  @Autowired private SampleUnitPublisher sampleUnitPublisher;
 
   @Autowired
   @Qualifier("sampleSummaryTransitionManager")
@@ -309,5 +313,28 @@ public class SampleService {
     } else {
       throw new UnknownSampleSummaryException();
     }
+  }
+
+  /**
+   * Distribute SampleUnits for a SampleUnitGroup. Will send the sampleUnitParent data to Case via
+   * PubSub and will transition the sampleUnitGroup state in collection exercise to PUBLISHED on
+   * success.
+   *
+   * @param collectionExerciseId Collection exercise id for the sample unit
+   * @param sampleUnit for which to distribute sample units
+   */
+  public void distributeSampleUnit(String collectionExerciseId, SampleUnit sampleUnit) {
+
+    // TODO, factor this into a method.  Just doing it like this for ease for now.
+    SampleUnitParentDTO parent = new SampleUnitParentDTO();
+    parent.setActiveEnrolment(sampleUnit.isActiveEnrolment());
+    parent.setId(sampleUnit.getId());
+    parent.setSampleUnitRef(sampleUnit.getSampleUnitRef());
+    parent.setSampleUnitType(sampleUnit.getSampleUnitType());
+    parent.setPartyId(sampleUnit.getPartyId());
+    parent.setCollectionInstrumentId(sampleUnit.getCollectionInstrumentId());
+    parent.setCollectionExerciseId(collectionExerciseId);
+
+    sampleUnitPublisher.sendSampleUnitToCase(parent);
   }
 }

@@ -7,6 +7,6 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 @Data
 @SuperBuilder
 public class SampleUnitParentDTO extends SampleUnit {
-  protected String collectionExerciseId;
-  protected SampleUnitChildrenDTO sampleUnitChildrenDTO;
+  private String collectionExerciseId;
+  private SampleUnitChildrenDTO sampleUnitChildrenDTO;
 }

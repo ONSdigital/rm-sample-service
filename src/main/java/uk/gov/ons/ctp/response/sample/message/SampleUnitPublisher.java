@@ -80,9 +80,10 @@ public class SampleUnitPublisher {
   }
 
   public void sendSampleUnitToCase(SampleUnitParentDTO sampleUnit) {
-    log.debug("Entering sendSampleUnit",
-            kv("sample_unit_type", sampleUnit.getSampleUnitType()),
-            kv("sample_unit_ref", sampleUnit.getSampleUnitRef()));
+    log.debug(
+        "Entering sendSampleUnit",
+        kv("sample_unit_type", sampleUnit.getSampleUnitType()),
+        kv("sample_unit_ref", sampleUnit.getSampleUnitRef()));
     try {
       String message = objectMapper.writeValueAsString(sampleUnit);
       ByteString data = ByteString.copyFromUtf8(message);
@@ -92,25 +93,26 @@ public class SampleUnitPublisher {
         log.info("Publishing message to PubSub");
         ApiFuture<String> messageIdFuture = publisher.publish(pubsubMessage);
         ApiFutures.addCallback(
-                messageIdFuture,
-                new ApiFutureCallback<>() {
-                  @Override
-                  public void onFailure(Throwable throwable) {
-                    if (throwable instanceof ApiException) {
-                      ApiException apiException = ((ApiException) throwable);
-                      log.error("SampleUnit publish sent failure to PubSub.",
-                              kv("error", apiException.getStatusCode().getCode()));
-                    }
-                    log.error("Error Publishing PubSub message",kv("message", message));
-                  }
+            messageIdFuture,
+            new ApiFutureCallback<>() {
+              @Override
+              public void onFailure(Throwable throwable) {
+                if (throwable instanceof ApiException) {
+                  ApiException apiException = ((ApiException) throwable);
+                  log.error(
+                      "SampleUnit publish sent failure to PubSub.",
+                      kv("error", apiException.getStatusCode().getCode()));
+                }
+                log.error("Error Publishing PubSub message", kv("message", message));
+              }
 
-                  @Override
-                  public void onSuccess(String messageId) {
-                    // Once published, returns server-assigned message ids (unique within the topic)
-                    log.info("SampleUnit publish sent successfully", kv("messageId", messageId));
-                  }
-                },
-                MoreExecutors.directExecutor());
+              @Override
+              public void onSuccess(String messageId) {
+                // Once published, returns server-assigned message ids (unique within the topic)
+                log.info("SampleUnit publish sent successfully", kv("messageId", messageId));
+              }
+            },
+            MoreExecutors.directExecutor());
       } finally {
         publisher.shutdown();
         pubSub.shutdown();
