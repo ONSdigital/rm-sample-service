@@ -56,7 +56,7 @@ public class SurveySvcClient {
       value = {RestClientException.class},
       maxAttemptsExpression = "#{${retries.maxAttempts}}",
       backoff = @Backoff(delayExpression = "#{${retries.backoff}}"))
-  public List<SurveyClassifierDTO> requestClassifierTypeSelectors(final String surveyId) {
+  public List<SurveyClassifierDTO> requestClassifierTypeSelectors(final UUID surveyId) {
     log.debug("Retrieving survey", kv("survey_id", surveyId));
     UriComponents uriComponents =
         restUtility.createUriComponents(
@@ -83,7 +83,7 @@ public class SurveySvcClient {
       maxAttemptsExpression = "#{${retries.maxAttempts}}",
       backoff = @Backoff(delayExpression = "#{${retries.backoff}}"))
   public SurveyClassifierTypeDTO requestClassifierTypeSelector(
-      final String surveyId, final UUID classifierType) {
+      final UUID surveyId, final UUID classifierType) {
     log.debug(
         "Requesting survey classifier type",
         kv("survey_id", surveyId.toString()),
@@ -101,7 +101,7 @@ public class SurveySvcClient {
     return responseEntity.getBody();
   }
 
-  public SurveyDTO findSurvey(final String surveyId) {
+  public SurveyDTO findSurvey(final UUID surveyId) {
     UriComponents uriComponents =
         restUtility.createUriComponents(
             appConfig.getSurveySvc().getSurveyDetailPath(), null, surveyId);
