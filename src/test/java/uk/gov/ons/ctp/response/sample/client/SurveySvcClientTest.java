@@ -35,7 +35,7 @@ import uk.gov.ons.ctp.response.sample.config.SurveySvc;
 @RunWith(MockitoJUnitRunner.class)
 public class SurveySvcClientTest {
 
-  private static final String SURVEY_ID = "ede0c029-3109-4ae1-b8c8-e4968000e2f4";
+  private static final UUID SURVEY_ID = UUID.fromString("ede0c029-3109-4ae1-b8c8-e4968000e2f4");
   private static final UUID CLASSIFIER_TYPE =
       UUID.fromString("dee0c029-3109-4ae1-b8c8-e4968000e2e5");
   private static final String SURVEY_REF = "ABC123";
