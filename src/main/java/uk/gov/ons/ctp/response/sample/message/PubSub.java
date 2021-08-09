@@ -39,7 +39,7 @@ public class PubSub {
 
   public Publisher caseNotificationPublisher() throws IOException {
     return publisherSupplier(
-            appConfig.getGcp().getProject(), appConfig.getGcp().getCaseNotificationTopic());
+        appConfig.getGcp().getProject(), appConfig.getGcp().getCaseNotificationTopic());
   }
 
   public void shutdown() {

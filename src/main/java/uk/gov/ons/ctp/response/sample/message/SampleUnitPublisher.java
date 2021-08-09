@@ -79,6 +79,11 @@ public class SampleUnitPublisher {
     }
   }
 
+  /**
+   * Sends a sample unit to case via PubSub
+   *
+   * @param sampleUnit A sample unit to be sent
+   */
   public void sendSampleUnitToCase(SampleUnitParentDTO sampleUnit) {
     log.debug(
         "Entering sendSampleUnit",

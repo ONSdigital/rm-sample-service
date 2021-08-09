@@ -24,8 +24,7 @@ public class SampleSummaryDistributionEndpoint {
   @Autowired private SampleService sampleService;
 
   @RequestMapping(
-      value =
-          "/collection-exercise/{collectionExerciseId}/samplesummary/{sampleSummaryId}",
+      value = "/collection-exercise/{collectionExerciseId}/samplesummary/{sampleSummaryId}",
       method = RequestMethod.GET)
   public ResponseEntity<Void> distribute(
       @PathVariable("collectionExerciseId") String collectionExerciseId,

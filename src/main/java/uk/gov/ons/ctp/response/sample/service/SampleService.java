@@ -316,9 +316,8 @@ public class SampleService {
   }
 
   /**
-   * Distribute SampleUnits for a SampleUnitGroup. Will send the sampleUnitParent data to Case via
-   * PubSub and will transition the sampleUnitGroup state in collection exercise to PUBLISHED on
-   * success.
+   * Distribute a SampleUnit to get the case created in the case service. It's serialised using
+   * SampleUnitParentDTO as the SampleUnit doesn't have the collection exercise information with it.
    *
    * @param collectionExerciseId Collection exercise id for the sample unit
    * @param sampleUnit for which to distribute sample units
