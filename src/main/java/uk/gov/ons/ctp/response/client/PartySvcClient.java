@@ -17,6 +17,8 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
+import uk.gov.ons.ctp.response.sample.representation.SampleLinkCreationRequestDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleLinkDTO;
 
 /** HTTP RestClient implementation for calls to the Party service */
 @Component
@@ -55,5 +57,20 @@ public class PartySvcClient {
     ResponseEntity<PartyDTO> responseEntity =
         restTemplate.exchange(uriComponents.toUri(), HttpMethod.GET, httpEntity, PartyDTO.class);
     return responseEntity.getBody();
+  }
+
+  public void linkSampleSummaryId(String sampleSummaryId, String collectionExerciseId) {
+    log.debug(
+        "Linking sample summary to collection exercise",
+        kv("sample_summary_id", sampleSummaryId),
+        kv("collection_exercise_id", collectionExerciseId));
+    UriComponents uriComponents =
+        restUtility.createUriComponents(
+            appConfig.getPartySvc().getSampleLinkPath(), null, sampleSummaryId);
+    SampleLinkCreationRequestDTO sampleLinkCreationRequestDTO = new SampleLinkCreationRequestDTO();
+    sampleLinkCreationRequestDTO.setCollectionExerciseId(collectionExerciseId);
+    HttpEntity<SampleLinkCreationRequestDTO> httpEntity =
+        restUtility.createHttpEntity(sampleLinkCreationRequestDTO);
+    restTemplate.exchange(uriComponents.toUri(), HttpMethod.PUT, httpEntity, SampleLinkDTO.class);
   }
 }
