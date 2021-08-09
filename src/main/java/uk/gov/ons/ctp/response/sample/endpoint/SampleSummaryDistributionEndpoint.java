@@ -23,6 +23,15 @@ public class SampleSummaryDistributionEndpoint {
       LoggerFactory.getLogger(SampleSummaryDistributionEndpoint.class);
   @Autowired private SampleService sampleService;
 
+  /**
+   * Distributes all the SampleUnits for a SampleSummary to case. Distributing here means to tell
+   * case about all the sampleUnits so cases can be made against each one to track survey completion
+   * progress.
+   *
+   * @param collectionExerciseId The collection exercise id for the sample summary
+   * @param sampleSummaryId The sample summary ID used to find all the sample units to distribute
+   * @return A HTTP response
+   */
   @RequestMapping(
       value = "/collection-exercise/{collectionExerciseId}/samplesummary/{sampleSummaryId}",
       method = RequestMethod.GET)

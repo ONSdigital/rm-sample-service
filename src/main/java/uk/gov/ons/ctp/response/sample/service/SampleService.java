@@ -323,8 +323,20 @@ public class SampleService {
    * @param sampleUnit for which to distribute sample units
    */
   public void distributeSampleUnit(String collectionExerciseId, SampleUnit sampleUnit) {
+    SampleUnitParentDTO parent = createSampleUnitParentDTOObject(collectionExerciseId, sampleUnit);
+    sampleUnitPublisher.sendSampleUnitToCase(parent);
+  }
 
-    // TODO, factor this into a method.  Just doing it like this for ease for now.
+  /**
+   * Takes a populated sample unit and collection exercise ID and returns a populated
+   * sampleUnitParentDTO object
+   *
+   * @param collectionExerciseId A collection exercise ID
+   * @param sampleUnit A populated sample unit
+   * @return A populated SampleUnitParent Object
+   */
+  public SampleUnitParentDTO createSampleUnitParentDTOObject(
+      String collectionExerciseId, SampleUnit sampleUnit) {
     SampleUnitParentDTO parent = new SampleUnitParentDTO();
     parent.setActiveEnrolment(sampleUnit.isActiveEnrolment());
     parent.setId(sampleUnit.getId());
@@ -333,7 +345,6 @@ public class SampleService {
     parent.setPartyId(sampleUnit.getPartyId());
     parent.setCollectionInstrumentId(sampleUnit.getCollectionInstrumentId());
     parent.setCollectionExerciseId(collectionExerciseId);
-
-    sampleUnitPublisher.sendSampleUnitToCase(parent);
+    return parent;
   }
 }
