@@ -27,4 +27,22 @@ databaseChangeLog:
             path: add_collection_instrument_to_sample.sql
             relativeToChangelogFile: true
             splitStatements: false
+  - changeSet:
+      id: 17-4
+      author: Warren Bailey
+      changes:
+        - sqlFile:
+            comment: Add collection exercise to sample summary
+            path: add_collection_exercise_to_sample_summary.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+  - changeSet:
+      id: 17-5
+      author: Warren Bailey
+      changes:
+        - sqlFile:
+            comment: Add survey to sample summary
+            path: add_survey_id_to_sample_summary.sql
+            relativeToChangelogFile: true
+            splitStatements: false
 

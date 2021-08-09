@@ -58,7 +58,7 @@ public class SampleSummaryEnrichmentService {
   @Autowired private CollectionInstrumentSvcClient collectionInstrumentSvcClient;
 
   @Transactional(propagation = Propagation.REQUIRED)
-  public boolean enrich(String surveyId, UUID sampleSummaryId, String collectionExerciseId)
+  public boolean enrich(UUID surveyId, UUID sampleSummaryId, UUID collectionExerciseId)
       throws UnknownSampleSummaryException {
 
     // first find the correct sample summary
@@ -74,6 +74,8 @@ public class SampleSummaryEnrichmentService {
      * The collectionExerciseId should be set by the sample-file-uploader as it's talking to party to create the
      * business attributes. */
     partySvcClient.linkSampleSummaryId(sampleSummaryId.toString(), collectionExerciseId);
+
+    enrichSampleSummary(sampleSummary, surveyId, collectionExerciseId);
 
     // get all the samples
     Stream<SampleUnit> sampleUnits =
@@ -128,7 +130,7 @@ public class SampleSummaryEnrichmentService {
   }
 
   private boolean findAndUpdateCollectionInstrument(
-      String surveyId, Map<String, Optional<UUID>> formTypeMap, SampleUnit sampleUnit) {
+      UUID surveyId, Map<String, Optional<UUID>> formTypeMap, SampleUnit sampleUnit) {
     // now find the Collection instrument for this sample
     // and if we haven't seen this form type before add it
     // to a map so we can reuse for the next sample
@@ -168,7 +170,7 @@ public class SampleSummaryEnrichmentService {
     return collectionInstrumentId.isPresent();
   }
 
-  private boolean findAndUpdateParty(String surveyId, SampleUnit sampleUnit, UUID sampleUnitId) {
+  private boolean findAndUpdateParty(UUID surveyId, SampleUnit sampleUnit, UUID sampleUnitId) {
     PartyDTO party = getParty(sampleUnit.getSampleUnitRef());
     boolean foundParty = (party != null && party.getId() != null);
     if (foundParty) {
@@ -202,9 +204,9 @@ public class SampleSummaryEnrichmentService {
    * @throws RestClientException something went wrong making http call
    */
   private UUID requestCollectionInstrumentId(
-      List<String> classifierTypes, SampleUnit sampleUnit, String surveyId) {
+      List<String> classifierTypes, SampleUnit sampleUnit, UUID surveyId) {
     Map<String, String> classifiers = new HashMap<>();
-    classifiers.put("SURVEY_ID", surveyId);
+    classifiers.put("SURVEY_ID", surveyId.toString());
 
     // for all the classifiers returned by the survey service for this survey
     // get the ids from the sample unit
@@ -273,7 +275,7 @@ public class SampleSummaryEnrichmentService {
     }
   }
 
-  private boolean hasActiveEnrolment(PartyDTO party, String surveyId) {
+  private boolean hasActiveEnrolment(PartyDTO party, UUID surveyId) {
     List<Enrolment> enrolments =
         party.getAssociations().stream()
             .map(Association::getEnrolments)
@@ -283,8 +285,8 @@ public class SampleSummaryEnrichmentService {
         .anyMatch(enrolment -> enrolmentIsEnabledForSurvey(enrolment, surveyId));
   }
 
-  private boolean enrolmentIsEnabledForSurvey(final Enrolment enrolment, String surveyId) {
-    return enrolment.getSurveyId().equals(surveyId)
+  private boolean enrolmentIsEnabledForSurvey(final Enrolment enrolment, UUID surveyId) {
+    return enrolment.getSurveyId().equals(surveyId.toString())
         && enrolment.getEnrolmentStatus().equalsIgnoreCase(ENABLED);
   }
 
@@ -294,7 +296,7 @@ public class SampleSummaryEnrichmentService {
    * @param surveyId for which to get collection instrument classifier selectors.
    * @return List<String> Survey classifier type selectors for exercise
    */
-  private List<String> requestSurveyClassifiers(String surveyId) {
+  private List<String> requestSurveyClassifiers(UUID surveyId) {
 
     SurveyClassifierTypeDTO surveyClassifierType;
 
@@ -328,5 +330,12 @@ public class SampleSummaryEnrichmentService {
       LOG.error("Error requesting Survey Classifier Types", kv("surveyId", surveyId));
       throw new IllegalStateException("Error requesting Survey Classifier Types");
     }
+  }
+
+  private void enrichSampleSummary(
+      SampleSummary sampleSummary, UUID surveyId, UUID collectionExerciseId) {
+    sampleSummary.setCollectionExerciseId(collectionExerciseId);
+    sampleSummary.setSurveyId(surveyId);
+    sampleSummaryRepository.saveAndFlush(sampleSummary);
   }
 }

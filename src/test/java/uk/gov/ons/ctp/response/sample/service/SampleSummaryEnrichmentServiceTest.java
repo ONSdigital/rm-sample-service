@@ -1,5 +1,6 @@
 package uk.gov.ons.ctp.response.sample.service;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -52,10 +53,10 @@ public class SampleSummaryEnrichmentServiceTest {
    * @throws UnknownSampleSummaryException fails the test
    */
   @Test
-  public void testValidate() throws UnknownSampleSummaryException {
-    String surveyId = UUID.randomUUID().toString();
+  public void testEnrich() throws UnknownSampleSummaryException {
+    UUID surveyId = UUID.randomUUID();
     UUID sampleSummaryId = UUID.randomUUID();
-    String collectionExerciseId = UUID.randomUUID().toString();
+    UUID collectionExerciseId = UUID.randomUUID();
 
     String sampleUnitType = "B";
     UUID sampleUnitId = UUID.randomUUID();
@@ -115,10 +116,10 @@ public class SampleSummaryEnrichmentServiceTest {
    * @throws UnknownSampleSummaryException fails the test
    */
   @Test
-  public void testValidateFailsWithUnknownPartyId() throws UnknownSampleSummaryException {
-    String surveyId = UUID.randomUUID().toString();
+  public void testEnrichFailsWithUnknownPartyId() throws UnknownSampleSummaryException {
+    UUID surveyId = UUID.randomUUID();
     UUID sampleSummaryId = UUID.randomUUID();
-    String collectionExerciseId = UUID.randomUUID().toString();
+    UUID collectionExerciseId = UUID.randomUUID();
     String sampleUnitRef = "11111111";
     String sampleUnitType = "B";
     UUID sampleUnitId = UUID.randomUUID();
@@ -152,11 +153,11 @@ public class SampleSummaryEnrichmentServiceTest {
    * @throws UnknownSampleSummaryException fails the test
    */
   @Test
-  public void testValidateFailsWithUnknownCollectionInstrument()
+  public void testEnrichFailsWithUnknownCollectionInstrument()
       throws UnknownSampleSummaryException {
-    String surveyId = UUID.randomUUID().toString();
+    UUID surveyId = UUID.randomUUID();
     UUID sampleSummaryId = UUID.randomUUID();
-    String collectionExerciseId = UUID.randomUUID().toString();
+    UUID collectionExerciseId = UUID.randomUUID();
 
     String sampleUnitType = "B";
     UUID sampleUnitId = UUID.randomUUID();
@@ -210,16 +211,33 @@ public class SampleSummaryEnrichmentServiceTest {
    * @throws UnknownSampleSummaryException expected
    */
   @Test(expected = UnknownSampleSummaryException.class)
-  public void testValidateFailsWithUnknownSampleSummary() throws UnknownSampleSummaryException {
-    String surveyId = UUID.randomUUID().toString();
+  public void testEnrichFailsWithUnknownSampleSummary() throws UnknownSampleSummaryException {
+    UUID surveyId = UUID.randomUUID();
     UUID sampleSummaryId = UUID.randomUUID();
-    String collectionExerciseId = UUID.randomUUID().toString();
+    UUID collectionExerciseId = UUID.randomUUID();
 
     when(sampleSummaryRepository.findById(sampleSummaryId)).thenReturn(Optional.ofNullable(null));
     sampleSummaryEnrichmentService.enrich(surveyId, sampleSummaryId, collectionExerciseId);
   }
 
-  private PartyDTO buildPartyDTO(String surveyId) {
+  @Test
+  public void testEnrichSampleSummary() throws UnknownSampleSummaryException {
+    UUID surveyId = UUID.randomUUID();
+    UUID sampleSummaryId = UUID.randomUUID();
+    UUID collectionExerciseId = UUID.randomUUID();
+
+    SampleSummary sampleSummary = new SampleSummary();
+    sampleSummary.setId(sampleSummaryId);
+    sampleSummary.setSampleSummaryPK(1);
+
+    when(sampleSummaryRepository.findById(sampleSummaryId)).thenReturn(Optional.of(sampleSummary));
+    sampleSummaryEnrichmentService.enrich(surveyId, sampleSummaryId, collectionExerciseId);
+
+    assertEquals(surveyId, sampleSummary.getSurveyId());
+    assertEquals(collectionExerciseId, sampleSummary.getCollectionExerciseId());
+  }
+
+  private PartyDTO buildPartyDTO(UUID surveyId) {
     PartyDTO partyDTO = new PartyDTO();
     partyDTO.setId(UUID.randomUUID().toString());
 
@@ -227,7 +245,7 @@ public class SampleSummaryEnrichmentServiceTest {
     enrolment.setEnrolmentStatus("ENABLED");
     List<Enrolment> enrolments = new ArrayList<>();
     enrolments.add(enrolment);
-    enrolment.setSurveyId(surveyId);
+    enrolment.setSurveyId(surveyId.toString());
 
     Association association = new Association();
     association.setEnrolments(enrolments);

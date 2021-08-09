@@ -72,6 +72,12 @@ public class SampleSummary implements Serializable {
   @Size(max = 250)
   private String description;
 
+  @Column(name = "collection_exercise_id")
+  private UUID collectionExerciseId;
+
+  @Column(name = "survey_id")
+  private UUID surveyId;
+
   @JsonIgnore
   public Integer getSampleSummaryPK() {
     return sampleSummaryPK;

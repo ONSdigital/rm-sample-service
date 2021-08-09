@@ -33,8 +33,8 @@ public class SampleSummaryEnrichementEndpoint {
           "/survey/{surveyId}/collection-exercise/{collectionExerciseId}/samplesummary/{sampleSummaryId}",
       method = RequestMethod.GET)
   public ResponseEntity<Void> validate(
-      @PathVariable("surveyId") String surveyId,
-      @PathVariable("collectionExerciseId") String collectionExerciseId,
+      @PathVariable("surveyId") UUID surveyId,
+      @PathVariable("collectionExerciseId") UUID collectionExerciseId,
       @PathVariable("sampleSummaryId") UUID sampleSummaryId) {
 
     LOG.debug(
