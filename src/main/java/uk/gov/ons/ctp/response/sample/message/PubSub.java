@@ -37,6 +37,11 @@ public class PubSub {
         appConfig.getGcp().getProject(), appConfig.getGcp().getSampleUnitPublisherTopic());
   }
 
+  public Publisher caseNotificationPublisher() throws IOException {
+    return publisherSupplier(
+            appConfig.getGcp().getProject(), appConfig.getGcp().getCaseNotificationTopic());
+  }
+
   public void shutdown() {
     if (StringUtil.isEmpty(System.getenv("PUBSUB_EMULATOR_HOST"))) {
       PubSubEmulator.CHANNEL.shutdown();

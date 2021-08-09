@@ -88,7 +88,7 @@ public class SampleUnitPublisher {
       String message = objectMapper.writeValueAsString(sampleUnit);
       ByteString data = ByteString.copyFromUtf8(message);
       PubsubMessage pubsubMessage = PubsubMessage.newBuilder().setData(data).build();
-      Publisher publisher = pubSub.sampleUnitPublisher();
+      Publisher publisher = pubSub.caseNotificationPublisher();
       try {
         log.info("Publishing message to PubSub");
         ApiFuture<String> messageIdFuture = publisher.publish(pubsubMessage);
