@@ -326,8 +326,8 @@ public class SampleSummaryEnrichmentService {
   }
 
   private void enrichSampleSummary(
-      SampleSummary sampleSummary, UUID surveyId, UUID collectionExercise) {
-    sampleSummary.setCollectionExerciseId(collectionExercise);
+      SampleSummary sampleSummary, UUID surveyId, UUID collectionExerciseId) {
+    sampleSummary.setCollectionExerciseId(collectionExerciseId);
     sampleSummary.setSurveyId(surveyId);
     sampleSummaryRepository.saveAndFlush(sampleSummary);
   }
