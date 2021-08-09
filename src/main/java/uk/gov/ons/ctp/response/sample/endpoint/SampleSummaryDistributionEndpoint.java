@@ -25,10 +25,9 @@ public class SampleSummaryDistributionEndpoint {
 
   @RequestMapping(
       value =
-          "/survey/{surveyId}/collection-exercise/{collectionExerciseId}/samplesummary/{sampleSummaryId}",
+          "/collection-exercise/{collectionExerciseId}/samplesummary/{sampleSummaryId}",
       method = RequestMethod.GET)
   public ResponseEntity<Void> distribute(
-      @PathVariable("surveyId") String surveyId,
       @PathVariable("collectionExerciseId") String collectionExerciseId,
       @PathVariable("sampleSummaryId") UUID sampleSummaryId) {
 
