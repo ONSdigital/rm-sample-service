@@ -63,3 +63,4 @@ dns:
 gcp:
   project: ras-rm-sandbox
   sampleUnitPublisherTopic: "sample-unit-topic"
+  caseNotificationTopic: "case-notification-topic"
