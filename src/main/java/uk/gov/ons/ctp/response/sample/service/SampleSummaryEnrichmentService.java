@@ -73,7 +73,7 @@ public class SampleSummaryEnrichmentService {
      * collection exercise) but not the collectionExerciseId.
      * The collectionExerciseId should be set by the sample-file-uploader as it's talking to party to create the
      * business attributes. */
-    partySvcClient.linkSampleSummaryId(sampleSummaryId.toString(), collectionExerciseId);
+    partySvcClient.linkSampleSummaryId(sampleSummaryId.toString(), collectionExerciseId.toString());
 
     enrichSampleSummary(sampleSummary, surveyId, collectionExerciseId);
 
