@@ -3,6 +3,7 @@ package uk.gov.ons.ctp.response.sample.service;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.Test;
@@ -10,6 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitParentDTO;
@@ -26,6 +28,7 @@ public class SampleSummaryDistributionServiceTest {
   private static final String SAMPLE_UNIT_TYPE = "B";
 
   @Mock private SampleSummaryRepository sampleSummaryRepository;
+  @Mock private SampleService sampleService;
 
   @InjectMocks private SampleSummaryDistributionService sampleSummaryDistributionService;
 
@@ -33,6 +36,19 @@ public class SampleSummaryDistributionServiceTest {
   public void testDistributeFailsWithUnknownSampleSummaryId()
       throws UnknownSampleSummaryException, NoSampleUnitsInSampleSummaryException {
     when(sampleSummaryRepository.findById(SAMPLE_SUMMARY_ID)).thenReturn(Optional.ofNullable(null));
+    sampleSummaryDistributionService.distribute(SAMPLE_SUMMARY_ID);
+  }
+
+  @Test(expected = NoSampleUnitsInSampleSummaryException.class)
+  public void testDistributeFailsWithNoSampleUnitsInSampleSummary()
+      throws UnknownSampleSummaryException, NoSampleUnitsInSampleSummaryException {
+    SampleSummary sampleSummary = new SampleSummary();
+    sampleSummary.setId(SAMPLE_SUMMARY_ID);
+    sampleSummary.setSampleSummaryPK(1);
+    when(sampleSummaryRepository.findById(SAMPLE_SUMMARY_ID))
+        .thenReturn(Optional.of(sampleSummary));
+    when(sampleService.findSampleUnitsBySampleSummary(SAMPLE_SUMMARY_ID))
+        .thenReturn(new ArrayList<>());
     sampleSummaryDistributionService.distribute(SAMPLE_SUMMARY_ID);
   }
 
