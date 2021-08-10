@@ -1,5 +1,6 @@
 package uk.gov.ons.ctp.response.sample.representation;
 
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -78,6 +79,12 @@ public class SampleUnitDTO {
   private String formType;
 
   private SampleUnitState state;
+
+  private UUID partyId;
+
+  private boolean activeEnrolment;
+
+  private UUID collectionInstrumentId;
 
   private String id;
 }

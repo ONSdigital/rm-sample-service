@@ -85,7 +85,7 @@ public class SampleSummaryDistributionService {
       UUID collectionExerciseId, SampleUnit sampleUnit) {
     SampleUnitParentDTO parent = new SampleUnitParentDTO();
     parent.setActiveEnrolment(sampleUnit.isActiveEnrolment());
-    parent.setId(sampleUnit.getId());
+    parent.setId(sampleUnit.getId().toString());
     parent.setSampleUnitRef(sampleUnit.getSampleUnitRef());
     parent.setSampleUnitType(sampleUnit.getSampleUnitType());
     parent.setPartyId(sampleUnit.getPartyId());
