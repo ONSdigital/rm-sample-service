@@ -42,6 +42,8 @@ public class SampleSummaryDistributionEndpoint {
       return ResponseEntity.badRequest().build();
     }
 
+    LOG.info(
+        "Successfully distributed sample units to case", kv("sampleSummaryId", sampleSummaryId));
     return ResponseEntity.ok().build();
   }
 }
