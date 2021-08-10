@@ -19,6 +19,8 @@ public class SampleSummaryDistributionServiceTest {
   private static final String COLLECTION_EXERCISE_ID = "dd83d654-ed2d-4265-b554-a5eb579904b4";
   private static final String PARTY_ID = "f6135ff0-a3fa-4baf-a61d-08a350266189";
   private static final String SAMPLEUNIT_ID = "4ef7326b-4143-43f7-ba67-65056d4e20b8";
+  private static final String SAMPLE_UNIT_REF = "12345678901";
+  private static final String SAMPLE_UNIT_TYPE = "B";
 
   @InjectMocks private SampleSummaryDistributionService sampleSummaryDistributionService;
 
@@ -27,7 +29,8 @@ public class SampleSummaryDistributionServiceTest {
     SampleUnit testSampleUnit = new SampleUnit();
     testSampleUnit.setId(UUID.fromString(SAMPLEUNIT_ID));
     testSampleUnit.setActiveEnrolment(true);
-    testSampleUnit.setSampleUnitRef("12345678901");
+    testSampleUnit.setSampleUnitType(SAMPLE_UNIT_TYPE);
+    testSampleUnit.setSampleUnitRef(SAMPLE_UNIT_REF);
     testSampleUnit.setPartyId(UUID.fromString(PARTY_ID));
 
     SampleUnitParentDTO output =
@@ -35,7 +38,8 @@ public class SampleSummaryDistributionServiceTest {
             UUID.fromString(COLLECTION_EXERCISE_ID), testSampleUnit);
 
     assertEquals(output.getId(), UUID.fromString(SAMPLEUNIT_ID));
-    assertEquals(output.getSampleUnitRef(), "12345678901");
+    assertEquals(output.getSampleUnitType(), SAMPLE_UNIT_TYPE);
+    assertEquals(output.getSampleUnitRef(), SAMPLE_UNIT_REF);
     assertTrue(output.isActiveEnrolment());
     assertEquals(output.getPartyId(), UUID.fromString(PARTY_ID));
     assertEquals(output.getCollectionExerciseId(), COLLECTION_EXERCISE_ID);

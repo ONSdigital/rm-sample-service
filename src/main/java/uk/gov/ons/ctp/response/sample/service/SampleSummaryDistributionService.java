@@ -23,6 +23,14 @@ public class SampleSummaryDistributionService {
   @Autowired private SampleUnitPublisher sampleUnitPublisher;
   @Autowired private SampleSummaryRepository sampleSummaryRepository;
 
+  /**
+   * Distributes the sample units to the case service to create cases against each sample unit.
+   * This is done over pubsub.
+   *
+   * @param sampleSummaryId The sampleSummary ID
+   * @throws NoSampleUnitsInSampleSummaryException Thrown when the sampleSummary has no sample units in it
+   * @throws UnknownSampleSummaryException Thrown when the sampleSummaryId doesn't match any in the database
+   */
   public void distribute(UUID sampleSummaryId)
       throws NoSampleUnitsInSampleSummaryException, UnknownSampleSummaryException {
     // first find the correct sample summary
@@ -30,7 +38,6 @@ public class SampleSummaryDistributionService {
         sampleSummaryRepository
             .findById(sampleSummaryId)
             .orElseThrow(UnknownSampleSummaryException::new);
-    UUID collectionExerciseId = sampleSummary.getCollectionExerciseId();
 
     List<SampleUnit> sampleUnits = sampleService.findSampleUnitsBySampleSummary(sampleSummaryId);
 
