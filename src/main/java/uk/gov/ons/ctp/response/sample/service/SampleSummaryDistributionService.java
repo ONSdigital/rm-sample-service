@@ -60,6 +60,8 @@ public class SampleSummaryDistributionService {
           }
         });
 
+    // Currently nothing uses this flag, but in the future we'll clean up old samples once they're
+    // no longer needed
     sampleSummary.setMarkForDeletion(true);
     sampleSummaryRepository.saveAndFlush(sampleSummary);
   }
