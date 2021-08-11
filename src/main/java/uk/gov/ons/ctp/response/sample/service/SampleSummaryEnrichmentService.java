@@ -70,7 +70,7 @@ public class SampleSummaryEnrichmentService {
 
     /* Link the sample summary and collection exercise.  This is something that needs to be changed down the line as
      * it's odd that the attributes in party have a sampleSummaryId (which is only ever going to be for a specific
-     * collection exercise) but not the collectionExerciseId.
+     * collection exercise) when they're created but not the collectionExerciseId.
      * The collectionExerciseId should be set by the sample-file-uploader as it's talking to party to create the
      * business attributes. */
     partySvcClient.linkSampleSummaryId(sampleSummaryId.toString(), collectionExerciseId.toString());
