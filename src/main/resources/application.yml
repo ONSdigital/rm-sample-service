@@ -108,8 +108,8 @@ collection-instrument-svc:
     read-timeout-milli-seconds: 5000
 
 collection-exercise-svc:
-  sample-validated-path: /collectionexerciseexecution/validated/{valid}/collectionExercise/{collectionExerciseId}
-  sample-distributed-path: /collectionexerciseexecution/distributed/{distributed}/collectionExercise/{collectionExerciseId}
+  sample-validated-path: /collectionexerciseexecution/validated/{valid}/collectionexercise/{collectionExerciseId}
+  sample-distributed-path: /collectionexerciseexecution/distributed/{distributed}/collectionexercise/{collectionExerciseId}
   connection-config:
     scheme: http
     host: localhost

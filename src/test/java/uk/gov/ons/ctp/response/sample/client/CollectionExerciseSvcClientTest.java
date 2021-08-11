@@ -37,9 +37,9 @@ public class CollectionExerciseSvcClientTest {
   public void setUp() {
     CollectionExerciseSvc collectionExerciseSvc = new CollectionExerciseSvc();
     collectionExerciseSvc.setSampleDistributedPath(
-        "/collectionexerciseexecution/distributed/{distributed}/collectionExercise/{collectionExerciseId}");
+        "/collectionexerciseexecution/distributed/{distributed}/collectionexercise/{collectionExerciseId}");
     collectionExerciseSvc.setSampleValidatedPath(
-        "/collectionexerciseexecution/validated/{valid}/collectionExercise/{collectionExerciseId}");
+        "/collectionexerciseexecution/validated/{valid}/collectionexercise/{collectionExerciseId}");
     when(appConfig.getCollectionExerciseSvc()).thenReturn(collectionExerciseSvc);
   }
 
