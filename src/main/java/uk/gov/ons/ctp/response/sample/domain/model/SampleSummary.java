@@ -78,6 +78,9 @@ public class SampleSummary implements Serializable {
   @Column(name = "survey_id")
   private UUID surveyId;
 
+  @Column(name = "mark_for_deletion")
+  private boolean markForDeletion;
+
   @JsonIgnore
   public Integer getSampleSummaryPK() {
     return sampleSummaryPK;

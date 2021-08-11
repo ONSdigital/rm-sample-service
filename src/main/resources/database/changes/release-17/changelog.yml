@@ -45,4 +45,13 @@ databaseChangeLog:
             path: add_survey_id_to_sample_summary.sql
             relativeToChangelogFile: true
             splitStatements: false
+  - changeSet:
+      id: 17-6
+      author: Adam Mann
+      changes:
+        - sqlFile:
+            comment: Add mark_for_deletion to sample summary
+            path: add_mark_for_deletion_to_sample_summary.sql
+            relativeToChangelogFile: true
+            splitStatements: false
 

@@ -59,6 +59,9 @@ public class SampleSummaryDistributionService {
             LOG.error("Failed to distribute sample unit", ex);
           }
         });
+
+    sampleSummary.setMarkForDeletion(true);
+    sampleSummaryRepository.saveAndFlush(sampleSummary);
   }
 
   /**

@@ -1,0 +1,1 @@
+ALTER TABLE sample.sample_summary ADD COLUMN mark_for_deletion BOOLEAN DEFAULT FALSE;

@@ -58,6 +58,7 @@ public class SampleSummaryDistributionServiceTest {
 
     sampleSummaryDistributionService.distribute(SAMPLE_SUMMARY_ID);
     verify(sampleUnitPublisher, times(1)).sendSampleUnitToCase(any());
+    verify(sampleSummaryRepository, times(1)).saveAndFlush(any());
   }
 
   @Test(expected = UnknownSampleSummaryException.class)
@@ -65,6 +66,7 @@ public class SampleSummaryDistributionServiceTest {
       throws UnknownSampleSummaryException, NoSampleUnitsInSampleSummaryException {
     when(sampleSummaryRepository.findById(SAMPLE_SUMMARY_ID)).thenReturn(Optional.empty());
     sampleSummaryDistributionService.distribute(SAMPLE_SUMMARY_ID);
+    verify(sampleSummaryRepository, never()).saveAndFlush(any());
   }
 
   @Test(expected = NoSampleUnitsInSampleSummaryException.class)
@@ -78,6 +80,7 @@ public class SampleSummaryDistributionServiceTest {
     when(sampleService.findSampleUnitsBySampleSummary(SAMPLE_SUMMARY_ID))
         .thenReturn(new ArrayList<>());
     sampleSummaryDistributionService.distribute(SAMPLE_SUMMARY_ID);
+    verify(sampleSummaryRepository, never()).saveAndFlush(any());
   }
 
   @Test
