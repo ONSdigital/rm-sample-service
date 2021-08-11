@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.ons.ctp.response.client.CollectionExerciseSvcClient;
 import uk.gov.ons.ctp.response.sample.service.SampleSummaryEnrichmentService;
 import uk.gov.ons.ctp.response.sample.service.UnknownSampleSummaryException;
 
@@ -28,6 +29,8 @@ public class SampleSummaryEnrichementEndpoint {
 
   @Autowired private SampleSummaryEnrichmentService sampleSummaryEnrichmentService;
 
+  @Autowired private CollectionExerciseSvcClient collectionExerciseSvcClient;
+
   @RequestMapping(
       value =
           "/survey/{surveyId}/collection-exercise/{collectionExerciseId}/samplesummary/{sampleSummaryId}",
@@ -36,6 +39,8 @@ public class SampleSummaryEnrichementEndpoint {
       @PathVariable("surveyId") UUID surveyId,
       @PathVariable("collectionExerciseId") UUID collectionExerciseId,
       @PathVariable("sampleSummaryId") UUID sampleSummaryId) {
+
+    // TODO this method needs to be async or ideally replace with pubsub
 
     LOG.debug(
         "about to enrich sample summary",
@@ -46,6 +51,11 @@ public class SampleSummaryEnrichementEndpoint {
     try {
       boolean validated =
           sampleSummaryEnrichmentService.enrich(surveyId, sampleSummaryId, collectionExerciseId);
+
+      // call collection exercise to inform it the sample summary is valid
+      // ideally we'll change this to a pubsub message too
+      collectionExerciseSvcClient.validateSampleSummary(validated, collectionExerciseId);
+
       LOG.debug(
           "Enriched sample summary",
           kv("sampleSummaryId", sampleSummaryId),

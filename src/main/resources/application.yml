@@ -107,6 +107,15 @@ collection-instrument-svc:
     connect-timeout-milli-seconds: 5000
     read-timeout-milli-seconds: 5000
 
+collection-exercise-svc:
+  sample-validated-path: /collectionexerciseexecution/validated/{valid}/collectionExercise/{collectionExerciseId}
+  sample-distributed-path: /collectionexerciseexecution/distributed/{distributed}/collectionExercise/{collectionExerciseId}
+  connection-config:
+    scheme: http
+    host: localhost
+    port: 8145
+    username: admin
+    password: secret
 
 party-svc:
   request-party-path: /party-api/v1/businesses/ref/{sampleUnitRef}
