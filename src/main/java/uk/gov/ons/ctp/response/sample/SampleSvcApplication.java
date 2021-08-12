@@ -42,8 +42,6 @@ import uk.gov.ons.ctp.response.sample.service.state.SampleSvcStateTransitionMana
 @EnableAsync
 public class SampleSvcApplication {
 
-  public static final String COLLECTION_INSTRUMENT_CACHE = "collectioninstruments";
-
   @Autowired private StateTransitionManagerFactory stateTransitionManager;
 
   @Autowired private AppConfig appConfig;
