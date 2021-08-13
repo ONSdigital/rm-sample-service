@@ -11,6 +11,7 @@ import com.google.cloud.pubsub.v1.Subscriber;
 import com.google.pubsub.v1.ProjectSubscriptionName;
 import com.google.pubsub.v1.PubsubMessage;
 import java.io.IOException;
+import java.util.UUID;
 import org.eclipse.jetty.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,10 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryActivationDTO;
+import uk.gov.ons.ctp.response.sample.service.NoSampleUnitsInSampleSummaryException;
+import uk.gov.ons.ctp.response.sample.service.SampleSummaryDistributionService;
+import uk.gov.ons.ctp.response.sample.service.SampleSummaryEnrichmentService;
+import uk.gov.ons.ctp.response.sample.service.UnknownSampleSummaryException;
 import uk.gov.ons.ctp.response.sample.utility.PubSubEmulator;
 
 /** PubSub subscription responsible for receipt of sample units via PubSub. */
@@ -28,6 +33,8 @@ public class SampleSummaryActivation {
   private static final Logger LOG = LoggerFactory.getLogger(SampleSummaryActivation.class);
   @Autowired private ObjectMapper objectMapper;
   @Autowired AppConfig appConfig;
+  @Autowired SampleSummaryEnrichmentService sampleSummaryEnrichmentService;
+  @Autowired SampleSummaryDistributionService sampleSummaryDistributionService;
 
   /**
    * To process SampleUnit from PubSub This creates application ready event listener to provide an
@@ -37,7 +44,7 @@ public class SampleSummaryActivation {
    */
   @EventListener(ApplicationReadyEvent.class)
   public void activateSampleSummary() throws IOException {
-    log.debug("received SampleSummaryActivation message from PubSub");
+    LOG.debug("received SampleSummaryActivation message from PubSub");
     // Instantiate an asynchronous message receiver.
     MessageReceiver receiver =
         (PubsubMessage message, AckReplyConsumer consumer) -> {
@@ -51,10 +58,7 @@ public class SampleSummaryActivation {
 
             // Ack message so collection exercise isn't hanging
             consumer.ack();
-            // Enrich sample units
-            // Send message to collection exercise on enrich completion
-            // Distribute
-            // Send message to collection exercise on distribute completion
+            activateSampleSummaryFromPubsub(sampleSummaryActivation);
 
           } catch (final IOException e) {
             LOG.error(
@@ -72,6 +76,55 @@ public class SampleSummaryActivation {
         kv(subscriber.getSubscriptionNameString()));
   }
 
+  private void activateSampleSummaryFromPubsub(SampleSummaryActivationDTO sampleSummaryActivation) {
+    validateAndEnrich(sampleSummaryActivation);
+    // Send message about 'enrichment complete' to collection exercise
+    distribute(sampleSummaryActivation);
+    // Send message about 'distribution complete' to collection exercise
+
+  }
+
+  private void validateAndEnrich(SampleSummaryActivationDTO sampleSummaryActivation) {
+    UUID sampleSummaryId = sampleSummaryActivation.getSampleSummaryId();
+    UUID surveyId = sampleSummaryActivation.getSurveyId();
+    UUID collectionExerciseId = sampleSummaryActivation.getCollectionExerciseId();
+
+    LOG.debug(
+        "about to enrich sample summary",
+        kv("sampleSummaryId", sampleSummaryId),
+        kv("surveyId", surveyId),
+        kv("collectionExerciseId", collectionExerciseId));
+
+    try {
+      boolean validated =
+          sampleSummaryEnrichmentService.enrich(surveyId, sampleSummaryId, collectionExerciseId);
+      LOG.debug(
+          "Enriched sample summary",
+          kv("sampleSummaryId", sampleSummaryId),
+          kv("surveyId", surveyId),
+          kv("collectionExerciseId", collectionExerciseId),
+          kv("validated", validated));
+      if (validated) {
+        LOG.info("Success!");
+      } else {
+        LOG.error("TODO - do something when something goes wrong with validation and enrichment");
+        // TODO do something useful on failure
+      }
+    } catch (UnknownSampleSummaryException e) {
+      LOG.error("unknown sample summary id", kv("sampleSummaryId", sampleSummaryId), e);
+      // TODO do something useful on failure
+    }
+  }
+
+  private void distribute(SampleSummaryActivationDTO sampleSummaryActivation) {
+    try {
+      sampleSummaryDistributionService.distribute(sampleSummaryActivation.getSampleSummaryId());
+    } catch (NoSampleUnitsInSampleSummaryException | UnknownSampleSummaryException e) {
+      LOG.error("TODO - something went wrong");
+      // TODO - do something useful when it goes wrong
+    }
+  }
+
   /**
    * Provides PubSub subscriber for sample unit notification against message receiver
    *
@@ -81,7 +134,7 @@ public class SampleSummaryActivation {
   private Subscriber getSampleSummaryActivationSubscriber(MessageReceiver receiver)
       throws IOException {
     if (StringUtil.isBlank(System.getenv("PUBSUB_EMULATOR_HOST"))) {
-      LOG.info("Returning Subscriber for sample unit notification");
+      LOG.info("Returning subscriber for sample summary activation");
       ExecutorProvider executorProvider =
           InstantiatingExecutorProvider.newBuilder().setExecutorThreadCount(4).build();
       // `setParallelPullCount` determines how many StreamingPull streams the subscriber will open
@@ -94,8 +147,8 @@ public class SampleSummaryActivation {
           .setExecutorProvider(executorProvider)
           .build();
     } else {
-      LOG.info("Returning emulator Subscriber");
-      return new PubSubEmulator().getSampleSummaryActivationEmulatorSubscriber(receiver);
+      LOG.info("Returning emulator subscriber for sample summary activation");
+      return new PubSubEmulator().getEmulatorSubscriberForSampleSummaryActivation(receiver);
     }
   }
 
@@ -107,9 +160,10 @@ public class SampleSummaryActivation {
   private ProjectSubscriptionName getSampleUnitSubscriptionName() {
     String project = appConfig.getGcp().getProject();
     String subscriptionId = appConfig.getGcp().getSampleSummaryActivationSubscription();
-    log.with("Subscription id", subscriptionId)
-        .with("project", project)
-        .info("creating pubsub subscription name for sample unit notifications ");
+    LOG.info(
+        "creating pubsub subscription name for sample unit notifications",
+        kv("Subscription id", subscriptionId),
+        kv("project", project));
     return ProjectSubscriptionName.of(project, subscriptionId);
   }
 }

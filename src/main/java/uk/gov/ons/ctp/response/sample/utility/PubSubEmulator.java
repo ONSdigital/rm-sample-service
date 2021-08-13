@@ -36,6 +36,8 @@ public class PubSubEmulator {
   private static final String CASE_CREATION_TOPIC_ID = "test_case_creation_topic";
   private static final String SUBSCRIPTION_ID = "test_subscription";
   private static final String CASE_CREATION_SUBSCRIPTION_ID = "test_case_creation_subscription";
+  private static final String SAMPLE_SUMMARY_ACTIVATION_SUBSCRIPTION_ID =
+      "test_sample_summary_activation_subscription";
   private final TopicAdminClient topicClient =
       TopicAdminClient.create(
           TopicAdminSettings.newBuilder()
@@ -74,6 +76,15 @@ public class PubSubEmulator {
   public Subscriber getEmulatorSubscriberForCaseCreationNotification(MessageReceiver receiver) {
     return Subscriber.newBuilder(
             ProjectSubscriptionName.of(PROJECT_ID, CASE_CREATION_SUBSCRIPTION_ID), receiver)
+        .setChannelProvider(CHANNEL_PROVIDER)
+        .setCredentialsProvider(CREDENTIAL_PROVIDER)
+        .build();
+  }
+
+  public Subscriber getEmulatorSubscriberForSampleSummaryActivation(MessageReceiver receiver) {
+    return Subscriber.newBuilder(
+            ProjectSubscriptionName.of(PROJECT_ID, SAMPLE_SUMMARY_ACTIVATION_SUBSCRIPTION_ID),
+            receiver)
         .setChannelProvider(CHANNEL_PROVIDER)
         .setCredentialsProvider(CREDENTIAL_PROVIDER)
         .build();
