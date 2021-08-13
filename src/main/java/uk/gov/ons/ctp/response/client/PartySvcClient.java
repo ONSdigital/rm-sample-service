@@ -59,6 +59,10 @@ public class PartySvcClient {
     return responseEntity.getBody();
   }
 
+  @Retryable(
+      value = {RestClientException.class},
+      maxAttemptsExpression = "#{${retries.maxAttempts}}",
+      backoff = @Backoff(delayExpression = "#{${retries.backoff}}"))
   public void linkSampleSummaryId(String sampleSummaryId, String collectionExerciseId) {
     log.debug(
         "Linking sample summary to collection exercise",
