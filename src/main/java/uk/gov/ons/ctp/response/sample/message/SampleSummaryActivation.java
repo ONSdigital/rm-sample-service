@@ -10,21 +10,23 @@ import com.google.cloud.pubsub.v1.MessageReceiver;
 import com.google.cloud.pubsub.v1.Subscriber;
 import com.google.pubsub.v1.ProjectSubscriptionName;
 import com.google.pubsub.v1.PubsubMessage;
+import java.io.IOException;
+import org.eclipse.jetty.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
+import uk.gov.ons.ctp.response.sample.config.AppConfig;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryActivationDTO;
+import uk.gov.ons.ctp.response.sample.utility.PubSubEmulator;
 
 /** PubSub subscription responsible for receipt of sample units via PubSub. */
 @Component
 public class SampleSummaryActivation {
   private static final Logger LOG = LoggerFactory.getLogger(SampleSummaryActivation.class);
   @Autowired private ObjectMapper objectMapper;
-  @Autowired private SampleService sampleService;
   @Autowired AppConfig appConfig;
 
   /**
@@ -41,25 +43,33 @@ public class SampleSummaryActivation {
         (PubsubMessage message, AckReplyConsumer consumer) -> {
           // Handle incoming message, then ack the received message.
           LOG.info("Receiving message ID from PubSub", kv(message.getMessageId()));
-          LOG.with(message.getData().toString()).debug("Receiving data from PubSub ");
+          LOG.debug("Receiving data from PubSub ", kv(message.getData().toString()));
           try {
-            SampleUnit sampleUnit =
-                objectMapper.readValue(message.getData().toStringUtf8(), SampleUnit.class);
-            sampleService.acceptSampleUnit(sampleUnit);
+            SampleSummaryActivationDTO sampleSummaryActivation =
+                objectMapper.readValue(
+                    message.getData().toStringUtf8(), SampleSummaryActivationDTO.class);
+
+            // Ack message so collection exercise isn't hanging
             consumer.ack();
+            // Enrich sample units
+            // Send message to collection exercise on enrich completion
+            // Distribute
+            // Send message to collection exercise on distribute completion
+
           } catch (final IOException e) {
-            log.with(e)
-                .error(
-                    "Something went wrong while processing message received from PubSub "
-                        + "for sample unit notification");
+            LOG.error(
+                "Something went wrong while processing message received from PubSub "
+                    + "for sample unit notification",
+                e);
             consumer.nack();
           }
         };
-    Subscriber subscriber = getSampleUnitReceiverSubscriber(receiver);
+    Subscriber subscriber = getSampleSummaryActivationSubscriber(receiver);
     // Start the subscriber.
     subscriber.startAsync().awaitRunning();
-    log.with(subscriber.getSubscriptionNameString())
-        .info("Listening for sample unit notification messages on PubSub-subscription id");
+    LOG.info(
+        "Listening for sample unit notification messages on PubSub-subscription id",
+        kv(subscriber.getSubscriptionNameString()));
   }
 
   /**
@@ -68,9 +78,10 @@ public class SampleSummaryActivation {
    * @param receiver: com.google.cloud.pubsub.v1.MessageReceiver;
    * @return com.google.cloud.pubsub.v1.Subscriber;
    */
-  private Subscriber getSampleUnitReceiverSubscriber(MessageReceiver receiver) throws IOException {
+  private Subscriber getSampleSummaryActivationSubscriber(MessageReceiver receiver)
+      throws IOException {
     if (StringUtil.isBlank(System.getenv("PUBSUB_EMULATOR_HOST"))) {
-      log.info("Returning Subscriber for sample unit notification");
+      LOG.info("Returning Subscriber for sample unit notification");
       ExecutorProvider executorProvider =
           InstantiatingExecutorProvider.newBuilder().setExecutorThreadCount(4).build();
       // `setParallelPullCount` determines how many StreamingPull streams the subscriber will open
@@ -83,8 +94,8 @@ public class SampleSummaryActivation {
           .setExecutorProvider(executorProvider)
           .build();
     } else {
-      log.info("Returning emulator Subscriber");
-      return new PubSubEmulator().getSampleUnitEmulatorSubscriber(receiver);
+      LOG.info("Returning emulator Subscriber");
+      return new PubSubEmulator().getSampleSummaryActivationEmulatorSubscriber(receiver);
     }
   }
 
@@ -95,7 +106,7 @@ public class SampleSummaryActivation {
    */
   private ProjectSubscriptionName getSampleUnitSubscriptionName() {
     String project = appConfig.getGcp().getProject();
-    String subscriptionId = appConfig.getGcp().getSampleUnitReceiverSubscription();
+    String subscriptionId = appConfig.getGcp().getSampleSummaryActivationSubscription();
     log.with("Subscription id", subscriptionId)
         .with("project", project)
         .info("creating pubsub subscription name for sample unit notifications ");

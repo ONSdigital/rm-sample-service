@@ -150,5 +150,6 @@ retries:
 
 gcp:
   project: ras-rm-sandbox
+  sampleSummaryActivationSubscription: "test_subscription"
   sampleUnitPublisherTopic: "test_topic"
   caseNotificationTopic: "test_topic"
