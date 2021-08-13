@@ -39,6 +39,7 @@ public class SampleSummaryDistributionEndpoint {
     try {
       sampleSummaryDistributionService.distribute(sampleSummaryId);
     } catch (UnknownSampleSummaryException | NoSampleUnitsInSampleSummaryException e) {
+      LOG.error("Something went wrong", kv("sampleSummaryId", sampleSummaryId), e);
       return ResponseEntity.badRequest().build();
     }
 
