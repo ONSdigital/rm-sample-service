@@ -20,6 +20,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
+import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseStatusDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryActivationDTO;
 import uk.gov.ons.ctp.response.sample.service.NoSampleUnitsInSampleSummaryException;
 import uk.gov.ons.ctp.response.sample.service.SampleSummaryDistributionService;
@@ -56,9 +57,10 @@ public class SampleSummaryActivation {
                 objectMapper.readValue(
                     message.getData().toStringUtf8(), SampleSummaryActivationDTO.class);
 
-            // Ack message so collection exercise isn't hanging
-            consumer.ack();
+            // Figure out when it should ack/nack at the end, once we know of all the places
+            // it can go wrong.
             activateSampleSummaryFromPubsub(sampleSummaryActivation);
+            consumer.ack();
 
           } catch (final IOException e) {
             LOG.error(
@@ -78,6 +80,10 @@ public class SampleSummaryActivation {
 
   private void activateSampleSummaryFromPubsub(SampleSummaryActivationDTO sampleSummaryActivation) {
     validateAndEnrich(sampleSummaryActivation);
+    CollectionExerciseStatusDTO collectionExerciseStatus = new CollectionExerciseStatusDTO();
+    collectionExerciseStatus.setCollectionExerciseId(
+        sampleSummaryActivation.getCollectionExerciseId());
+    // sendMessageToCollectionExercise(collectionExerciseStatus)
     // Send message about 'enrichment complete' to collection exercise
     distribute(sampleSummaryActivation);
     // Send message about 'distribution complete' to collection exercise
