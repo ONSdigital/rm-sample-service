@@ -39,7 +39,6 @@ import uk.gov.ons.ctp.response.sample.validation.BusinessSurveySample;
 public class SampleServiceTest {
 
   private static final String SAMPLE_SUMMARY_ID = "c6ea7ae3-468d-4b7d-847c-af54874baa46";
-
   private static final String SAMPLEUNIT_ID = "4ef7326b-4143-43f7-ba67-65056d4e20b8";
 
   @Mock private SampleSummaryRepository sampleSummaryRepository;

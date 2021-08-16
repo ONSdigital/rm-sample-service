@@ -110,6 +110,7 @@ collection-instrument-svc:
 
 party-svc:
   request-party-path: /party-api/v1/businesses/ref/{sampleUnitRef}
+  sample-link-path: /party-api/v1/businesses/sample/link/{sampleSummaryId}
   connection-config:
     scheme: http
     host: localhost
@@ -150,3 +151,4 @@ retries:
 gcp:
   project: ras-rm-sandbox
   sampleUnitPublisherTopic: "test_topic"
+  caseNotificationTopic: "test_topic"

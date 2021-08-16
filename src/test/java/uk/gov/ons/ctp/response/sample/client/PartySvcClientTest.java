@@ -25,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.ons.ctp.response.client.PartySvcClient;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.config.PartySvc;
+import uk.gov.ons.ctp.response.sample.representation.SampleLinkDTO;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PartySvcClientTest {
@@ -76,5 +77,37 @@ public class PartySvcClientTest {
     // Then
     verify(restTemplate, times(1))
         .exchange(any(URI.class), eq(HttpMethod.GET), any(HttpEntity.class), eq(PartyDTO.class));
+  }
+
+  @Test
+  public void linkSampleSummaryId_200Response() {
+    // Given
+    when(restTemplate.exchange(
+            any(URI.class), eq(HttpMethod.PUT), any(HttpEntity.class), eq(SampleLinkDTO.class)))
+        .thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
+
+    // When
+    partySvcClient.linkSampleSummaryId(SAMPLE_SUMMARY_ID, COLLECTION_EXERCISE_ID);
+
+    // Then
+    verify(restTemplate, times(1))
+        .exchange(
+            any(URI.class), eq(HttpMethod.PUT), any(HttpEntity.class), eq(SampleLinkDTO.class));
+  }
+
+  @Test(expected = HttpClientErrorException.class)
+  public void linkSampleSummaryId() {
+    // Given
+    when(restTemplate.exchange(
+            any(URI.class), eq(HttpMethod.PUT), any(HttpEntity.class), eq(SampleLinkDTO.class)))
+        .thenThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
+
+    // When
+    partySvcClient.linkSampleSummaryId(SAMPLE_SUMMARY_ID, COLLECTION_EXERCISE_ID);
+
+    // Then
+    verify(restTemplate, times(1))
+        .exchange(
+            any(URI.class), eq(HttpMethod.PUT), any(HttpEntity.class), eq(SampleLinkDTO.class));
   }
 }
