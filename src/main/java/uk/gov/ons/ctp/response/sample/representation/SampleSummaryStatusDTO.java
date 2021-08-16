@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-public class CollectionExerciseStatusDTO {
+public class SampleSummaryStatusDTO {
   private UUID collectionExerciseId;
 
   public enum Status {

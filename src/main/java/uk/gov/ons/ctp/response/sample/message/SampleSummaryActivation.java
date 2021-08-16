@@ -20,7 +20,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
-import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseStatusDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryStatusDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryActivationDTO;
 import uk.gov.ons.ctp.response.sample.service.NoSampleUnitsInSampleSummaryException;
 import uk.gov.ons.ctp.response.sample.service.SampleSummaryDistributionService;
@@ -80,7 +80,7 @@ public class SampleSummaryActivation {
 
   private void activateSampleSummaryFromPubsub(SampleSummaryActivationDTO sampleSummaryActivation) {
     validateAndEnrich(sampleSummaryActivation);
-    CollectionExerciseStatusDTO collectionExerciseStatus = new CollectionExerciseStatusDTO();
+    SampleSummaryStatusDTO collectionExerciseStatus = new SampleSummaryStatusDTO();
     collectionExerciseStatus.setCollectionExerciseId(
         sampleSummaryActivation.getCollectionExerciseId());
     // sendMessageToCollectionExercise(collectionExerciseStatus)
