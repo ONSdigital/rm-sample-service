@@ -50,8 +50,8 @@ public class SampleSummaryActivation {
     MessageReceiver receiver =
         (PubsubMessage message, AckReplyConsumer consumer) -> {
           // Handle incoming message, then ack the received message.
-          LOG.info("Receiving message ID from PubSub", kv(message.getMessageId()));
-          LOG.debug("Receiving data from PubSub ", kv(message.getData().toString()));
+          LOG.info("Receiving message ID from PubSub", kv("messageId", message.getMessageId()));
+          LOG.debug("Receiving data from PubSub ", kv("data", message.getData().toString()));
           try {
             SampleSummaryActivationDTO sampleSummaryActivation =
                 objectMapper.readValue(
@@ -75,7 +75,7 @@ public class SampleSummaryActivation {
     subscriber.startAsync().awaitRunning();
     LOG.info(
         "Listening for sample unit notification messages on PubSub-subscription id",
-        kv(subscriber.getSubscriptionNameString()));
+        kv("subscriptionId", subscriber.getSubscriptionNameString()));
   }
 
   private void activateSampleSummaryFromPubsub(SampleSummaryActivationDTO sampleSummaryActivation) {
