@@ -1,6 +1,5 @@
 package uk.gov.ons.ctp.response.client;
 
-
 import java.util.List;
 import libs.collection.instrument.representation.CollectionInstrumentDTO;
 import libs.common.rest.RestUtility;
