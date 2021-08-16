@@ -6,4 +6,5 @@ import lombok.Data;
 public class GCP {
   String project;
   String sampleUnitPublisherTopic;
+  String caseNotificationTopic;
 }
