@@ -22,10 +22,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryActivationDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryStatusDTO;
-import uk.gov.ons.ctp.response.sample.service.NoSampleUnitsInSampleSummaryException;
-import uk.gov.ons.ctp.response.sample.service.SampleSummaryDistributionService;
-import uk.gov.ons.ctp.response.sample.service.SampleSummaryEnrichmentService;
-import uk.gov.ons.ctp.response.sample.service.UnknownSampleSummaryException;
+import uk.gov.ons.ctp.response.sample.service.*;
 import uk.gov.ons.ctp.response.sample.utility.PubSubEmulator;
 
 /** PubSub subscription responsible for sample summary activation via PubSub. */
@@ -72,11 +69,12 @@ public class SampleSummaryActivation {
                 "Something went wrong while processing message received from PubSub "
                     + "for sample unit notification",
                 e);
-            // Only nack if we can't deserialize it
+            // Only nack on this specific if we can't deserialize it
             consumer.nack();
-          } catch (final Exception e) {
-            // TODO - do a specific type of exception (SampleSummaryActivationException?)
-            LOG.error("Something went wrong, investigate");
+          } catch (final SampleSummaryActivationException e) {
+            LOG.error("Something went wrong during the sample summary activation", e);
+            // Intentionally not nacking as we've already told collection exercise of the
+            // failure.
           }
         };
     Subscriber subscriber = getSampleSummaryActivationSubscriber(receiver);
@@ -96,12 +94,14 @@ public class SampleSummaryActivation {
    *
    * @param sampleSummaryActivation an object containing all the details required for activation
    */
-  private void activateSampleSummaryFromPubsub(SampleSummaryActivationDTO sampleSummaryActivation) {
+  private void activateSampleSummaryFromPubsub(SampleSummaryActivationDTO sampleSummaryActivation)
+      throws SampleSummaryActivationException {
     LOG.info(
         "Beginning sample summary activation",
         kv("sampleSummaryActivation", sampleSummaryActivation));
     validateAndEnrich(sampleSummaryActivation);
     sendEnrichStatusToCollectionExercise(sampleSummaryActivation.getCollectionExerciseId(), true);
+
     distribute(sampleSummaryActivation);
     sendDistributeStatusToCollectionExercise(
         sampleSummaryActivation.getCollectionExerciseId(), true);
@@ -136,7 +136,8 @@ public class SampleSummaryActivation {
    *
    * @param sampleSummaryActivation an object containing all the details required for activation
    */
-  private void validateAndEnrich(SampleSummaryActivationDTO sampleSummaryActivation) {
+  private void validateAndEnrich(SampleSummaryActivationDTO sampleSummaryActivation)
+      throws SampleSummaryActivationException {
     UUID sampleSummaryId = sampleSummaryActivation.getSampleSummaryId();
     UUID surveyId = sampleSummaryActivation.getSurveyId();
     UUID collectionExerciseId = sampleSummaryActivation.getCollectionExerciseId();
@@ -159,16 +160,20 @@ public class SampleSummaryActivation {
       if (validated) {
         LOG.info("Sample summary successfully enriched", kv("sampleSummaryId", sampleSummaryId));
       } else {
-        LOG.error("TODO - do something when something goes wrong with validation and enrichment");
-        sendEnrichStatusToCollectionExercise(collectionExerciseId, false);
-        // TODO - do a specific type of exception (SampleSummaryActivationException?)
-        throw new RuntimeException();
+        LOG.error("Validation and enrichment failed", kv("sampleSummaryId", sampleSummaryId));
+        throw new SampleSummaryActivationException();
       }
     } catch (UnknownSampleSummaryException e) {
       LOG.error("unknown sample summary id", kv("sampleSummaryId", sampleSummaryId), e);
       sendEnrichStatusToCollectionExercise(collectionExerciseId, false);
-      // TODO - do a specific type of exception (SampleSummaryActivationException?)
-      throw new RuntimeException();
+      throw new SampleSummaryActivationException();
+    } catch (SampleSummaryActivationException e) {
+      LOG.error(
+          "Something went wrong activating sample summary",
+          kv("sampleSummaryId", sampleSummaryId),
+          e);
+      sendEnrichStatusToCollectionExercise(collectionExerciseId, false);
+      throw new SampleSummaryActivationException();
     }
   }
 
@@ -179,13 +184,17 @@ public class SampleSummaryActivation {
    *
    * @param sampleSummaryActivation an object containing all the details required for activation
    */
-  private void distribute(SampleSummaryActivationDTO sampleSummaryActivation) {
+  private void distribute(SampleSummaryActivationDTO sampleSummaryActivation)
+      throws SampleSummaryActivationException {
     try {
       sampleSummaryDistributionService.distribute(sampleSummaryActivation.getSampleSummaryId());
     } catch (NoSampleUnitsInSampleSummaryException | UnknownSampleSummaryException e) {
-      LOG.error("TODO - something went wrong");
+      LOG.error(
+          "something went wrong during distribution sample units",
+          kv("sampleSummaryActivation", sampleSummaryActivation));
       sendDistributeStatusToCollectionExercise(
           sampleSummaryActivation.getCollectionExerciseId(), false);
+      throw new SampleSummaryActivationException();
     }
   }
 
