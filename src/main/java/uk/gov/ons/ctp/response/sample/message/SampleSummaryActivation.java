@@ -81,9 +81,11 @@ public class SampleSummaryActivation {
 
   private void activateSampleSummaryFromPubsub(SampleSummaryActivationDTO sampleSummaryActivation) {
     validateAndEnrich(sampleSummaryActivation);
-    sendSuccessfulEnrichStatusToCollectionExercise(sampleSummaryActivation);
+    sendSuccessfulEnrichStatusToCollectionExercise(
+        sampleSummaryActivation.getCollectionExerciseId());
     distribute(sampleSummaryActivation);
-    sendSuccessfulDistributeStatusToCollectionExercise(sampleSummaryActivation);
+    sendSuccessfulDistributeStatusToCollectionExercise(
+        sampleSummaryActivation.getCollectionExerciseId());
   }
 
   private void sendSuccessfulEnrichStatusToCollectionExercise(UUID collectionExerciseId) {
