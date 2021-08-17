@@ -34,7 +34,7 @@ public class SampleSummaryActivation {
   private static final Logger LOG = LoggerFactory.getLogger(SampleSummaryActivation.class);
   @Autowired private ObjectMapper objectMapper;
   @Autowired AppConfig appConfig;
-  @Autowired CollectionExercisePublisher collectionExercisePublisher;
+  @Autowired SampleSummaryActivationStatusPublisher sampleSummaryActivationStatusPublisher;
   @Autowired SampleSummaryEnrichmentService sampleSummaryEnrichmentService;
   @Autowired SampleSummaryDistributionService sampleSummaryDistributionService;
 
@@ -58,10 +58,11 @@ public class SampleSummaryActivation {
                 objectMapper.readValue(
                     message.getData().toStringUtf8(), SampleSummaryActivationDTO.class);
 
-            // Figure out when it should ack/nack at the end, once we know of all the places
-            // it can go wrong.
-            activateSampleSummaryFromPubsub(sampleSummaryActivation);
+            // We ack here now that the message has be deserialized correctly.  If something goes
+            // wrong then
+            // we'll inform collection exercise via a separate pubsub message.
             consumer.ack();
+            activateSampleSummaryFromPubsub(sampleSummaryActivation);
 
           } catch (final IOException e) {
             LOG.error(
@@ -79,47 +80,55 @@ public class SampleSummaryActivation {
         kv("subscriptionId", subscriber.getSubscriptionNameString()));
   }
 
+  /**
+   * Sorts out all the sample units for a given sample summary. It does this by first validating and
+   * enriching the data, followed by distributing all the sample units to case.
+   *
+   * <p>During each successful step of the process, a message will be sent to collection exercise so
+   * it can know how the sample summary activation is going.
+   *
+   * @param sampleSummaryActivation an object containing all the details required for activation
+   */
   private void activateSampleSummaryFromPubsub(SampleSummaryActivationDTO sampleSummaryActivation) {
+    LOG.info(
+        "Beginning sample summary activation",
+        kv("sampleSummaryActivation", sampleSummaryActivation));
     validateAndEnrich(sampleSummaryActivation);
-    sendSuccessfulEnrichStatusToCollectionExercise(
-        sampleSummaryActivation.getCollectionExerciseId());
+    sendEnrichStatusToCollectionExercise(sampleSummaryActivation.getCollectionExerciseId(), true);
     distribute(sampleSummaryActivation);
-    sendSuccessfulDistributeStatusToCollectionExercise(
-        sampleSummaryActivation.getCollectionExerciseId());
+    sendDistributeStatusToCollectionExercise(
+        sampleSummaryActivation.getCollectionExerciseId(), true);
+    LOG.info(
+        "Completed sample summary activation",
+        kv("sampleSummaryActivation", sampleSummaryActivation));
   }
 
-  private void sendSuccessfulEnrichStatusToCollectionExercise(UUID collectionExerciseId) {
+  private void sendEnrichStatusToCollectionExercise(UUID collectionExerciseId, boolean successful) {
     SampleSummaryStatusDTO collectionExerciseStatus = new SampleSummaryStatusDTO();
     collectionExerciseStatus.setCollectionExerciseId(collectionExerciseId);
-    collectionExerciseStatus.setSuccessful(true);
+    collectionExerciseStatus.setSuccessful(successful);
     collectionExerciseStatus.setEvent(SampleSummaryStatusDTO.Event.ENRICHED);
-    collectionExercisePublisher.updateSampleSummaryStatus(collectionExerciseStatus);
+    sampleSummaryActivationStatusPublisher.updateSampleSummaryActivationStatus(
+        collectionExerciseStatus);
   }
 
-  private void sendFailedEnrichStatusToCollectionExercise(UUID collectionExerciseId) {
+  private void sendDistributeStatusToCollectionExercise(
+      UUID collectionExerciseId, boolean successful) {
     SampleSummaryStatusDTO collectionExerciseStatus = new SampleSummaryStatusDTO();
     collectionExerciseStatus.setCollectionExerciseId(collectionExerciseId);
-    collectionExerciseStatus.setSuccessful(false);
-    collectionExerciseStatus.setEvent(SampleSummaryStatusDTO.Event.ENRICHED);
-    collectionExercisePublisher.updateSampleSummaryStatus(collectionExerciseStatus);
-  }
-
-  private void sendSuccessfulDistributeStatusToCollectionExercise(UUID collectionExerciseId) {
-    SampleSummaryStatusDTO collectionExerciseStatus = new SampleSummaryStatusDTO();
-    collectionExerciseStatus.setCollectionExerciseId(collectionExerciseId);
-    collectionExerciseStatus.setSuccessful(true);
+    collectionExerciseStatus.setSuccessful(successful);
     collectionExerciseStatus.setEvent(SampleSummaryStatusDTO.Event.DISTRIBUTED);
-    collectionExercisePublisher.updateSampleSummaryStatus(collectionExerciseStatus);
+    sampleSummaryActivationStatusPublisher.updateSampleSummaryActivationStatus(
+        collectionExerciseStatus);
   }
 
-  private void sendFailedDistributeStatusToCollectionExercise(UUID collectionExerciseId) {
-    SampleSummaryStatusDTO collectionExerciseStatus = new SampleSummaryStatusDTO();
-    collectionExerciseStatus.setCollectionExerciseId(collectionExerciseId);
-    collectionExerciseStatus.setSuccessful(false);
-    collectionExerciseStatus.setEvent(SampleSummaryStatusDTO.Event.DISTRIBUTED);
-    collectionExercisePublisher.updateSampleSummaryStatus(collectionExerciseStatus);
-  }
-
+  /**
+   * Executes the first step of the activation process. This will validate all the sample unit data
+   * and enrich the sample unit by gathering any extra data required for the second step of the
+   * activation process.
+   *
+   * @param sampleSummaryActivation an object containing all the details required for activation
+   */
   private void validateAndEnrich(SampleSummaryActivationDTO sampleSummaryActivation) {
     UUID sampleSummaryId = sampleSummaryActivation.getSampleSummaryId();
     UUID surveyId = sampleSummaryActivation.getSurveyId();
@@ -141,24 +150,32 @@ public class SampleSummaryActivation {
           kv("collectionExerciseId", collectionExerciseId),
           kv("validated", validated));
       if (validated) {
-        LOG.info("Success!");
+        LOG.info("Sample summary successfully enriched", kv("sampleSummaryId", sampleSummaryId));
       } else {
         LOG.error("TODO - do something when something goes wrong with validation and enrichment");
-        sendFailedEnrichStatusToCollectionExercise(collectionExerciseId);
+        sendEnrichStatusToCollectionExercise(collectionExerciseId, false);
+        throw new RuntimeException();
       }
     } catch (UnknownSampleSummaryException e) {
       LOG.error("unknown sample summary id", kv("sampleSummaryId", sampleSummaryId), e);
-      sendFailedEnrichStatusToCollectionExercise(collectionExerciseId);
+      sendEnrichStatusToCollectionExercise(collectionExerciseId, false);
     }
   }
 
+  /**
+   * Executes the second step of the activation process. This will send each sample unit in a sample
+   * summary to the case service to create cases for each one (which are used to track the progress
+   * of the survey submission).
+   *
+   * @param sampleSummaryActivation an object containing all the details required for activation
+   */
   private void distribute(SampleSummaryActivationDTO sampleSummaryActivation) {
     try {
       sampleSummaryDistributionService.distribute(sampleSummaryActivation.getSampleSummaryId());
     } catch (NoSampleUnitsInSampleSummaryException | UnknownSampleSummaryException e) {
       LOG.error("TODO - something went wrong");
-      sendFailedDistributeStatusToCollectionExercise(
-          sampleSummaryActivation.getCollectionExerciseId());
+      sendDistributeStatusToCollectionExercise(
+          sampleSummaryActivation.getCollectionExerciseId(), false);
     }
   }
 

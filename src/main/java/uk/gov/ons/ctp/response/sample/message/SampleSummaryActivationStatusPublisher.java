@@ -21,8 +21,9 @@ import uk.gov.ons.ctp.response.sample.representation.SampleSummaryStatusDTO;
 
 /** SampleUnitPublisher publishes message to PubSub */
 @Service
-public class CollectionExercisePublisher {
-  private static final Logger log = LoggerFactory.getLogger(CollectionExercisePublisher.class);
+public class SampleSummaryActivationStatusPublisher {
+  private static final Logger log =
+      LoggerFactory.getLogger(SampleSummaryActivationStatusPublisher.class);
 
   @Autowired private PubSub pubSub;
 
@@ -33,7 +34,7 @@ public class CollectionExercisePublisher {
    *
    * @param sampleSummaryStatus to be sent
    */
-  public void updateSampleSummaryStatus(SampleSummaryStatusDTO sampleSummaryStatus) {
+  public void updateSampleSummaryActivationStatus(SampleSummaryStatusDTO sampleSummaryStatus) {
     log.debug(
         "Informing collection exercise about status of sample summary activation",
         kv("sampleSummaryStatus", sampleSummaryStatus));
