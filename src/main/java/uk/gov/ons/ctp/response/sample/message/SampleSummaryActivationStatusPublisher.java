@@ -42,7 +42,7 @@ public class SampleSummaryActivationStatusPublisher {
       String message = objectMapper.writeValueAsString(sampleSummaryStatus);
       ByteString data = ByteString.copyFromUtf8(message);
       PubsubMessage pubsubMessage = PubsubMessage.newBuilder().setData(data).build();
-      Publisher publisher = pubSub.sampleSummaryStatusPublisher();
+      Publisher publisher = pubSub.sampleSummaryActivationStatusPublisher();
       try {
         log.info("Publishing message to PubSub", kv("publisher", publisher));
         ApiFuture<String> messageIdFuture = publisher.publish(pubsubMessage);

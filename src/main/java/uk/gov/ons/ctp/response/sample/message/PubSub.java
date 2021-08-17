@@ -32,9 +32,10 @@ public class PubSub {
     }
   }
 
-  public Publisher sampleSummaryStatusPublisher() throws IOException {
+  public Publisher sampleSummaryActivationStatusPublisher() throws IOException {
     return publisherSupplier(
-        appConfig.getGcp().getProject(), appConfig.getGcp().getSampleSummaryStatusTopic());
+        appConfig.getGcp().getProject(),
+        appConfig.getGcp().getSampleSummaryActivationStatusTopic());
   }
 
   public Publisher sampleUnitPublisher() throws IOException {

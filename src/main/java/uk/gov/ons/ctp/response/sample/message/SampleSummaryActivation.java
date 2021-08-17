@@ -72,7 +72,11 @@ public class SampleSummaryActivation {
                 "Something went wrong while processing message received from PubSub "
                     + "for sample unit notification",
                 e);
+            // Only nack if we can't deserialize it
             consumer.nack();
+          } catch (final Exception e) {
+            // TODO - do a specific type of exception (SampleSummaryActivationException?)
+            LOG.error("Something went wrong, investigate");
           }
         };
     Subscriber subscriber = getSampleSummaryActivationSubscriber(receiver);
@@ -157,11 +161,14 @@ public class SampleSummaryActivation {
       } else {
         LOG.error("TODO - do something when something goes wrong with validation and enrichment");
         sendEnrichStatusToCollectionExercise(collectionExerciseId, false);
+        // TODO - do a specific type of exception (SampleSummaryActivationException?)
         throw new RuntimeException();
       }
     } catch (UnknownSampleSummaryException e) {
       LOG.error("unknown sample summary id", kv("sampleSummaryId", sampleSummaryId), e);
       sendEnrichStatusToCollectionExercise(collectionExerciseId, false);
+      // TODO - do a specific type of exception (SampleSummaryActivationException?)
+      throw new RuntimeException();
     }
   }
 

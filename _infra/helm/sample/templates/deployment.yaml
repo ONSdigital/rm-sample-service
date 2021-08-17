@@ -239,8 +239,8 @@ spec:
             value: "{{ .Values.gcp.project }}"
           - name: GCP_SAMPLESUMMARYACTIVATIONSUBSCRIPTION
             value: "{{ .Values.gcp.sampleSummaryActivationSubscription }}"
-          - name: GCP_SAMPLESUMMARYSTATUSTOPIC
-            value: "{{ .Values.gcp.sampleSummaryStatusTopic }}"
+          - name: GCP_SAMPLESUMMARYACTIVATIONSTATUSTOPIC
+            value: "{{ .Values.gcp.sampleSummaryActivationStatusTopic }}"
           - name: GCP_SAMPLEUNITPUBLISHERTOPIC
             value: "{{ .Values.gcp.sampleUnitPublisherTopic }}"
           - name: GCP_CASENOTIFICATIONTOPIC
