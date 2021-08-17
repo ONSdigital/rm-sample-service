@@ -20,8 +20,8 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
-import uk.gov.ons.ctp.response.sample.representation.SampleSummaryStatusDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryActivationDTO;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryStatusDTO;
 import uk.gov.ons.ctp.response.sample.service.NoSampleUnitsInSampleSummaryException;
 import uk.gov.ons.ctp.response.sample.service.SampleSummaryDistributionService;
 import uk.gov.ons.ctp.response.sample.service.SampleSummaryEnrichmentService;
@@ -34,6 +34,7 @@ public class SampleSummaryActivation {
   private static final Logger LOG = LoggerFactory.getLogger(SampleSummaryActivation.class);
   @Autowired private ObjectMapper objectMapper;
   @Autowired AppConfig appConfig;
+  @Autowired CollectionExercisePublisher collectionExercisePublisher;
   @Autowired SampleSummaryEnrichmentService sampleSummaryEnrichmentService;
   @Autowired SampleSummaryDistributionService sampleSummaryDistributionService;
 
@@ -80,14 +81,41 @@ public class SampleSummaryActivation {
 
   private void activateSampleSummaryFromPubsub(SampleSummaryActivationDTO sampleSummaryActivation) {
     validateAndEnrich(sampleSummaryActivation);
-    SampleSummaryStatusDTO collectionExerciseStatus = new SampleSummaryStatusDTO();
-    collectionExerciseStatus.setCollectionExerciseId(
-        sampleSummaryActivation.getCollectionExerciseId());
-    // sendMessageToCollectionExercise(collectionExerciseStatus)
-    // Send message about 'enrichment complete' to collection exercise
+    sendSuccessfulEnrichStatusToCollectionExercise(sampleSummaryActivation);
     distribute(sampleSummaryActivation);
-    // Send message about 'distribution complete' to collection exercise
+    sendSuccessfulDistributeStatusToCollectionExercise(sampleSummaryActivation);
+  }
 
+  private void sendSuccessfulEnrichStatusToCollectionExercise(UUID collectionExerciseId) {
+    SampleSummaryStatusDTO collectionExerciseStatus = new SampleSummaryStatusDTO();
+    collectionExerciseStatus.setCollectionExerciseId(collectionExerciseId);
+    collectionExerciseStatus.setSuccessful(true);
+    collectionExerciseStatus.setEvent(SampleSummaryStatusDTO.Event.ENRICHED);
+    collectionExercisePublisher.updateSampleSummaryStatus(collectionExerciseStatus);
+  }
+
+  private void sendFailedEnrichStatusToCollectionExercise(UUID collectionExerciseId) {
+    SampleSummaryStatusDTO collectionExerciseStatus = new SampleSummaryStatusDTO();
+    collectionExerciseStatus.setCollectionExerciseId(collectionExerciseId);
+    collectionExerciseStatus.setSuccessful(false);
+    collectionExerciseStatus.setEvent(SampleSummaryStatusDTO.Event.ENRICHED);
+    collectionExercisePublisher.updateSampleSummaryStatus(collectionExerciseStatus);
+  }
+
+  private void sendSuccessfulDistributeStatusToCollectionExercise(UUID collectionExerciseId) {
+    SampleSummaryStatusDTO collectionExerciseStatus = new SampleSummaryStatusDTO();
+    collectionExerciseStatus.setCollectionExerciseId(collectionExerciseId);
+    collectionExerciseStatus.setSuccessful(true);
+    collectionExerciseStatus.setEvent(SampleSummaryStatusDTO.Event.DISTRIBUTED);
+    collectionExercisePublisher.updateSampleSummaryStatus(collectionExerciseStatus);
+  }
+
+  private void sendFailedDistributeStatusToCollectionExercise(UUID collectionExerciseId) {
+    SampleSummaryStatusDTO collectionExerciseStatus = new SampleSummaryStatusDTO();
+    collectionExerciseStatus.setCollectionExerciseId(collectionExerciseId);
+    collectionExerciseStatus.setSuccessful(false);
+    collectionExerciseStatus.setEvent(SampleSummaryStatusDTO.Event.DISTRIBUTED);
+    collectionExercisePublisher.updateSampleSummaryStatus(collectionExerciseStatus);
   }
 
   private void validateAndEnrich(SampleSummaryActivationDTO sampleSummaryActivation) {
@@ -114,11 +142,11 @@ public class SampleSummaryActivation {
         LOG.info("Success!");
       } else {
         LOG.error("TODO - do something when something goes wrong with validation and enrichment");
-        // TODO do something useful on failure
+        sendFailedEnrichStatusToCollectionExercise(collectionExerciseId);
       }
     } catch (UnknownSampleSummaryException e) {
       LOG.error("unknown sample summary id", kv("sampleSummaryId", sampleSummaryId), e);
-      // TODO do something useful on failure
+      sendFailedEnrichStatusToCollectionExercise(collectionExerciseId);
     }
   }
 
@@ -127,7 +155,8 @@ public class SampleSummaryActivation {
       sampleSummaryDistributionService.distribute(sampleSummaryActivation.getSampleSummaryId());
     } catch (NoSampleUnitsInSampleSummaryException | UnknownSampleSummaryException e) {
       LOG.error("TODO - something went wrong");
-      // TODO - do something useful when it goes wrong
+      sendFailedDistributeStatusToCollectionExercise(
+          sampleSummaryActivation.getCollectionExerciseId());
     }
   }
 

@@ -19,5 +19,6 @@ public class SampleSummaryStatusDTO {
     DISTRIBUTED,
     ENRICHED
   }
+
   private Event event;
 }

@@ -237,6 +237,8 @@ spec:
             value: "$(DB_PASSWORD)"
           - name: GCP_PROJECT
             value: "{{ .Values.gcp.project }}"
+          - name: GCP_SAMPLESUMMARYSTATUSTOPIC
+            value: "{{ .Values.gcp.sampleSummaryStatusTopic }}"
           - name: GCP_SAMPLEUNITPUBLISHERTOPIC
             value: "{{ .Values.gcp.sampleUnitPublisherTopic }}"
           - name: GCP_CASENOTIFICATIONTOPIC
