@@ -28,25 +28,28 @@ import uk.gov.ons.ctp.response.sample.service.SampleSummaryEnrichmentService;
 import uk.gov.ons.ctp.response.sample.service.UnknownSampleSummaryException;
 import uk.gov.ons.ctp.response.sample.utility.PubSubEmulator;
 
-/** PubSub subscription responsible for receipt of sample units via PubSub. */
+/** PubSub subscription responsible for sample summary activation via PubSub. */
 @Component
 public class SampleSummaryActivation {
   private static final Logger LOG = LoggerFactory.getLogger(SampleSummaryActivation.class);
   @Autowired private ObjectMapper objectMapper;
+
   @Autowired AppConfig appConfig;
+
   @Autowired SampleSummaryActivationStatusPublisher sampleSummaryActivationStatusPublisher;
+
   @Autowired SampleSummaryEnrichmentService sampleSummaryEnrichmentService;
+
   @Autowired SampleSummaryDistributionService sampleSummaryDistributionService;
 
   /**
-   * To process SampleUnit from PubSub This creates application ready event listener to provide an
-   * active subscription for the new sample unit when published.
+   * To process Sample summary activation from PubSub.
    *
    * @throws IOException
    */
   @EventListener(ApplicationReadyEvent.class)
   public void activateSampleSummary() throws IOException {
-    LOG.debug("received SampleSummaryActivation message from PubSub");
+    LOG.debug("Creating SampleSummaryActivation subscription from application ready event");
     // Instantiate an asynchronous message receiver.
     MessageReceiver receiver =
         (PubsubMessage message, AckReplyConsumer consumer) -> {
@@ -196,7 +199,7 @@ public class SampleSummaryActivation {
       // subscriber to process messages. Here, the subscriber is configured to open 2 streams for
       // receiving messages, each stream creates a new executor with 4 threads to help process the
       // message callbacks. In total 2x4=8 threads are used for message processing.
-      return Subscriber.newBuilder(getSampleUnitSubscriptionName(), receiver)
+      return Subscriber.newBuilder(getSampleSummaryActivationSubscriptionName(), receiver)
           .setParallelPullCount(2)
           .setExecutorProvider(executorProvider)
           .build();
@@ -211,11 +214,11 @@ public class SampleSummaryActivation {
    *
    * @return com.google.pubsub.v1.ProjectSubscriptionName
    */
-  private ProjectSubscriptionName getSampleUnitSubscriptionName() {
+  private ProjectSubscriptionName getSampleSummaryActivationSubscriptionName() {
     String project = appConfig.getGcp().getProject();
     String subscriptionId = appConfig.getGcp().getSampleSummaryActivationSubscription();
     LOG.info(
-        "creating pubsub subscription name for sample unit notifications",
+        "creating pubsub subscription name for sample summary activation",
         kv("Subscription id", subscriptionId),
         kv("project", project));
     return ProjectSubscriptionName.of(project, subscriptionId);
