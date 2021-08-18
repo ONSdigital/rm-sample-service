@@ -235,6 +235,8 @@ spec:
             value: "$(DB_USERNAME)"
           - name: SPRING_DATASOURCE_PASSWORD
             value: "$(DB_PASSWORD)"
+          - name: SPRING_CLOUD_GCP_PROJECT-ID
+            value: "{{ .Values.gcp.project }}"
           - name: GCP_PROJECT
             value: "{{ .Values.gcp.project }}"
           - name: GCP_SAMPLESUMMARYACTIVATIONSUBSCRIPTION
