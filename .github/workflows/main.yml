@@ -6,7 +6,7 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main, sample-v2 ]
+    branches: [ main ]
 env:
   IMAGE: sample
   REGISTRY_HOSTNAME: eu.gcr.io
