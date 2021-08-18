@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class SampleSummaryStatusDTO {
   private UUID collectionExerciseId;
 
-  private Boolean successful;
+  private boolean successful;
 
   public enum Event {
     DISTRIBUTED,
