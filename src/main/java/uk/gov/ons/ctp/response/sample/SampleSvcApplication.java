@@ -8,6 +8,7 @@ import libs.common.jackson.CustomObjectMapper;
 import libs.common.rest.RestUtility;
 import libs.common.state.StateTransitionManager;
 import libs.common.state.StateTransitionManagerFactory;
+import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.cobertura.CoverageIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,11 +16,16 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cloud.gcp.pubsub.core.PubSubTemplate;
+import org.springframework.cloud.gcp.pubsub.integration.outbound.PubSubMessageHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.integration.annotation.IntegrationComponentScan;
+import org.springframework.integration.annotation.MessagingGateway;
+import org.springframework.integration.annotation.ServiceActivator;
+import org.springframework.messaging.MessageHandler;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
@@ -40,6 +46,7 @@ import uk.gov.ons.ctp.response.sample.service.state.SampleSvcStateTransitionMana
 @EnableJpaRepositories(basePackages = {"uk.gov.ons.ctp.response"})
 @EntityScan("uk.gov.ons.ctp.response")
 @EnableAsync
+@Slf4j
 public class SampleSvcApplication {
 
   @Autowired private StateTransitionManagerFactory stateTransitionManager;
@@ -148,5 +155,19 @@ public class SampleSvcApplication {
   public Validator csvIngestValidator() {
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     return factory.getValidator();
+  }
+
+  @Bean
+  @ServiceActivator(inputChannel = "sampleUnitChannel")
+  public MessageHandler sampleUnitMessageSender(PubSubTemplate pubsubTemplate) {
+    String topicId = appConfig.getGcp().getCaseNotificationTopic();
+    log.info(
+        "Application started with publisher for sample unit to collex with topic Id {}", topicId);
+    return new PubSubMessageHandler(pubsubTemplate, topicId);
+  }
+
+  @MessagingGateway(defaultRequestChannel = "sampleUnitChannel")
+  public interface PubSubOutboundSampleUnitGateway {
+    void sendToPubSub(String text);
   }
 }
