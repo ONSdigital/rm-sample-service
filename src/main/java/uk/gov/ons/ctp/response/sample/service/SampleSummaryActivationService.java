@@ -47,7 +47,7 @@ public class SampleSummaryActivationService {
         kv("sampleSummaryActivation", sampleSummaryActivation));
   }
 
-  private void sendEnrichStatusToCollectionExercise(UUID collectionExerciseId, boolean successful) {
+  public void sendEnrichStatusToCollectionExercise(UUID collectionExerciseId, boolean successful) {
     SampleSummaryStatusDTO collectionExerciseStatus = new SampleSummaryStatusDTO();
     collectionExerciseStatus.setCollectionExerciseId(collectionExerciseId);
     collectionExerciseStatus.setSuccessful(successful);
@@ -55,7 +55,7 @@ public class SampleSummaryActivationService {
     sampleSummaryActivationStatusPublisher.sendSampleSummaryActivation(collectionExerciseStatus);
   }
 
-  private void sendDistributeStatusToCollectionExercise(
+  public void sendDistributeStatusToCollectionExercise(
       UUID collectionExerciseId, boolean successful) {
     SampleSummaryStatusDTO collectionExerciseStatus = new SampleSummaryStatusDTO();
     collectionExerciseStatus.setCollectionExerciseId(collectionExerciseId);
