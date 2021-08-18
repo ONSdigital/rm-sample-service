@@ -52,8 +52,7 @@ public class SampleSummaryActivationService {
     collectionExerciseStatus.setCollectionExerciseId(collectionExerciseId);
     collectionExerciseStatus.setSuccessful(successful);
     collectionExerciseStatus.setEvent(SampleSummaryStatusDTO.Event.ENRICHED);
-    sampleSummaryActivationStatusPublisher.updateSampleSummaryActivationStatus(
-        collectionExerciseStatus);
+    sampleSummaryActivationStatusPublisher.sendSampleSummaryActivation(collectionExerciseStatus);
   }
 
   private void sendDistributeStatusToCollectionExercise(
@@ -62,8 +61,7 @@ public class SampleSummaryActivationService {
     collectionExerciseStatus.setCollectionExerciseId(collectionExerciseId);
     collectionExerciseStatus.setSuccessful(successful);
     collectionExerciseStatus.setEvent(SampleSummaryStatusDTO.Event.DISTRIBUTED);
-    sampleSummaryActivationStatusPublisher.updateSampleSummaryActivationStatus(
-        collectionExerciseStatus);
+    sampleSummaryActivationStatusPublisher.sendSampleSummaryActivation(collectionExerciseStatus);
   }
 
   /**

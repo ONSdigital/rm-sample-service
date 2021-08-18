@@ -15,11 +15,20 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cloud.gcp.pubsub.core.PubSubTemplate;
+import org.springframework.cloud.gcp.pubsub.integration.AckMode;
+import org.springframework.cloud.gcp.pubsub.integration.inbound.PubSubInboundChannelAdapter;
+import org.springframework.cloud.gcp.pubsub.integration.outbound.PubSubMessageHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.integration.annotation.IntegrationComponentScan;
+import org.springframework.integration.annotation.MessagingGateway;
+import org.springframework.integration.annotation.ServiceActivator;
+import org.springframework.integration.channel.PublishSubscribeChannel;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.MessageHandler;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
@@ -150,5 +159,36 @@ public class SampleSvcApplication {
   public Validator csvIngestValidator() {
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     return factory.getValidator();
+  }
+
+  /* PubSub / Spring integration configuration */
+
+  @Bean(name = "sampleSummaryActivationChannel")
+  public MessageChannel inputMessageChannel() {
+    return new PublishSubscribeChannel();
+  }
+
+  @Bean
+  public PubSubInboundChannelAdapter inboundChannelAdapter(
+      @Qualifier("sampleSummaryActivationChannel") MessageChannel messageChannel,
+      PubSubTemplate pubSubTemplate) {
+    PubSubInboundChannelAdapter adapter =
+        new PubSubInboundChannelAdapter(
+            pubSubTemplate, appConfig.getGcp().getSampleSummaryActivationSubscription());
+    adapter.setOutputChannel(messageChannel);
+    adapter.setAckMode(AckMode.MANUAL);
+    return adapter;
+  }
+
+  @Bean
+  @ServiceActivator(inputChannel = "sampleSummaryActivationStatusChannel")
+  public MessageHandler messageSender(PubSubTemplate pubsubTemplate) {
+    return new PubSubMessageHandler(
+        pubsubTemplate, appConfig.getGcp().getSampleSummaryActivationStatusTopic());
+  }
+
+  @MessagingGateway(defaultRequestChannel = "sampleSummaryActivationStatusChannel")
+  public interface PubsubOutboundGateway {
+    void sendToPubsub(String text);
   }
 }
