@@ -154,7 +154,7 @@ retries:
 
 gcp:
   project: ras-rm-sandbox
-  sampleSummaryActivationSubscription: "test_subscription"
-  sampleSummaryActivationStatusTopic: "test_topic"
+  sampleSummaryActivationSubscription: "test_activation_subscription"
+  sampleSummaryActivationStatusTopic: "test_activation_topic"
   sampleUnitPublisherTopic: "test_topic"
   caseNotificationTopic: "test_topic"
