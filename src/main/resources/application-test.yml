@@ -5,6 +5,12 @@ spring:
     url: jdbc:postgresql://localhost:36432/postgres
     default-schema: sample
 
+  cloud:
+    gcp:
+      project-id: test
+      pubsub:
+        emulator-host: localhost:18681
+
 sample-unit-distribution:
   delay-milli-seconds: 1000
 
