@@ -58,7 +58,7 @@ public class SampleSummaryDistributionService {
           } catch (RuntimeException ex) {
             LOG.error(
                 "Failed to distribute sample unit", kv("SampleSummaryId", sampleSummaryId), ex);
-            throw new RuntimeException();
+            throw ex;
           }
         });
 

@@ -44,7 +44,9 @@ public class SampleSummaryActivationService {
         sampleSummaryActivation.getCollectionExerciseId(), true);
     LOG.info(
         "Completed sample summary activation",
-        kv("sampleSummaryActivation", sampleSummaryActivation));
+        kv("sampleSummaryId", sampleSummaryActivation.getSampleSummaryId()),
+        kv("surveyId", sampleSummaryActivation.getSurveyId()),
+        kv("collectionExerciseId", sampleSummaryActivation.getCollectionExerciseId()));
   }
 
   public void sendEnrichStatusToCollectionExercise(UUID collectionExerciseId, boolean successful) {
@@ -108,7 +110,7 @@ public class SampleSummaryActivationService {
           kv("sampleSummaryId", sampleSummaryId),
           e);
       sendEnrichStatusToCollectionExercise(collectionExerciseId, false);
-      throw new SampleSummaryActivationException();
+      throw e;
     }
   }
 
@@ -126,7 +128,9 @@ public class SampleSummaryActivationService {
     } catch (NoSampleUnitsInSampleSummaryException | UnknownSampleSummaryException e) {
       LOG.error(
           "something went wrong during distribution sample units",
-          kv("sampleSummaryActivation", sampleSummaryActivation));
+          kv("sampleSummaryId", sampleSummaryActivation.getSampleSummaryId()),
+          kv("surveyId", sampleSummaryActivation.getSurveyId()),
+          kv("collectionExerciseId", sampleSummaryActivation.getCollectionExerciseId()));
       sendDistributeStatusToCollectionExercise(
           sampleSummaryActivation.getCollectionExerciseId(), false);
       throw new SampleSummaryActivationException();
