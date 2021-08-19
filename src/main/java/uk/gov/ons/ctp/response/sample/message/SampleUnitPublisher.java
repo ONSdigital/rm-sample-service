@@ -41,9 +41,11 @@ public class SampleUnitPublisher {
     log.debug("send to queue sampleDelivery", kv("sample_unit", sampleUnit));
     try {
       String message = objectMapper.writeValueAsString(sampleUnit);
-      log.info("Publishing message to PubSub");
+      log.info("Publishing message to PubSub", kv("sample_unit", sampleUnit.getSampleUnitRef()));
       samplePublisher.sendToPubSub(message);
-      log.info("Sample Unit published to PubSub successfully");
+      log.info(
+          "Sample Unit published to PubSub successfully",
+          kv("sample_unit", sampleUnit.getSampleUnitRef()));
     } catch (JsonProcessingException e) {
       log.error("Error while sample unit can not be parsed.", kv("sampleUnit", sampleUnit));
       throw new RuntimeException(e);

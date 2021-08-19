@@ -160,7 +160,7 @@ public class SampleSvcApplication {
   @Bean
   @ServiceActivator(inputChannel = "sampleUnitChannel")
   public MessageHandler sampleUnitMessageSender(PubSubTemplate pubsubTemplate) {
-    String topicId = appConfig.getGcp().getCaseNotificationTopic();
+    String topicId = appConfig.getGcp().getSampleUnitPublisherTopic();
     log.info(
         "Application started with publisher for sample unit to collex with topic Id {}", topicId);
     return new PubSubMessageHandler(pubsubTemplate, topicId);
