@@ -34,7 +34,6 @@ import org.springframework.validation.BindingResult;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.representation.BusinessSampleUnitDTO;
-import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import uk.gov.ons.ctp.response.sample.service.UnknownSampleSummaryException;

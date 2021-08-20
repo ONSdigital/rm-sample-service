@@ -11,7 +11,6 @@ import java.util.concurrent.Executors;
 import javax.validation.Valid;
 import libs.common.error.CTPException;
 import libs.common.error.InvalidRequestException;
-import libs.common.time.DateTimeUtil;
 import libs.sample.validation.BusinessSampleUnit;
 import ma.glasnost.orika.MapperFacade;
 import org.slf4j.Logger;
@@ -28,11 +27,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.representation.BusinessSampleUnitDTO;
-import uk.gov.ons.ctp.response.sample.representation.CollectionExerciseJobCreationRequestDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
@@ -56,55 +53,6 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   public SampleEndpoint(SampleService sampleService, MapperFacade mapperFacade) {
     this.sampleService = sampleService;
     this.mapperFacade = mapperFacade;
-  }
-
-  /**
-   * POST CollectionExerciseJob associated to SampleSummary surveyRef and exerciseDateTime
-   *
-   * @param collectionExerciseJobCreationRequestDTO CollectionExerciseJobCreationRequestDTO related
-   *     to SampleUnits
-   * @param bindingResult collects errors thrown
-   * @return Response Returns sampleUnitsTotal value
-   * @throws CTPException if update operation fails or CollectionExerciseJob already exists
-   * @throws InvalidRequestException if binding errors
-   */
-  @RequestMapping(
-      value = "/sampleunitrequests",
-      method = RequestMethod.POST,
-      consumes = "application/json")
-  public ResponseEntity<SampleUnitsRequestDTO> createSampleUnitRequest(
-      final @Valid @RequestBody CollectionExerciseJobCreationRequestDTO
-              collectionExerciseJobCreationRequestDTO,
-      BindingResult bindingResult)
-      throws CTPException, InvalidRequestException {
-    log.debug(
-        "Entering createCollectionExerciseJob ",
-        kv("collection_exercise_job_creation_request", collectionExerciseJobCreationRequestDTO));
-    if (bindingResult.hasErrors()) {
-      throw new InvalidRequestException("Binding errors for create action: ", bindingResult);
-    }
-    CollectionExerciseJob cej = new CollectionExerciseJob();
-    Integer sampleUnitsTotal = 0;
-    List<UUID> sampleSummaryIds =
-        collectionExerciseJobCreationRequestDTO.getSampleSummaryUUIDList();
-    for (UUID sampleSummaryID : sampleSummaryIds) {
-      cej = mapperFacade.map(collectionExerciseJobCreationRequestDTO, CollectionExerciseJob.class);
-      cej.setCreatedDateTime(DateTimeUtil.nowUTC());
-      cej.setSampleSummaryId(sampleSummaryID);
-      cej.setJobComplete(false);
-
-      sampleUnitsTotal += sampleService.initialiseCollectionExerciseJob(cej);
-    }
-    SampleUnitsRequestDTO sampleUnitsRequest = new SampleUnitsRequestDTO(sampleUnitsTotal);
-
-    String newResourceUrl =
-        ServletUriComponentsBuilder.fromCurrentRequest()
-            .path("/{id}")
-            .buildAndExpand(cej.getCollectionExerciseId())
-            .toUri()
-            .toString();
-
-    return ResponseEntity.created(URI.create(newResourceUrl)).body(sampleUnitsRequest);
   }
 
   /**

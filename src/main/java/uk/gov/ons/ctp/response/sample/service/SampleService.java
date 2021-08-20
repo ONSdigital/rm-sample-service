@@ -43,8 +43,6 @@ public class SampleService {
   private StateTransitionManager<SampleUnitState, SampleUnitEvent>
       sampleSvcUnitStateTransitionManager;
 
-  @Autowired private CollectionExerciseJobService collectionExerciseJobService;
-
   public List<SampleSummary> findAllSampleSummaries() {
     return sampleSummaryRepository.findAll();
   }
@@ -205,26 +203,6 @@ public class SampleService {
       log.error("unable to find sample summary", kv("sampleSummaryFK", sampleSummaryFK));
       throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND);
     }
-  }
-
-  /**
-   * Save CollectionExerciseJob to collectionExerciseJob table
-   *
-   * @param job CollectionExerciseJobCreationRequestDTO related to SampleUnits
-   * @return Integer Returns sampleUnitsTotal value
-   * @throws CTPException if update operation fails or CollectionExerciseJob already exists
-   */
-  public Integer initialiseCollectionExerciseJob(CollectionExerciseJob job) throws CTPException {
-    // Integer sampleUnitsTotal =
-    // initialiseSampleUnitsForCollectionExcerciseCollection(job.getSampleSummaryId());
-    Integer sampleUnitsTotal = 0;
-    SampleSummary sampleSummary =
-        sampleSummaryRepository.findById(job.getSampleSummaryId()).orElse(null);
-    if (sampleSummary != null && sampleSummary.getTotalSampleUnits() != 0) {
-      sampleUnitsTotal = sampleSummary.getTotalSampleUnits();
-      collectionExerciseJobService.storeCollectionExerciseJob(job);
-    }
-    return sampleUnitsTotal;
   }
 
   public int getSampleSummaryUnitCount(UUID sampleSummaryId) {
