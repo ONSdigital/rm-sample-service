@@ -153,6 +153,8 @@ retries:
   backoff: 5000
 
 gcp:
-  project: ras-rm-dev
+  project: ras-rm-sandbox
+  sampleSummaryActivationSubscription: "test_activation_subscription"
+  sampleSummaryActivationStatusTopic: "test_activation_topic"
   sampleUnitPublisherTopic: "test_topic"
   caseNotificationTopic: "test_topic"
