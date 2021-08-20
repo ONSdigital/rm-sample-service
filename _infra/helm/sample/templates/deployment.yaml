@@ -241,7 +241,7 @@ spec:
             value: "{{ .Values.gcp.sampleUnitPublisherTopic }}"
           - name: GCP_CASENOTIFICATIONTOPIC
             value: "{{ .Values.gcp.caseNotificationTopic }}"
-          - name: SPRING_CLOUD_GCP_PROJECT-ID
+          - name: SPRING_CLOUD_GCP_PROJECTID
             value: "{{ .Values.gcp.project }}"
           resources:
             {{- toYaml .Values.resources.application | nindent 12 }}
