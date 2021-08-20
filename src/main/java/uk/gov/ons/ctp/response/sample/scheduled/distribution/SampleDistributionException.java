@@ -1,7 +1,6 @@
 package uk.gov.ons.ctp.response.sample.scheduled.distribution;
 
 import java.util.List;
-import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
 
 public class SampleDistributionException extends Exception {

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 
 /** JPA Data Repository needed to persist CollectionExerciseJobs */
 @Repository
