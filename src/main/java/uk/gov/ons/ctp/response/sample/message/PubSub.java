@@ -32,11 +32,6 @@ public class PubSub {
     }
   }
 
-  public Publisher sampleUnitPublisher() throws IOException {
-    return publisherSupplier(
-        appConfig.getGcp().getProject(), appConfig.getGcp().getSampleUnitPublisherTopic());
-  }
-
   public Publisher caseNotificationPublisher() throws IOException {
     return publisherSupplier(
         appConfig.getGcp().getProject(), appConfig.getGcp().getCaseNotificationTopic());
