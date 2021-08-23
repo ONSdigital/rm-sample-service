@@ -208,15 +208,6 @@ components:
           type: string
           enum: [INIT, DELIVERED, PERSISTED, FAILED]
           example: INIT
-        sampleAttributes:
-          type: object
-          properties:
-            attributes:
-              type: object
-            id: 
-              type: string
-              format: uuid
-              example: fd6a1aa3-ba17-43a8-beae-a39e67c6444d
     SampleSummary:
       type: object
       properties:
