@@ -33,8 +33,6 @@ import uk.gov.ons.ctp.response.sample.representation.BusinessSampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
-import uk.gov.ons.ctp.response.sample.scheduled.distribution.SampleDistributionException;
-import uk.gov.ons.ctp.response.sample.scheduled.distribution.SampleUnitDistributor;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import uk.gov.ons.ctp.response.sample.service.UnknownSampleSummaryException;
 import uk.gov.ons.ctp.response.sample.service.UnknownSampleUnitException;
@@ -50,14 +48,11 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       Executors.newFixedThreadPool(NUM_UPLOAD_THREADS);
   private SampleService sampleService;
   private MapperFacade mapperFacade;
-  private SampleUnitDistributor distributor;
 
   @Autowired
-  public SampleEndpoint(
-      SampleService sampleService, MapperFacade mapperFacade, SampleUnitDistributor distributor) {
+  public SampleEndpoint(SampleService sampleService, MapperFacade mapperFacade) {
     this.sampleService = sampleService;
     this.mapperFacade = mapperFacade;
-    this.distributor = distributor;
   }
 
   /**
@@ -175,21 +170,6 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     } catch (UnknownSampleSummaryException e) {
       log.error("unknown sample summary id", kv("sampleSummaryId", sampleSummaryId), e);
       return ResponseEntity.badRequest().build();
-    }
-  }
-
-  @RequestMapping(value = "export", method = RequestMethod.POST)
-  public ResponseEntity<Void> exportSamples() {
-    try {
-      distributor.distribute();
-      return ResponseEntity.noContent().build();
-    } catch (SampleDistributionException e) {
-      log.error(
-          e.getMessage(),
-          kv("CollectionExerciseJob", e.getCollectionExerciseJob()),
-          kv("Samples", e.getSampleUnits()),
-          kv("status", 500));
-      return ResponseEntity.status(500).build();
     }
   }
 

@@ -50,9 +50,6 @@ rollingUpdate:
 managedRabbitMQ:
   enabled: false
 
-export:
-  cron: "* * * * *"
-
 distribution:
   delay: 1000
 
