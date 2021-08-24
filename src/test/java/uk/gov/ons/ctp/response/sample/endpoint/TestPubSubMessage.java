@@ -10,8 +10,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.utility.PubSubEmulator;
-import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
 
 public class TestPubSubMessage {
   private static final Logger log = LoggerFactory.getLogger(TestPubSubMessage.class);
@@ -20,7 +20,7 @@ public class TestPubSubMessage {
 
   public TestPubSubMessage() throws IOException {}
 
-  public SampleUnit getPubSubSampleUnit() throws IOException {
+  public SampleUnitDTO getPubSubSampleUnit() throws IOException {
 
     MessageReceiver receiver =
         (PubsubMessage message, AckReplyConsumer consumer) -> {
@@ -53,6 +53,6 @@ public class TestPubSubMessage {
     service.shutdown();
     System.out.println(receivedMessage);
     ObjectMapper objectMapper = new ObjectMapper();
-    return objectMapper.readValue(receivedMessage, SampleUnit.class);
+    return objectMapper.readValue(receivedMessage, SampleUnitDTO.class);
   }
 }
