@@ -21,7 +21,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
@@ -53,15 +52,12 @@ public class SampleServiceTest {
   private StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent>
       sampleSvcUnitStateTransitionManager;
 
-  @Mock private CollectionExerciseJobService collectionExerciseJobService;
-
   @InjectMocks private SampleService sampleService;
 
   private List<BusinessSurveySample> surveySample;
 
   private List<SampleUnit> sampleUnit;
   private List<SampleSummary> sampleSummaryList;
-  private List<CollectionExerciseJob> collectionExerciseJobs;
 
   /**
    * Before the test
@@ -73,7 +69,6 @@ public class SampleServiceTest {
     surveySample = FixtureHelper.loadClassFixtures(BusinessSurveySample[].class);
     sampleUnit = FixtureHelper.loadClassFixtures(SampleUnit[].class);
     sampleSummaryList = FixtureHelper.loadClassFixtures(SampleSummary[].class);
-    collectionExerciseJobs = FixtureHelper.loadClassFixtures(CollectionExerciseJob[].class);
 
     // This is required for pretty much all tests that create a sample summary
     when(this.sampleSummaryRepository.save(any(SampleSummary.class))).then(returnsFirstArg());
@@ -143,36 +138,6 @@ public class SampleServiceTest {
     assertThat(sampleSummaryList.get(0).getState(), is(SampleState.ACTIVE));
   }
 
-  /**
-   * Test that a CollectionExerciseJob is only stored if there are SampleUnits found for the
-   * surveyRef and have not been previously sent
-   *
-   * @throws Exception oops
-   */
-  @Test
-  public void testNoCollectionExerciseStoredWhenNoSampleUnits() throws Exception {
-    Integer sampleUnitsTotal =
-        sampleService.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
-    verify(collectionExerciseJobService, times(0)).storeCollectionExerciseJob(any());
-    assertThat(sampleUnitsTotal, is(0));
-  }
-
-  /**
-   * Test that a CollectionExerciseJob is stored if there are SampleUnits found for the surveyRef
-   * that have not been previously sent to CollectionExercise
-   *
-   * @throws Exception oops
-   */
-  @Test
-  public void testOneCollectionExerciseJobIsStoredWhenSampleUnitsAreFound() throws Exception {
-    SampleSummary newSummary = createSampleSummary(5, 2);
-    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.of(newSummary));
-    Integer sampleUnitsTotal =
-        sampleService.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
-    verify(collectionExerciseJobService, times(1)).storeCollectionExerciseJob(any());
-    assertThat(sampleUnitsTotal, is(5));
-  }
-
   private SampleSummary createSampleSummary(int numSamples, int expectedInstruments) {
     SampleSummary newSummary = sampleService.createAndSaveSampleSummary();
 
@@ -180,39 +145,6 @@ public class SampleServiceTest {
     newSummary.setExpectedCollectionInstruments(expectedInstruments);
     newSummary.setSampleSummaryPK(1);
     return newSummary;
-  }
-
-  /**
-   * Test that a CollectionExerciseJob is NOT stored if there are No SampleUnits found for the
-   * surveyRef that have not been previously sent to CollectionExercise
-   *
-   * @throws Exception oops
-   */
-  @Test
-  public void testNoCollectionExerciseJobIsStoredWhenNoSampleUnitsAreFound() throws Exception {
-    SampleSummary newSummary = createSampleSummary(0, 2);
-    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.of(newSummary));
-    Integer sampleUnitsTotal =
-        sampleService.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
-    verify(collectionExerciseJobService, times(0)).storeCollectionExerciseJob(any());
-    assertThat(sampleUnitsTotal, is(0));
-  }
-
-  /**
-   * Test that a CollectionExerciseJob is NOT stored if there are No SampleSummaries found for the
-   * surveyRef that have not been previously sent to CollectionExercise
-   *
-   * @throws Exception oops
-   */
-  @Test
-  public void testNoCollectionExerciseJobIsStoredWhenNoSampleSummaryIsFound() throws Exception {
-    SampleSummary sampleSummary = null;
-    when(sampleSummaryRepository.findById(any(UUID.class)))
-        .thenReturn(Optional.ofNullable(sampleSummary));
-    Integer sampleUnitsTotal =
-        sampleService.initialiseCollectionExerciseJob(collectionExerciseJobs.get(0));
-    verify(collectionExerciseJobService, times(0)).storeCollectionExerciseJob(any());
-    assertEquals(0, sampleUnitsTotal.intValue());
   }
 
   @Test
