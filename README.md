@@ -27,11 +27,6 @@ Note. If you need to skip the integration tests due to port clashes run
 mvn clean install -Ddocker.skip -DskipITs
 ```
 
-## Testing
-* to add a collectionExerciseJob to the postgres database
-
-      curl -H "Content-Type: application/json" -X POST -d '{ "collectionExerciseJobPK" : "4","surveyRef" : "str1234","exerciseDateTime" : "2012-12-13T12:12:12.000+00" }' http://localhost:8125/samples/sampleunitrequests
-
 ## API
 See [API.md](https://github.com/ONSdigital/rm-sample-service/blob/main/API.md) for API documentation.
 

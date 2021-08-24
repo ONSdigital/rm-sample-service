@@ -93,34 +93,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFoundError'
-  /samples/sampleunitrequests:
-    post:
-      summary: Creates a new respondent.
-      description: | 
-        POST CollectionExerciseJob associated to SampleSummary surveyRef and exerciseDateTime
-      tags:
-        - samples
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CollectionExerciseJobCreationRequest'
-      responses:
-        '201':
-          description: The collection exercise as associated with a sample
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  sampleUnitsTotal:
-                    type: integer
-                    example: 1
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '422':
-          $ref: '#/components/responses/InvalidRequestBodyError'
   /samples/{id}:
     get:
       summary: Get Sample Unit
@@ -297,25 +269,5 @@ components:
         totalSampleUnits:
           type: integer
           example: 1
-    CollectionExerciseJobCreationRequest:
-      type: object
-      properties:
-        collectionExerciseId:
-          type: string
-          format: uuid
-          example: fd6a1aa3-ba17-43a8-beae-a39e67c6444d
-        surveyRef:
-          type: string
-          example: "123"
-        exerciseDateTime:
-          type: string
-          format: date-time
-          example: "2020-06-08T09:50:25.338Z"
-        sampleSummaryUUIDList:
-          type: array
-          items:
-            type: string
-            format: uuid
-            example: fd6a1bb3-ba17-43a8-beae-a39e67c6444d
 security:
   - basicAuth: []
