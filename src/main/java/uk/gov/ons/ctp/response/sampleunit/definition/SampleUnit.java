@@ -15,5 +15,4 @@ public class SampleUnit {
   @NotNull protected String sampleUnitType;
   protected String formType;
   @NotNull protected String collectionExerciseId;
-  protected SampleAttributes sampleAttributes;
 }

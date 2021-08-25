@@ -10,7 +10,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -72,6 +71,4 @@ public class SampleUnit implements Serializable {
 
   @Column(name = "collection_instrument_id")
   private UUID collectionInstrumentId;
-
-  @Transient private SampleAttributes sampleAttributes;
 }
