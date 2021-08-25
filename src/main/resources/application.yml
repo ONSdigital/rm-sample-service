@@ -130,15 +130,6 @@ party-svc:
     # time to read response
     read-timeout-milli-seconds: 5000
 
-
-rabbitmq:
-  username: guest
-  password: guest
-  host: localhost
-  port: 5672
-  virtualhost: /
-  cron: "* * * * * ?"
-
 messaging:
   backoffInitial: 5000
   backoffMultiplier: 3

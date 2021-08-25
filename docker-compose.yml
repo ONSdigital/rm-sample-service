@@ -7,17 +7,6 @@ services:
     ports:
       - "36432:5432"
 
-  rabbitmq:
-    container_name: rabbitmq-it
-    image: rabbitmq:3.6.10-management
-    ports:
-      - "35369:4369"
-      - "55672:25672"
-      - "36671:5671"
-      - "36672:5672"
-      - "26671:15671"
-      - "26672:15672"
-
   party-service:
     container_name: party-service-it
     image: sdcplatform/ras-party

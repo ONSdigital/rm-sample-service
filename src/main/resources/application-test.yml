@@ -18,8 +18,5 @@ party-svc:
   connection-config:
     port: 38081
 
-rabbitmq:
-  port: 36672
-
 gcp:
   project: "test"
