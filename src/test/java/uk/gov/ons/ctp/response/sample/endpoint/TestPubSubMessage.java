@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.ons.ctp.response.sample.utility.PubSubEmulator;
-import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnit;
 
 public class TestPubSubMessage {
   private static final Logger log = LoggerFactory.getLogger(TestPubSubMessage.class);

@@ -23,4 +23,3 @@ rabbitmq:
 
 gcp:
   project: "test"
-  sampleUnitPublisherTopic: "test_topic"

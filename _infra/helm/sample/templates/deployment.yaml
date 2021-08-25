@@ -243,8 +243,6 @@ spec:
             value: "{{ .Values.gcp.sampleSummaryActivationSubscription }}"
           - name: GCP_SAMPLESUMMARYACTIVATIONSTATUSTOPIC
             value: "{{ .Values.gcp.sampleSummaryActivationStatusTopic }}"
-          - name: GCP_SAMPLEUNITPUBLISHERTOPIC
-            value: "{{ .Values.gcp.sampleUnitPublisherTopic }}"
           - name: GCP_CASENOTIFICATIONTOPIC
             value: "{{ .Values.gcp.caseNotificationTopic }}"
           resources:

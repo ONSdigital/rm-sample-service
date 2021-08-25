@@ -2,7 +2,7 @@ package uk.gov.ons.ctp.response.sample.mapper;
 
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MappingContext;
-import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnit;
 
 public class SampleUnitMapper
     extends CustomMapper<uk.gov.ons.ctp.response.sample.domain.model.SampleUnit, SampleUnit> {

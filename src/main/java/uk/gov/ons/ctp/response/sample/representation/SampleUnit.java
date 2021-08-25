@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.response.sampleunit.definition;
+package uk.gov.ons.ctp.response.sample.representation;
 
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;

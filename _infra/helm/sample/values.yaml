@@ -61,5 +61,4 @@ gcp:
   project: ras-rm-sandbox
   sampleSummaryActivationSubscription: "sample-summary-activation-subscription"
   sampleSummaryActivationStatusTopic: "sample-summary-activation-status-topic"
-  sampleUnitPublisherTopic: "sample-unit-topic"
   caseNotificationTopic: "case-notification-topic"
