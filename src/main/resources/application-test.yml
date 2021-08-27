@@ -24,3 +24,4 @@ rabbitmq:
 gcp:
   project: "test"
   sampleUnitPublisherTopic: "test_topic"
+  caseNotificationTopic: "test_topic"
