@@ -68,13 +68,13 @@ spring:
     changeLog: classpath:/database/changelog-master.yml
     liquibase-schema: sample
 
-  cloud:
-    gcp:
-      project-id: ras-rm-dev
-
   security:
     user: admin
     password: secret
+
+  cloud:
+    gcp:
+      project-id: ras-rm-dev
 
 survey-svc:
   request-classifier-types-list-path: /surveys/{surveyId}/classifiertypeselectors

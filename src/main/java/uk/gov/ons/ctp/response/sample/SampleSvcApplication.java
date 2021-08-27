@@ -8,6 +8,7 @@ import libs.common.jackson.CustomObjectMapper;
 import libs.common.rest.RestUtility;
 import libs.common.state.StateTransitionManager;
 import libs.common.state.StateTransitionManagerFactory;
+import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.cobertura.CoverageIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -49,6 +50,7 @@ import uk.gov.ons.ctp.response.sample.service.state.SampleSvcStateTransitionMana
 @EnableJpaRepositories(basePackages = {"uk.gov.ons.ctp.response"})
 @EntityScan("uk.gov.ons.ctp.response")
 @EnableAsync
+@Slf4j
 public class SampleSvcApplication {
 
   @Autowired private StateTransitionManagerFactory stateTransitionManager;
@@ -157,6 +159,20 @@ public class SampleSvcApplication {
   public Validator csvIngestValidator() {
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     return factory.getValidator();
+  }
+
+  @Bean
+  @ServiceActivator(inputChannel = "sampleUnitChannel")
+  public MessageHandler sampleUnitMessageSender(PubSubTemplate pubsubTemplate) {
+    String topicId = appConfig.getGcp().getSampleUnitPublisherTopic();
+    log.info(
+        "Application started with publisher for sample unit to collex with topic Id {}", topicId);
+    return new PubSubMessageHandler(pubsubTemplate, topicId);
+  }
+
+  @MessagingGateway(defaultRequestChannel = "sampleUnitChannel")
+  public interface PubSubOutboundSampleUnitGateway {
+    void sendToPubSub(String text);
   }
 
   /* PubSub / Spring integration configuration */

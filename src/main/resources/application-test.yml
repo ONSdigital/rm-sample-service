@@ -20,3 +20,4 @@ party-svc:
 
 gcp:
   project: "test"
+  caseNotificationTopic: "test_topic"

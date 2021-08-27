@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.ons.ctp.response.sample.SampleSvcApplication;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitParentDTO;
 
 /** SampleUnitPublisher publishes message to PubSub */
@@ -27,6 +28,8 @@ public class SampleUnitPublisher {
   @Autowired private PubSub pubSub;
 
   @Autowired private ObjectMapper objectMapper;
+
+  @Autowired private SampleSvcApplication.PubSubOutboundSampleUnitGateway samplePublisher;
 
   /**
    * Sends a sample unit to case via PubSub
