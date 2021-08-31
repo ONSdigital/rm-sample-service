@@ -51,8 +51,8 @@ public class SampleUnitPublisher {
    */
   public void sendSampleUnitToCase(SampleUnitParentDTO sampleUnit) {
     try {
-      String message = objectMapper.writeValueAsString(sampleUnit);
       log.info("Publishing message to PubSub", kv("sampleUnitRef", sampleUnit.getSampleUnitRef()));
+      String message = objectMapper.writeValueAsString(sampleUnit);
       caseNotificationPublisher.sendToPubSub(message);
       log.info(
           "Sample unit to case publish sent successfully",
