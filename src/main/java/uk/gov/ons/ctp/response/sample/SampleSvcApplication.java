@@ -207,14 +207,14 @@ public class SampleSvcApplication {
   }
 
   @Bean
-  @ServiceActivator(inputChannel = "sampleUnitChannel")
+  @ServiceActivator(inputChannel = "caseNotificationChannel")
   public MessageHandler caseNotificationMessageSender(PubSubTemplate pubsubTemplate) {
     String topicId = appConfig.getGcp().getCaseNotificationTopic();
     log.info("Application started with publisher for sample to case with topic Id {}", topicId);
     return new PubSubMessageHandler(pubsubTemplate, topicId);
   }
 
-  @MessagingGateway(defaultRequestChannel = "sampleUnitChannel")
+  @MessagingGateway(defaultRequestChannel = "caseNotificationChannel")
   public interface PubSubOutboundCaseNotificationGateway {
     void sendToPubSub(String text);
   }
