@@ -215,9 +215,7 @@ public class SampleService {
           String.format("Sample summary %s has no total sample units set", sampleSummaryId));
     }
 
-    int sampleUnitsTotal = sampleSummary.getTotalSampleUnits().intValue();
-
-    return sampleUnitsTotal;
+    return sampleSummary.getTotalSampleUnits().intValue();
   }
 
   public Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, String message) {
