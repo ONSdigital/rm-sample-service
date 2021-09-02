@@ -19,23 +19,32 @@ import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
 import uk.gov.ons.ctp.response.sampleunit.definition.SampleUnit;
+import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 
-/** Distributes SampleUnits to Collex when requested via job. Retries failures until successful */
+/**
+ * Distributes SampleUnits to Collex when requested via job. Retries failures
+ * until successful
+ */
 @Component
 public class SampleUnitDistributor {
   private static final Logger log = LoggerFactory.getLogger(SampleUnitDistributor.class);
 
   private static final int TRANSACTION_TIMEOUT_SECONDS = 3600;
 
-  @Autowired private SampleUnitSender sampleUnitSender;
+  @Autowired
+  private SampleUnitSender sampleUnitSender;
 
-  @Autowired private CollectionExerciseJobRepository collectionExerciseJobRepository;
+  @Autowired
+  private CollectionExerciseJobRepository collectionExerciseJobRepository;
 
-  @Autowired private SampleUnitRepository sampleUnitRepository;
+  @Autowired
+  private SampleUnitRepository sampleUnitRepository;
 
-  @Autowired private SampleSummaryRepository sampleSummaryRepository;
+  @Autowired
+  private SampleSummaryRepository sampleSummaryRepository;
 
-  @Autowired private SampleUnitMapper sampleUnitMapper;
+  @Autowired
+  private SampleUnitMapper sampleUnitMapper;
 
   /** Scheduled job for distributing SampleUnits */
   @Transactional(timeout = TRANSACTION_TIMEOUT_SECONDS)
@@ -50,8 +59,12 @@ public class SampleUnitDistributor {
   private void processJob(CollectionExerciseJob job) throws SampleDistributionException {
     UUID sampleSummaryId = job.getSampleSummaryId();
     try {
+      List<SampleSummary> sampleSummaries = sampleSummaryRepository.findById(sampleSummaryId);
+      if (sampleSummaries == null) {
+        throw new NoSuchElementException();
+      }
       List<SampleUnit> invalidSamples =
-          sampleSummaryRepository.findById(sampleSummaryId).parallelStream()
+          sampleSummaries.parallelStream()
               .filter(sampleSummary -> sampleSummary.getState() == SampleState.ACTIVE)
               .map(
                   sampleSummary ->
@@ -80,9 +93,9 @@ public class SampleUnitDistributor {
   }
 
   /**
-   * Publish a SampleUnit. If it passes then return true otherwise false. This will mimick the
-   * previous functionality and allow us to obtain a collection of the Sample units that fail for
-   * better logging.
+   * Publish a SampleUnit. If it passes then return true otherwise false. This
+   * will mimick the previous functionality and allow us to obtain a collection of
+   * the Sample units that fail for better logging.
    *
    * @return Predicate<SampleUnit>
    */
@@ -92,11 +105,8 @@ public class SampleUnitDistributor {
         sampleUnitSender.sendSampleUnit(mappedSampleUnit);
         return true;
       } catch (CTPException e) {
-        log.error(
-            "Failed to send a sample unit to queue and update state",
-            kv("sample_unit_id", mappedSampleUnit.getId()),
-            "exception",
-            e);
+        log.error("Failed to send a sample unit to queue and update state",
+            kv("sample_unit_id", mappedSampleUnit.getId()), "exception", e);
         return false;
       }
     };
