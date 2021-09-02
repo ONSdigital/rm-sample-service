@@ -62,7 +62,6 @@ public class SampleUnitDistributor {
                   sampleSummary ->
                       sampleUnitRepository.findBySampleSummaryFKAndState(
                           sampleSummary.getSampleSummaryPK(), SampleUnitState.PERSISTED))
-              .orElseGet(Stream::empty)
               .map(
                   sampleUnit ->
                       sampleUnitMapper.mapSampleUnit(
