@@ -93,8 +93,10 @@ public class SampleSummaryEnrichmentService {
 
     // get all the samples
     Stream<SampleUnit> sampleUnits =
-        sampleUnitRepository.findBySampleSummaryFKAndState(
-            sampleSummary.getSampleSummaryPK(), SampleUnitDTO.SampleUnitState.PERSISTED).parallel();
+        sampleUnitRepository
+            .findBySampleSummaryFKAndState(
+                sampleSummary.getSampleSummaryPK(), SampleUnitDTO.SampleUnitState.PERSISTED)
+            .parallel();
 
     LOG.debug("found samples for sample summary", kv("sampleSummaryId", sampleSummaryId));
     // create a map to hold form types to collection instrument ids
