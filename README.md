@@ -56,10 +56,6 @@ On file upload it creates a new SampleSummary entry in the database with State =
 SampleOuboundPublisher - It will then asynchronously parse the sample file and send a message with the routing key `Sample.SampleUploadStarted.binding`
 However this routing key doesnt match the binding key `Sample.SampleDelivery.binding` for the `sample-outbound-exchange` so presumably this message will be discarded (Further analysis required). Collection exercise is listening to the `Sample.SampleDelivery` queue
 
-CsvIngesterBusiness - Providing the SampleSummary type is "B" it will attempt to parse the uploaded CSV. Foreach line in the sample file create a new callable so this can all be sone asynchronously, pass in a new empty keyset. Our asynchronous callable is now syncronised because opencsv is not actually threadsafe!?!? The empty keyset is then used to store sample units where exceptions are thrown for duplicates.
-We're converting each sample file line into a business sample unit. We construct a list of samples, calculate the size of the collection instrument (number of unique formtypes) then save each sample unit to the database and update the SampleSummary with the total number of collection instruments and total number of sample units.
-For each sample unit; we create a Party Creation request and ship it off to the `Sample.Party` queue. Sample itself if listening on that queue and will pick up its own message to send to party via a rest call, then it sends an event to the event exchange where the event is `sample PERSISTED` (This exchange has no bindings associated with it so im guess this is just completely ignored and not required?
-
 SampleUnitDistributor - For each collection exercise job that has not been completed (jobcomplete=false), look for active sample summaries and send the `PERSISTED` sample unit to the `Sample.SampleDelivery` queue.
 
 ## Quick guide
