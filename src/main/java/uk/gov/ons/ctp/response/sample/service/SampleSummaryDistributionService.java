@@ -94,9 +94,9 @@ public class SampleSummaryDistributionService {
     SampleUnitParentDTO parent = createSampleUnitParentDTOObject(collectionExerciseId, sampleUnit);
     sampleUnitPublisher.sendSampleUnitToCase(parent);
     try {
-      LOG.debug(
+      LOG.info(
           "Transitioning state of sampleUnit",
-          kv("SampleUnit", sampleUnit),
+          kv("id", sampleUnit.getId()),
           kv("from", sampleUnit.getState()),
           kv("to", SampleUnitDTO.SampleUnitEvent.DELIVERING));
       SampleUnitDTO.SampleUnitState newState =
