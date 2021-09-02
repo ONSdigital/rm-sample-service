@@ -117,7 +117,7 @@ public class SampleSummaryEnrichmentService {
               kv("sampleSummaryId", sampleSummaryId));
           boolean foundParty = findAndUpdateParty(surveyId, sampleUnit, sampleUnitId);
           LOG.debug(
-              "attempted to find party",
+              "party request returned " + foundParty,
               kv("sampleUnitId", sampleUnitId),
               kv("sampleSummaryId", sampleSummaryId),
               kv("foundParty", foundParty));
@@ -128,7 +128,7 @@ public class SampleSummaryEnrichmentService {
                 kv("sampleSummaryId", sampleSummaryId));
             boolean foundCI = findAndUpdateCollectionInstrument(surveyId, formTypeMap, sampleUnit);
             LOG.debug(
-                "attempted to find CI",
+                "CI request returned " + foundCI,
                 kv("sampleUnitId", sampleUnitId),
                 kv("sampleSummaryId", sampleSummaryId),
                 kv("foundCI", foundCI));
