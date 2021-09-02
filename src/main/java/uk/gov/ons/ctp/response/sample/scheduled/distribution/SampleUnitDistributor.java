@@ -51,8 +51,7 @@ public class SampleUnitDistributor {
     UUID sampleSummaryId = job.getSampleSummaryId();
     try {
       List<SampleUnit> invalidSamples =
-          sampleSummaryRepository.findById(sampleSummaryId)
-              .parallelStream()
+          sampleSummaryRepository.findById(sampleSummaryId).parallelStream()
               .filter(sampleSummary -> sampleSummary.getState() == SampleState.ACTIVE)
               .map(
                   sampleSummary ->
