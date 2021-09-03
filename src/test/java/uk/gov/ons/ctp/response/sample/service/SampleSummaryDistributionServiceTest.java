@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
 import org.junit.Test;
@@ -61,10 +62,11 @@ public class SampleSummaryDistributionServiceTest {
     sampleUnit.setPartyId(UUID.fromString(PARTY_ID));
     List<SampleUnit> samples = new ArrayList<>();
     samples.add(sampleUnit);
+    Stream<SampleUnit> sampleStream = samples.stream();
 
     when(sampleSummaryRepository.findById(SAMPLE_SUMMARY_ID))
         .thenReturn(Optional.of(sampleSummary));
-    when(sampleService.findSampleUnitsBySampleSummary(SAMPLE_SUMMARY_ID)).thenReturn(samples);
+    when(sampleService.findSampleUnitsBySampleSummary(SAMPLE_SUMMARY_ID)).thenReturn(sampleStream);
 
     sampleSummaryDistributionService.distribute(SAMPLE_SUMMARY_ID);
     verify(sampleUnitPublisher, times(1)).sendSampleUnitToCase(any());
@@ -90,7 +92,7 @@ public class SampleSummaryDistributionServiceTest {
     when(sampleSummaryRepository.findById(SAMPLE_SUMMARY_ID))
         .thenReturn(Optional.of(sampleSummary));
     when(sampleService.findSampleUnitsBySampleSummary(SAMPLE_SUMMARY_ID))
-        .thenReturn(new ArrayList<>());
+        .thenReturn(new ArrayList<SampleUnit>().stream());
     sampleSummaryDistributionService.distribute(SAMPLE_SUMMARY_ID);
     verify(sampleSummaryRepository, never()).saveAndFlush(any());
   }
