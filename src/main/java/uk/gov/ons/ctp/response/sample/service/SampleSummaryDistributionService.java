@@ -2,10 +2,10 @@ package uk.gov.ons.ctp.response.sample.service;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
-import java.util.List;
 import java.util.UUID;
 import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,9 +52,9 @@ public class SampleSummaryDistributionService {
             .findById(sampleSummaryId)
             .orElseThrow(UnknownSampleSummaryException::new);
 
-    List<SampleUnit> sampleUnits = sampleService.findSampleUnitsBySampleSummary(sampleSummaryId);
+    Stream<SampleUnit> sampleUnits = sampleService.findSampleUnitsBySampleSummary(sampleSummaryId);
 
-    if (sampleUnits.isEmpty()) {
+    if (sampleUnits == null) {
       LOG.info(
           "No sample unit groups to distribute for summary",
           kv("sampleSummaryId", sampleSummaryId));

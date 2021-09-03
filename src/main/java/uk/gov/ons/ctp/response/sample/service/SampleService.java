@@ -4,6 +4,7 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
 import libs.common.time.DateTimeUtil;
@@ -225,13 +226,13 @@ public class SampleService {
     return sampleUnitRepository.findById(id).orElse(null);
   }
 
-  public List<SampleUnit> findSampleUnitsBySampleSummary(UUID sampleSummaryId) {
+  public Stream<SampleUnit> findSampleUnitsBySampleSummary(UUID sampleSummaryId) {
     try {
       SampleSummary ss = sampleSummaryRepository.findById(sampleSummaryId).orElseThrow();
-      return sampleUnitRepository.findBySampleSummaryFK(ss.getSampleSummaryPK());
+      return sampleUnitRepository.findBySampleSummaryFK(ss.getSampleSummaryPK()).parallelStream();
     } catch (NoSuchElementException e) {
       log.error("unable to find sample summary", kv("sampleSummaryId", sampleSummaryId));
-      return new ArrayList<>();
+      return null;
     }
   }
 
