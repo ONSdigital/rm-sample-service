@@ -3,9 +3,10 @@ package uk.gov.ons.ctp.response.sample.service;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
-import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,16 +56,13 @@ public class SampleSummaryDistributionService {
     Stream<SampleUnit> sampleUnits =
         sampleService.findSampleUnitsBySampleSummary(sampleSummaryId).parallel();
 
-    if (sampleUnits == null) {
-      LOG.info(
-          "No sample unit groups to distribute for summary",
-          kv("sampleSummaryId", sampleSummaryId));
-      throw new NoSampleUnitsInSampleSummaryException();
-    }
-
     // Catch errors distributing sample units so that only failing units are stopped
+    // We need to check that the stream length wasn't 0 - we can't check directly as this would
+    // consume the stream
+    AtomicInteger i = new AtomicInteger(0);
     sampleUnits.forEach(
         sampleUnit -> {
+          i.getAndIncrement();
           try {
             distributeSampleUnit(sampleSummary.getCollectionExerciseId(), sampleUnit);
 
@@ -75,10 +73,17 @@ public class SampleSummaryDistributionService {
           }
         });
 
+    if (i.get() == 0) {
+      LOG.info(
+          "No sample unit groups to distribute for summary",
+          kv("sampleSummaryId", sampleSummaryId));
+      throw new NoSampleUnitsInSampleSummaryException();
+    }
     // Nothing currently uses this flag, but in the future we'll clean up old samples once they're
+    // Currently nothing uses this flag, but in the future we'll clean up old samples once they're
     // no longer needed
     LOG.info(
-        "Distribution was successful.  Marking sample summary for deletion",
+            "Distribution was successful.  Marking sample summary for deletion",
         kv("sampleSummaryId", sampleSummaryId));
     sampleSummary.setMarkForDeletion(true);
     sampleSummaryRepository.saveAndFlush(sampleSummary);
