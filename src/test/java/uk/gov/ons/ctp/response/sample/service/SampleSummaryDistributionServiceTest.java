@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import libs.common.error.CTPException;
+import libs.common.state.StateTransitionManager;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -15,7 +17,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
+import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.message.SampleUnitPublisher;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitParentDTO;
 
 /** tests */
@@ -30,6 +34,12 @@ public class SampleSummaryDistributionServiceTest {
   private static final String SAMPLE_UNIT_TYPE = "B";
 
   @Mock private SampleSummaryRepository sampleSummaryRepository;
+  @Mock private SampleUnitRepository sampleUnitRepository;
+
+  @Mock
+  private StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent>
+      sampleUnitStateTransitionManager;
+
   @Mock private SampleUnitPublisher sampleUnitPublisher;
   @Mock private SampleService sampleService;
 
@@ -38,7 +48,7 @@ public class SampleSummaryDistributionServiceTest {
 
   @Test
   public void testDistribute()
-      throws UnknownSampleSummaryException, NoSampleUnitsInSampleSummaryException {
+      throws UnknownSampleSummaryException, NoSampleUnitsInSampleSummaryException, CTPException {
     SampleSummary sampleSummary = new SampleSummary();
     sampleSummary.setId(SAMPLE_SUMMARY_ID);
     sampleSummary.setSampleSummaryPK(1);
@@ -58,6 +68,8 @@ public class SampleSummaryDistributionServiceTest {
 
     sampleSummaryDistributionService.distribute(SAMPLE_SUMMARY_ID);
     verify(sampleUnitPublisher, times(1)).sendSampleUnitToCase(any());
+    verify(sampleUnitStateTransitionManager, times(1)).transition(any(), any());
+    verify(sampleUnitRepository, times(1)).saveAndFlush(any());
     verify(sampleSummaryRepository, times(1)).saveAndFlush(any());
   }
 

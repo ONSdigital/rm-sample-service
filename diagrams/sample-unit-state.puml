@@ -5,5 +5,5 @@ skinparam state {
 
 [*] --> INIT
 INIT --> PERSISTED : persisting [[https://github.com/ONSdigital/rm-sample-service/blob/main/src/main/java/uk/gov/ons/ctp/response/sample/service/impl/SampleServiceImpl.java#L201 *]]
-PERSISTED --> DELIVERED : delivering [[https://github.com/ONSdigital/rm-sample-service/blob/main/src/main/java/uk/gov/ons/ctp/response/sample/scheduled/distribution/SampleUnitDistributor.java#L146 *]]
+PERSISTED --> DELIVERED : delivering to case [[https://github.com/ONSdigital/rm-sample-service/blob/main/src/main/java/uk/gov/ons/ctp/response/sample/service/SampleDistributionService.java#L103 *]]
 @enduml

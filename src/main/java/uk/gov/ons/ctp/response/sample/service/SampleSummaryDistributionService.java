@@ -4,14 +4,19 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import java.util.List;
 import java.util.UUID;
+import libs.common.error.CTPException;
+import libs.common.state.StateTransitionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
+import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.message.SampleUnitPublisher;
+import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitParentDTO;
 
 @Service
@@ -22,6 +27,12 @@ public class SampleSummaryDistributionService {
   @Autowired private SampleService sampleService;
   @Autowired private SampleUnitPublisher sampleUnitPublisher;
   @Autowired private SampleSummaryRepository sampleSummaryRepository;
+  @Autowired private SampleUnitRepository sampleUnitRepository;
+
+  @Autowired
+  @Qualifier("sampleUnitTransitionManager")
+  private StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent>
+      sampleUnitTransitionManager;
 
   /**
    * Distributes the sample units to the case service to create cases against each sample unit. This
@@ -55,6 +66,7 @@ public class SampleSummaryDistributionService {
         sampleUnit -> {
           try {
             distributeSampleUnit(sampleSummary.getCollectionExerciseId(), sampleUnit);
+
           } catch (RuntimeException ex) {
             LOG.error(
                 "Failed to distribute sample unit", kv("SampleSummaryId", sampleSummaryId), ex);
@@ -81,6 +93,20 @@ public class SampleSummaryDistributionService {
   public void distributeSampleUnit(UUID collectionExerciseId, SampleUnit sampleUnit) {
     SampleUnitParentDTO parent = createSampleUnitParentDTOObject(collectionExerciseId, sampleUnit);
     sampleUnitPublisher.sendSampleUnitToCase(parent);
+    try {
+      LOG.info(
+          "Transitioning state of sampleUnit",
+          kv("id", sampleUnit.getId()),
+          kv("from", sampleUnit.getState()),
+          kv("to", SampleUnitDTO.SampleUnitEvent.DELIVERING));
+      SampleUnitDTO.SampleUnitState newState =
+          sampleUnitTransitionManager.transition(
+              sampleUnit.getState(), SampleUnitDTO.SampleUnitEvent.DELIVERING);
+      sampleUnit.setState(newState);
+      sampleUnitRepository.saveAndFlush(sampleUnit);
+    } catch (CTPException e) {
+      LOG.error("Error occurred whilst transitioning state", e);
+    }
   }
 
   /**
