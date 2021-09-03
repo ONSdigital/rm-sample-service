@@ -52,7 +52,8 @@ public class SampleSummaryDistributionService {
             .findById(sampleSummaryId)
             .orElseThrow(UnknownSampleSummaryException::new);
 
-    Stream<SampleUnit> sampleUnits = sampleService.findSampleUnitsBySampleSummary(sampleSummaryId);
+    Stream<SampleUnit> sampleUnits =
+        sampleService.findSampleUnitsBySampleSummary(sampleSummaryId).parallel();
 
     if (sampleUnits == null) {
       LOG.info(

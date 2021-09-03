@@ -229,7 +229,7 @@ public class SampleService {
   public Stream<SampleUnit> findSampleUnitsBySampleSummary(UUID sampleSummaryId) {
     try {
       SampleSummary ss = sampleSummaryRepository.findById(sampleSummaryId).orElseThrow();
-      return sampleUnitRepository.findBySampleSummaryFK(ss.getSampleSummaryPK()).parallelStream();
+      return sampleUnitRepository.findBySampleSummaryFK(ss.getSampleSummaryPK());
     } catch (NoSuchElementException e) {
       log.error("unable to find sample summary", kv("sampleSummaryId", sampleSummaryId));
       return null;
