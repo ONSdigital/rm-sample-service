@@ -260,6 +260,7 @@ public class SampleService {
     }
   }
 
+  @Transactional(propagation = Propagation.REQUIRED, readOnly = true)
   public List<SampleUnit> findSampleUnitsBySampleSummaryAndState(
       UUID sampleSummaryId, SampleUnitState state) {
     try {
