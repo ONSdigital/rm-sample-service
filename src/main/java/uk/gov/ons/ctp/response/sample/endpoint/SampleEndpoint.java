@@ -182,9 +182,24 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
 
   @RequestMapping(value = "{sampleSummaryId}/sampleunits", method = RequestMethod.GET)
   public ResponseEntity<SampleUnitDTO[]> requestSampleUnitsForSampleSummary(
-      @PathVariable("sampleSummaryId") final UUID sampleSummaryId) throws CTPException {
+      @PathVariable("sampleSummaryId") final UUID sampleSummaryId,
+      @RequestParam(required = false) String state)
+      throws CTPException {
 
-    List<SampleUnit> sampleUnits = sampleService.findSampleUnitsBySampleSummary(sampleSummaryId);
+    List<SampleUnit> sampleUnits;
+    if (state == null) {
+      sampleUnits = sampleService.findSampleUnitsBySampleSummary(sampleSummaryId);
+    } else {
+      try {
+        SampleUnitDTO.SampleUnitState sampleUnitState =
+            SampleUnitDTO.SampleUnitState.valueOf(state);
+        sampleUnits =
+            sampleService.findSampleUnitsBySampleSummaryAndState(sampleSummaryId, sampleUnitState);
+      } catch (IllegalArgumentException | NullPointerException e) {
+        throw new CTPException(
+            CTPException.Fault.BAD_REQUEST, String.format("%s is not a valid state", state));
+      }
+    }
 
     List<SampleUnitDTO> result = mapperFacade.mapAsList(sampleUnits, SampleUnitDTO.class);
 
