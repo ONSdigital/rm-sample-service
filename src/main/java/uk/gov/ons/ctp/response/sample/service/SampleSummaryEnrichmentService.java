@@ -6,6 +6,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import libs.collection.instrument.representation.CollectionInstrumentDTO;
+import libs.common.error.CTPException;
+import libs.common.state.StateTransitionManager;
 import libs.party.representation.Association;
 import libs.party.representation.Enrolment;
 import libs.party.representation.PartyDTO;
@@ -15,6 +17,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -28,6 +31,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.validation.CollectionInstrumentClassifierTypes;
 
@@ -56,6 +60,16 @@ public class SampleSummaryEnrichmentService {
   @Autowired private SurveySvcClient surveySvcClient;
 
   @Autowired private CollectionInstrumentSvcClient collectionInstrumentSvcClient;
+
+  @Autowired
+  @Qualifier("sampleSummaryTransitionManager")
+  private StateTransitionManager<SampleSummaryDTO.SampleState, SampleSummaryDTO.SampleEvent>
+      sampleSummaryTransitionManager;
+
+  @Autowired
+  @Qualifier("sampleUnitTransitionManager")
+  private StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent>
+      sampleUnitTransitionManager;
 
   @Transactional(propagation = Propagation.REQUIRED)
   public boolean enrich(UUID surveyId, UUID sampleSummaryId, UUID collectionExerciseId)
@@ -86,7 +100,7 @@ public class SampleSummaryEnrichmentService {
     // create a map to hold form types to collection instrument ids
     Map<String, Optional<UUID>> formTypeMap = new HashMap<>();
 
-    List<UUID> invalidSamples = new ArrayList<>();
+    List<SampleUnit> invalidSamples = new ArrayList<>();
     sampleUnits.forEach(
         (sampleUnit) -> {
           UUID sampleUnitId = sampleUnit.getId();
@@ -101,7 +115,7 @@ public class SampleSummaryEnrichmentService {
               kv("sampleSummaryId", sampleSummaryId));
           boolean foundParty = findAndUpdateParty(surveyId, sampleUnit, sampleUnitId);
           LOG.debug(
-              "party found",
+              "attempted to find party",
               kv("sampleUnitId", sampleUnitId),
               kv("sampleSummaryId", sampleSummaryId),
               kv("foundParty", foundParty));
@@ -112,21 +126,62 @@ public class SampleSummaryEnrichmentService {
                 kv("sampleSummaryId", sampleSummaryId));
             boolean foundCI = findAndUpdateCollectionInstrument(surveyId, formTypeMap, sampleUnit);
             LOG.debug(
-                "CI found",
+                "attempted to find CI",
                 kv("sampleUnitId", sampleUnitId),
                 kv("sampleSummaryId", sampleSummaryId),
                 kv("foundCI", foundCI));
             if (!foundCI) {
-              invalidSamples.add(sampleUnitId);
+              invalidSamples.add(sampleUnit);
             }
           } else {
-            invalidSamples.add(sampleUnitId);
+            invalidSamples.add(sampleUnit);
           }
           sampleUnitRepository.saveAndFlush(sampleUnit);
         });
 
     // if there are invalid samples then it is not validated
-    return invalidSamples.isEmpty();
+    boolean valid = invalidSamples.isEmpty();
+    if (!valid) {
+      invalidSamples.forEach(this::markAsInvalid);
+      failSampleSummary(sampleSummaryId);
+    }
+    return valid;
+  }
+
+  private void markAsInvalid(SampleUnit sampleUnit) {
+    try {
+      SampleUnitDTO.SampleUnitState newState =
+          sampleUnitTransitionManager.transition(
+              sampleUnit.getState(), SampleUnitDTO.SampleUnitEvent.FAIL_VALIDATION);
+      sampleUnit.setState(newState);
+      sampleUnitRepository.saveAndFlush(sampleUnit);
+    } catch (CTPException | RuntimeException e) {
+      LOG.error(
+          "Failed to put sample summary into FAILED state",
+          kv("sampleUnit", sampleUnit.getId()),
+          e);
+    }
+  }
+
+  public void failSampleSummary(UUID sampleSummaryId) {
+    try {
+      SampleSummary sampleSummary =
+          sampleSummaryRepository
+              .findById(sampleSummaryId)
+              .orElseThrow(UnknownSampleSummaryException::new);
+
+      SampleSummaryDTO.SampleState newState =
+          sampleSummaryTransitionManager.transition(
+              sampleSummary.getState(), SampleSummaryDTO.SampleEvent.FAIL_VALIDATION);
+      sampleSummary.setState(newState);
+      this.sampleSummaryRepository.save(sampleSummary);
+
+    } catch (CTPException | UnknownSampleSummaryException | RuntimeException e) {
+      LOG.error(
+          "Failed to put sample summary into FAILED state",
+          kv("sampleSummary", sampleSummaryId),
+          e);
+    }
   }
 
   private boolean findAndUpdateCollectionInstrument(
