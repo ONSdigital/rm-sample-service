@@ -14,6 +14,7 @@ import libs.common.error.InvalidRequestException;
 import libs.common.time.DateTimeUtil;
 import libs.sample.validation.BusinessSampleUnit;
 import ma.glasnost.orika.MapperFacade;
+import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -187,7 +188,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       throws CTPException {
 
     List<SampleUnit> sampleUnits;
-    if (state == null) {
+    if (Strings.isEmpty(state)) {
       sampleUnits = sampleService.findSampleUnitsBySampleSummary(sampleSummaryId);
     } else {
       try {
