@@ -273,7 +273,7 @@ public class SampleService {
           .collect(Collectors.toList());
     } catch (UnknownSampleSummaryException e) {
       log.error("unable to find sample summary", kv("sampleSummaryId", sampleSummaryId));
-      return new ArrayList<>();
+      return Collections.EMPTY_LIST;
     }
   }
 
