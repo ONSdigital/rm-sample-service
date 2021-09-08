@@ -191,12 +191,24 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     if (Strings.isEmpty(state)) {
       sampleUnits = sampleService.findSampleUnitsBySampleSummary(sampleSummaryId);
     } else {
+      log.debug(
+          "finding samples with state", kv("sampleSummaryId", sampleSummaryId), kv("state", state));
       try {
         SampleUnitDTO.SampleUnitState sampleUnitState =
             SampleUnitDTO.SampleUnitState.valueOf(state);
         sampleUnits =
             sampleService.findSampleUnitsBySampleSummaryAndState(sampleSummaryId, sampleUnitState);
+        log.info(
+            "found samples with state",
+            kv("sampleSummaryId", sampleSummaryId),
+            kv("state", state),
+            kv("numberOfSamples", sampleUnits.size()));
       } catch (IllegalArgumentException | NullPointerException e) {
+        log.error(
+            "failed to find samples with state",
+            kv("sampleSummaryId", sampleSummaryId),
+            kv("state", state),
+            e);
         throw new CTPException(
             CTPException.Fault.BAD_REQUEST, String.format("%s is not a valid state", state));
       }

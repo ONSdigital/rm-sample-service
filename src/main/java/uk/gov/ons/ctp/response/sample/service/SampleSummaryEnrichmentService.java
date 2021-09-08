@@ -142,19 +142,24 @@ public class SampleSummaryEnrichmentService {
     // if there are invalid samples then it is not validated
     boolean valid = invalidSamples.isEmpty();
     if (!valid) {
-      invalidSamples.forEach(this::markAsInvalid);
+      LOG.info(
+          String.format("%d samples have failed to enrich", invalidSamples.size()),
+          kv("sampleSummaryId", sampleSummaryId));
+      invalidSamples.forEach(this::markAsFailed);
       failSampleSummary(sampleSummaryId);
     }
     return valid;
   }
 
-  private void markAsInvalid(SampleUnit sampleUnit) {
+  private void markAsFailed(SampleUnit sampleUnit) {
     try {
+      LOG.info("marking sample unit as failed", kv("sampleUnitId", sampleUnit.getId()));
       SampleUnitDTO.SampleUnitState newState =
           sampleUnitTransitionManager.transition(
               sampleUnit.getState(), SampleUnitDTO.SampleUnitEvent.FAIL_VALIDATION);
       sampleUnit.setState(newState);
       sampleUnitRepository.saveAndFlush(sampleUnit);
+      LOG.info("sample unit transitioned to failed state", kv("sampleUnitId", sampleUnit.getId()));
     } catch (CTPException | RuntimeException e) {
       LOG.error(
           "Failed to put sample summary into FAILED state",
@@ -164,6 +169,7 @@ public class SampleSummaryEnrichmentService {
   }
 
   public void failSampleSummary(UUID sampleSummaryId) {
+    LOG.info("failing sample summary", kv("sampleSummaryId", sampleSummaryId));
     try {
       SampleSummary sampleSummary =
           sampleSummaryRepository
@@ -175,7 +181,7 @@ public class SampleSummaryEnrichmentService {
               sampleSummary.getState(), SampleSummaryDTO.SampleEvent.FAIL_VALIDATION);
       sampleSummary.setState(newState);
       this.sampleSummaryRepository.save(sampleSummary);
-
+      LOG.info("sample summary transitioned to failed", kv("sampleSummaryId", sampleSummaryId));
     } catch (CTPException | UnknownSampleSummaryException | RuntimeException e) {
       LOG.error(
           "Failed to put sample summary into FAILED state",
