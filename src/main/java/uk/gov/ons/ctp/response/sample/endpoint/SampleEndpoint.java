@@ -130,10 +130,12 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       @RequestParam(required = false) String state)
       throws CTPException {
 
-
     List<SampleUnit> sampleUnits;
     if (Strings.isEmpty(state)) {
-      sampleUnits =sampleService.findSampleUnitsBySampleSummary(sampleSummaryId).collect(Collectors.toList());
+      sampleUnits =
+          sampleService
+              .findSampleUnitsBySampleSummary(sampleSummaryId)
+              .collect(Collectors.toList());
       List<SampleUnitDTO> result = mapperFacade.mapAsList(sampleUnits, SampleUnitDTO.class);
 
       if (!sampleUnits.isEmpty()) {
