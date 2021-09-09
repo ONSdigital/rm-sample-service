@@ -47,14 +47,19 @@ public class SampleSummaryDistributionService {
    */
   public void distribute(UUID sampleSummaryId)
       throws NoSampleUnitsInSampleSummaryException, UnknownSampleSummaryException {
+    LOG.info("about to distribute sample summary", kv("sampleSummaryId", sampleSummaryId));
     // first find the correct sample summary
     SampleSummary sampleSummary =
         sampleSummaryRepository
             .findById(sampleSummaryId)
             .orElseThrow(UnknownSampleSummaryException::new);
 
+    LOG.info("found sample summary", kv("sampleSummary", sampleSummary.getId()));
+
     Stream<SampleUnit> sampleUnits =
         sampleService.findSampleUnitsBySampleSummary(sampleSummaryId).parallel();
+
+    LOG.info("found sample units for summary", kv("sampleSummaryId", sampleSummaryId));
 
     // Catch errors distributing sample units so that only failing units are stopped
     // We need to check that the stream length wasn't 0 - we can't check directly as this would
@@ -64,11 +69,18 @@ public class SampleSummaryDistributionService {
         sampleUnit -> {
           i.getAndIncrement();
           try {
+            LOG.info(
+                "distribute sample unit",
+                kv("sampleSummaryId", sampleSummaryId),
+                kv("sampleUnitId", sampleUnit.getId()));
             distributeSampleUnit(sampleSummary.getCollectionExerciseId(), sampleUnit);
 
           } catch (RuntimeException ex) {
             LOG.error(
-                "Failed to distribute sample unit", kv("SampleSummaryId", sampleSummaryId), ex);
+                "Failed to distribute sample unit",
+                kv("sampleSummaryId", sampleSummaryId),
+                kv("sampleUnitId", sampleUnit.getId()),
+                ex);
             throw ex;
           }
         });
