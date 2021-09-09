@@ -3,7 +3,6 @@ package uk.gov.ons.ctp.response.sample.service;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
@@ -232,24 +231,22 @@ public class SampleService {
       return sampleUnitRepository.findBySampleSummaryFK(ss.getSampleSummaryPK());
     } catch (NoSuchElementException e) {
       log.error("unable to find sample summary", kv("sampleSummaryId", sampleSummaryId));
-      return null;
+      return Collections.EMPTY_LIST.stream();
     }
   }
 
   @Transactional(propagation = Propagation.REQUIRED, readOnly = true)
-  public List<SampleUnit> findSampleUnitsBySampleSummaryAndState(
+  public Stream<SampleUnit> findSampleUnitsBySampleSummaryAndState(
       UUID sampleSummaryId, SampleUnitState state) {
     try {
       SampleSummary ss =
           sampleSummaryRepository
               .findById(sampleSummaryId)
               .orElseThrow(UnknownSampleSummaryException::new);
-      return sampleUnitRepository
-          .findBySampleSummaryFKAndState(ss.getSampleSummaryPK(), state)
-          .collect(Collectors.toList());
+      return sampleUnitRepository.findBySampleSummaryFKAndState(ss.getSampleSummaryPK(), state);
     } catch (UnknownSampleSummaryException e) {
       log.error("unable to find sample summary", kv("sampleSummaryId", sampleSummaryId));
-      return Collections.EMPTY_LIST;
+      return Collections.EMPTY_LIST.stream();
     }
   }
 

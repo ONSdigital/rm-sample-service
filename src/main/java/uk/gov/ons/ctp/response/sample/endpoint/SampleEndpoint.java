@@ -152,7 +152,9 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
         SampleUnitDTO.SampleUnitState sampleUnitState =
             SampleUnitDTO.SampleUnitState.valueOf(state);
         sampleUnits =
-            sampleService.findSampleUnitsBySampleSummaryAndState(sampleSummaryId, sampleUnitState);
+            sampleService
+                .findSampleUnitsBySampleSummaryAndState(sampleSummaryId, sampleUnitState)
+                .collect(Collectors.toList());
         log.info(
             "found samples with state",
             kv("sampleSummaryId", sampleSummaryId),

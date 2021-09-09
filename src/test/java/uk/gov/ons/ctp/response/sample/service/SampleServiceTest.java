@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import libs.common.FixtureHelper;
 import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
@@ -276,8 +277,9 @@ public class SampleServiceTest {
         .thenReturn(sampleUnits.stream());
 
     List<SampleUnit> su =
-        sampleService.findSampleUnitsBySampleSummaryAndState(
-            newSummary.getId(), SampleUnitState.FAILED);
+        sampleService
+            .findSampleUnitsBySampleSummaryAndState(newSummary.getId(), SampleUnitState.FAILED)
+            .collect(Collectors.toList());
 
     assertEquals(sampleUnit, su.get(0));
 
@@ -291,8 +293,9 @@ public class SampleServiceTest {
     when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(null));
 
     List<SampleUnit> su =
-        sampleService.findSampleUnitsBySampleSummaryAndState(
-            UUID.randomUUID(), SampleUnitState.FAILED);
+        sampleService
+            .findSampleUnitsBySampleSummaryAndState(UUID.randomUUID(), SampleUnitState.FAILED)
+            .collect(Collectors.toList());
     assertTrue(su.isEmpty());
 
     verify(sampleUnitRepository, never()).findBySampleSummaryFKAndState(any(), any());
