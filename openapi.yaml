@@ -194,11 +194,11 @@ paths:
             example: 34597808-ec88-4e93-af2f-228e33ff7946
         - in: query
           name: state
+          description: only return sample units that have the requested state
           required: false
           schema:
             type: string
             example: FAILED
-          description: only returned sample units that have the requested state
       responses:
         '200':
           description: The respondent was retrieved successfully.
