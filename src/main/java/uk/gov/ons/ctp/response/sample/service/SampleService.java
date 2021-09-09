@@ -225,6 +225,7 @@ public class SampleService {
     return sampleUnitRepository.findById(id).orElse(null);
   }
 
+  @Transactional(propagation = Propagation.REQUIRED, readOnly = true)
   public Stream<SampleUnit> findSampleUnitsBySampleSummary(UUID sampleSummaryId) {
     try {
       SampleSummary ss = sampleSummaryRepository.findById(sampleSummaryId).orElseThrow();
