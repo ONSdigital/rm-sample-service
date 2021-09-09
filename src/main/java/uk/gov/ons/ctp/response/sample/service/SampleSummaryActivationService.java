@@ -37,11 +37,8 @@ public class SampleSummaryActivationService {
         "Beginning sample summary activation",
         kv("sampleSummaryActivation", sampleSummaryActivation));
     validateAndEnrich(sampleSummaryActivation);
-    sendEnrichStatusToCollectionExercise(sampleSummaryActivation.getCollectionExerciseId(), true);
 
     distribute(sampleSummaryActivation);
-    sendDistributeStatusToCollectionExercise(
-        sampleSummaryActivation.getCollectionExerciseId(), true);
     LOG.info(
         "Completed sample summary activation",
         kv("sampleSummaryId", sampleSummaryActivation.getSampleSummaryId()),
@@ -96,14 +93,19 @@ public class SampleSummaryActivationService {
           kv("validated", validated));
       if (validated) {
         LOG.info("Sample summary successfully enriched", kv("sampleSummaryId", sampleSummaryId));
+        sendEnrichStatusToCollectionExercise(
+            sampleSummaryActivation.getCollectionExerciseId(), true);
       } else {
         LOG.error("Validation and enrichment failed", kv("sampleSummaryId", sampleSummaryId));
+        sendEnrichStatusToCollectionExercise(
+            sampleSummaryActivation.getCollectionExerciseId(), false);
         throw new SampleSummaryActivationException();
       }
+
     } catch (UnknownSampleSummaryException e) {
       LOG.error("unknown sample summary id", kv("sampleSummaryId", sampleSummaryId), e);
       sendEnrichStatusToCollectionExercise(collectionExerciseId, false);
-      throw new SampleSummaryActivationException();
+      throw new SampleSummaryActivationException(e);
     } catch (SampleSummaryActivationException e) {
       LOG.error(
           "Something went wrong activating sample summary",
@@ -125,6 +127,9 @@ public class SampleSummaryActivationService {
       throws SampleSummaryActivationException {
     try {
       sampleSummaryDistributionService.distribute(sampleSummaryActivation.getSampleSummaryId());
+      sendDistributeStatusToCollectionExercise(
+          sampleSummaryActivation.getCollectionExerciseId(), true);
+
     } catch (NoSampleUnitsInSampleSummaryException | UnknownSampleSummaryException e) {
       LOG.error(
           "something went wrong during distribution sample units",

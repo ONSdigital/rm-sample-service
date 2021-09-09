@@ -14,6 +14,7 @@ import libs.common.error.InvalidRequestException;
 import libs.common.time.DateTimeUtil;
 import libs.sample.validation.BusinessSampleUnit;
 import ma.glasnost.orika.MapperFacade;
+import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -182,19 +183,51 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
 
   @RequestMapping(value = "{sampleSummaryId}/sampleunits", method = RequestMethod.GET)
   public ResponseEntity<SampleUnitDTO[]> requestSampleUnitsForSampleSummary(
-      @PathVariable("sampleSummaryId") final UUID sampleSummaryId) throws CTPException {
+      @PathVariable("sampleSummaryId") final UUID sampleSummaryId,
+      @RequestParam(required = false) String state)
+      throws CTPException {
 
-    List<SampleUnit> sampleUnits = sampleService.findSampleUnitsBySampleSummary(sampleSummaryId);
+    List<SampleUnit> sampleUnits;
+    if (Strings.isEmpty(state)) {
+      sampleUnits = sampleService.findSampleUnitsBySampleSummary(sampleSummaryId);
 
-    List<SampleUnitDTO> result = mapperFacade.mapAsList(sampleUnits, SampleUnitDTO.class);
+      List<SampleUnitDTO> result = mapperFacade.mapAsList(sampleUnits, SampleUnitDTO.class);
 
-    if (!sampleUnits.isEmpty()) {
-      return ResponseEntity.ok(result.toArray(new SampleUnitDTO[] {}));
+      if (!sampleUnits.isEmpty()) {
+        return ResponseEntity.ok(result.toArray(new SampleUnitDTO[] {}));
+      }
+
+      throw new CTPException(
+          CTPException.Fault.BAD_REQUEST,
+          String.format("No sample units were found for sample summary %s", sampleSummaryId));
+    } else {
+      log.debug(
+          "finding samples with state", kv("sampleSummaryId", sampleSummaryId), kv("state", state));
+      try {
+        SampleUnitDTO.SampleUnitState sampleUnitState =
+            SampleUnitDTO.SampleUnitState.valueOf(state);
+        sampleUnits =
+            sampleService.findSampleUnitsBySampleSummaryAndState(sampleSummaryId, sampleUnitState);
+        log.info(
+            "found samples with state",
+            kv("sampleSummaryId", sampleSummaryId),
+            kv("state", state),
+            kv("numberOfSamples", sampleUnits.size()));
+
+        List<SampleUnitDTO> result = mapperFacade.mapAsList(sampleUnits, SampleUnitDTO.class);
+
+        return ResponseEntity.ok(result.toArray(new SampleUnitDTO[] {}));
+
+      } catch (IllegalArgumentException | NullPointerException e) {
+        log.error(
+            "failed to find samples with state",
+            kv("sampleSummaryId", sampleSummaryId),
+            kv("state", state),
+            e);
+        throw new CTPException(
+            CTPException.Fault.BAD_REQUEST, String.format("%s is not a valid state", state));
+      }
     }
-
-    throw new CTPException(
-        CTPException.Fault.BAD_REQUEST,
-        String.format("No sample units were found for sample summary %s", sampleSummaryId));
   }
 
   @RequestMapping(

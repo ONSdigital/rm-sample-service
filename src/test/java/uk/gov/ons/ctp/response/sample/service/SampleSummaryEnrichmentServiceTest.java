@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.*;
 import libs.collection.instrument.representation.CollectionInstrumentDTO;
+import libs.common.state.StateTransitionManager;
 import libs.party.representation.Association;
 import libs.party.representation.Enrolment;
 import libs.party.representation.PartyDTO;
@@ -20,6 +21,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.ons.ctp.response.client.CollectionInstrumentSvcClient;
@@ -29,6 +31,7 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -43,6 +46,16 @@ public class SampleSummaryEnrichmentServiceTest {
   @Mock private CollectionInstrumentSvcClient collectionInstrumentSvcClient;
 
   @Mock private SurveySvcClient surveySvcClient;
+
+  @Mock
+  @Qualifier("sampleSummaryTransitionManager")
+  private StateTransitionManager<SampleSummaryDTO.SampleState, SampleSummaryDTO.SampleEvent>
+      sampleSummaryTransitionManager;
+
+  @Mock
+  @Qualifier("sampleUnitTransitionManager")
+  private StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent>
+      sampleUnitTransitionManager;
 
   // class under test
   @InjectMocks private SampleSummaryEnrichmentService sampleSummaryEnrichmentService;
@@ -65,12 +78,14 @@ public class SampleSummaryEnrichmentServiceTest {
     SampleSummary sampleSummary = new SampleSummary();
     sampleSummary.setId(sampleSummaryId);
     sampleSummary.setSampleSummaryPK(1);
+    sampleSummary.setState(SampleSummaryDTO.SampleState.ACTIVE);
 
     SampleUnit sampleUnit = new SampleUnit();
     sampleUnit.setId(sampleUnitId);
     String sampleUnitRef = "11111111";
     sampleUnit.setSampleUnitRef(sampleUnitRef);
     sampleUnit.setSampleUnitType(sampleUnitType);
+    sampleUnit.setState(SampleUnitDTO.SampleUnitState.PERSISTED);
     List<SampleUnit> samples = new ArrayList<>();
     samples.add(sampleUnit);
 
@@ -113,10 +128,10 @@ public class SampleSummaryEnrichmentServiceTest {
   /**
    * Test the enrichment fails if the party does not exist
    *
-   * @throws UnknownSampleSummaryException fails the test
+   * @throws Exception any exception fails the test
    */
   @Test
-  public void testEnrichFailsWithUnknownPartyId() throws UnknownSampleSummaryException {
+  public void testEnrichFailsWithUnknownPartyId() throws Exception {
     UUID surveyId = UUID.randomUUID();
     UUID sampleSummaryId = UUID.randomUUID();
     UUID collectionExerciseId = UUID.randomUUID();
@@ -127,11 +142,13 @@ public class SampleSummaryEnrichmentServiceTest {
     SampleSummary sampleSummary = new SampleSummary();
     sampleSummary.setId(sampleSummaryId);
     sampleSummary.setSampleSummaryPK(1);
+    sampleSummary.setState(SampleSummaryDTO.SampleState.ACTIVE);
 
     SampleUnit sampleUnit = new SampleUnit();
     sampleUnit.setId(sampleUnitId);
     sampleUnit.setSampleUnitRef(sampleUnitRef);
     sampleUnit.setSampleUnitType(sampleUnitType);
+    sampleUnit.setState(SampleUnitDTO.SampleUnitState.PERSISTED);
     List<SampleUnit> samples = new ArrayList<>();
     samples.add(sampleUnit);
 
@@ -141,20 +158,35 @@ public class SampleSummaryEnrichmentServiceTest {
         .thenReturn(samples.stream());
     when(partySvcClient.requestParty(sampleUnitRef))
         .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND, "Not found"));
+    when(sampleSummaryTransitionManager.transition(
+            SampleSummaryDTO.SampleState.ACTIVE, SampleSummaryDTO.SampleEvent.FAIL_VALIDATION))
+        .thenReturn(SampleSummaryDTO.SampleState.FAILED);
+    when(sampleUnitTransitionManager.transition(
+            SampleUnitDTO.SampleUnitState.PERSISTED, SampleUnitDTO.SampleUnitEvent.FAIL_VALIDATION))
+        .thenReturn(SampleUnitDTO.SampleUnitState.FAILED);
 
     boolean enriched =
         sampleSummaryEnrichmentService.enrich(surveyId, sampleSummaryId, collectionExerciseId);
     assertFalse("sample summary ", enriched);
+
+    assertEquals(SampleSummaryDTO.SampleState.FAILED, sampleSummary.getState());
+    assertEquals(SampleUnitDTO.SampleUnitState.FAILED, sampleUnit.getState());
+
+    verify(sampleSummaryTransitionManager, times(1))
+        .transition(
+            SampleSummaryDTO.SampleState.ACTIVE, SampleSummaryDTO.SampleEvent.FAIL_VALIDATION);
+    verify(sampleUnitTransitionManager, times(1))
+        .transition(
+            SampleUnitDTO.SampleUnitState.PERSISTED, SampleUnitDTO.SampleUnitEvent.FAIL_VALIDATION);
   }
 
   /**
    * Test that enrichment fails with unknown collection instrument
    *
-   * @throws UnknownSampleSummaryException fails the test
+   * @throws any exception fails the test
    */
   @Test
-  public void testEnrichFailsWithUnknownCollectionInstrument()
-      throws UnknownSampleSummaryException {
+  public void testEnrichFailsWithUnknownCollectionInstrument() throws Exception {
     UUID surveyId = UUID.randomUUID();
     UUID sampleSummaryId = UUID.randomUUID();
     UUID collectionExerciseId = UUID.randomUUID();
@@ -166,12 +198,15 @@ public class SampleSummaryEnrichmentServiceTest {
     SampleSummary sampleSummary = new SampleSummary();
     sampleSummary.setId(sampleSummaryId);
     sampleSummary.setSampleSummaryPK(1);
+    sampleSummary.setState(SampleSummaryDTO.SampleState.ACTIVE);
 
     SampleUnit sampleUnit = new SampleUnit();
     sampleUnit.setId(sampleUnitId);
     String sampleUnitRef = "11111111";
     sampleUnit.setSampleUnitRef(sampleUnitRef);
     sampleUnit.setSampleUnitType(sampleUnitType);
+    sampleUnit.setState(SampleUnitDTO.SampleUnitState.PERSISTED);
+
     List<SampleUnit> samples = new ArrayList<>();
     samples.add(sampleUnit);
 
@@ -199,10 +234,27 @@ public class SampleSummaryEnrichmentServiceTest {
     when(sampleUnitRepository.findBySampleSummaryFKAndState(
             1, SampleUnitDTO.SampleUnitState.PERSISTED))
         .thenReturn(samples.stream());
+
+    when(sampleSummaryTransitionManager.transition(
+            SampleSummaryDTO.SampleState.ACTIVE, SampleSummaryDTO.SampleEvent.FAIL_VALIDATION))
+        .thenReturn(SampleSummaryDTO.SampleState.FAILED);
+    when(sampleUnitTransitionManager.transition(
+            SampleUnitDTO.SampleUnitState.PERSISTED, SampleUnitDTO.SampleUnitEvent.FAIL_VALIDATION))
+        .thenReturn(SampleUnitDTO.SampleUnitState.FAILED);
     boolean enriched =
         sampleSummaryEnrichmentService.enrich(surveyId, sampleSummaryId, collectionExerciseId);
+
     assertFalse("sample summary should not be enriched", enriched);
+    assertEquals(SampleSummaryDTO.SampleState.FAILED, sampleSummary.getState());
+    assertEquals(SampleUnitDTO.SampleUnitState.FAILED, sampleUnit.getState());
+
     verify(partySvcClient, times(1)).requestParty(sampleUnitRef);
+    verify(sampleSummaryTransitionManager, times(1))
+        .transition(
+            SampleSummaryDTO.SampleState.ACTIVE, SampleSummaryDTO.SampleEvent.FAIL_VALIDATION);
+    verify(sampleUnitTransitionManager, times(1))
+        .transition(
+            SampleUnitDTO.SampleUnitState.PERSISTED, SampleUnitDTO.SampleUnitEvent.FAIL_VALIDATION);
   }
 
   /**

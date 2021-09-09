@@ -14,7 +14,9 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryActivationDTO;
-import uk.gov.ons.ctp.response.sample.service.*;
+import uk.gov.ons.ctp.response.sample.service.SampleSummaryActivationException;
+import uk.gov.ons.ctp.response.sample.service.SampleSummaryActivationService;
+import uk.gov.ons.ctp.response.sample.service.SampleSummaryEnrichmentService;
 
 /** PubSub subscription responsible for sample summary activation via PubSub. */
 @Component
