@@ -71,7 +71,7 @@ public class SampleSummaryEnrichmentService {
   private StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent>
       sampleUnitTransitionManager;
 
-  @Transactional(propagation = Propagation.REQUIRED)
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public boolean enrich(UUID surveyId, UUID sampleSummaryId, UUID collectionExerciseId)
       throws UnknownSampleSummaryException {
 
