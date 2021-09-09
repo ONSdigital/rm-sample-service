@@ -190,6 +190,16 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     List<SampleUnit> sampleUnits;
     if (Strings.isEmpty(state)) {
       sampleUnits = sampleService.findSampleUnitsBySampleSummary(sampleSummaryId);
+
+      List<SampleUnitDTO> result = mapperFacade.mapAsList(sampleUnits, SampleUnitDTO.class);
+
+      if (!sampleUnits.isEmpty()) {
+        return ResponseEntity.ok(result.toArray(new SampleUnitDTO[] {}));
+      }
+
+      throw new CTPException(
+          CTPException.Fault.BAD_REQUEST,
+          String.format("No sample units were found for sample summary %s", sampleSummaryId));
     } else {
       log.debug(
           "finding samples with state", kv("sampleSummaryId", sampleSummaryId), kv("state", state));
@@ -203,6 +213,11 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
             kv("sampleSummaryId", sampleSummaryId),
             kv("state", state),
             kv("numberOfSamples", sampleUnits.size()));
+
+        List<SampleUnitDTO> result = mapperFacade.mapAsList(sampleUnits, SampleUnitDTO.class);
+
+        return ResponseEntity.ok(result.toArray(new SampleUnitDTO[] {}));
+
       } catch (IllegalArgumentException | NullPointerException e) {
         log.error(
             "failed to find samples with state",
@@ -213,16 +228,6 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
             CTPException.Fault.BAD_REQUEST, String.format("%s is not a valid state", state));
       }
     }
-
-    List<SampleUnitDTO> result = mapperFacade.mapAsList(sampleUnits, SampleUnitDTO.class);
-
-    if (!sampleUnits.isEmpty()) {
-      return ResponseEntity.ok(result.toArray(new SampleUnitDTO[] {}));
-    }
-
-    throw new CTPException(
-        CTPException.Fault.BAD_REQUEST,
-        String.format("No sample units were found for sample summary %s", sampleSummaryId));
   }
 
   @RequestMapping(
