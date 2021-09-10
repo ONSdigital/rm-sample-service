@@ -3,6 +3,7 @@ package uk.gov.ons.ctp.response.sample.service;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import libs.collection.instrument.representation.CollectionInstrumentDTO;
@@ -13,6 +14,7 @@ import libs.party.representation.Enrolment;
 import libs.party.representation.PartyDTO;
 import libs.survey.representation.SurveyClassifierDTO;
 import libs.survey.representation.SurveyClassifierTypeDTO;
+import org.apache.logging.log4j.util.Strings;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,7 +102,7 @@ public class SampleSummaryEnrichmentService {
 
     LOG.debug("found samples for sample summary", kv("sampleSummaryId", sampleSummaryId));
     // create a map to hold form types to collection instrument ids
-    Map<String, Optional<UUID>> formTypeMap = new HashMap<>();
+    final Map<String, Optional<UUID>> formTypeMap = new ConcurrentHashMap<>();
 
     List<SampleUnit> invalidSamples = new ArrayList<>();
     sampleUnits.forEach(
@@ -198,9 +200,17 @@ public class SampleSummaryEnrichmentService {
     // and if we haven't seen this form type before add it
     // to a map so we can reuse for the next sample
 
+    String formType;
+    if (sampleUnit.getFormType() != null) {
+      formType = sampleUnit.getFormType();
+    } else {
+      // concurrent hashmap don't allow nulls so use an empty string instead
+      formType = Strings.EMPTY;
+    }
+
     Optional<UUID> collectionInstrumentId =
         formTypeMap.computeIfAbsent(
-            sampleUnit.getFormType(),
+            formType,
             key -> {
               UUID ciId = null;
               List<String> classifierTypes = requestSurveyClassifiers(surveyId);
