@@ -15,7 +15,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.cloud.gcp.pubsub.core.PubSubTemplate;
 import org.springframework.cloud.gcp.pubsub.integration.AckMode;
 import org.springframework.cloud.gcp.pubsub.integration.inbound.PubSubInboundChannelAdapter;
@@ -31,6 +34,7 @@ import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
@@ -56,6 +60,8 @@ public class SampleSvcApplication {
   @Autowired private StateTransitionManagerFactory stateTransitionManager;
 
   @Autowired private AppConfig appConfig;
+
+  public static final String COLLECTION_INSTRUMENT_CACHE = "collectioninstruments";
 
   /**
    * This method is the entry point to the Spring Boot application.
@@ -203,5 +209,21 @@ public class SampleSvcApplication {
   @MessagingGateway(defaultRequestChannel = "caseNotificationChannel")
   public interface PubSubOutboundCaseNotificationGateway {
     void sendToPubSub(String text);
+  }
+
+  @Bean
+  public CacheManager cacheManager() {
+    return new ConcurrentMapCacheManager(COLLECTION_INSTRUMENT_CACHE);
+  }
+
+  @CacheEvict(
+      allEntries = true,
+      cacheNames = {COLLECTION_INSTRUMENT_CACHE})
+  @Scheduled(fixedDelay = 60000)
+  public void cacheEvict() {
+    /* This is getting rid of the cached entries in case anything's been changed. We imagine
+    that
+        * the maximum of a 1 minute delay to seeing changes reflected in the collection
+        * exercise service will not cause any issues*/
   }
 }

@@ -91,7 +91,6 @@
 		</dependency>
 
 
-
 		<!-- Third Party -->
 		<!-- Added because of mockito errors. It's explained more here
         https://dev.to/scottshipp/how-to-fix-a-mockito-cannot-mock-this-class-exception-in-a-spring-boot-app-457e -->
@@ -239,6 +238,14 @@
 			<artifactId>spring-cloud-gcp-pubsub</artifactId>
 			<version>1.2.8.RELEASE</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.github.tomakehurst</groupId>
+			<artifactId>wiremock</artifactId>
+			<version>2.18.0</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<dependencyManagement>
@@ -302,6 +309,8 @@
 				<version>${common.version}</version>
 				<scope>test</scope>
 			</dependency>
+
+
 
 		</dependencies>
 
