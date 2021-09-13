@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ctp.response.sample.message.SampleSummaryActivationStatusPublisher;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryActivationDTO;
@@ -31,6 +32,7 @@ public class SampleSummaryActivationService {
    *
    * @param sampleSummaryActivation an object containing all the details required for activation
    */
+  @Async
   public void activateSampleSummaryFromPubsub(SampleSummaryActivationDTO sampleSummaryActivation)
       throws SampleSummaryActivationException {
     LOG.info(
