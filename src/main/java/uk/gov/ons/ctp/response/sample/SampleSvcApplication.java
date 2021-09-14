@@ -10,6 +10,8 @@ import libs.common.state.StateTransitionManager;
 import libs.common.state.StateTransitionManagerFactory;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.cobertura.CoverageIgnore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
@@ -62,6 +64,8 @@ public class SampleSvcApplication {
   @Autowired private AppConfig appConfig;
 
   public static final String COLLECTION_INSTRUMENT_CACHE = "collectioninstruments";
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(SampleSvcApplication.class);
 
   /**
    * This method is the entry point to the Spring Boot application.
@@ -222,8 +226,10 @@ public class SampleSvcApplication {
   @Scheduled(fixedDelay = 60000)
   public void cacheEvict() {
     /* This is getting rid of the cached entries in case anything's been changed. We imagine
-    that
-        * the maximum of a 1 minute delay to seeing changes reflected in the collection
-        * exercise service will not cause any issues*/
+     * that the maximum of a 1 minute delay to seeing changes reflected in the collection
+     * instrument service will not cause any issues
+     *
+     */
+    LOGGER.info("Collection instrument cache evicted");
   }
 }
