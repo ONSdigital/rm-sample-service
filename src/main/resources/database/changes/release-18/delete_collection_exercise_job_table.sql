@@ -1,0 +1,1 @@
+DROP TABLE sample.collection_exercise_job;

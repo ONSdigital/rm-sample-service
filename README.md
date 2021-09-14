@@ -27,11 +27,6 @@ Note. If you need to skip the integration tests due to port clashes run
 mvn clean install -Ddocker.skip -DskipITs
 ```
 
-## Testing
-* to add a collectionExerciseJob to the postgres database
-
-      curl -H "Content-Type: application/json" -X POST -d '{ "collectionExerciseJobPK" : "4","surveyRef" : "str1234","exerciseDateTime" : "2012-12-13T12:12:12.000+00" }' http://localhost:8125/samples/sampleunitrequests
-
 ## API
 See [API.md](https://github.com/ONSdigital/rm-sample-service/blob/main/API.md) for API documentation.
 
@@ -53,17 +48,13 @@ The following changes can be safely made to the service/database
 
 ## Communicates with
 - Party via a rest call `/party-api/v1/parties` for creating a new business
-- Collection-exercise via rabbit for both `INIT` and `PERSISTED` sample units
+- Collection-exercise via PubSub to inform how the enrichment and distribution of sample units to case is going
 
 ## What it does
 On file upload it creates a new SampleSummary entry in the database with State = INIT
 
 SampleOuboundPublisher - It will then asynchronously parse the sample file and send a message with the routing key `Sample.SampleUploadStarted.binding`
-However this routing key doesnt match the binding key `Sample.SampleDelivery.binding` for the `sample-outbound-exchange` so presumably this message will be descarded (Further analysis required). Collection exercise is listening to the `Sample.SampleDelivery` queue
-
-CsvIngesterBusiness - Providing the SampleSummary type is "B" it will attempt to parse the uploaded CSV. Foreach line in the sample file create a new callable so this can all be sone asyncronously, pass in a new empty keyset. Our asyncronous callable is now syncronised because opencsv is not actually threadsafe!?!? The empty keyset is then used to store sample units where exceptions are thrown for duplicates.
-We're converting each sample file line into a business sample unit. We construct a list of samples, calculate the size of the collection instrument (number of unique formtypes) then save each sample unit to the database and update the SampleSummary with the total number of collection instruments and total number of sample units.
-For each sample unit; we create a Party Creation request and ship it off to the `Sample.Party` queue. Sample itself if listening on that queue and will pick up its own message to send to party via a rest call, then it sends an event to the event exchange where the event is `sample PERSISTED` (This exchange has no bindings associated with it so im guess this is just completely ignored and not required?
+However this routing key doesnt match the binding key `Sample.SampleDelivery.binding` for the `sample-outbound-exchange` so presumably this message will be discarded (Further analysis required). Collection exercise is listening to the `Sample.SampleDelivery` queue
 
 SampleUnitDistributor - For each collection exercise job that has not been completed (jobcomplete=false), look for active sample summaries and send the `PERSISTED` sample unit to the `Sample.SampleDelivery` queue.
 

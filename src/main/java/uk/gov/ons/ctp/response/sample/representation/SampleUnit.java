@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.response.sampleunit.definition;
+package uk.gov.ons.ctp.response.sample.representation;
 
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -15,5 +15,4 @@ public class SampleUnit {
   @NotNull protected String sampleUnitType;
   protected String formType;
   @NotNull protected String collectionExerciseId;
-  protected SampleAttributes sampleAttributes;
 }

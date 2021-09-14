@@ -16,7 +16,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.ons.ctp.response.sample.domain.model.CollectionExerciseJob;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
@@ -44,8 +43,6 @@ public class SampleService {
   @Qualifier("sampleUnitTransitionManager")
   private StateTransitionManager<SampleUnitState, SampleUnitEvent>
       sampleSvcUnitStateTransitionManager;
-
-  @Autowired private CollectionExerciseJobService collectionExerciseJobService;
 
   public List<SampleSummary> findAllSampleSummaries() {
     return sampleSummaryRepository.findAll();
@@ -209,26 +206,6 @@ public class SampleService {
     }
   }
 
-  /**
-   * Save CollectionExerciseJob to collectionExerciseJob table
-   *
-   * @param job CollectionExerciseJobCreationRequestDTO related to SampleUnits
-   * @return Integer Returns sampleUnitsTotal value
-   * @throws CTPException if update operation fails or CollectionExerciseJob already exists
-   */
-  public Integer initialiseCollectionExerciseJob(CollectionExerciseJob job) throws CTPException {
-    // Integer sampleUnitsTotal =
-    // initialiseSampleUnitsForCollectionExcerciseCollection(job.getSampleSummaryId());
-    Integer sampleUnitsTotal = 0;
-    SampleSummary sampleSummary =
-        sampleSummaryRepository.findById(job.getSampleSummaryId()).orElse(null);
-    if (sampleSummary != null && sampleSummary.getTotalSampleUnits() != 0) {
-      sampleUnitsTotal = sampleSummary.getTotalSampleUnits();
-      collectionExerciseJobService.storeCollectionExerciseJob(job);
-    }
-    return sampleUnitsTotal;
-  }
-
   public int getSampleSummaryUnitCount(UUID sampleSummaryId) {
     SampleSummary sampleSummary = sampleSummaryRepository.findById(sampleSummaryId).orElse(null);
     if (sampleSummary == null) {
@@ -239,9 +216,7 @@ public class SampleService {
           String.format("Sample summary %s has no total sample units set", sampleSummaryId));
     }
 
-    int sampleUnitsTotal = sampleSummary.getTotalSampleUnits().intValue();
-
-    return sampleUnitsTotal;
+    return sampleSummary.getTotalSampleUnits().intValue();
   }
 
   // TODO get this to get the attributes in a separate call then stitch the results into the value

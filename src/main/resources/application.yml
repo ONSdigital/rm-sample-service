@@ -130,15 +130,6 @@ party-svc:
     # time to read response
     read-timeout-milli-seconds: 5000
 
-
-rabbitmq:
-  username: guest
-  password: guest
-  host: localhost
-  port: 5672
-  virtualhost: /
-  cron: "* * * * * ?"
-
 messaging:
   backoffInitial: 5000
   backoffMultiplier: 3
@@ -156,5 +147,4 @@ gcp:
   project: ras-rm-sandbox
   sampleSummaryActivationSubscription: "test_activation_subscription"
   sampleSummaryActivationStatusTopic: "test_activation_topic"
-  sampleUnitPublisherTopic: "test_topic"
   caseNotificationTopic: "test_topic"

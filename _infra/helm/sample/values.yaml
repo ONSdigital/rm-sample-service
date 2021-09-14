@@ -47,12 +47,6 @@ rollingUpdate:
   maxSurge: 1
   maxUnavailable: 1
 
-managedRabbitMQ:
-  enabled: false
-
-export:
-  cron: "* * * * *"
-
 distribution:
   delay: 1000
 
@@ -64,5 +58,4 @@ gcp:
   project: ras-rm-sandbox
   sampleSummaryActivationSubscription: "sample-summary-activation-subscription"
   sampleSummaryActivationStatusTopic: "sample-summary-activation-status-topic"
-  sampleUnitPublisherTopic: "sample-unit-topic"
   caseNotificationTopic: "case-notification-topic"

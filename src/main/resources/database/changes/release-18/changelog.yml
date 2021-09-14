@@ -1,0 +1,11 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 18-1
+      author: Adam Mann
+      changes:
+        - sqlFile:
+            comment: Remove collection_exercise_job table
+            path: delete_collection_exercise_job_table.sql
+            relativeToChangelogFile: true
+            splitStatements: false
