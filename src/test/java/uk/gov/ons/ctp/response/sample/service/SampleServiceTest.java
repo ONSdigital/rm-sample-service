@@ -4,10 +4,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -255,5 +254,47 @@ public class SampleServiceTest {
         .thenReturn(null);
     sampleService.findSampleUnitBySampleSummaryAndSampleUnitRef(
         newSummary.getId(), businessSampleUnit.getSampleUnitRef());
+  }
+
+  @Test
+  public void findSampleUnitsBySampleSummaryAndState() {
+    SampleSummary newSummary = createSampleSummary(5, 2);
+    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.of(newSummary));
+
+    SampleUnit sampleUnit = new SampleUnit();
+    sampleUnit.setId(UUID.randomUUID());
+    String sampleUnitRef = "11111111";
+    sampleUnit.setSampleUnitRef(sampleUnitRef);
+    sampleUnit.setSampleUnitType("B");
+    sampleUnit.setState(SampleUnitState.FAILED);
+
+    List<SampleUnit> sampleUnits = new ArrayList<>();
+    sampleUnits.add(sampleUnit);
+
+    when(sampleUnitRepository.findBySampleSummaryFKAndState(
+            newSummary.getSampleSummaryPK(), SampleUnitState.FAILED))
+        .thenReturn(sampleUnits.stream());
+
+    List<SampleUnit> su =
+        sampleService.findSampleUnitsBySampleSummaryAndState(
+            newSummary.getId(), SampleUnitState.FAILED);
+
+    assertEquals(sampleUnit, su.get(0));
+
+    verify(sampleUnitRepository, times(1))
+        .findBySampleSummaryFKAndState(newSummary.getSampleSummaryPK(), SampleUnitState.FAILED);
+  }
+
+  @Test
+  public void findSampleUnitsBySampleSummaryAndStateReturnsEmptyList() {
+
+    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(null));
+
+    List<SampleUnit> su =
+        sampleService.findSampleUnitsBySampleSummaryAndState(
+            UUID.randomUUID(), SampleUnitState.FAILED);
+    assertTrue(su.isEmpty());
+
+    verify(sampleUnitRepository, never()).findBySampleSummaryFKAndState(any(), any());
   }
 }

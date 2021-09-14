@@ -3,6 +3,7 @@ package uk.gov.ons.ctp.response.sample.service;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
 import libs.common.time.DateTimeUtil;
@@ -218,43 +219,10 @@ public class SampleService {
     return sampleSummary.getTotalSampleUnits().intValue();
   }
 
-  public Optional<SampleSummary> failSampleSummary(SampleSummary sampleSummary, String message) {
-    try {
-      SampleState newState =
-          sampleSvcStateTransitionManager.transition(
-              sampleSummary.getState(), SampleEvent.FAIL_VALIDATION);
-      sampleSummary.setState(newState);
-      sampleSummary.setNotes(message);
-      SampleSummary persisted = this.sampleSummaryRepository.save(sampleSummary);
-
-      return Optional.of(persisted);
-    } catch (CTPException e) {
-      log.error(
-          "Failed to put sample summary into FAILED state",
-          kv("sample_summary", sampleSummary.getId()),
-          e);
-
-      return Optional.empty();
-    } catch (RuntimeException e) {
-      // Hibernate throws RuntimeException if any issue persisting the SampleSummary. This is to
-      // ensure it is logged
-      // (otherwise they just disappear).
-      log.error("Failed to persist sample summary - {}", e);
-
-      throw e;
-    }
-  }
-
-  public Optional<SampleSummary> failSampleSummary(
-      SampleSummary sampleSummary, Exception exception) {
-    return failSampleSummary(sampleSummary, exception.getMessage());
-  }
-
   // TODO get this to get the attributes in a separate call then stitch the results into the value
   // returned by sampleUnitRepository.findById
   public SampleUnit findSampleUnit(UUID id) {
-    SampleUnit su = sampleUnitRepository.findById(id).orElse(null);
-    return su;
+    return sampleUnitRepository.findById(id).orElse(null);
   }
 
   public List<SampleUnit> findSampleUnitsBySampleSummary(UUID sampleSummaryId) {
@@ -264,6 +232,23 @@ public class SampleService {
     } catch (NoSuchElementException e) {
       log.error("unable to find sample summary", kv("sampleSummaryId", sampleSummaryId));
       return new ArrayList<>();
+    }
+  }
+
+  @Transactional(propagation = Propagation.REQUIRED, readOnly = true)
+  public List<SampleUnit> findSampleUnitsBySampleSummaryAndState(
+      UUID sampleSummaryId, SampleUnitState state) {
+    try {
+      SampleSummary ss =
+          sampleSummaryRepository
+              .findById(sampleSummaryId)
+              .orElseThrow(UnknownSampleSummaryException::new);
+      return sampleUnitRepository
+          .findBySampleSummaryFKAndState(ss.getSampleSummaryPK(), state)
+          .collect(Collectors.toList());
+    } catch (UnknownSampleSummaryException e) {
+      log.error("unable to find sample summary", kv("sampleSummaryId", sampleSummaryId));
+      return Collections.EMPTY_LIST;
     }
   }
 

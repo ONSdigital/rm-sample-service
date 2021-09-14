@@ -4,6 +4,7 @@ skinparam state {
 }
 
 [*] --> INIT
-INIT --> PERSISTED : persisting [[https://github.com/ONSdigital/rm-sample-service/blob/main/src/main/java/uk/gov/ons/ctp/response/sample/service/impl/SampleServiceImpl.java#L201 *]]
-PERSISTED --> DELIVERED : delivering to case [[https://github.com/ONSdigital/rm-sample-service/blob/main/src/main/java/uk/gov/ons/ctp/response/sample/service/SampleDistributionService.java#L103 *]]
+INIT --> PERSISTED : persisting
+PERSISTED --> DELIVERED : delivering to case
+PERSISTED --> FAILED : failed to enrich
 @enduml

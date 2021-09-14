@@ -151,6 +151,13 @@ paths:
             type: string
             format: uuid
             example: 34597808-ec88-4e93-af2f-228e33ff7946
+        - in: query
+          name: state
+          description: only return sample units that have the requested state
+          required: false
+          schema:
+            type: string
+            example: FAILED
       responses:
         '200':
           description: The respondent was retrieved successfully.
