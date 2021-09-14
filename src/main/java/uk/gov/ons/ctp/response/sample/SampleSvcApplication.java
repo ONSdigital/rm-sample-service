@@ -63,8 +63,6 @@ public class SampleSvcApplication {
 
   @Autowired private AppConfig appConfig;
 
-  public static final String COLLECTION_INSTRUMENT_CACHE = "collectioninstruments";
-
   private static final Logger LOGGER = LoggerFactory.getLogger(SampleSvcApplication.class);
 
   /**
@@ -214,6 +212,8 @@ public class SampleSvcApplication {
   public interface PubSubOutboundCaseNotificationGateway {
     void sendToPubSub(String text);
   }
+
+  public static final String COLLECTION_INSTRUMENT_CACHE = "collectioninstruments";
 
   @Bean
   public CacheManager cacheManager() {
