@@ -228,6 +228,6 @@ public class SampleSvcApplication {
      * instrument service will not cause any issues
      *
      */
-    log.info("Collection instrument cache evicted");
+    log.debug("Collection instrument cache evicted");
   }
 }
