@@ -36,6 +36,7 @@ import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
@@ -56,6 +57,7 @@ import uk.gov.ons.ctp.response.sample.service.state.SampleSvcStateTransitionMana
 @EnableJpaRepositories(basePackages = {"uk.gov.ons.ctp.response"})
 @EntityScan("uk.gov.ons.ctp.response")
 @EnableAsync
+@EnableScheduling
 @Slf4j
 public class SampleSvcApplication {
 
@@ -63,7 +65,6 @@ public class SampleSvcApplication {
 
   @Autowired private AppConfig appConfig;
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(SampleSvcApplication.class);
 
   /**
    * This method is the entry point to the Spring Boot application.
@@ -230,6 +231,6 @@ public class SampleSvcApplication {
      * instrument service will not cause any issues
      *
      */
-    LOGGER.info("Collection instrument cache evicted");
+    log.info("Collection instrument cache evicted");
   }
 }
