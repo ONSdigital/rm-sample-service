@@ -10,8 +10,6 @@ import libs.common.state.StateTransitionManager;
 import libs.common.state.StateTransitionManagerFactory;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.cobertura.CoverageIgnore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
@@ -64,7 +62,6 @@ public class SampleSvcApplication {
   @Autowired private StateTransitionManagerFactory stateTransitionManager;
 
   @Autowired private AppConfig appConfig;
-
 
   /**
    * This method is the entry point to the Spring Boot application.
