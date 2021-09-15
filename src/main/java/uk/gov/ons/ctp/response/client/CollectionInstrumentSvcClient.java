@@ -1,11 +1,14 @@
 package uk.gov.ons.ctp.response.client;
 
+import static uk.gov.ons.ctp.response.sample.SampleSvcApplication.COLLECTION_INSTRUMENT_CACHE;
+
 import java.util.List;
 import libs.collection.instrument.representation.CollectionInstrumentDTO;
 import libs.common.rest.RestUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -48,6 +51,7 @@ public class CollectionInstrumentSvcClient {
       value = {RestClientException.class},
       maxAttemptsExpression = "#{${retries.maxAttempts}}",
       backoff = @Backoff(delayExpression = "#{${retries.backoff}}"))
+  @Cacheable(COLLECTION_INSTRUMENT_CACHE)
   public List<CollectionInstrumentDTO> requestCollectionInstruments(String searchString) {
     MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
     queryParams.add("searchString", searchString);

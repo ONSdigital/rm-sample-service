@@ -15,7 +15,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.cloud.gcp.pubsub.core.PubSubTemplate;
 import org.springframework.cloud.gcp.pubsub.integration.AckMode;
 import org.springframework.cloud.gcp.pubsub.integration.inbound.PubSubInboundChannelAdapter;
@@ -31,6 +34,8 @@ import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
@@ -50,6 +55,7 @@ import uk.gov.ons.ctp.response.sample.service.state.SampleSvcStateTransitionMana
 @EnableJpaRepositories(basePackages = {"uk.gov.ons.ctp.response"})
 @EntityScan("uk.gov.ons.ctp.response")
 @EnableAsync
+@EnableScheduling
 @Slf4j
 public class SampleSvcApplication {
 
@@ -203,5 +209,25 @@ public class SampleSvcApplication {
   @MessagingGateway(defaultRequestChannel = "caseNotificationChannel")
   public interface PubSubOutboundCaseNotificationGateway {
     void sendToPubSub(String text);
+  }
+
+  public static final String COLLECTION_INSTRUMENT_CACHE = "collectioninstruments";
+
+  @Bean
+  public CacheManager cacheManager() {
+    return new ConcurrentMapCacheManager(COLLECTION_INSTRUMENT_CACHE);
+  }
+
+  @CacheEvict(
+      allEntries = true,
+      cacheNames = {COLLECTION_INSTRUMENT_CACHE})
+  @Scheduled(fixedDelay = 60000)
+  public void cacheEvict() {
+    /* This is getting rid of the cached entries in case anything's been changed. We imagine
+     * that the maximum of a 1 minute delay to seeing changes reflected in the collection
+     * instrument service will not cause any issues
+     *
+     */
+    log.debug("Collection instrument cache evicted");
   }
 }
