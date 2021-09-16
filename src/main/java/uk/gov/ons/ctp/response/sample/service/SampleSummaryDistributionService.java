@@ -59,8 +59,7 @@ public class SampleSummaryDistributionService {
 
     LOG.info("found sample summary", kv("sampleSummary", sampleSummary.getId()));
 
-    Stream<SampleUnit> sampleUnits =
-        sampleService.findSampleUnitsBySampleSummary(sampleSummaryId).parallel();
+    Stream<SampleUnit> sampleUnits = sampleService.findSampleUnitsBySampleSummary(sampleSummaryId);
 
     LOG.info("found sample units for summary", kv("sampleSummaryId", sampleSummaryId));
 
@@ -68,25 +67,27 @@ public class SampleSummaryDistributionService {
     // We need to check that the stream length wasn't 0 - we can't check directly as this would
     // consume the stream
     AtomicInteger i = new AtomicInteger(0);
-    sampleUnits.forEach(
-        sampleUnit -> {
-          i.getAndIncrement();
-          try {
-            LOG.info(
-                "distribute sample unit",
-                kv("sampleSummaryId", sampleSummaryId),
-                kv("sampleUnitId", sampleUnit.getId()));
-            distributeSampleUnit(sampleSummary.getCollectionExerciseId(), sampleUnit);
+    sampleUnits
+        .parallel()
+        .forEach(
+            sampleUnit -> {
+              i.getAndIncrement();
+              try {
+                LOG.info(
+                    "distribute sample unit",
+                    kv("sampleSummaryId", sampleSummaryId),
+                    kv("sampleUnitId", sampleUnit.getId()));
+                distributeSampleUnit(sampleSummary.getCollectionExerciseId(), sampleUnit);
 
-          } catch (RuntimeException ex) {
-            LOG.error(
-                "Failed to distribute sample unit",
-                kv("sampleSummaryId", sampleSummaryId),
-                kv("sampleUnitId", sampleUnit.getId()),
-                ex);
-            throw ex;
-          }
-        });
+              } catch (RuntimeException ex) {
+                LOG.error(
+                    "Failed to distribute sample unit",
+                    kv("sampleSummaryId", sampleSummaryId),
+                    kv("sampleUnitId", sampleUnit.getId()),
+                    ex);
+                throw ex;
+              }
+            });
 
     if (i.get() == 0) {
       LOG.info(

@@ -95,53 +95,54 @@ public class SampleSummaryEnrichmentService {
 
     // get all the samples
     Stream<SampleUnit> sampleUnits =
-        sampleUnitRepository
-            .findBySampleSummaryFKAndState(
-                sampleSummary.getSampleSummaryPK(), SampleUnitDTO.SampleUnitState.PERSISTED)
-            .parallel();
+        sampleUnitRepository.findBySampleSummaryFKAndState(
+            sampleSummary.getSampleSummaryPK(), SampleUnitDTO.SampleUnitState.PERSISTED);
 
     LOG.debug("found samples for sample summary", kv("sampleSummaryId", sampleSummaryId));
     // create a map to hold form types to collection instrument ids
     final Map<String, Optional<UUID>> formTypeMap = new ConcurrentHashMap<>();
 
     List<SampleUnit> invalidSamples = new ArrayList<>();
-    sampleUnits.forEach(
-        (sampleUnit) -> {
-          UUID sampleUnitId = sampleUnit.getId();
-          LOG.debug(
-              "processing sample unit",
-              kv("sampleUnitId", sampleUnitId),
-              kv("sampleSummaryId", sampleSummaryId));
-          // for each sample check there is a party id
-          LOG.debug(
-              "about to find party",
-              kv("sampleUnitId", sampleUnitId),
-              kv("sampleSummaryId", sampleSummaryId));
-          boolean foundParty = findAndUpdateParty(surveyId, sampleUnit, sampleUnitId);
-          LOG.debug(
-              "party request returned " + foundParty,
-              kv("sampleUnitId", sampleUnitId),
-              kv("sampleSummaryId", sampleSummaryId),
-              kv("foundParty", foundParty));
-          if (foundParty) {
-            LOG.debug(
-                "about to search for collection instrument id",
-                kv("sampleUnitId", sampleUnitId),
-                kv("sampleSummaryId", sampleSummaryId));
-            boolean foundCI = findAndUpdateCollectionInstrument(surveyId, formTypeMap, sampleUnit);
-            LOG.debug(
-                "CI request returned " + foundCI,
-                kv("sampleUnitId", sampleUnitId),
-                kv("sampleSummaryId", sampleSummaryId),
-                kv("foundCI", foundCI));
-            if (!foundCI) {
-              invalidSamples.add(sampleUnit);
-            }
-          } else {
-            invalidSamples.add(sampleUnit);
-          }
-          sampleUnitRepository.saveAndFlush(sampleUnit);
-        });
+    sampleUnits
+        .parallel()
+        .forEach(
+            (sampleUnit) -> {
+              UUID sampleUnitId = sampleUnit.getId();
+              LOG.debug(
+                  "processing sample unit",
+                  kv("sampleUnitId", sampleUnitId),
+                  kv("sampleSummaryId", sampleSummaryId));
+              // for each sample check there is a party id
+              LOG.debug(
+                  "about to find party",
+                  kv("sampleUnitId", sampleUnitId),
+                  kv("sampleSummaryId", sampleSummaryId));
+              boolean foundParty = findAndUpdateParty(surveyId, sampleUnit, sampleUnitId);
+              LOG.debug(
+                  "party request returned " + foundParty,
+                  kv("sampleUnitId", sampleUnitId),
+                  kv("sampleSummaryId", sampleSummaryId),
+                  kv("foundParty", foundParty));
+              if (foundParty) {
+                LOG.debug(
+                    "about to search for collection instrument id",
+                    kv("sampleUnitId", sampleUnitId),
+                    kv("sampleSummaryId", sampleSummaryId));
+                boolean foundCI =
+                    findAndUpdateCollectionInstrument(surveyId, formTypeMap, sampleUnit);
+                LOG.debug(
+                    "CI request returned " + foundCI,
+                    kv("sampleUnitId", sampleUnitId),
+                    kv("sampleSummaryId", sampleSummaryId),
+                    kv("foundCI", foundCI));
+                if (!foundCI) {
+                  invalidSamples.add(sampleUnit);
+                }
+              } else {
+                invalidSamples.add(sampleUnit);
+              }
+              sampleUnitRepository.saveAndFlush(sampleUnit);
+            });
 
     // if there are invalid samples then it is not validated
     boolean valid = invalidSamples.isEmpty();
