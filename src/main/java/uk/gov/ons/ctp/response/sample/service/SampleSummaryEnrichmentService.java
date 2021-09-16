@@ -107,41 +107,45 @@ public class SampleSummaryEnrichmentService {
         .parallel()
         .forEach(
             (sampleUnit) -> {
-              UUID sampleUnitId = sampleUnit.getId();
-              LOG.debug(
-                  "processing sample unit",
-                  kv("sampleUnitId", sampleUnitId),
-                  kv("sampleSummaryId", sampleSummaryId));
-              // for each sample check there is a party id
-              LOG.debug(
-                  "about to find party",
-                  kv("sampleUnitId", sampleUnitId),
-                  kv("sampleSummaryId", sampleSummaryId));
-              boolean foundParty = findAndUpdateParty(surveyId, sampleUnit, sampleUnitId);
-              LOG.debug(
-                  "party request returned " + foundParty,
-                  kv("sampleUnitId", sampleUnitId),
-                  kv("sampleSummaryId", sampleSummaryId),
-                  kv("foundParty", foundParty));
-              if (foundParty) {
+              try {
+                UUID sampleUnitId = sampleUnit.getId();
                 LOG.debug(
-                    "about to search for collection instrument id",
+                    "processing sample unit",
                     kv("sampleUnitId", sampleUnitId),
                     kv("sampleSummaryId", sampleSummaryId));
-                boolean foundCI =
-                    findAndUpdateCollectionInstrument(surveyId, formTypeMap, sampleUnit);
+                // for each sample check there is a party id
                 LOG.debug(
-                    "CI request returned " + foundCI,
+                    "about to find party",
+                    kv("sampleUnitId", sampleUnitId),
+                    kv("sampleSummaryId", sampleSummaryId));
+                boolean foundParty = findAndUpdateParty(surveyId, sampleUnit, sampleUnitId);
+                LOG.debug(
+                    "party request returned " + foundParty,
                     kv("sampleUnitId", sampleUnitId),
                     kv("sampleSummaryId", sampleSummaryId),
-                    kv("foundCI", foundCI));
-                if (!foundCI) {
+                    kv("foundParty", foundParty));
+                if (foundParty) {
+                  LOG.debug(
+                      "about to search for collection instrument id",
+                      kv("sampleUnitId", sampleUnitId),
+                      kv("sampleSummaryId", sampleSummaryId));
+                  boolean foundCI =
+                      findAndUpdateCollectionInstrument(surveyId, formTypeMap, sampleUnit);
+                  LOG.debug(
+                      "CI request returned " + foundCI,
+                      kv("sampleUnitId", sampleUnitId),
+                      kv("sampleSummaryId", sampleSummaryId),
+                      kv("foundCI", foundCI));
+                  if (!foundCI) {
+                    invalidSamples.add(sampleUnit);
+                  }
+                } else {
                   invalidSamples.add(sampleUnit);
                 }
-              } else {
-                invalidSamples.add(sampleUnit);
+                sampleUnitRepository.saveAndFlush(sampleUnit);
+              } catch (RuntimeException e) {
+                LOG.error("Unexpected error enriching service", e);
               }
-              sampleUnitRepository.saveAndFlush(sampleUnit);
             });
 
     // if there are invalid samples then it is not validated
