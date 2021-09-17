@@ -173,6 +173,7 @@ public class SampleSummaryEnrichmentService {
       sampleUnitRepository.flush();
     } catch (RuntimeException e) {
       LOG.error("error saving samples", e);
+      throw e;
     }
   }
 
@@ -199,6 +200,7 @@ public class SampleSummaryEnrichmentService {
       sampleUnitRepository.flush();
     } catch (RuntimeException e) {
       LOG.error("error saving samples", e);
+      throw e;
     }
   }
 

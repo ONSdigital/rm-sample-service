@@ -2,6 +2,8 @@ package uk.gov.ons.ctp.response.sample.service;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -67,6 +69,8 @@ public class SampleSummaryDistributionService {
     // We need to check that the stream length wasn't 0 - we can't check directly as this would
     // consume the stream
     AtomicInteger i = new AtomicInteger(0);
+
+    List<SampleUnit> distributeSamples = new ArrayList<>();
     sampleUnits
         .parallel()
         .forEach(
@@ -78,6 +82,7 @@ public class SampleSummaryDistributionService {
                     kv("sampleSummaryId", sampleSummaryId),
                     kv("sampleUnitId", sampleUnit.getId()));
                 distributeSampleUnit(sampleSummary.getCollectionExerciseId(), sampleUnit);
+                distributeSamples.add(sampleUnit);
 
               } catch (RuntimeException ex) {
                 LOG.error(
@@ -95,6 +100,8 @@ public class SampleSummaryDistributionService {
           kv("sampleSummaryId", sampleSummaryId));
       throw new NoSampleUnitsInSampleSummaryException();
     }
+    sampleUnitRepository.saveAll(distributeSamples);
+    sampleUnitRepository.flush();
     // Nothing currently uses this flag, but in the future we'll clean up old samples once they're
     // Currently nothing uses this flag, but in the future we'll clean up old samples once they're
     // no longer needed
@@ -125,7 +132,6 @@ public class SampleSummaryDistributionService {
           sampleUnitTransitionManager.transition(
               sampleUnit.getState(), SampleUnitDTO.SampleUnitEvent.DELIVERING);
       sampleUnit.setState(newState);
-      sampleUnitRepository.saveAndFlush(sampleUnit);
     } catch (CTPException e) {
       LOG.error("Error occurred whilst transitioning state", e);
     }
