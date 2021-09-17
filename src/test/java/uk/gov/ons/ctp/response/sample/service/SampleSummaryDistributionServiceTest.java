@@ -71,7 +71,8 @@ public class SampleSummaryDistributionServiceTest {
     sampleSummaryDistributionService.distribute(SAMPLE_SUMMARY_ID);
     verify(sampleUnitPublisher, times(1)).sendSampleUnitToCase(any());
     verify(sampleUnitStateTransitionManager, times(1)).transition(any(), any());
-    verify(sampleUnitRepository, times(1)).saveAndFlush(any());
+    verify(sampleUnitRepository, times(1)).saveAll(any());
+    verify(sampleUnitRepository, times(1)).flush();
     verify(sampleSummaryRepository, times(1)).saveAndFlush(any());
   }
 
