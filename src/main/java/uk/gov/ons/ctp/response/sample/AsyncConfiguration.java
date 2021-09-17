@@ -14,12 +14,6 @@ public class AsyncConfiguration implements AsyncConfigurer {
 
   @Override
   public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
-    return new AsyncUncaughtExceptionHandler() {
-
-      @Override
-      public void handleUncaughtException(Throwable ex, Method method, Object... params) {
-        log.error("Error during async call", ex, kv("called method", method.getName()));
-      }
-    };
+    return (ex, method, params) -> log.error("Error during async method call", kv("method", method.getName()), ex);
   }
 }
