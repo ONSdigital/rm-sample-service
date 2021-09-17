@@ -108,7 +108,7 @@ public class SampleSummaryActivationService {
       LOG.error("unknown sample summary id", kv("sampleSummaryId", sampleSummaryId), e);
       sendEnrichStatusToCollectionExercise(collectionExerciseId, false);
       throw new SampleSummaryActivationException(e);
-    } catch (SampleSummaryActivationException e) {
+    } catch (SampleSummaryActivationException | RuntimeException e) {
       LOG.error(
           "Something went wrong activating sample summary",
           kv("sampleSummaryId", sampleSummaryId),
