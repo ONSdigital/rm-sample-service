@@ -187,8 +187,7 @@ public class SampleSummaryEnrichmentService {
                 sampleUnit.getState(), SampleUnitDTO.SampleUnitEvent.FAIL_VALIDATION);
         sampleUnit.setState(newState);
         LOG.info(
-            "sample unit transitioned to failed state",
-            kv("sampleUnitId", sampleUnit.getId()));
+            "sample unit transitioned to failed state", kv("sampleUnitId", sampleUnit.getId()));
       } catch (CTPException | RuntimeException e) {
         LOG.error(
             "Failed to put sample summary into FAILED state",

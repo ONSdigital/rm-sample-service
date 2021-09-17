@@ -2,7 +2,6 @@ package uk.gov.ons.ctp.response.sample;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
-import java.lang.reflect.Method;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +13,7 @@ public class AsyncConfiguration implements AsyncConfigurer {
 
   @Override
   public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
-    return (ex, method, params) -> log.error("Error during async method call", kv("method", method.getName()), ex);
+    return (ex, method, params) ->
+        log.error("Error during async method call", kv("method", method.getName()), ex);
   }
 }
