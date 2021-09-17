@@ -102,6 +102,7 @@ public class SampleSummaryEnrichmentService {
     // create a map to hold form types to collection instrument ids
     final Map<String, Optional<UUID>> formTypeMap = new ConcurrentHashMap<>();
 
+    List<SampleUnit> validSamples = new ArrayList<>();
     List<SampleUnit> invalidSamples = new ArrayList<>();
     sampleUnits
         .parallel()
@@ -138,19 +139,24 @@ public class SampleSummaryEnrichmentService {
                       kv("foundCI", foundCI));
                   if (!foundCI) {
                     invalidSamples.add(sampleUnit);
+                  } else {
+                    validSamples.add(sampleUnit);
                   }
                 } else {
                   invalidSamples.add(sampleUnit);
                 }
-                sampleUnitRepository.saveAndFlush(sampleUnit);
               } catch (RuntimeException e) {
                 LOG.error("Unexpected error enriching service", e);
+                invalidSamples.add(sampleUnit);
               }
             });
 
     // if there are invalid samples then it is not validated
     boolean valid = invalidSamples.isEmpty();
-    if (!valid) {
+    LOG.debug("sample summary enrichment complete", kv("valid", valid));
+    if (valid) {
+      validSamples.forEach(this::save);
+    } else {
       LOG.info(
           String.format("%d samples have failed to enrich", invalidSamples.size()),
           kv("sampleSummaryId", sampleSummaryId));
@@ -158,6 +164,14 @@ public class SampleSummaryEnrichmentService {
       failSampleSummary(sampleSummaryId);
     }
     return valid;
+  }
+
+  private void save(SampleUnit sampleUnit) {
+    try {
+      sampleUnitRepository.saveAndFlush(sampleUnit);
+    } catch (RuntimeException e) {
+      LOG.error("error saving samples", e);
+    }
   }
 
   private void markAsFailed(SampleUnit sampleUnit) {
