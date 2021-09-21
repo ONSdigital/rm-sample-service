@@ -65,7 +65,7 @@ public class SampleSummaryDistributionService {
 
     LOG.info("found sample units for summary", kv("sampleSummaryId", sampleSummaryId));
 
-      // We need to check that the stream length wasn't 0 - we can't check directly as this would
+    // We need to check that the stream length wasn't 0 - we can't check directly as this would
     // consume the stream
     AtomicInteger i = new AtomicInteger(0);
 
