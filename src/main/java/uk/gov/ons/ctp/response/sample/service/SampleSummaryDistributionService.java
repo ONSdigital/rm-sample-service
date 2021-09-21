@@ -65,8 +65,7 @@ public class SampleSummaryDistributionService {
 
     LOG.info("found sample units for summary", kv("sampleSummaryId", sampleSummaryId));
 
-    // Catch errors distributing sample units so that only failing units are stopped
-    // We need to check that the stream length wasn't 0 - we can't check directly as this would
+      // We need to check that the stream length wasn't 0 - we can't check directly as this would
     // consume the stream
     AtomicInteger i = new AtomicInteger(0);
 
@@ -103,7 +102,6 @@ public class SampleSummaryDistributionService {
     sampleUnitRepository.saveAll(distributeSamples);
     sampleUnitRepository.flush();
     // Nothing currently uses this flag, but in the future we'll clean up old samples once they're
-    // Currently nothing uses this flag, but in the future we'll clean up old samples once they're
     // no longer needed
     LOG.info(
         "Distribution was successful.  Marking sample summary for deletion",
