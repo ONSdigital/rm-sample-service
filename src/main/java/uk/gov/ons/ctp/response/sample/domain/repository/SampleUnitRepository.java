@@ -1,6 +1,5 @@
 package uk.gov.ons.ctp.response.sample.domain.repository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -19,7 +18,7 @@ public interface SampleUnitRepository extends JpaRepository<SampleUnit, Integer>
    * @param sampleSummaryFK The sampleSummaryFK
    * @return SampleUnit object or null
    */
-  List<SampleUnit> findBySampleSummaryFK(Integer sampleSummaryFK);
+  Stream<SampleUnit> findBySampleSummaryFK(Integer sampleSummaryFK);
 
   /**
    * Count SampleUnit entity by samplesummaryfk

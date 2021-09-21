@@ -3,6 +3,7 @@ package uk.gov.ons.ctp.response.sample.service;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import libs.collection.instrument.representation.CollectionInstrumentDTO;
@@ -13,6 +14,7 @@ import libs.party.representation.Enrolment;
 import libs.party.representation.PartyDTO;
 import libs.survey.representation.SurveyClassifierDTO;
 import libs.survey.representation.SurveyClassifierTypeDTO;
+import org.apache.logging.log4j.util.Strings;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +73,7 @@ public class SampleSummaryEnrichmentService {
   private StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent>
       sampleUnitTransitionManager;
 
-  @Transactional(propagation = Propagation.REQUIRED)
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public boolean enrich(UUID surveyId, UUID sampleSummaryId, UUID collectionExerciseId)
       throws UnknownSampleSummaryException {
 
@@ -98,73 +100,107 @@ public class SampleSummaryEnrichmentService {
 
     LOG.debug("found samples for sample summary", kv("sampleSummaryId", sampleSummaryId));
     // create a map to hold form types to collection instrument ids
-    Map<String, Optional<UUID>> formTypeMap = new HashMap<>();
+    final Map<String, Optional<UUID>> formTypeMap = new ConcurrentHashMap<>();
 
+    List<SampleUnit> validSamples = new ArrayList<>();
     List<SampleUnit> invalidSamples = new ArrayList<>();
-    sampleUnits.forEach(
-        (sampleUnit) -> {
-          UUID sampleUnitId = sampleUnit.getId();
-          LOG.debug(
-              "processing sample unit",
-              kv("sampleUnitId", sampleUnitId),
-              kv("sampleSummaryId", sampleSummaryId));
-          // for each sample check there is a party id
-          LOG.debug(
-              "about to find party",
-              kv("sampleUnitId", sampleUnitId),
-              kv("sampleSummaryId", sampleSummaryId));
-          boolean foundParty = findAndUpdateParty(surveyId, sampleUnit, sampleUnitId);
-          LOG.debug(
-              "attempted to find party",
-              kv("sampleUnitId", sampleUnitId),
-              kv("sampleSummaryId", sampleSummaryId),
-              kv("foundParty", foundParty));
-          if (foundParty) {
-            LOG.debug(
-                "about to search for collection instrument id",
-                kv("sampleUnitId", sampleUnitId),
-                kv("sampleSummaryId", sampleSummaryId));
-            boolean foundCI = findAndUpdateCollectionInstrument(surveyId, formTypeMap, sampleUnit);
-            LOG.debug(
-                "attempted to find CI",
-                kv("sampleUnitId", sampleUnitId),
-                kv("sampleSummaryId", sampleSummaryId),
-                kv("foundCI", foundCI));
-            if (!foundCI) {
-              invalidSamples.add(sampleUnit);
-            }
-          } else {
-            invalidSamples.add(sampleUnit);
-          }
-          sampleUnitRepository.saveAndFlush(sampleUnit);
-        });
+    sampleUnits
+        .parallel()
+        .forEach(
+            (sampleUnit) -> {
+              try {
+                UUID sampleUnitId = sampleUnit.getId();
+                LOG.debug(
+                    "processing sample unit",
+                    kv("sampleUnitId", sampleUnitId),
+                    kv("sampleSummaryId", sampleSummaryId));
+                // for each sample check there is a party id
+                LOG.debug(
+                    "about to find party",
+                    kv("sampleUnitId", sampleUnitId),
+                    kv("sampleSummaryId", sampleSummaryId));
+                boolean foundParty = findAndUpdateParty(surveyId, sampleUnit, sampleUnitId);
+                LOG.debug(
+                    "party request returned " + foundParty,
+                    kv("sampleUnitId", sampleUnitId),
+                    kv("sampleSummaryId", sampleSummaryId),
+                    kv("foundParty", foundParty));
+                if (foundParty) {
+                  LOG.debug(
+                      "about to search for collection instrument id",
+                      kv("sampleUnitId", sampleUnitId),
+                      kv("sampleSummaryId", sampleSummaryId));
+                  boolean foundCI =
+                      findAndUpdateCollectionInstrument(surveyId, formTypeMap, sampleUnit);
+                  LOG.debug(
+                      "CI request returned " + foundCI,
+                      kv("sampleUnitId", sampleUnitId),
+                      kv("sampleSummaryId", sampleSummaryId),
+                      kv("foundCI", foundCI));
+                  if (!foundCI) {
+                    invalidSamples.add(sampleUnit);
+                  } else {
+                    validSamples.add(sampleUnit);
+                  }
+                } else {
+                  invalidSamples.add(sampleUnit);
+                }
+              } catch (RuntimeException e) {
+                LOG.error("Unexpected error enriching service", e);
+                invalidSamples.add(sampleUnit);
+              }
+            });
 
     // if there are invalid samples then it is not validated
     boolean valid = invalidSamples.isEmpty();
-    if (!valid) {
+    if (valid) {
+      save(validSamples);
+    } else {
       LOG.info(
           String.format("%d samples have failed to enrich", invalidSamples.size()),
           kv("sampleSummaryId", sampleSummaryId));
-      invalidSamples.forEach(this::markAsFailed);
+      markAsFailed(invalidSamples);
       failSampleSummary(sampleSummaryId);
     }
+    LOG.debug("sample summary enrichment complete", kv("valid", valid));
     return valid;
   }
 
-  private void markAsFailed(SampleUnit sampleUnit) {
+  private void save(List<SampleUnit> sampleUnits) {
     try {
-      LOG.info("marking sample unit as failed", kv("sampleUnitId", sampleUnit.getId()));
-      SampleUnitDTO.SampleUnitState newState =
-          sampleUnitTransitionManager.transition(
-              sampleUnit.getState(), SampleUnitDTO.SampleUnitEvent.FAIL_VALIDATION);
-      sampleUnit.setState(newState);
-      sampleUnitRepository.saveAndFlush(sampleUnit);
-      LOG.info("sample unit transitioned to failed state", kv("sampleUnitId", sampleUnit.getId()));
-    } catch (CTPException | RuntimeException e) {
-      LOG.error(
-          "Failed to put sample summary into FAILED state",
-          kv("sampleUnit", sampleUnit.getId()),
-          e);
+      LOG.info("saving all samples to the database");
+      sampleUnitRepository.saveAll(sampleUnits);
+      sampleUnitRepository.flush();
+    } catch (RuntimeException e) {
+      LOG.error("error saving samples", e);
+      throw e;
+    }
+  }
+
+  private void markAsFailed(List<SampleUnit> sampleUnits) {
+    for (SampleUnit sampleUnit : sampleUnits) {
+      try {
+        LOG.info("marking sample unit as failed", kv("sampleUnitId", sampleUnit.getId()));
+
+        SampleUnitDTO.SampleUnitState newState =
+            sampleUnitTransitionManager.transition(
+                sampleUnit.getState(), SampleUnitDTO.SampleUnitEvent.FAIL_VALIDATION);
+        sampleUnit.setState(newState);
+        LOG.info(
+            "sample unit transitioned to failed state", kv("sampleUnitId", sampleUnit.getId()));
+      } catch (CTPException | RuntimeException e) {
+        LOG.error(
+            "Failed to put sample summary into FAILED state",
+            kv("sampleUnit", sampleUnit.getId()),
+            e);
+      }
+    }
+    try {
+      sampleUnitRepository.saveAll(sampleUnits);
+      sampleUnitRepository.flush();
+    } catch (RuntimeException e) {
+      LOG.error("error saving samples", e);
+      throw e;
     }
   }
 
@@ -196,9 +232,17 @@ public class SampleSummaryEnrichmentService {
     // and if we haven't seen this form type before add it
     // to a map so we can reuse for the next sample
 
+    String formType;
+    if (sampleUnit.getFormType() != null) {
+      formType = sampleUnit.getFormType();
+    } else {
+      // concurrent hashmap don't allow nulls so use an empty string instead
+      formType = Strings.EMPTY;
+    }
+
     Optional<UUID> collectionInstrumentId =
         formTypeMap.computeIfAbsent(
-            sampleUnit.getFormType(),
+            formType,
             key -> {
               UUID ciId = null;
               List<String> classifierTypes = requestSurveyClassifiers(surveyId);

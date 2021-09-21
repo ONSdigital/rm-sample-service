@@ -2,8 +2,11 @@ package uk.gov.ons.ctp.response.sample.service;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
 import org.slf4j.Logger;
@@ -11,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
@@ -44,36 +49,58 @@ public class SampleSummaryDistributionService {
    * @throws UnknownSampleSummaryException Thrown when the sampleSummaryId doesn't match any in the
    *     database
    */
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void distribute(UUID sampleSummaryId)
       throws NoSampleUnitsInSampleSummaryException, UnknownSampleSummaryException {
+    LOG.info("about to distribute sample summary", kv("sampleSummaryId", sampleSummaryId));
     // first find the correct sample summary
     SampleSummary sampleSummary =
         sampleSummaryRepository
             .findById(sampleSummaryId)
             .orElseThrow(UnknownSampleSummaryException::new);
 
-    List<SampleUnit> sampleUnits = sampleService.findSampleUnitsBySampleSummary(sampleSummaryId);
+    LOG.info("found sample summary", kv("sampleSummary", sampleSummary.getId()));
 
-    if (sampleUnits.isEmpty()) {
+    Stream<SampleUnit> sampleUnits = sampleService.findSampleUnitsBySampleSummary(sampleSummaryId);
+
+    LOG.info("found sample units for summary", kv("sampleSummaryId", sampleSummaryId));
+
+    // We need to check that the stream length wasn't 0 - we can't check directly as this would
+    // consume the stream
+    AtomicInteger i = new AtomicInteger(0);
+
+    List<SampleUnit> distributeSamples = new ArrayList<>();
+    sampleUnits
+        .parallel()
+        .forEach(
+            sampleUnit -> {
+              i.getAndIncrement();
+              try {
+                LOG.info(
+                    "distribute sample unit",
+                    kv("sampleSummaryId", sampleSummaryId),
+                    kv("sampleUnitId", sampleUnit.getId()));
+                distributeSampleUnit(sampleSummary.getCollectionExerciseId(), sampleUnit);
+                distributeSamples.add(sampleUnit);
+
+              } catch (RuntimeException ex) {
+                LOG.error(
+                    "Failed to distribute sample unit",
+                    kv("sampleSummaryId", sampleSummaryId),
+                    kv("sampleUnitId", sampleUnit.getId()),
+                    ex);
+                throw ex;
+              }
+            });
+
+    if (i.get() == 0) {
       LOG.info(
           "No sample unit groups to distribute for summary",
           kv("sampleSummaryId", sampleSummaryId));
       throw new NoSampleUnitsInSampleSummaryException();
     }
-
-    // Catch errors distributing sample units so that only failing units are stopped
-    sampleUnits.forEach(
-        sampleUnit -> {
-          try {
-            distributeSampleUnit(sampleSummary.getCollectionExerciseId(), sampleUnit);
-
-          } catch (RuntimeException ex) {
-            LOG.error(
-                "Failed to distribute sample unit", kv("SampleSummaryId", sampleSummaryId), ex);
-            throw ex;
-          }
-        });
-
+    sampleUnitRepository.saveAll(distributeSamples);
+    sampleUnitRepository.flush();
     // Nothing currently uses this flag, but in the future we'll clean up old samples once they're
     // no longer needed
     LOG.info(
@@ -103,7 +130,6 @@ public class SampleSummaryDistributionService {
           sampleUnitTransitionManager.transition(
               sampleUnit.getState(), SampleUnitDTO.SampleUnitEvent.DELIVERING);
       sampleUnit.setState(newState);
-      sampleUnitRepository.saveAndFlush(sampleUnit);
     } catch (CTPException e) {
       LOG.error("Error occurred whilst transitioning state", e);
     }
