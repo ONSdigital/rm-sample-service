@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 import libs.common.error.CTPException;
 import libs.common.error.InvalidRequestException;
@@ -21,8 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -126,7 +123,6 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     return ResponseEntity.ok(result);
   }
 
-  @Transactional(propagation = Propagation.REQUIRED)
   @RequestMapping(value = "{sampleSummaryId}/sampleunits", method = RequestMethod.GET)
   public ResponseEntity<SampleUnitDTO[]> requestSampleUnitsForSampleSummary(
       @PathVariable("sampleSummaryId") final UUID sampleSummaryId,
@@ -135,10 +131,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
 
     List<SampleUnit> sampleUnits;
     if (Strings.isEmpty(state)) {
-      sampleUnits =
-          sampleService
-              .findSampleUnitsBySampleSummary(sampleSummaryId)
-              .collect(Collectors.toList());
+      sampleUnits = sampleService.findSampleUnitsBySampleSummaryAsList(sampleSummaryId);
       List<SampleUnitDTO> result = mapperFacade.mapAsList(sampleUnits, SampleUnitDTO.class);
 
       if (!sampleUnits.isEmpty()) {
@@ -155,9 +148,8 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
         SampleUnitDTO.SampleUnitState sampleUnitState =
             SampleUnitDTO.SampleUnitState.valueOf(state);
         sampleUnits =
-            sampleService
-                .findSampleUnitsBySampleSummaryAndState(sampleSummaryId, sampleUnitState)
-                .collect(Collectors.toList());
+            sampleService.findSampleUnitsBySampleSummaryAndStateAsList(
+                sampleSummaryId, sampleUnitState);
         log.info(
             "found samples with state",
             kv("sampleSummaryId", sampleSummaryId),
