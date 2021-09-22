@@ -3,6 +3,7 @@ package uk.gov.ons.ctp.response.sample.service;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
@@ -226,6 +227,11 @@ public class SampleService {
   }
 
   @Transactional(propagation = Propagation.REQUIRED)
+  public List<SampleUnit> findSampleUnitsBySampleSummaryAsList(UUID sampleSummaryId) {
+    return this.findSampleUnitsBySampleSummary(sampleSummaryId).collect(Collectors.toList());
+  }
+
+  @Transactional(propagation = Propagation.REQUIRED)
   public Stream<SampleUnit> findSampleUnitsBySampleSummary(UUID sampleSummaryId) {
     try {
       SampleSummary ss = sampleSummaryRepository.findById(sampleSummaryId).orElseThrow();
@@ -236,7 +242,14 @@ public class SampleService {
     }
   }
 
-  @Transactional(propagation = Propagation.REQUIRED, readOnly = true)
+  @Transactional(propagation = Propagation.REQUIRED)
+  public List<SampleUnit> findSampleUnitsBySampleSummaryAndStateAsList(
+      UUID sampleSummaryId, SampleUnitState state) {
+    return this.findSampleUnitsBySampleSummaryAndState(sampleSummaryId, state)
+        .collect(Collectors.toList());
+  }
+
+  @Transactional(propagation = Propagation.REQUIRED)
   public Stream<SampleUnit> findSampleUnitsBySampleSummaryAndState(
       UUID sampleSummaryId, SampleUnitState state) {
     try {
