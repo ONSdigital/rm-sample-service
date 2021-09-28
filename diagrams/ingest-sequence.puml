@@ -1,18 +1,14 @@
 @startuml
 actor user
-user -> IDBR: export sample
+IDBR -> user : export sample
 user -> ResponseOpsUI: upload sample CSV
-ResponseOpsUI -> Sample:POST CSV
-Sample -> Sample: validate sample against ruleset
-Sample -> Sample: unmarshal to object tree (sample type specific)
-Sample -> DB: persist sample
+ResponseOpsUI -> SampleFileUploader :POST CSV
+SampleFileUploader -> Sample: Create sample summary
 loop for each sample unit
-  Sample -> RabbitMQ: enqueue
-  Party -> RabbitMQ: Read Sample Unit
-  Party -> DB: Process and Store
-  Party -> RabbitMQ: enqueue recept (SampleUnitUUID)
-  Sample -> RabbitMQ: Read Receipt
-  Sample -> DB : update Sample Unit to PERSISTED
+SampleFileUploader -> CSVWorker: send single line of sample file
+CSVWorker -> Sample: Create sample with INIT state
+Sample -> Sample : update Sample Unit to PERSISTED
+CSVWorker -> Party: Create party and attribute
 end
-Sample -> DB: update Sample Summary state to ACTIVE
+Sample -> Sample: update Sample Summary state to ACTIVE
 @enduml

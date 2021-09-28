@@ -5,6 +5,6 @@ skinparam state {
 
 [*] --> INIT
 INIT --> PERSISTED : persisting
-PERSISTED --> DELIVERED : delivering to case
-PERSISTED --> FAILED : failed to enrich
+PERSISTED --> DELIVERED : delivering
+PERSISTED --> FAILED : fail_validation
 @enduml
