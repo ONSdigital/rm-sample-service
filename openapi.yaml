@@ -13,10 +13,17 @@ tags:
     description: Informational endpoints.
   - name: samples
     description: Endpoints for interacting with samples.
-  - name: scheduled
-    description: tasks that run on a schedule
 
 paths:
+  /actuator/info:
+    get:
+      summary: Application information
+      description: Application information
+      tags:
+        - info
+      responses:
+        '200':
+          description: High level info about the application.
   /samples/count:
     get:
       summary: Sample unit count.
@@ -70,12 +77,35 @@ paths:
             format: uuid
             example: 34597808-ec88-4e93-af2f-228e33ff7946
       responses:
-        '200':
-          description: The respondent was retrieved successfully.
+        '201':
+          description: The sample summary was retrieved successfully.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SampleUnit'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+  /samples/samplesummary:
+    post:
+      summary: Create sample summary
+      description: Create sample summary
+      tags:
+        - samples
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SampleSummary'
+      responses:
+        '200':
+          description: The sample summary was created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SampleSummary'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -96,7 +126,7 @@ paths:
             example: 34597808-ec88-4e93-af2f-228e33ff7946
       responses:
         '200':
-          description: The respondent was retrieved successfully.
+          description: The sample unit was retrieved successfully.
           content:
             application/json:
               schema:
@@ -128,7 +158,7 @@ paths:
             example: FAILED
       responses:
         '200':
-          description: The respondent was retrieved successfully.
+          description: The sample units were retrieved successfully.
           content:
             application/json:
               schema:
@@ -177,7 +207,7 @@ paths:
           description: 'Sample already exists for the sample summary with that sampleUnitRef'
         '500':
           description: '#/components/responses/ServerError'
-  /samples/{sampleSummaryId/sampleunits/{sampleUnitRef}:
+  /samples/{sampleSummaryId}/sampleunits/{sampleUnitRef}:
     get:
       summary: Get Sample Unit
       description: Get sample unit by sampleSummaryId and sampleUnitRef
