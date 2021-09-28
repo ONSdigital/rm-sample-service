@@ -105,38 +105,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFoundError'
-  /samples/{id}/attributes:
-    get:
-      summary: Get Sample Unit Attributes
-      description: SampleUnit Attribute info for the given ID
-      tags:
-        - samples
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: 34597808-ec88-4e93-af2f-228e33ff7946
-      responses:
-        '200':
-          description: The respondent was retrieved successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  attributes:
-                    type: object
-                  id: 
-                    type: string
-                    format: uuid
-                    example: fd6a1aa3-ba17-43a8-beae-a39e67c6444d
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
   /samples/{samplesummaryId}/sampleunits:
     get:
       summary: Get Sample Units from sample summary
@@ -173,6 +141,74 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFoundError'
+    post:
+      summary: Create Sample Unit for sample summary
+      description: Create Sample Unit for sample summary
+      tags:
+        - samples
+      parameters:
+        - in: path
+          name: samplesummaryId
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 34597808-ec88-4e93-af2f-228e33ff7946
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SampleUnit'
+      responses:
+        '200':
+          description: The sample unit was created successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SampleUnit'
+        '400':
+          description: 'No sample unit found for sample summary.'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '409':
+          description: 'Sample already exists for the sample summary with that sampleUnitRef'
+        '500':
+          description: '#/components/responses/ServerError'
+  /samples/{sampleSummaryId/sampleunits/{sampleUnitRef}:
+    get:
+      summary: Get Sample Unit
+      description: Get sample unit by sampleSummaryId and sampleUnitRef
+      tags:
+        - samples
+      parameters:
+        - in: path
+          name: sampleSummaryId
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 34597808-ec88-4e93-af2f-228e33ff7946
+        - in: path
+          name: sampleUnitRef
+          required: true
+          schema:
+            type: string
+            example: 49990000001
+      responses:
+        '200':
+          description: The sample unit was found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SampleUnit'
+        '400':
+          description: 'No sample unit found'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
 
 components:
   securitySchemes:
@@ -188,6 +224,8 @@ components:
       description:  Resource has not been found
     InvalidRequestBodyError:
       description: One or more of the fields provided in the RequestBody wasn't part of the schema, wasn't set to a valid value, or the ID provided wasn't a proper UUID.
+    ServerError:
+      description: SOmething unexpected happened with the server.
   schemas:
     SampleUnit:
       type: object
