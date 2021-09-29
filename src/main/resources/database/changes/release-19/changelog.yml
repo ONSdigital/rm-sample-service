@@ -1,0 +1,11 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 19-1
+      author: Warren Bailey
+      changes:
+        - sqlFile:
+            comment: Add index to sample unit table
+            path: add_index_to_sample_unit_table.sql
+            relativeToChangelogFile: true
+            splitStatements: false
