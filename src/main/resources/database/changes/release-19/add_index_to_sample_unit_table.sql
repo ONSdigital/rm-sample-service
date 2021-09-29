@@ -1,2 +1,2 @@
-CREATE INDEX sample_unit_sample_unit_ref_index ON sample.sampleunit USING btree (sample_unit_ref);
-CREATE INDEX sample_unit_sample_summary_fk_index ON sample.sampleunit USING btree (sample_summary_fk);
+CREATE INDEX sample_unit_sample_unit_ref_index ON sample.sample_unit USING btree (sample_unit_ref);
+CREATE INDEX sample_unit_sample_summary_fk_index ON sample.sample_unit USING btree (sample_summary_fk);
