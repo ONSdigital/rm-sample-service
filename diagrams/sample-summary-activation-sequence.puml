@@ -1,0 +1,18 @@
+@startuml
+actor user
+user -> ResponseOpsUI: Set exercise ready for live
+ResponseOpsUI -> CollectionExercise: Begin execution
+CollectionExercise -> Sample: Get sample unit count
+CollectionExercise -> Sample: Send sample summary activation message
+Sample -> Party: Link collection_instrument_id and sample_summary_id
+Sample -> Sample: Enrich sample summary
+loop for each sample unit
+Sample -> Party: Get party_id
+Sample -> CollectionInstrument: Get collection_instrument_id
+end
+Sample -> CollectionExercise: Successful enrichment
+loop for each sample unit
+Sample -> Case: Create case from sample unit
+end
+Sample -> CollectionExercise: Successful distribution
+@enduml
