@@ -109,8 +109,7 @@ public class SampleService {
   @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
   public SampleSummary createAndSaveSampleSummary() {
     SampleSummary sampleSummary = new SampleSummary();
-
-    sampleSummary.setState(SampleState.INIT);
+    sampleSummary.setState(SampleState.ACTIVE);
     sampleSummary.setId(UUID.randomUUID());
 
     return sampleSummaryRepository.save(sampleSummary);
@@ -119,10 +118,11 @@ public class SampleService {
   @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
   public SampleSummary createAndSaveSampleSummary(SampleSummaryDTO summaryDTO) {
     SampleSummary sampleSummary = new SampleSummary();
-    sampleSummary.setState(SampleState.INIT);
+    sampleSummary.setState(SampleState.ACTIVE);
     sampleSummary.setId(UUID.randomUUID());
     sampleSummary.setTotalSampleUnits(summaryDTO.getTotalSampleUnits());
     sampleSummary.setExpectedCollectionInstruments(summaryDTO.getExpectedCollectionInstruments());
+    sampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
     log.debug("about to save sample summary");
     return sampleSummaryRepository.save(sampleSummary);
   }
@@ -151,22 +151,6 @@ public class SampleService {
     return sampleUnit;
   }
 
-  /**
-   * Effect a state transition for the target SampleSummary if one is required
-   *
-   * @param targetSampleSummary the sampleSummary to be updated
-   * @return SampleSummary the updated SampleSummary
-   * @throws CTPException if transition errors
-   */
-  public void activateSampleSummaryState(SampleSummary targetSampleSummary) throws CTPException {
-    SampleState newState =
-        sampleSvcStateTransitionManager.transition(
-            targetSampleSummary.getState(), SampleEvent.ACTIVATED);
-    targetSampleSummary.setState(newState);
-    targetSampleSummary.setIngestDateTime(DateTimeUtil.nowUTC());
-    sampleSummaryRepository.saveAndFlush(targetSampleSummary);
-  }
-
   public void updateState(SampleUnit sampleUnit) throws CTPException {
     changeSampleUnitState(sampleUnit);
   }
@@ -177,34 +161,6 @@ public class SampleService {
             sampleUnit.getState(), SampleUnitEvent.PERSISTING);
     sampleUnit.setState(newState);
     sampleUnitRepository.saveAndFlush(sampleUnit);
-  }
-
-  /**
-   * Check the number of sample units created and in persisted state and compare to the total number
-   * of sample units in the sample summary. If they match then the sample summary can be transition
-   * to activated.
-   *
-   * @param sampleUnit
-   * @throws CTPException
-   */
-  @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
-  public void sampleSummaryStateCheck(SampleUnit sampleUnit) throws CTPException {
-    Integer sampleSummaryFK = sampleUnit.getSampleSummaryFK();
-    int created =
-        sampleUnitRepository.countBySampleSummaryFKAndState(
-            sampleSummaryFK, SampleUnitState.PERSISTED);
-    try {
-      log.debug("attempting to find sample summary", kv("sampleSummaryFK", sampleSummaryFK));
-      SampleSummary sampleSummary =
-          sampleSummaryRepository.findBySampleSummaryPK(sampleSummaryFK).orElseThrow();
-      int total = sampleSummary.getTotalSampleUnits();
-      if (total == created) {
-        activateSampleSummaryState(sampleSummary);
-      }
-    } catch (NoSuchElementException e) {
-      log.error("unable to find sample summary", kv("sampleSummaryFK", sampleSummaryFK));
-      throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND);
-    }
   }
 
   public int getSampleSummaryUnitCount(UUID sampleSummaryId) {

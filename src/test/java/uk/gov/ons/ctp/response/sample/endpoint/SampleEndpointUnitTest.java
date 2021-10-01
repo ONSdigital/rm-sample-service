@@ -128,7 +128,7 @@ public class SampleEndpointUnitTest {
   @Test
   public void createSampleSummary() throws Exception {
     SampleSummary sampleSummary = new SampleSummary();
-    sampleSummary.setState(SampleSummaryDTO.SampleState.INIT);
+    sampleSummary.setState(SampleSummaryDTO.SampleState.ACTIVE);
     sampleSummary.setId(UUID.randomUUID());
 
     when(sampleService.createAndSaveSampleSummary(Matchers.any(SampleSummaryDTO.class)))

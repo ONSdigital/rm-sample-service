@@ -26,7 +26,6 @@ import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
-import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEvent;
@@ -81,7 +80,7 @@ public class SampleServiceTest {
   public void verifySampleSummaryCreatedCorrectly() {
     SampleSummary sampleSummary = sampleService.createAndSaveSampleSummary();
 
-    assertTrue(sampleSummary.getState() == SampleSummaryDTO.SampleState.INIT);
+    assertTrue(sampleSummary.getState() == SampleState.ACTIVE);
     assertNotNull(sampleSummary.getId());
 
     verify(sampleSummaryRepository).save(sampleSummary);
@@ -118,24 +117,6 @@ public class SampleServiceTest {
 
     sampleService.updateState(sampleUnit.get(0));
     assertThat(sampleUnit.get(0).getState(), is(SampleUnitState.PERSISTED));
-  }
-
-  /**
-   * Test that a sample summary is activated when all sample units are created.
-   *
-   * @throws Exception oops
-   */
-  @Test
-  public void activateSampleSummaryTest() throws Exception {
-    when(sampleUnitRepository.countBySampleSummaryFKAndState(1, SampleUnitState.PERSISTED))
-        .thenReturn(1);
-    when(sampleSummaryRepository.findBySampleSummaryPK(1))
-        .thenReturn(Optional.of(sampleSummaryList.get(0)));
-    when(sampleSvcStateTransitionManager.transition(SampleState.INIT, SampleEvent.ACTIVATED))
-        .thenReturn(SampleState.ACTIVE);
-
-    sampleService.sampleSummaryStateCheck(sampleUnit.get(0));
-    assertThat(sampleSummaryList.get(0).getState(), is(SampleState.ACTIVE));
   }
 
   private SampleSummary createSampleSummary(int numSamples, int expectedInstruments) {

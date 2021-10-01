@@ -18,13 +18,11 @@ public class SampleSummaryDTO {
   /** enum for Sample state */
   public enum SampleState {
     ACTIVE,
-    INIT,
     FAILED
   }
 
   /** enum for Sample event */
   public enum SampleEvent {
-    ACTIVATED,
     FAIL_VALIDATION
   }
 
