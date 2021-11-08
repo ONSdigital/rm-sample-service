@@ -28,7 +28,6 @@ public class CollectionExerciseEndActivation {
   public void messageReceiver(
       Message message,
       @Header(GcpPubSubHeaders.ORIGINAL_MESSAGE) BasicAcknowledgeablePubsubMessage pubSubMsg) {
-
     LOG.info(
         "Receiving message ID from PubSub messageId :{}",
         pubSubMsg.getPubsubMessage().getMessageId());
@@ -45,7 +44,6 @@ public class CollectionExerciseEndActivation {
       pubSubMsg.ack();
 
     } catch (IOException e) {
-
       LOG.error(
           "Something went wrong while processing message received from PubSub "
               + "for collection exercise end event",
