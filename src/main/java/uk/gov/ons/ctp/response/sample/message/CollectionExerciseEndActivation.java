@@ -1,7 +1,10 @@
 package uk.gov.ons.ctp.response.sample.message;
 
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import libs.common.error.CTPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +32,8 @@ public class CollectionExerciseEndActivation {
       Message message,
       @Header(GcpPubSubHeaders.ORIGINAL_MESSAGE) BasicAcknowledgeablePubsubMessage pubSubMsg) {
     LOG.info(
-        "Receiving message ID from PubSub messageId :{}",
-        pubSubMsg.getPubsubMessage().getMessageId());
+        "Receiving Collection exercise end event",
+        kv("PubSub ID", pubSubMsg.getPubsubMessage().getMessageId()));
 
     String payload = new String((byte[]) message.getPayload());
 
@@ -43,7 +46,7 @@ public class CollectionExerciseEndActivation {
 
       pubSubMsg.ack();
 
-    } catch (IOException e) {
+    } catch (IOException | CTPException e) {
       LOG.error(
           "Something went wrong while processing message received from PubSub "
               + "for collection exercise end event",
