@@ -25,7 +25,6 @@ public class CollectionExerciseEndService {
   private static final Logger LOG = LoggerFactory.getLogger(CollectionExerciseEndService.class);
 
   public void collectionExerciseEnd(UUID collectionExerciseId) {
-
     int sampleSummaryPK = markSampleSummaryComplete(collectionExerciseId);
 
     deleteSampleUnits(collectionExerciseId, sampleSummaryPK);
