@@ -19,7 +19,8 @@ public class SampleSummaryDTO {
   public enum SampleState {
     ACTIVE,
     INIT,
-    FAILED
+    FAILED,
+    COMPLETE
   }
 
   /** enum for Sample event */

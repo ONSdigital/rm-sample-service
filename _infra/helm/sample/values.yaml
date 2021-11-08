@@ -59,3 +59,4 @@ gcp:
   sampleSummaryActivationSubscription: "sample-summary-activation-subscription"
   sampleSummaryActivationStatusTopic: "sample-summary-activation-status-topic"
   caseNotificationTopic: "case-notification-topic"
+  collectionExerciseEndSubscription: "collection-exercise-end"

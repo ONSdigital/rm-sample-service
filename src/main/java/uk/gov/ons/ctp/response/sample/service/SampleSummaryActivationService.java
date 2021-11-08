@@ -15,7 +15,7 @@ import uk.gov.ons.ctp.response.sample.representation.SampleSummaryStatusDTO;
 @Service
 public class SampleSummaryActivationService {
 
-  private static final Logger LOG = LoggerFactory.getLogger(SampleSummaryEnrichmentService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SampleSummaryActivationService.class);
 
   @Autowired private SampleSummaryDistributionService sampleSummaryDistributionService;
 
