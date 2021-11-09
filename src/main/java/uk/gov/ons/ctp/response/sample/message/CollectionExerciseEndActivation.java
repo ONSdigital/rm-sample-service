@@ -50,7 +50,7 @@ public class CollectionExerciseEndActivation {
       LOG.error(
           "Something went wrong while processing message received from PubSub "
               + "for Collection Exercise End event",
-          kv("message", message),
+          kv("messageId", pubSubMsg.getPubsubMessage().getMessageId()),
           e);
       pubSubMsg.nack();
     }
