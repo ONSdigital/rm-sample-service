@@ -30,7 +30,7 @@ public class CollectionExerciseEndService {
 
   private void deleteSampleUnits(int sampleSummaryPk) {
     sampleUnitRepository.deleteBySampleSummaryFK(sampleSummaryPk);
-    LOG.info("Sample Units deleted", kv("Sample summary PK", sampleSummaryPk));
+    LOG.info("Sample Units deleted", kv("sampleSummaryPk", sampleSummaryPk));
   }
 
   private int markSampleSummaryComplete(UUID collectionExerciseId) throws CTPException {
@@ -43,17 +43,16 @@ public class CollectionExerciseEndService {
       sampleSummaryRepository.saveAndFlush(sampleSummary);
       LOG.info(
           "Sample summary marked complete",
-          kv("Collection excercise ID", collectionExerciseId),
-          kv("Sample summary", sampleSummary.getId()));
+          kv("collectionExerciseId", collectionExerciseId),
+          kv("sampleSummaryId", sampleSummary.getId()));
       return sampleSummary.getSampleSummaryPK();
     } else {
       LOG.error(
-          "Unable to find any sample summaries",
-          kv("Collection excercise ID", collectionExerciseId));
+          "Unable to find any sample summaries", kv("collectionExerciseId", collectionExerciseId));
       throw new CTPException(
           CTPException.Fault.RESOURCE_NOT_FOUND,
           "Sample Summary not found",
-          kv("Collection Exercise ID", collectionExerciseId));
+          kv("collectionExerciseId", collectionExerciseId));
     }
   }
 }

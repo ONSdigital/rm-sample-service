@@ -1,7 +1,6 @@
 package uk.gov.ons.ctp.response.sample.service;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -47,5 +46,6 @@ public class CollectionExerciseEndServiceTest {
     collectionExerciseEndService.collectionExerciseEnd(testCollectionExerciseId);
 
     verify(sampleSummaryRepository).findByCollectionExerciseId(testCollectionExerciseId);
+    verify(sampleUnitRepository, never()).deleteBySampleSummaryFK(any());
   }
 }

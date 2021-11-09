@@ -26,14 +26,14 @@ public class CollectionExerciseEndActivation {
 
   @Autowired private CollectionExerciseEndService collectionExerciseEndService;
 
-  /** To process Collection exercise end from PubSub. */
+  /** To process Collection Exercise End event from PubSub. */
   @ServiceActivator(inputChannel = "collectionExerciseEndActivationChannel")
   public void messageReceiver(
       Message message,
       @Header(GcpPubSubHeaders.ORIGINAL_MESSAGE) BasicAcknowledgeablePubsubMessage pubSubMsg) {
     LOG.info(
-        "Receiving Collection exercise end event",
-        kv("PubSub ID", pubSubMsg.getPubsubMessage().getMessageId()));
+        "Receiving Collection Exercise End event",
+        kv("messageId", pubSubMsg.getPubsubMessage().getMessageId()));
 
     String payload = new String((byte[]) message.getPayload());
 
@@ -49,7 +49,8 @@ public class CollectionExerciseEndActivation {
     } catch (IOException | CTPException e) {
       LOG.error(
           "Something went wrong while processing message received from PubSub "
-              + "for collection exercise end event",
+              + "for Collection Exercise End event",
+          kv("message", message),
           e);
       pubSubMsg.nack();
     }
