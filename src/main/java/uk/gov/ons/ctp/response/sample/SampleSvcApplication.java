@@ -170,13 +170,30 @@ public class SampleSvcApplication {
   /* PubSub / Spring integration configuration */
 
   @Bean(name = "sampleSummaryActivationChannel")
-  public MessageChannel inputMessageChannel() {
+  public MessageChannel sampleSummaryInputMessageChannel() {
     return new PublishSubscribeChannel();
   }
 
   @Bean
-  public PubSubInboundChannelAdapter inboundChannelAdapter(
+  public PubSubInboundChannelAdapter sampleSummaryInboundChannelAdapter(
       @Qualifier("sampleSummaryActivationChannel") MessageChannel messageChannel,
+      PubSubTemplate pubSubTemplate) {
+    PubSubInboundChannelAdapter adapter =
+        new PubSubInboundChannelAdapter(
+            pubSubTemplate, appConfig.getGcp().getSampleSummaryActivationSubscription());
+    adapter.setOutputChannel(messageChannel);
+    adapter.setAckMode(AckMode.MANUAL);
+    return adapter;
+  }
+
+  @Bean(name = "collectionExerciseEndActivationChannel")
+  public MessageChannel collectionExerciseEndInputMessageChannel() {
+    return new PublishSubscribeChannel();
+  }
+
+  @Bean
+  public PubSubInboundChannelAdapter collectionExerciseEndInboundChannelAdapter(
+      @Qualifier("collectionExerciseEndActivationChannel") MessageChannel messageChannel,
       PubSubTemplate pubSubTemplate) {
     PubSubInboundChannelAdapter adapter =
         new PubSubInboundChannelAdapter(

@@ -21,6 +21,13 @@ public interface SampleUnitRepository extends JpaRepository<SampleUnit, Integer>
   Stream<SampleUnit> findBySampleSummaryFK(Integer sampleSummaryFK);
 
   /**
+   * Delete SampleUnit entity by samplesummarypk
+   *
+   * @param sampleSummaryPK The sampleSummaryFK
+   */
+  void deleteBySampleSummaryFK(Integer sampleSummaryPK);
+
+  /**
    * Count SampleUnit entity by samplesummaryfk
    *
    * @param sampleSummaryFK The sampleSummaryFK

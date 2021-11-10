@@ -148,3 +148,4 @@ gcp:
   sampleSummaryActivationSubscription: "test_activation_subscription"
   sampleSummaryActivationStatusTopic: "test_activation_topic"
   caseNotificationTopic: "test_topic"
+  collectionExerciseEndSubscription: "test_collection_exercise_end_sample"
