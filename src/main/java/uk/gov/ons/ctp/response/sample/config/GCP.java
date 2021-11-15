@@ -8,4 +8,5 @@ public class GCP {
   String sampleSummaryActivationSubscription;
   String sampleSummaryActivationStatusTopic;
   String caseNotificationTopic;
+  String collectionExerciseEndSubscription;
 }

@@ -197,7 +197,7 @@ public class SampleSvcApplication {
       PubSubTemplate pubSubTemplate) {
     PubSubInboundChannelAdapter adapter =
         new PubSubInboundChannelAdapter(
-            pubSubTemplate, appConfig.getGcp().getSampleSummaryActivationSubscription());
+            pubSubTemplate, appConfig.getGcp().getCollectionExerciseEndSubscription());
     adapter.setOutputChannel(messageChannel);
     adapter.setAckMode(AckMode.MANUAL);
     return adapter;
