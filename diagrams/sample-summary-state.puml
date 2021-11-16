@@ -6,4 +6,5 @@ skinparam state {
 [*] --> INIT
 INIT --> ACTIVE : activated
 ACTIVE --> FAILED : fail_validation
+ACTIVE --> COMPLETE : completed
 @enduml

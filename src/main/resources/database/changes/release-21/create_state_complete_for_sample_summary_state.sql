@@ -1,0 +1,1 @@
+INSERT INTO sample.samplesummarystate(state) VALUES('COMPLETE');
