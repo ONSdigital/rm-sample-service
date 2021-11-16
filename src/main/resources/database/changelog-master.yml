@@ -36,6 +36,8 @@ databaseChangeLog:
       file: database/changes/release-19/changelog.yml
   - include:
       file: database/changes/release-20/changelog.yml
+  - include:
+      file: database/changes/release-21/changelog.yml
 
 
 # When adding new groups of migrations to this file the numbers are arbitrary, please follow the following format for
