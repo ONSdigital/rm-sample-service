@@ -1,0 +1,1 @@
+INSERT INTO sample.sample_summary_state(state_pk) VALUES('COMPLETE');

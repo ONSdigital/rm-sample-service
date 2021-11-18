@@ -4,6 +4,7 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import java.util.Optional;
 import java.util.UUID;
+import javax.transaction.Transactional;
 import libs.common.error.CTPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,7 @@ import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 
 @Service
+@Transactional
 public class CollectionExerciseEndService {
 
   @Autowired private SampleUnitRepository sampleUnitRepository;
@@ -24,18 +26,10 @@ public class CollectionExerciseEndService {
   private static final Logger LOG = LoggerFactory.getLogger(CollectionExerciseEndService.class);
 
   public void collectionExerciseEnd(UUID collectionExerciseId) throws CTPException {
-    int sampleSummaryPK = markSampleSummaryComplete(collectionExerciseId);
-    deleteSampleUnits(sampleSummaryPK);
-  }
-
-  private void deleteSampleUnits(int sampleSummaryPk) {
-    sampleUnitRepository.deleteBySampleSummaryFK(sampleSummaryPk);
-    LOG.info("Sample Units deleted", kv("sampleSummaryPk", sampleSummaryPk));
-  }
-
-  private int markSampleSummaryComplete(UUID collectionExerciseId) throws CTPException {
     Optional<SampleSummary> optionalSampleSummary =
         sampleSummaryRepository.findByCollectionExerciseId(collectionExerciseId);
+
+    int sampleSummaryPK;
 
     if (optionalSampleSummary.isPresent()) {
       SampleSummary sampleSummary = optionalSampleSummary.get();
@@ -45,7 +39,7 @@ public class CollectionExerciseEndService {
           "Sample summary marked complete",
           kv("collectionExerciseId", collectionExerciseId),
           kv("sampleSummaryId", sampleSummary.getId()));
-      return sampleSummary.getSampleSummaryPK();
+      sampleSummaryPK = sampleSummary.getSampleSummaryPK();
     } else {
       LOG.error(
           "Unable to find any sample summaries", kv("collectionExerciseId", collectionExerciseId));
@@ -54,5 +48,8 @@ public class CollectionExerciseEndService {
           "Sample Summary not found",
           kv("collectionExerciseId", collectionExerciseId));
     }
+    sampleUnitRepository.deleteBySampleSummaryFK(sampleSummaryPK);
+    LOG.info("Sample Units deleted", kv("sampleSummaryPk", sampleSummaryPK));
+    sampleUnitRepository.flush();
   }
 }
