@@ -135,7 +135,7 @@ public class SampleSummaryEnrichmentService {
                           surveyId,
                           formTypeMap,
                           sampleUnit,
-                          sampleSummary.getCollectionExerciseId());
+                          collectionExerciseId);
                   LOG.debug(
                       "CI request returned " + foundCI,
                       kv("sampleUnitId", sampleUnitId),
