@@ -131,7 +131,11 @@ public class SampleSummaryEnrichmentService {
                       kv("sampleUnitId", sampleUnitId),
                       kv("sampleSummaryId", sampleSummaryId));
                   boolean foundCI =
-                      findAndUpdateCollectionInstrument(surveyId, formTypeMap, sampleUnit);
+                      findAndUpdateCollectionInstrument(
+                          surveyId,
+                          formTypeMap,
+                          sampleUnit,
+                          sampleSummary.getCollectionExerciseId());
                   LOG.debug(
                       "CI request returned " + foundCI,
                       kv("sampleUnitId", sampleUnitId),
@@ -227,7 +231,10 @@ public class SampleSummaryEnrichmentService {
   }
 
   private boolean findAndUpdateCollectionInstrument(
-      UUID surveyId, Map<String, Optional<UUID>> formTypeMap, SampleUnit sampleUnit) {
+      UUID surveyId,
+      Map<String, Optional<UUID>> formTypeMap,
+      SampleUnit sampleUnit,
+      UUID collectionExerciseId) {
     // now find the Collection instrument for this sample
     // and if we haven't seen this form type before add it
     // to a map so we can reuse for the next sample
@@ -247,7 +254,9 @@ public class SampleSummaryEnrichmentService {
               UUID ciId = null;
               List<String> classifierTypes = requestSurveyClassifiers(surveyId);
               try {
-                ciId = requestCollectionInstrumentId(classifierTypes, sampleUnit, surveyId);
+                ciId =
+                    requestCollectionInstrumentId(
+                        classifierTypes, sampleUnit, surveyId, collectionExerciseId);
               } catch (HttpClientErrorException e) {
                 if (e.getStatusCode() != HttpStatus.NOT_FOUND) {
                   LOG.error(
@@ -309,9 +318,14 @@ public class SampleSummaryEnrichmentService {
    * @throws RestClientException something went wrong making http call
    */
   private UUID requestCollectionInstrumentId(
-      List<String> classifierTypes, SampleUnit sampleUnit, UUID surveyId) {
+      List<String> classifierTypes,
+      SampleUnit sampleUnit,
+      UUID surveyId,
+      UUID collectionExerciseId) {
     Map<String, String> classifiers = new HashMap<>();
     classifiers.put("SURVEY_ID", surveyId.toString());
+    // Add collection exercise to map the correct collection instrument
+    classifiers.put("COLLECTION_EXERCISE", collectionExerciseId.toString());
 
     // for all the classifiers returned by the survey service for this survey
     // get the ids from the sample unit
