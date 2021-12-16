@@ -132,10 +132,7 @@ public class SampleSummaryEnrichmentService {
                       kv("sampleSummaryId", sampleSummaryId));
                   boolean foundCI =
                       findAndUpdateCollectionInstrument(
-                          surveyId,
-                          formTypeMap,
-                          sampleUnit,
-                          collectionExerciseId);
+                          surveyId, formTypeMap, sampleUnit, collectionExerciseId);
                   LOG.debug(
                       "CI request returned " + foundCI,
                       kv("sampleUnitId", sampleUnitId),
