@@ -240,11 +240,13 @@ public class SampleSvcApplication {
       cacheNames = {COLLECTION_INSTRUMENT_CACHE})
   @Scheduled(fixedDelay = 60000)
   public void cacheEvict() {
-    /* This is getting rid of the cached entries in case anything's been changed. We imagine
-     * that the maximum of a 1 minute delay to seeing changes reflected in the collection
+    /*
+     * This is getting rid of the cached entries in case anything's been changed. We
+     * imagine
+     * that the maximum of a 1 minute delay to seeing changes reflected in the
+     * collection
      * instrument service will not cause any issues
      *
      */
-    log.debug("Collection instrument cache evicted");
   }
 }
