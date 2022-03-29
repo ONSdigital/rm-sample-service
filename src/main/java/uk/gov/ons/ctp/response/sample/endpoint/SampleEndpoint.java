@@ -98,7 +98,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
    * DELETE endpoint to delete the sample summary and all related sample units given sampleSummaryId
    *
    * @param sampleSummaryId the id fo the SampleSummary to delete
-   * @return noContent
+   * @return noContent on success
    * @throws CTPException if SampleSummary not found
    */
   @RequestMapping(value = "/samplesummary/{sampleSummaryId}", method = RequestMethod.DELETE)

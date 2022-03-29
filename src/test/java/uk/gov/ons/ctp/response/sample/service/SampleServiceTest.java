@@ -11,10 +11,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.persistence.PersistenceException;
 import libs.common.FixtureHelper;
 import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
 import libs.sample.validation.BusinessSampleUnit;
+import org.assertj.core.api.Fail;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -159,7 +161,7 @@ public class SampleServiceTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void getSampleSummaryUnitCountSampleSummaryNonExistent() {
-    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(null));
+    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
 
     sampleService.getSampleSummaryUnitCount(UUID.randomUUID());
   }
@@ -171,6 +173,33 @@ public class SampleServiceTest {
     when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.of(newSummary));
 
     sampleService.getSampleSummaryUnitCount(newSummary.getId());
+  }
+
+  @Test
+  public void deleteSampleSummarySuccess() {
+    SampleSummary sampleSummary = new SampleSummary();
+    sampleSummary.setSampleSummaryPK(1);
+    sampleSummary.setId(UUID.randomUUID());
+    sampleService.deleteSampleSummaryAndSampleUnits(sampleSummary);
+    verify(sampleUnitRepository, times(1)).deleteBySampleSummaryFK(any());
+    verify(sampleSummaryRepository, times(1)).deleteByIdEquals(any());
+  }
+
+  @Test
+  public void deleteSampleSummaryNotCalledWhenSampleUnitFails() {
+    doThrow(new PersistenceException()).when(sampleUnitRepository).deleteBySampleSummaryFK(any());
+    SampleSummary sampleSummary = new SampleSummary();
+    sampleSummary.setSampleSummaryPK(1);
+    sampleSummary.setId(UUID.randomUUID());
+    try {
+      sampleService.deleteSampleSummaryAndSampleUnits(sampleSummary);
+      // Will only get here if the above method doesn't throw an exception
+      Fail.fail("Exception should've been thrown");
+
+    } catch (PersistenceException e) {
+      verify(sampleUnitRepository, times(1)).deleteBySampleSummaryFK(any());
+      verify(sampleSummaryRepository, never()).deleteByIdEquals(any());
+    }
   }
 
   @Test
@@ -235,7 +264,7 @@ public class SampleServiceTest {
       throws UnknownSampleSummaryException, UnknownSampleUnitException, CTPException {
 
     SampleSummary newSummary = createSampleSummary(5, 2);
-    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(null));
+    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
     BusinessSampleUnit businessSampleUnit = new BusinessSampleUnit();
     sampleService.createSampleUnit(newSummary.getId(), businessSampleUnit, SampleUnitState.INIT);
     verify(sampleUnitRepository, times(1)).save(any(SampleUnit.class));
@@ -290,7 +319,7 @@ public class SampleServiceTest {
   @Test
   public void findSampleUnitsBySampleSummaryAndStateReturnsEmptyList() {
 
-    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(null));
+    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
 
     List<SampleUnit> su =
         sampleService
