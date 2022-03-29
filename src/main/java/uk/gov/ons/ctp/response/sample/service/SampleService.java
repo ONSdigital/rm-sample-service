@@ -69,6 +69,12 @@ public class SampleService {
   }
 
   @Transactional(propagation = Propagation.REQUIRED)
+  public void deleteSampleSummaryAndSampleUnits(SampleSummary sampleSummary) {
+    sampleUnitRepository.deleteBySampleSummaryFK(sampleSummary.getSampleSummaryPK());
+    sampleSummaryRepository.deleteByIdEquals(sampleSummary.getId());
+  }
+
+  @Transactional(propagation = Propagation.REQUIRED)
   public SampleUnit createSampleUnit(
       UUID sampleSummaryId, BusinessSampleUnit samplingUnit, SampleUnitState sampleUnitState)
       throws UnknownSampleSummaryException, CTPException {
