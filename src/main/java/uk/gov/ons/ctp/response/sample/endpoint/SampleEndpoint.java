@@ -94,6 +94,33 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     return ResponseEntity.ok(result);
   }
 
+  /**
+   * DELETE endpoint to delete the sample summary and all related sample units given sampleSummaryId
+   *
+   * @param sampleSummaryId the id fo the SampleSummary to delete
+   * @return noContent on success
+   * @throws CTPException if SampleSummary not found
+   */
+  @RequestMapping(value = "/samplesummary/{sampleSummaryId}", method = RequestMethod.DELETE)
+  public ResponseEntity<?> deleteSampleSummary(
+      @PathVariable("sampleSummaryId") final UUID sampleSummaryId) throws CTPException {
+    SampleSummary sampleSummary = sampleService.findSampleSummary(sampleSummaryId);
+    log.info(
+        "Attempting to delete sample units and sample summary records",
+        kv("sampleSummaryId", sampleSummaryId));
+    if (sampleSummary == null) {
+      throw new CTPException(
+          CTPException.Fault.RESOURCE_NOT_FOUND,
+          String.format("Sample Summary not found for sampleSummaryId %s", sampleSummaryId));
+    }
+    sampleService.deleteSampleSummaryAndSampleUnits(sampleSummary);
+    log.info(
+        "Successfully deleted sample units and sample summary records",
+        kv("sampleSummaryId", sampleSummaryId));
+
+    return ResponseEntity.noContent().build();
+  }
+
   @RequestMapping(value = "/count", method = RequestMethod.GET)
   public ResponseEntity<SampleUnitsRequestDTO> getSampleSummaryUnitCount(
       @RequestParam(value = "sampleSummaryId") List<UUID> sampleSummaryIdList) {

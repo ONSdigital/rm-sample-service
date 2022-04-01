@@ -81,6 +81,17 @@ public class SampleEndpointUnitTest {
   }
 
   @Test
+  public void deleteSampleSummaryNotFound() throws Exception {
+    when(sampleService.findSampleSummary(any())).thenReturn(null);
+
+    String url = String.format("/samples/samplesummary/%s", UUID.randomUUID());
+
+    ResultActions actions = mockMvc.perform(delete(url));
+
+    actions.andExpect(status().isNotFound());
+  }
+
+  @Test
   public void addSingleSample() throws Exception {
     BusinessSampleUnitDTO businessSampleUnitDTO = new BusinessSampleUnitDTO();
     businessSampleUnitDTO.setEntname1("test1");
