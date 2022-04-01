@@ -105,12 +105,18 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   public ResponseEntity<?> deleteSampleSummary(
       @PathVariable("sampleSummaryId") final UUID sampleSummaryId) throws CTPException {
     SampleSummary sampleSummary = sampleService.findSampleSummary(sampleSummaryId);
+    log.info(
+        "Attempting to delete sample units and sample summary records",
+        kv("sampleSummaryId", sampleSummaryId));
     if (sampleSummary == null) {
       throw new CTPException(
           CTPException.Fault.RESOURCE_NOT_FOUND,
           String.format("Sample Summary not found for sampleSummaryId %s", sampleSummaryId));
     }
     sampleService.deleteSampleSummaryAndSampleUnits(sampleSummary);
+    log.info(
+        "Successfully deleted sample units and sample summary records",
+        kv("sampleSummaryId", sampleSummaryId));
 
     return ResponseEntity.noContent().build();
   }
