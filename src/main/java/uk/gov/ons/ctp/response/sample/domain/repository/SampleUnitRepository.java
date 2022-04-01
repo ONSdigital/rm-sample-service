@@ -4,6 +4,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
@@ -25,6 +27,8 @@ public interface SampleUnitRepository extends JpaRepository<SampleUnit, Integer>
    *
    * @param sampleSummaryPK The sampleSummaryFK
    */
+  @Modifying
+  @Query("DELETE from SampleUnit where sampleSummaryFK = :sampleSummaryPK")
   void deleteBySampleSummaryFK(Integer sampleSummaryPK);
 
   /**
