@@ -16,24 +16,24 @@ import org.springframework.core.io.ResourceLoader;
  * preprod or prod as the schemas already exist
  */
 public class CustomSpringLiquibase implements InitializingBean, BeanNameAware, ResourceLoaderAware {
-    private SpringLiquibase springLiquibase;
+  private SpringLiquibase springLiquibase;
 
-    public CustomSpringLiquibase(SpringLiquibase liquibase) {
-        this.springLiquibase = liquibase;
-    }
+  public CustomSpringLiquibase(SpringLiquibase liquibase) {
+    this.springLiquibase = liquibase;
+  }
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        springLiquibase.afterPropertiesSet();
-    }
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    springLiquibase.afterPropertiesSet();
+  }
 
-    @Override
-    public void setBeanName(String name) {
-        springLiquibase.setBeanName(name);
-    }
+  @Override
+  public void setBeanName(String name) {
+    springLiquibase.setBeanName(name);
+  }
 
-    @Override
-    public void setResourceLoader(ResourceLoader resourceLoader) {
-        springLiquibase.setResourceLoader(resourceLoader);
-    }
+  @Override
+  public void setResourceLoader(ResourceLoader resourceLoader) {
+    springLiquibase.setResourceLoader(resourceLoader);
+  }
 }

@@ -1,9 +1,9 @@
 package uk.gov.ons.ctp.response.sample;
 
+import javax.sql.DataSource;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import javax.sql.DataSource;
 import libs.common.error.RestExceptionHandler;
 import libs.common.jackson.CustomObjectMapper;
 import libs.common.rest.RestUtility;
@@ -97,10 +97,10 @@ public class SampleSvcApplication {
     }
 
     return DataSourceBuilder.create()
-            .url(liquibaseProperties.getUrl())
-            .username(liquibaseProperties.getUser())
-            .password(liquibaseProperties.getPassword())
-            .build();
+        .url(liquibaseProperties.getUrl())
+        .username(liquibaseProperties.getUser())
+        .password(liquibaseProperties.getPassword())
+        .build();
   }
 
   /**
