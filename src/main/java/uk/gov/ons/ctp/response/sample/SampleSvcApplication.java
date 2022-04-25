@@ -3,11 +3,13 @@ package uk.gov.ons.ctp.response.sample;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.sql.DataSource;
 import libs.common.error.RestExceptionHandler;
 import libs.common.jackson.CustomObjectMapper;
 import libs.common.rest.RestUtility;
 import libs.common.state.StateTransitionManager;
 import libs.common.state.StateTransitionManagerFactory;
+import liquibase.integration.spring.SpringLiquibase;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.cobertura.CoverageIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.boot.sql.init.dependency.DependsOnDatabaseInitialization;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.EnableCaching;
@@ -25,6 +30,7 @@ import org.springframework.cloud.gcp.pubsub.integration.inbound.PubSubInboundCha
 import org.springframework.cloud.gcp.pubsub.integration.outbound.PubSubMessageHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.integration.annotation.IntegrationComponentScan;
@@ -60,8 +66,42 @@ import uk.gov.ons.ctp.response.sample.service.state.SampleSvcStateTransitionMana
 public class SampleSvcApplication {
 
   @Autowired private StateTransitionManagerFactory stateTransitionManager;
-
+  @Autowired private DataSource dataSource;
   @Autowired private AppConfig appConfig;
+
+  @Bean
+  public LiquibaseProperties liquibaseProperties() {
+    return new LiquibaseProperties();
+  }
+
+  @Bean
+  @DependsOn(value = "entityManagerFactory")
+  @DependsOnDatabaseInitialization
+  public CustomSpringLiquibase liquibase() {
+    LiquibaseProperties liquibaseProperties = liquibaseProperties();
+    SpringLiquibase liquibase = new SpringLiquibase();
+    liquibase.setChangeLog(liquibaseProperties.getChangeLog());
+    liquibase.setContexts(liquibaseProperties.getContexts());
+    liquibase.setDataSource(getDataSource(liquibaseProperties));
+    liquibase.setDefaultSchema(liquibaseProperties.getDefaultSchema());
+    liquibase.setDropFirst(liquibaseProperties.isDropFirst());
+    liquibase.setShouldRun(true);
+    liquibase.setLabels(liquibaseProperties.getLabels());
+    liquibase.setChangeLogParameters(liquibaseProperties.getParameters());
+    return new CustomSpringLiquibase(liquibase);
+  }
+
+  private DataSource getDataSource(LiquibaseProperties liquibaseProperties) {
+    if (liquibaseProperties.getUrl() == null) {
+      return this.dataSource;
+    }
+
+    return DataSourceBuilder.create()
+            .url(liquibaseProperties.getUrl())
+            .username(liquibaseProperties.getUser())
+            .password(liquibaseProperties.getPassword())
+            .build();
+  }
 
   /**
    * This method is the entry point to the Spring Boot application.

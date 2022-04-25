@@ -18,6 +18,10 @@ logging:
   useJson: false
 
 management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
   security:
     roles: SUPERUSER
     enabled: false
@@ -39,13 +43,6 @@ spring:
     username: postgres
     password: postgres
     driverClassName: org.postgresql.Driver
-    continue-on-error: true
-    tomcat:
-      initial-size: 5
-      max-active: 10
-      max-idle: 5
-      min-idle: 3
-    initialization-mode: always
     hikari:
       connection-timeout: 60000
       maximum-pool-size: 20
@@ -56,17 +53,22 @@ spring:
       file-size-threshold: 0
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQL94Dialect
-    properties:
-      hibernate:
-        ddl-auto: update
-        default_schema: sample
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: update
+      default_schema: sample
     open-in-view: true
+  sql:
+    init:
+      mode: always
+      continue-on-error: true
   liquibase:
     user: postgres
     password: postgres
     url: jdbc:postgresql://localhost:5432/postgres
     changeLog: classpath:/database/changelog-master.yml
     liquibase-schema: sample
+    enabled: false
 
   security:
     user: admin
