@@ -13,7 +13,7 @@
 		<tag>HEAD</tag>
 	</scm>
 	<properties>
-		<springboot.version>2.5.12</springboot.version>
+		<springboot.version>2.6.7</springboot.version>
 		<spring.cloud.gcp.version>1.2.8.RELEASE</spring.cloud.gcp.version>
 		<common.version>10.49.4</common.version>
 		<java.version>11</java.version>
