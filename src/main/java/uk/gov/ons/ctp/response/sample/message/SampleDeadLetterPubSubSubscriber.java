@@ -30,7 +30,6 @@ public class SampleDeadLetterPubSubSubscriber {
   /**
    * Sets up a connection to the sample dead letter subscription. A sample is added to the dead
    * letter queue after 10 failed processing attempts
-   *
    */
   @EventListener(ApplicationReadyEvent.class)
   public void sampleDeadLetterSubscription() throws IOException {
