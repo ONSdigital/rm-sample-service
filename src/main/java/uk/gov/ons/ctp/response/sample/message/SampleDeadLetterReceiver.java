@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.MessageEndpoint;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import uk.gov.ons.ctp.response.sample.service.SampleSummaryEnrichmentService;
@@ -24,7 +26,7 @@ public class SampleDeadLetterReceiver {
    * @param sampleDeadLetterId to process
    * @throws CTPException CTPException
    */
-  //  @Transactional()
+  @Transactional(propagation = Propagation.REQUIRED, value = "transactionManager")
   public void process(UUID sampleDeadLetterId) throws CTPException {
     log.info("Processing dead letter sample", kv("dead letter sample", sampleDeadLetterId));
 
