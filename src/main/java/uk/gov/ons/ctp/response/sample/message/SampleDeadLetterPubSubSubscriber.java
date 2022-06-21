@@ -17,6 +17,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
+import uk.gov.ons.ctp.response.sample.service.UnknownSampleSummaryException;
 
 @Component
 public class SampleDeadLetterPubSubSubscriber {
@@ -50,8 +51,11 @@ public class SampleDeadLetterPubSubSubscriber {
       log.info("Received a dead lettered sample", kv("payload", payload));
       try {
         sampleDeadLetterReceiver.process(sampleSummaryId);
-      } catch (CTPException e) {
-        log.error("Error processing sample", e);
+      } catch (CTPException | UnknownSampleSummaryException | RuntimeException e) {
+        log.error(
+            "Failed to put sample summary into FAILED state",
+            kv("sampleSummary", sampleSummaryId),
+            e);
         consumer.nack();
       } catch (Exception e) {
         log.error("Unexpected error processing sample", e);
