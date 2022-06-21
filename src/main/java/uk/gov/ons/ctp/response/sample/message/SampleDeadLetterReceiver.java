@@ -56,7 +56,7 @@ public class SampleDeadLetterReceiver {
 
       SampleSummaryDTO.SampleState newState =
           sampleSummaryTransitionManager.transition(
-              sampleSummary.getState(), SampleSummaryDTO.SampleEvent.FAIL_VALIDATION);
+              SampleSummaryDTO.SampleState.FAILED, SampleSummaryDTO.SampleEvent.FAIL_VALIDATION);
       sampleSummary.setState(newState);
       this.sampleSummaryRepository.save(sampleSummary);
       log.info("sample summary transitioned to failed", kv("sampleSummaryId", sampleDeadLetterId));
