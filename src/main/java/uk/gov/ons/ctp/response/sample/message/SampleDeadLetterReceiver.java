@@ -54,7 +54,10 @@ public class SampleDeadLetterReceiver {
               .findById(sampleDeadLetterId)
               .orElseThrow(UnknownSampleSummaryException::new);
 
-      sampleSummary.setState(SampleSummaryDTO.SampleState.FAILED);
+      SampleSummaryDTO.SampleState newState =
+          sampleSummaryTransitionManager.transition(
+              sampleSummary.getState(), SampleSummaryDTO.SampleEvent.FAIL_INGESTION);
+      sampleSummary.setState(newState);
       this.sampleSummaryRepository.save(sampleSummary);
       log.info("sample summary transitioned to failed", kv("sampleSummaryId", sampleDeadLetterId));
     }
