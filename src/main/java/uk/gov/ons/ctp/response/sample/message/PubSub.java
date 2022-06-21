@@ -49,14 +49,14 @@ public class PubSub {
   }
 
   /***
-   * Provides subscription name for the case notification subscriber
+   * Provides subscription name for the sample file dead letter subscriber
    * @return com.google.pubsub.v1.ProjectSubscriptionName
    */
   public ProjectSubscriptionName getSampleDeadLetterSubscriptionName() {
     String project = appConfig.getGcp().getProject();
     String subscriptionId = appConfig.getGcp().getSampleSummaryDeadLetterSubscription();
     log.info(
-        "creating pubsub subscription name for case creation notification "
+        "creating pubsub subscription name for sample dead letter "
             + subscriptionId
             + " in project "
             + project);

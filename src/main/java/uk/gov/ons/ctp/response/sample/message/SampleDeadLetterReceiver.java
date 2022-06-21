@@ -19,7 +19,7 @@ import uk.gov.ons.ctp.response.sample.service.SampleService;
 import uk.gov.ons.ctp.response.sample.service.SampleSummaryEnrichmentService;
 import uk.gov.ons.ctp.response.sample.service.UnknownSampleSummaryException;
 
-/** The reader of CaseReceipts from queue */
+/** The reader of dead lettered samples from queue */
 @MessageEndpoint
 public class SampleDeadLetterReceiver {
   private static final Logger log = LoggerFactory.getLogger(SampleDeadLetterReceiver.class);
