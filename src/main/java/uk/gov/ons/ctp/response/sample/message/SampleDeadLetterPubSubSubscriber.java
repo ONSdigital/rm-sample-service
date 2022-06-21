@@ -10,6 +10,8 @@ import com.google.cloud.pubsub.v1.Subscriber;
 import com.google.pubsub.v1.ProjectSubscriptionName;
 import com.google.pubsub.v1.PubsubMessage;
 import java.io.IOException;
+import java.util.UUID;
+
 import libs.common.error.CTPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +20,6 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
-import uk.gov.ons.ctp.response.sample.message.feedback.SampleDeadLetter;
 
 @Component
 public class SampleDeadLetterPubSubSubscriber {
@@ -47,25 +48,18 @@ public class SampleDeadLetterPubSubSubscriber {
   public MessageReceiver createMessageReceiver() {
     return (PubsubMessage message, AckReplyConsumer consumer) -> {
       String payload = message.getData().toStringUtf8();
+      UUID sampleSummaryId = UUID.fromString(message.getAttributesOrDefault("sample_summary_id", "default"));
       log.info("Received a dead lettered sample", kv("payload", payload));
       try {
-        ObjectMapper mapper = new ObjectMapper();
-        SampleDeadLetter sample = mapper.readValue(payload, SampleDeadLetter.class);
-        log.debug("Successfully serialised sample", kv("sample", sample));
-        try {
-          sampleDeadLetterReceiver.process(sample);
-        } catch (CTPException e) {
-          log.error("Error processing sample", e);
-          consumer.nack();
-        } catch (Exception e) {
-          log.error("Unexpected error processing sample", e);
-          consumer.nack();
-        }
-        consumer.ack();
-      } catch (JsonProcessingException e) {
-        log.error("Error serialising sample", e);
+        sampleDeadLetterReceiver.process(sampleSummaryId);
+      } catch (CTPException e) {
+        log.error("Error processing sample", e);
+        consumer.nack();
+      } catch (Exception e) {
+        log.error("Unexpected error processing sample", e);
         consumer.nack();
       }
+      consumer.ack();
     };
   }
 }

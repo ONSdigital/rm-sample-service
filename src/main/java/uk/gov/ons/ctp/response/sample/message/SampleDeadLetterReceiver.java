@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.MessageEndpoint;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
-import uk.gov.ons.ctp.response.sample.message.feedback.SampleDeadLetter;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import uk.gov.ons.ctp.response.sample.service.SampleSummaryEnrichmentService;
 
@@ -22,22 +21,21 @@ public class SampleDeadLetterReceiver {
   /**
    * To process SampleSummaries from dead letter queue
    *
-   * @param sampleDeadLetter to process
+   * @param sampleDeadLetterId to process
    * @throws CTPException CTPException
    */
   //  @Transactional()
-  public void process(SampleDeadLetter sampleDeadLetter) throws CTPException {
-    log.info("Processing dead letter sample", kv("dead letter sample", sampleDeadLetter));
-    UUID sampleSummaryId = UUID.fromString(sampleDeadLetter.getSampleSummaryId());
+  public void process(UUID sampleDeadLetterId) throws CTPException {
+    log.info("Processing dead letter sample", kv("dead letter sample", sampleDeadLetterId));
 
-    SampleSummary existingSampleSummary = sampleService.findSampleSummary(sampleSummaryId);
+    SampleSummary existingSampleSummary = sampleService.findSampleSummary(sampleDeadLetterId);
     log.info("Found existing sample summary", kv("existing_sample_summary", existingSampleSummary));
 
     if (existingSampleSummary == null) {
-      log.error("No existing sample summary found", kv("sample_summary_id", sampleSummaryId));
+      log.error("No existing sample summary found", kv("sample_summary_id", sampleDeadLetterId));
     } else {
-      sampleSummaryEnrichmentService.failSampleSummary(sampleSummaryId);
+      sampleSummaryEnrichmentService.failSampleSummary(sampleDeadLetterId);
     }
-    log.info("Dead letter sample processing complete", kv("sample_summary", sampleDeadLetter));
+    log.info("Dead letter sample processing complete", kv("sample_summary", sampleDeadLetterId));
   }
 }
