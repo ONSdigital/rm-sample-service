@@ -2,8 +2,6 @@ package uk.gov.ons.ctp.response.sample.message;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.pubsub.v1.AckReplyConsumer;
 import com.google.cloud.pubsub.v1.MessageReceiver;
 import com.google.cloud.pubsub.v1.Subscriber;
@@ -11,7 +9,6 @@ import com.google.pubsub.v1.ProjectSubscriptionName;
 import com.google.pubsub.v1.PubsubMessage;
 import java.io.IOException;
 import java.util.UUID;
-
 import libs.common.error.CTPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +45,8 @@ public class SampleDeadLetterPubSubSubscriber {
   public MessageReceiver createMessageReceiver() {
     return (PubsubMessage message, AckReplyConsumer consumer) -> {
       String payload = message.getData().toStringUtf8();
-      UUID sampleSummaryId = UUID.fromString(message.getAttributesOrDefault("sample_summary_id", "default"));
+      UUID sampleSummaryId =
+          UUID.fromString(message.getAttributesOrDefault("sample_summary_id", "default"));
       log.info("Received a dead lettered sample", kv("payload", payload));
       try {
         sampleDeadLetterReceiver.process(sampleSummaryId);
