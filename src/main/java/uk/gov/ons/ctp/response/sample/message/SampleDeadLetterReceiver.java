@@ -58,7 +58,8 @@ public class SampleDeadLetterReceiver {
           sampleSummaryTransitionManager.transition(
               sampleSummary.getState(), SampleSummaryDTO.SampleEvent.FAIL_INGESTION);
       sampleSummary.setState(newState);
-      sampleSummary.setNotes("Error: Sample file formatting problem, potentially invalid number of business columns");
+      sampleSummary.setNotes(
+          "Error: Sample file formatting problem, potentially invalid number of business columns");
       this.sampleSummaryRepository.save(sampleSummary);
       log.info("sample summary transitioned to failed", kv("sampleSummaryId", sampleDeadLetterId));
     }
