@@ -42,18 +42,13 @@ public class SampleDeadLetterReceiver {
       throws CTPException, UnknownSampleSummaryException, RuntimeException {
     log.info("Processing dead letter sample", kv("dead letter sample", sampleDeadLetterId));
 
-    SampleSummary existingSampleSummary = sampleService.findSampleSummary(sampleDeadLetterId);
-    log.info("Found existing sample summary", kv("existing_sample_summary", existingSampleSummary));
+    SampleSummary sampleSummary = sampleService.findSampleSummary(sampleDeadLetterId);
+    log.info("Found existing sample summary", kv("existing_sample_summary", sampleSummary));
 
-    if (existingSampleSummary == null) {
+    if (sampleSummary == null) {
       log.error("No existing sample summary found", kv("sample_summary_id", sampleDeadLetterId));
     } else {
       log.info("failing sample summary", kv("sampleSummaryId", sampleDeadLetterId));
-      SampleSummary sampleSummary =
-          sampleSummaryRepository
-              .findById(sampleDeadLetterId)
-              .orElseThrow(UnknownSampleSummaryException::new);
-
       SampleSummaryDTO.SampleState newState =
           sampleSummaryTransitionManager.transition(
               sampleSummary.getState(), SampleSummaryDTO.SampleEvent.FAIL_INGESTION);
