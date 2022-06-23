@@ -219,6 +219,8 @@ spec:
             value: "{{ .Values.gcp.caseNotificationTopic }}"
           - name: GCP_COLLECTIONEXERCISEENDSUBSCRIPTION
             value: "{{ .Values.gcp.collectionExerciseEndSubscription }}"
+          - name: GCP_SAMPLESUMMARYDEADLETTERSUBSCRIPTION
+            value: "{{ .Values.gcp.sampleSummaryDeadLetterSubscription }}"
           - name: SPRING_CLOUD_GCP_PROJECTID
             value: "{{ .Values.gcp.project }}"
           resources:

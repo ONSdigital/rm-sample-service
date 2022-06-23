@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.response.sample.endpoint;
+package uk.gov.ons.ctp.response.sample.message;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.pubsub.v1.AckReplyConsumer;
