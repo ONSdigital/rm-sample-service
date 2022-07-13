@@ -37,7 +37,7 @@ CREATE SEQUENCE sample.collectionexercisejobseq
     CACHE 1;
 
 
-ALTER TABLE sample.collectionexercisejobseq OWNER TO postgres;
+--ALTER TABLE sample.collectionexercisejobseq OWNER TO postgres;
 
 --SET default_tablespace = '';
 
@@ -45,39 +45,39 @@ ALTER TABLE sample.collectionexercisejobseq OWNER TO postgres;
 -- Name: databasechangelog; Type: TABLE; Schema: sample; Owner: postgres
 --
 
-CREATE TABLE sample.databasechangelog (
-    id character varying(255) NOT NULL,
-    author character varying(255) NOT NULL,
-    filename character varying(255) NOT NULL,
-    dateexecuted timestamp without time zone NOT NULL,
-    orderexecuted integer NOT NULL,
-    exectype character varying(10) NOT NULL,
-    md5sum character varying(35),
-    description character varying(255),
-    comments character varying(255),
-    tag character varying(255),
-    liquibase character varying(20),
-    contexts character varying(255),
-    labels character varying(255),
-    deployment_id character varying(10)
-);
+--CREATE TABLE sample.databasechangelog (
+--    id character varying(255) NOT NULL,
+--    author character varying(255) NOT NULL,
+--    filename character varying(255) NOT NULL,
+--    dateexecuted timestamp without time zone NOT NULL,
+--    orderexecuted integer NOT NULL,
+--    exectype character varying(10) NOT NULL,
+--    md5sum character varying(35),
+--    description character varying(255),
+--    comments character varying(255),
+--    tag character varying(255),
+--    liquibase character varying(20),
+--    contexts character varying(255),
+--    labels character varying(255),
+--    deployment_id character varying(10)
+--);
 
 
-ALTER TABLE sample.databasechangelog OWNER TO postgres;
+--ALTER TABLE sample.databasechangelog OWNER TO postgres;
 
 --
 -- Name: databasechangeloglock; Type: TABLE; Schema: sample; Owner: postgres
 --
 
-CREATE TABLE sample.databasechangeloglock (
-    id integer NOT NULL,
-    locked boolean NOT NULL,
-    lockgranted timestamp without time zone,
-    lockedby character varying(255)
-);
+--CREATE TABLE sample.databasechangeloglock (
+--    id integer NOT NULL,
+--    locked boolean NOT NULL,
+--    lockgranted timestamp without time zone,
+--    lockedby character varying(255)
+--);
 
 
-ALTER TABLE sample.databasechangeloglock OWNER TO postgres;
+--ALTER TABLE sample.databasechangeloglock OWNER TO postgres;
 
 --
 -- Name: messagelogseq; Type: SEQUENCE; Schema: sample; Owner: postgres
@@ -91,7 +91,7 @@ CREATE SEQUENCE sample.messagelogseq
     CACHE 1;
 
 
-ALTER TABLE sample.messagelogseq OWNER TO postgres;
+--ALTER TABLE sample.messagelogseq OWNER TO postgres;
 
 --
 -- Name: reportpkseq; Type: SEQUENCE; Schema: sample; Owner: postgres
@@ -105,7 +105,7 @@ CREATE SEQUENCE sample.reportpkseq
     CACHE 1;
 
 
-ALTER TABLE sample.reportpkseq OWNER TO postgres;
+--ALTER TABLE sample.reportpkseq OWNER TO postgres;
 
 --
 -- Name: sample_summary; Type: TABLE; Schema: sample; Owner: postgres
@@ -126,7 +126,7 @@ CREATE TABLE sample.sample_summary (
 );
 
 
-ALTER TABLE sample.sample_summary OWNER TO postgres;
+--ALTER TABLE sample.sample_summary OWNER TO postgres;
 
 --
 -- Name: sample_summary_state; Type: TABLE; Schema: sample; Owner: postgres
@@ -137,7 +137,7 @@ CREATE TABLE sample.sample_summary_state (
 );
 
 
-ALTER TABLE sample.sample_summary_state OWNER TO postgres;
+--ALTER TABLE sample.sample_summary_state OWNER TO postgres;
 
 --
 -- Name: sample_unit; Type: TABLE; Schema: sample; Owner: postgres
@@ -157,7 +157,7 @@ CREATE TABLE sample.sample_unit (
 );
 
 
-ALTER TABLE sample.sample_unit OWNER TO postgres;
+--ALTER TABLE sample.sample_unit OWNER TO postgres;
 
 --
 -- Name: sample_unit_state; Type: TABLE; Schema: sample; Owner: postgres
@@ -168,7 +168,7 @@ CREATE TABLE sample.sample_unit_state (
 );
 
 
-ALTER TABLE sample.sample_unit_state OWNER TO postgres;
+--ALTER TABLE sample.sample_unit_state OWNER TO postgres;
 
 --
 -- Name: samplesummaryseq; Type: SEQUENCE; Schema: sample; Owner: postgres
@@ -182,7 +182,7 @@ CREATE SEQUENCE sample.samplesummaryseq
     CACHE 1;
 
 
-ALTER TABLE sample.samplesummaryseq OWNER TO postgres;
+--ALTER TABLE sample.samplesummaryseq OWNER TO postgres;
 
 --
 -- Name: sampleunitseq; Type: SEQUENCE; Schema: sample; Owner: postgres
@@ -196,14 +196,14 @@ CREATE SEQUENCE sample.sampleunitseq
     CACHE 1;
 
 
-ALTER TABLE sample.sampleunitseq OWNER TO postgres;
+--ALTER TABLE sample.sampleunitseq OWNER TO postgres;
 
 --
 -- Name: databasechangeloglock databasechangeloglock_pkey; Type: CONSTRAINT; Schema: sample; Owner: postgres
 --
 
-ALTER TABLE ONLY sample.databasechangeloglock
-    ADD CONSTRAINT databasechangeloglock_pkey PRIMARY KEY (id);
+--ALTER TABLE ONLY sample.databasechangeloglock
+--    ADD CONSTRAINT databasechangeloglock_pkey PRIMARY KEY (id);
 
 
 --
