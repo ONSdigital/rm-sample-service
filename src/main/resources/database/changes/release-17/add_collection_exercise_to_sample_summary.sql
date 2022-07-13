@@ -1,1 +1,0 @@
-ALTER TABLE sample.sample_summary ADD COLUMN collection_exercise_id uuid;

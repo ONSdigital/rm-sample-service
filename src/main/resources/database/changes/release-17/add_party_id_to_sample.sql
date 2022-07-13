@@ -1,1 +1,0 @@
-ALTER TABLE sample.sample_unit ADD COLUMN party_id uuid;
