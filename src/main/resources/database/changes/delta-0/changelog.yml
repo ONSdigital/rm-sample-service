@@ -14,7 +14,7 @@ databaseChangeLog:
       author: Mark Price
       changes:
         - sqlFile:
-            comment: Rebase July 2022
+            comment: Rebase July 2022 - force build
             path: data.sql
             relativeToChangelogFile: true
             splitStatements: false
