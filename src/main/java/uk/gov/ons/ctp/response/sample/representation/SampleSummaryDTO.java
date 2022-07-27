@@ -27,6 +27,7 @@ public class SampleSummaryDTO {
   public enum SampleEvent {
     ACTIVATED,
     FAIL_VALIDATION,
+    FAIL_INGESTION,
     COMPLETED
   }
 
