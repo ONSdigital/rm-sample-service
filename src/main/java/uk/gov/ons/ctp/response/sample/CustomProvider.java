@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.response.casesvc;
+package uk.gov.ons.ctp.response.sample;
 
 import org.hibernate.boot.model.relational.Namespace;
 import org.hibernate.boot.model.relational.Sequence;
