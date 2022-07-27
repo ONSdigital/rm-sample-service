@@ -54,10 +54,16 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQL94Dialect
     defer-datasource-initialization: true
+    open-in-view: true
     hibernate:
       ddl-auto: update
       default_schema: sample
-    open-in-view: true
+    properties:
+      hibernate:
+        hbm2ddl:
+          schema_filter_provider: uk.gov.ons.ctp.response.casesvc.CustomProvider
+          id:
+            new_generator_mappings: false
   sql:
     init:
       mode: always
