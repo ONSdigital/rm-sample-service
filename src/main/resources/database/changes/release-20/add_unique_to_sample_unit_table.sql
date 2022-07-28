@@ -1,1 +1,0 @@
-ALTER TABLE sample.sample_unit ADD UNIQUE (sample_unit_ref, sample_summary_fk);

@@ -1,1 +1,0 @@
-ALTER TABLE sample.sample_unit ADD COLUMN active_enrolment boolean default false;

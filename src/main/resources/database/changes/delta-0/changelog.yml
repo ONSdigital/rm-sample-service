@@ -1,11 +1,11 @@
 databaseChangeLog:
 
   - changeSet:
-      id: 10.49.1-1
-      author: Adam Hawtin
+      id: 0-1
+      author: Jacob Harrison
       changes:
         - sqlFile:
-            comment: Add sample attributes table
-            path: add_sample_attributes_table.sql
+            comment: Rebase July 2022
+            path: objects.sql
             relativeToChangelogFile: true
             splitStatements: false
