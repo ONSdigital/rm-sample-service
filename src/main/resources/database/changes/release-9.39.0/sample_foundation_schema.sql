@@ -2,7 +2,7 @@ SET SCHEMA 'sample';
 
 --create sequences
 
-CREATE SEQUENCE samplesummaryseq
+CREATE SEQUENCE IF NOT EXISTS samplesummaryseq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10,14 +10,14 @@ CREATE SEQUENCE samplesummaryseq
     CACHE 1;
 
 -- for primary keys
-CREATE SEQUENCE sampleunitseq
+CREATE SEQUENCE IF NOT EXISTS sampleunitseq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     MAXVALUE 999999999999
     CACHE 1;
 
-CREATE SEQUENCE collectionexercisejobseq
+CREATE SEQUENCE IF NOT EXISTS collectionexercisejobseq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
