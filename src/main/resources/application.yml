@@ -56,7 +56,7 @@ spring:
     defer-datasource-initialization: true
     open-in-view: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
       default_schema: sample
     properties:
       hibernate:
@@ -74,7 +74,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/postgres
     changeLog: classpath:/database/changelog-master.yml
     liquibase-schema: sample
-    enabled: false
+    enabled: true
 
   security:
     user: admin

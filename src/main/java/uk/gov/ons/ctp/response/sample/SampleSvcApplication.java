@@ -85,7 +85,7 @@ public class SampleSvcApplication {
     liquibase.setDataSource(getDataSource(liquibaseProperties));
     liquibase.setDefaultSchema(liquibaseProperties.getDefaultSchema());
     liquibase.setDropFirst(liquibaseProperties.isDropFirst());
-    liquibase.setShouldRun(true);
+    liquibase.setShouldRun(false);
     liquibase.setLabels(liquibaseProperties.getLabels());
     liquibase.setChangeLogParameters(liquibaseProperties.getParameters());
     return new CustomSpringLiquibase(liquibase);
