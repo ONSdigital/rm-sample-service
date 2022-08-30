@@ -190,6 +190,36 @@ public class SampleService {
    * of sample units in the sample summary. If they match then the sample summary can be transition
    * to activated.
    *
+   * @param sampleSummaryId
+   * @throws CTPException
+   */
+  @Transactional(propagation = Propagation.REQUIRED)
+  public Boolean sampleSummaryStateCheck(UUID sampleSummaryId) throws CTPException {
+    SampleSummary sampleSummary = sampleSummaryRepository.findById(sampleSummaryId).orElseThrow();
+    Integer sampleSummaryPK = sampleSummary.getSampleSummaryPK();
+    int created =
+        sampleUnitRepository.countBySampleSummaryFKAndState(
+            sampleSummaryPK, SampleUnitState.PERSISTED);
+    try {
+      log.debug("attempting to find sample summary", kv("sampleSummaryPK", sampleSummaryPK));
+      int total = sampleSummary.getTotalSampleUnits();
+      if (total == created) {
+        activateSampleSummaryState(sampleSummary);
+        return true;
+      } else {
+        return false;
+      }
+    } catch (NoSuchElementException e) {
+      log.error("unable to find sample summary", kv("sampleSummaryPK", sampleSummaryPK));
+      throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND);
+    }
+  }
+
+  /**
+   * Check the number of sample units created and in persisted state and compare to the total number
+   * of sample units in the sample summary. If they match then the sample summary can be transition
+   * to activated.
+   *
    * @param sampleUnit
    * @throws CTPException
    */

@@ -255,8 +255,6 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
           sampleService.createSampleUnit(
               sampleSummaryId, businessSampleUnit, SampleUnitDTO.SampleUnitState.INIT);
       log.debug("sample created");
-      // check the state of the sample summary
-      sampleService.sampleSummaryStateCheck(sampleUnit);
       SampleUnitDTO sampleUnitDTO = mapperFacade.map(sampleUnit, SampleUnitDTO.class);
       log.debug("created SampleUnitDTO", kv("sampleUnitDTO", sampleUnitDTO));
       return ResponseEntity.created(
@@ -269,6 +267,31 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     } catch (UnknownSampleSummaryException e) {
       log.error("unknown sample summary id", kv("sampleSummaryId", sampleSummaryId), e);
       return ResponseEntity.badRequest().build();
+    } catch (CTPException | RuntimeException e) {
+      log.error("unexpected exception", kv("sampleSummaryId", sampleSummaryId), e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  @RequestMapping(value = "{sampleSummaryId}/check-all-units-present", method = RequestMethod.GET)
+  public ResponseEntity<Boolean> checkAllSampleUnitsForSampleSummary(
+      @PathVariable("sampleSummaryId") final UUID sampleSummaryId,
+      final @Valid @RequestBody BusinessSampleUnitDTO businessSampleUnitDTO,
+      BindingResult bindingResult)
+      throws InvalidRequestException {
+
+    if (bindingResult.hasErrors()) {
+      throw new InvalidRequestException("Binding errors for create action: ", bindingResult);
+    }
+    log.debug(
+        "create sample unit request received", kv("businessSampleUnitDTO", businessSampleUnitDTO));
+    BusinessSampleUnit businessSampleUnit =
+        mapperFacade.map(businessSampleUnitDTO, BusinessSampleUnit.class);
+
+    log.debug("business sample constructed", kv("businessSample", businessSampleUnit));
+    try {
+      Boolean isAllPresent = sampleService.sampleSummaryStateCheck(sampleSummaryId);
+      return ResponseEntity.ok(isAllPresent);
     } catch (CTPException | RuntimeException e) {
       log.error("unexpected exception", kv("sampleSummaryId", sampleSummaryId), e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
