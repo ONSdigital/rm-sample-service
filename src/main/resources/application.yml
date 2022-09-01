@@ -74,7 +74,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/postgres
     changeLog: classpath:/database/changelog-master.yml
     liquibase-schema: sample
-    enabled: true
+    enabled: false
 
   security:
     user: admin
