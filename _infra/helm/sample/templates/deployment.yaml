@@ -89,10 +89,10 @@ spec:
               path: /actuator/info
               port: {{ .Values.container.port }}
             initialDelaySeconds: 300
-            periodSeconds: 20
+            periodSeconds: 25
             failureThreshold: 5
             successThreshold: 1
-            timeoutSeconds: 5
+            timeoutSeconds: 8
           env:
           - name: DB_HOST
             {{- if .Values.database.managedPostgres }}
