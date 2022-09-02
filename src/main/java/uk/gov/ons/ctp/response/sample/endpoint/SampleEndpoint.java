@@ -273,22 +273,12 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     }
   }
 
-  @RequestMapping(value = "{sampleSummaryId}/check-all-units-present", method = RequestMethod.GET)
+  @RequestMapping(
+      value = "/samplesummary/{sampleSummaryId}/check-all-units-present",
+      method = RequestMethod.GET)
   public ResponseEntity<Boolean> checkAllSampleUnitsForSampleSummary(
-      @PathVariable("sampleSummaryId") final UUID sampleSummaryId,
-      final @Valid @RequestBody BusinessSampleUnitDTO businessSampleUnitDTO,
-      BindingResult bindingResult)
-      throws InvalidRequestException {
+      @PathVariable("sampleSummaryId") final UUID sampleSummaryId) {
 
-    if (bindingResult.hasErrors()) {
-      throw new InvalidRequestException("Binding errors for create action: ", bindingResult);
-    }
-    log.debug(
-        "create sample unit request received", kv("businessSampleUnitDTO", businessSampleUnitDTO));
-    BusinessSampleUnit businessSampleUnit =
-        mapperFacade.map(businessSampleUnitDTO, BusinessSampleUnit.class);
-
-    log.debug("business sample constructed", kv("businessSample", businessSampleUnit));
     try {
       Boolean isAllPresent = sampleService.sampleSummaryStateCheck(sampleSummaryId);
       return ResponseEntity.ok(isAllPresent);
