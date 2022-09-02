@@ -195,7 +195,8 @@ public class SampleService {
    * @throws CTPException
    */
   @Transactional(propagation = Propagation.REQUIRED)
-  public SampleSummaryLoadingStatus sampleSummaryStateCheck(UUID sampleSummaryId) throws CTPException {
+  public SampleSummaryLoadingStatus sampleSummaryStateCheck(UUID sampleSummaryId)
+      throws CTPException {
     SampleSummary sampleSummary = sampleSummaryRepository.findById(sampleSummaryId).orElseThrow();
     Integer sampleSummaryPK = sampleSummary.getSampleSummaryPK();
     int created =

@@ -277,7 +277,8 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       @PathVariable("sampleSummaryId") final UUID sampleSummaryId) {
 
     try {
-      SampleSummaryLoadingStatus sampleSummaryLoadingStatus = sampleService.sampleSummaryStateCheck(sampleSummaryId);
+      SampleSummaryLoadingStatus sampleSummaryLoadingStatus =
+          sampleService.sampleSummaryStateCheck(sampleSummaryId);
       return ResponseEntity.ok(sampleSummaryLoadingStatus);
     } catch (CTPException | RuntimeException e) {
       log.error("unexpected exception", kv("sampleSummaryId", sampleSummaryId), e);
