@@ -24,6 +24,7 @@ import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryLoadingStatus;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
 
@@ -194,7 +195,7 @@ public class SampleService {
    * @throws CTPException
    */
   @Transactional(propagation = Propagation.REQUIRED)
-  public Boolean sampleSummaryStateCheck(UUID sampleSummaryId) throws CTPException {
+  public SampleSummaryLoadingStatus sampleSummaryStateCheck(UUID sampleSummaryId) throws CTPException {
     SampleSummary sampleSummary = sampleSummaryRepository.findById(sampleSummaryId).orElseThrow();
     Integer sampleSummaryPK = sampleSummary.getSampleSummaryPK();
     int created =
@@ -203,12 +204,17 @@ public class SampleService {
     try {
       log.debug("attempting to find sample summary", kv("sampleSummaryPK", sampleSummaryPK));
       int total = sampleSummary.getTotalSampleUnits();
+      SampleSummaryLoadingStatus sampleSummaryLoadingStatus = new SampleSummaryLoadingStatus();
+      sampleSummaryLoadingStatus.setCurrentTotal(created);
+      sampleSummaryLoadingStatus.setExpectedTotal(total);
       if (total == created) {
         activateSampleSummaryState(sampleSummary);
-        return true;
+        sampleSummaryLoadingStatus.setAreAllSampleUnitsLoaded(true);
       } else {
-        return false;
+        sampleSummaryLoadingStatus.setAreAllSampleUnitsLoaded(false);
       }
+      return sampleSummaryLoadingStatus;
+
     } catch (NoSuchElementException e) {
       log.error("unable to find sample summary", kv("sampleSummaryPK", sampleSummaryPK));
       throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND);

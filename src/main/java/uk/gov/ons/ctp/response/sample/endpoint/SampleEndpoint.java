@@ -30,10 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
-import uk.gov.ons.ctp.response.sample.representation.BusinessSampleUnitDTO;
-import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
-import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
-import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
+import uk.gov.ons.ctp.response.sample.representation.*;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import uk.gov.ons.ctp.response.sample.service.UnknownSampleSummaryException;
 import uk.gov.ons.ctp.response.sample.service.UnknownSampleUnitException;
@@ -276,12 +273,12 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   @RequestMapping(
       value = "/samplesummary/{sampleSummaryId}/check-all-units-present",
       method = RequestMethod.GET)
-  public ResponseEntity<Boolean> checkAllSampleUnitsForSampleSummary(
+  public ResponseEntity<SampleSummaryLoadingStatus> checkAllSampleUnitsForSampleSummary(
       @PathVariable("sampleSummaryId") final UUID sampleSummaryId) {
 
     try {
-      Boolean isAllPresent = sampleService.sampleSummaryStateCheck(sampleSummaryId);
-      return ResponseEntity.ok(isAllPresent);
+      SampleSummaryLoadingStatus sampleSummaryLoadingStatus = sampleService.sampleSummaryStateCheck(sampleSummaryId);
+      return ResponseEntity.ok(sampleSummaryLoadingStatus);
     } catch (CTPException | RuntimeException e) {
       log.error("unexpected exception", kv("sampleSummaryId", sampleSummaryId), e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
