@@ -99,6 +99,41 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFoundError'
+  /samples/samplesummary/{sampleSummaryId}/check-all-units-present:
+    get:
+      summary: Check all sample units present for the sample summary
+      description: Checks all present and move to ACTIVE state if true
+      tags:
+        - samples
+      parameters:
+        - in: path
+          name: sampleSummaryId
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 34597808-ec88-4e93-af2f-228e33ff7946
+      responses:
+        '200':
+          description: The call was successful.  Will return this regardless of whether or not it's ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SampleSummaryLoadingStatus'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    delete:
+      summary: Delete sample summary
+      description: Delete sample summary and all sample units relating to it
+      tags:
+        - samples
+      responses:
+        '204':
+          description: Sample summary and sample units were deleted successfully.
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
   /samples/samplesummary:
     post:
       summary: Create sample summary
@@ -334,5 +369,17 @@ components:
         totalSampleUnits:
           type: integer
           example: 1
+    SampleSummaryLoadingStatus:
+      type: object
+      properties:
+        areAllSampleUnitsLoaded:
+          type: boolean
+          example: true
+        expectedTotal:
+          type: integer
+          example: 200
+        currentTotal:
+          type: integer
+          example: 150
 security:
   - basicAuth: []
