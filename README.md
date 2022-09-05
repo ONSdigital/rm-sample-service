@@ -59,6 +59,8 @@ becoming cases.
 ### Sample and Sample summary creation
 - Sample summary is created with the INIT state
 - samples are individually set up against a sample summary (in the INIT state?)
+- Response-operations-ui (or any service) hits the endpoint to check if all sample units have been loaded.  If so, move
+  sample summary to ACTIVE state
 
 ### Sending samples to case for case creation
 - Listens on the <topic> for a sample activation message
@@ -73,7 +75,8 @@ to
 ## Quick guide
 
 - Sample Unit: A single row within the sample file
-- Sample Summary: The entire collection of Sample Units in a sample file (Counting unique refs only, duplicates are discarded, only the first is kept)
+- Sample Summary: The entire collection of Sample Units in a sample file (Counting unique refs only, duplicates are
+  discarded, only the first is kept)
 
 
 ## Copyright

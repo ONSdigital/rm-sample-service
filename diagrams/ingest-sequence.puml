@@ -10,5 +10,6 @@ CSVWorker -> Sample: Create sample with INIT state
 Sample -> Sample : update Sample Unit to PERSISTED
 CSVWorker -> Party: Create party and attribute
 end
+ResponseOpsUI -> Sample: check all units have been loaded
 Sample -> Sample: update Sample Summary state to ACTIVE
 @enduml
