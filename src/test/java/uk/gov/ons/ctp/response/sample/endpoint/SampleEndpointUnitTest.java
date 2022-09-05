@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import libs.common.error.RestExceptionHandler;
 import libs.common.jackson.CustomObjectMapper;
@@ -158,5 +159,18 @@ public class SampleEndpointUnitTest {
     dto.setExpectedCollectionInstruments(1);
 
     verify(sampleService, times(1)).createAndSaveSampleSummary(dto);
+  }
+
+  @Test
+  public void checkAllSampleUnitsForSampleSummaryNotFound() throws Exception {
+    when(sampleService.sampleSummaryStateCheck(any())).thenThrow(new NoSuchElementException());
+    // when(sampleService.findSampleSummary(any())).thenReturn(null);
+
+    String url =
+        String.format("/samples/samplesummary/%s/check-all-units-present", UUID.randomUUID());
+
+    ResultActions actions = mockMvc.perform(get(url));
+
+    actions.andExpect(status().isNotFound());
   }
 }

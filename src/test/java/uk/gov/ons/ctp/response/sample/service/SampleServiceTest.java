@@ -30,6 +30,7 @@ import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO.SampleState;
+import uk.gov.ons.ctp.response.sample.representation.SampleSummaryLoadingStatus;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitEvent;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO.SampleUnitState;
@@ -129,15 +130,18 @@ public class SampleServiceTest {
    */
   @Test
   public void activateSampleSummaryTest() throws Exception {
+    SampleSummary newSummary = createSampleSummary(1, 1);
+    newSummary.setTotalSampleUnits(1);
+    when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.of(newSummary));
     when(sampleUnitRepository.countBySampleSummaryFKAndState(1, SampleUnitState.PERSISTED))
         .thenReturn(1);
-    when(sampleSummaryRepository.findBySampleSummaryPK(1))
-        .thenReturn(Optional.of(sampleSummaryList.get(0)));
     when(sampleSvcStateTransitionManager.transition(SampleState.INIT, SampleEvent.ACTIVATED))
         .thenReturn(SampleState.ACTIVE);
 
-    sampleService.sampleSummaryStateCheck(sampleUnit.get(0));
-    assertThat(sampleSummaryList.get(0).getState(), is(SampleState.ACTIVE));
+    SampleSummaryLoadingStatus output = sampleService.sampleSummaryStateCheck(UUID.randomUUID());
+    assertEquals(output.getExpectedTotal().intValue(), 1);
+    assertEquals(output.getCurrentTotal().intValue(), 1);
+    assertTrue(output.isAreAllSampleUnitsLoaded());
   }
 
   private SampleSummary createSampleSummary(int numSamples, int expectedInstruments) {

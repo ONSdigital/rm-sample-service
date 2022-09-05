@@ -191,63 +191,34 @@ public class SampleService {
    * of sample units in the sample summary. If they match then the sample summary can be transition
    * to activated.
    *
-   * @param sampleSummaryId
-   * @throws CTPException
+   * @param sampleSummaryId The id of the sample summary
+   * @throws CTPException raised if the state transition fails
+   * @throws NoSuchElementException raised if the sample summary cannot be found
    */
   @Transactional(propagation = Propagation.REQUIRED)
   public SampleSummaryLoadingStatus sampleSummaryStateCheck(UUID sampleSummaryId)
-      throws CTPException {
+      throws CTPException, NoSuchElementException {
     SampleSummary sampleSummary = sampleSummaryRepository.findById(sampleSummaryId).orElseThrow();
     Integer sampleSummaryPK = sampleSummary.getSampleSummaryPK();
     int created =
         sampleUnitRepository.countBySampleSummaryFKAndState(
             sampleSummaryPK, SampleUnitState.PERSISTED);
-    try {
-      log.debug("attempting to find sample summary", kv("sampleSummaryPK", sampleSummaryPK));
-      int total = sampleSummary.getTotalSampleUnits();
-      SampleSummaryLoadingStatus sampleSummaryLoadingStatus = new SampleSummaryLoadingStatus();
-      sampleSummaryLoadingStatus.setCurrentTotal(created);
-      sampleSummaryLoadingStatus.setExpectedTotal(total);
-      if (total == created) {
-        activateSampleSummaryState(sampleSummary);
-        sampleSummaryLoadingStatus.setAreAllSampleUnitsLoaded(true);
-      } else {
-        sampleSummaryLoadingStatus.setAreAllSampleUnitsLoaded(false);
-      }
-      return sampleSummaryLoadingStatus;
-
-    } catch (NoSuchElementException e) {
-      log.error("unable to find sample summary", kv("sampleSummaryPK", sampleSummaryPK));
-      throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND);
+    log.debug("attempting to find sample summary", kv("sampleSummaryPK", sampleSummaryPK));
+    int total = sampleSummary.getTotalSampleUnits();
+    SampleSummaryLoadingStatus sampleSummaryLoadingStatus = new SampleSummaryLoadingStatus();
+    sampleSummaryLoadingStatus.setCurrentTotal(created);
+    sampleSummaryLoadingStatus.setExpectedTotal(total);
+    if (total == created) {
+      log.info(
+          "All sample units have been loaded, updating summary state",
+          kv("sampleSummaryPK", sampleSummaryPK));
+      activateSampleSummaryState(sampleSummary);
+      sampleSummaryLoadingStatus.setAreAllSampleUnitsLoaded(true);
+    } else {
+      log.info("Not all sample units have been loaded", kv("sampleSummaryPK", sampleSummaryPK));
+      sampleSummaryLoadingStatus.setAreAllSampleUnitsLoaded(false);
     }
-  }
-
-  /**
-   * Check the number of sample units created and in persisted state and compare to the total number
-   * of sample units in the sample summary. If they match then the sample summary can be transition
-   * to activated.
-   *
-   * @param sampleUnit
-   * @throws CTPException
-   */
-  @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
-  public void sampleSummaryStateCheck(SampleUnit sampleUnit) throws CTPException {
-    Integer sampleSummaryFK = sampleUnit.getSampleSummaryFK();
-    int created =
-        sampleUnitRepository.countBySampleSummaryFKAndState(
-            sampleSummaryFK, SampleUnitState.PERSISTED);
-    try {
-      log.debug("attempting to find sample summary", kv("sampleSummaryFK", sampleSummaryFK));
-      SampleSummary sampleSummary =
-          sampleSummaryRepository.findBySampleSummaryPK(sampleSummaryFK).orElseThrow();
-      int total = sampleSummary.getTotalSampleUnits();
-      if (total == created) {
-        activateSampleSummaryState(sampleSummary);
-      }
-    } catch (NoSuchElementException e) {
-      log.error("unable to find sample summary", kv("sampleSummaryFK", sampleSummaryFK));
-      throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND);
-    }
+    return sampleSummaryLoadingStatus;
   }
 
   public int getSampleSummaryUnitCount(UUID sampleSummaryId) {

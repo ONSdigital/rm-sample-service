@@ -5,6 +5,7 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 import com.opencsv.bean.CsvToBean;
 import java.net.URI;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -275,14 +276,16 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       method = RequestMethod.GET)
   public ResponseEntity<SampleSummaryLoadingStatus> checkAllSampleUnitsForSampleSummary(
       @PathVariable("sampleSummaryId") final UUID sampleSummaryId) {
-
     try {
       SampleSummaryLoadingStatus sampleSummaryLoadingStatus =
           sampleService.sampleSummaryStateCheck(sampleSummaryId);
       return ResponseEntity.ok(sampleSummaryLoadingStatus);
-    } catch (CTPException | RuntimeException e) {
+    } catch (CTPException e) {
       log.error("unexpected exception", kv("sampleSummaryId", sampleSummaryId), e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    } catch (NoSuchElementException e) {
+      log.error("Sample summary not found", kv("sampleSummaryId", sampleSummaryId), e);
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 

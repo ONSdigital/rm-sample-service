@@ -122,6 +122,10 @@ paths:
                 $ref: '#/components/schemas/SampleSummaryLoadingStatus'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          description: '#/components/responses/ServerError'
     delete:
       summary: Delete sample summary
       description: Delete sample summary and all sample units relating to it
@@ -302,7 +306,7 @@ components:
     InvalidRequestBodyError:
       description: One or more of the fields provided in the RequestBody wasn't part of the schema, wasn't set to a valid value, or the ID provided wasn't a proper UUID.
     ServerError:
-      description: SOmething unexpected happened with the server.
+      description: Something unexpected happened with the server.
   schemas:
     SampleUnit:
       type: object
