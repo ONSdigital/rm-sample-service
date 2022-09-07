@@ -164,7 +164,6 @@ public class SampleEndpointUnitTest {
   @Test
   public void checkAllSampleUnitsForSampleSummaryNotFound() throws Exception {
     when(sampleService.sampleSummaryStateCheck(any())).thenThrow(new NoSuchElementException());
-    // when(sampleService.findSampleSummary(any())).thenReturn(null);
 
     String url =
         String.format("/samples/samplesummary/%s/check-all-units-present", UUID.randomUUID());
