@@ -166,7 +166,9 @@ public class SampleEndpointUnitTest {
     when(sampleService.sampleSummaryStateCheck(any())).thenThrow(new NoSuchElementException());
 
     String url =
-        String.format("/samples/samplesummary/%s/check-and-transition-sample-summary-status", UUID.randomUUID());
+        String.format(
+            "/samples/samplesummary/%s/check-and-transition-sample-summary-status",
+            UUID.randomUUID());
 
     ResultActions actions = mockMvc.perform(get(url));
 
