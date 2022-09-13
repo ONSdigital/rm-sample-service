@@ -272,7 +272,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   }
 
   @RequestMapping(
-      value = "/samplesummary/{sampleSummaryId}/check-all-units-present",
+      value = "/samplesummary/{sampleSummaryId}/check-and-transition-sample-summary-status",
       method = RequestMethod.GET)
   public ResponseEntity<SampleSummaryLoadingStatus> checkAllSampleUnitsForSampleSummary(
       @PathVariable("sampleSummaryId") final UUID sampleSummaryId) {
