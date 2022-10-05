@@ -90,11 +90,13 @@ public class SampleService {
           sampleUnitRepository.existsBySampleUnitRefAndSampleSummaryFK(
               samplingUnit.getSampleUnitRef(), sampleSummary.getSampleSummaryPK());
       if (!exists) {
+        System.out.println("YOU GOT HERE -- the sample unit is new!");
         SampleUnit sampleUnit =
             createAndSaveSampleUnit(sampleSummary, sampleUnitState, samplingUnit);
         updateState(sampleUnit);
         return sampleUnit;
       } else {
+        System.out.println("YOU GOT HERE -- the sample unit already exists!");
         throw new IllegalStateException("sample unit already exists");
       }
     } else {
