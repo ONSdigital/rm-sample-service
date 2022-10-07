@@ -61,11 +61,10 @@ public class SampleService {
       SampleUnitState sampleUnitState) {
     int expectedCI = calculateExpectedCollectionInstruments(samplingUnitList);
 
-
-
     sampleSummary.setTotalSampleUnits(samplingUnitList.size());
 
-    System.out.println("This is the number of sample units in the list: " + samplingUnitList.size());
+    System.out.println(
+        "This is the number of sample units in the list: " + samplingUnitList.size());
     sampleSummary.setExpectedCollectionInstruments(expectedCI);
     SampleSummary savedSampleSummary = sampleSummaryRepository.save(sampleSummary);
     saveSampleUnits(samplingUnitList, savedSampleSummary, sampleUnitState);
@@ -135,7 +134,9 @@ public class SampleService {
     sampleSummary.setState(SampleState.INIT);
     sampleSummary.setId(UUID.randomUUID());
     sampleSummary.setTotalSampleUnits(summaryDTO.getTotalSampleUnits());
-    System.out.println(("Here is the number of s-units when saving sample sum: " + summaryDTO.getTotalSampleUnits()));
+    System.out.println(
+        ("Here is the number of s-units when saving sample sum: "
+            + summaryDTO.getTotalSampleUnits()));
     sampleSummary.setExpectedCollectionInstruments(summaryDTO.getExpectedCollectionInstruments());
     log.debug("about to save sample summary");
     return sampleSummaryRepository.save(sampleSummary);
@@ -239,7 +240,9 @@ public class SampleService {
       throw new IllegalStateException(
           String.format("Sample summary %s has no total sample units set", sampleSummaryId));
     }
-    System.out.println("Here is number of sample units when getting count: " + sampleSummary.getTotalSampleUnits());
+    System.out.println(
+        "Here is number of sample units when getting count: "
+            + sampleSummary.getTotalSampleUnits());
 
     return sampleSummary.getTotalSampleUnits().intValue();
   }
