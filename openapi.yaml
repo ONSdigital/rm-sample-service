@@ -254,7 +254,7 @@ paths:
           description: 'No sample unit found for sample summary.'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-        '409':
+        '422':
           description: 'Sample already exists for the sample summary with that sampleUnitRef'
         '500':
           description: '#/components/responses/ServerError'
