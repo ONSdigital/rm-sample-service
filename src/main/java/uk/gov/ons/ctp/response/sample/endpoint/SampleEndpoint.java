@@ -261,7 +261,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
           .body(sampleUnitDTO);
     } catch (IllegalStateException e) {
       log.warn("duplicate sample", kv("sampleSummaryId", sampleSummaryId), e);
-      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+      return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).build();
     } catch (UnknownSampleSummaryException e) {
       log.error("unknown sample summary id", kv("sampleSummaryId", sampleSummaryId), e);
       return ResponseEntity.badRequest().build();
