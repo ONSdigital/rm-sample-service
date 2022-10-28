@@ -5,6 +5,7 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 import com.opencsv.bean.CsvToBean;
 import java.net.URI;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,10 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
-import uk.gov.ons.ctp.response.sample.representation.BusinessSampleUnitDTO;
-import uk.gov.ons.ctp.response.sample.representation.SampleSummaryDTO;
-import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
-import uk.gov.ons.ctp.response.sample.representation.SampleUnitsRequestDTO;
+import uk.gov.ons.ctp.response.sample.representation.*;
 import uk.gov.ons.ctp.response.sample.service.SampleService;
 import uk.gov.ons.ctp.response.sample.service.UnknownSampleSummaryException;
 import uk.gov.ons.ctp.response.sample.service.UnknownSampleUnitException;
@@ -255,8 +253,6 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
           sampleService.createSampleUnit(
               sampleSummaryId, businessSampleUnit, SampleUnitDTO.SampleUnitState.INIT);
       log.debug("sample created");
-      // check the state of the sample summary
-      sampleService.sampleSummaryStateCheck(sampleUnit);
       SampleUnitDTO sampleUnitDTO = mapperFacade.map(sampleUnit, SampleUnitDTO.class);
       log.debug("created SampleUnitDTO", kv("sampleUnitDTO", sampleUnitDTO));
       return ResponseEntity.created(
@@ -272,6 +268,24 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     } catch (CTPException | RuntimeException e) {
       log.error("unexpected exception", kv("sampleSummaryId", sampleSummaryId), e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  @RequestMapping(
+      value = "/samplesummary/{sampleSummaryId}/check-and-transition-sample-summary-status",
+      method = RequestMethod.GET)
+  public ResponseEntity<SampleSummaryLoadingStatus> checkAllSampleUnitsForSampleSummary(
+      @PathVariable("sampleSummaryId") final UUID sampleSummaryId) {
+    try {
+      SampleSummaryLoadingStatus sampleSummaryLoadingStatus =
+          sampleService.sampleSummaryStateCheck(sampleSummaryId);
+      return ResponseEntity.ok(sampleSummaryLoadingStatus);
+    } catch (CTPException e) {
+      log.error("unexpected exception", kv("sampleSummaryId", sampleSummaryId), e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    } catch (NoSuchElementException e) {
+      log.error("Sample summary not found", kv("sampleSummaryId", sampleSummaryId), e);
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 
