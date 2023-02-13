@@ -34,7 +34,7 @@ CREATE TABLE sample.samplesummary
   ingestdatetime timestamp with time zone
 );
 
-CREATE TABLE sample.sampleunit
+CREATE TABLE IF NOT EXISTS sample.sampleunit
 (
   sampleunitPK bigint NOT NULL,
   samplesummaryFK bigint NOT NULL,
