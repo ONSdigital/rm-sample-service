@@ -2,7 +2,7 @@ SET SCHEMA 'sample';
 
 --create sequences
 
-CREATE SEQUENCE IF NOT EXISTS samplesummaryseq
+CREATE SEQUENCE amplesummaryseq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10,14 +10,14 @@ CREATE SEQUENCE IF NOT EXISTS samplesummaryseq
     CACHE 1;
 
 -- for primary keys
-CREATE SEQUENCE IF NOT EXISTS sampleunitseq
+CREATE SEQUENCE sampleunitseq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     MAXVALUE 999999999999
     CACHE 1;
 
-CREATE SEQUENCE IF NOT EXISTS collectionexercisejobseq
+CREATE SEQUENCE collectionexercisejobseq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -34,7 +34,7 @@ CREATE TABLE sample.samplesummary
   ingestdatetime timestamp with time zone
 );
 
-CREATE TABLE IF NOT EXISTS sample.sampleunit
+CREATE TABLE sample.sampleunit
 (
   sampleunitPK bigint NOT NULL,
   samplesummaryFK bigint NOT NULL,
