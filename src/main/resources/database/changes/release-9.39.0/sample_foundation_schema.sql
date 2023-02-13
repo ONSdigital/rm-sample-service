@@ -2,7 +2,7 @@ SET SCHEMA 'sample';
 
 --create sequences
 
-CREATE SEQUENCE amplesummaryseq
+CREATE SEQUENCE samplesummaryseq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
