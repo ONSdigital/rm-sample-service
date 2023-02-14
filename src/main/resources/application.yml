@@ -39,7 +39,7 @@ spring:
   application:
     name: ONS SampleService
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://localhost:5432/ras
     username: postgres
     password: postgres
     driverClassName: org.postgresql.Driver
@@ -62,8 +62,8 @@ spring:
       hibernate:
         hbm2ddl:
           schema_filter_provider: uk.gov.ons.ctp.response.sample.CustomProvider
-          id:
-            new_generator_mappings: false
+        id:
+          new_generator_mappings: false
   sql:
     init:
       mode: always
@@ -71,7 +71,7 @@ spring:
   liquibase:
     user: postgres
     password: postgres
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://localhost:5432/ras
     changeLog: classpath:/database/changelog-master.yml
     liquibase-schema: sample
     enabled: false
