@@ -20,8 +20,9 @@ import java.util.concurrent.ExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/***
- * This is a PubSub Emulator class. This is a utility class which is used for testing pubsub function
+/**
+ * * This is a PubSub Emulator class. This is a utility class which is used for testing pubsub
+ * function
  */
 public class PubSubEmulator {
   private static final Logger log = LoggerFactory.getLogger(PubSubEmulator.class);
