@@ -58,6 +58,12 @@ spring:
     hibernate:
       ddl-auto: update
       default_schema: sample
+    properties:
+      hibernate:
+        hbm2ddl:
+          schema_filter_provider: uk.gov.ons.ctp.response.sample.CustomProvider
+        id:
+          new_generator_mappings: false
   sql:
     init:
       mode: always
