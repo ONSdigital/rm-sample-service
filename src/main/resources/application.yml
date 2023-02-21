@@ -74,6 +74,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/ras
     changeLog: classpath:/database/changelog-master.yml
     liquibase-schema: sample
+    default-schema: sample
     enabled: false
 
   security:
