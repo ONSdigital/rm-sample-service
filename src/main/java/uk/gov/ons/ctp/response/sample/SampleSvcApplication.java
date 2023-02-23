@@ -90,7 +90,7 @@ public class SampleSvcApplication {
     liquibase.setChangeLogParameters(liquibaseProperties.getParameters());
     liquibase.setLiquibaseSchema(liquibaseProperties.getLiquibaseSchema());
     liquibase.setDatabaseChangeLogLockTable(liquibaseProperties.getDatabaseChangeLogLockTable());
-    liquibase.setDatabaseChangeLogTable(liquibase.getDatabaseChangeLogTable());
+    liquibase.setDatabaseChangeLogTable(liquibaseProperties.getDatabaseChangeLogTable());
     return new CustomSpringLiquibase(liquibase);
   }
 
