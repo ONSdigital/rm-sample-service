@@ -59,9 +59,9 @@ spring:
     open-in-view: true
     hibernate:
       ddl-auto: update
+      default_schema: sample
     properties:
       hibernate:
-        default_schema: sample
         hbm2ddl:
           schema_filter_provider: uk.gov.ons.ctp.response.sample.CustomProvider
         id:
