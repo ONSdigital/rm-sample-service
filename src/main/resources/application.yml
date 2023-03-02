@@ -13,6 +13,8 @@ logging:
     org.springframework: WARN
     uk.gov.ons.ctp: DEBUG
     io.pivotal.springcloud: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
   profile: DEV
   useJson: false
