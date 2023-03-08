@@ -56,7 +56,7 @@ spring:
       file-size-threshold: 0
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQL94Dialect
-    defer-datasource-initialization: true
+    defer-datasource-initialization: false
     open-in-view: true
     hibernate:
       ddl-auto: none
