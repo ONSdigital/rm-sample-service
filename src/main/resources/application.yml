@@ -45,6 +45,7 @@ spring:
     username: postgres
     password: postgres
     driverClassName: org.postgresql.Driver
+    initialization-mode: always
     hikari:
       connection-timeout: 60000
       maximum-pool-size: 20
