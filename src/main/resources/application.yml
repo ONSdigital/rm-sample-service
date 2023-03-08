@@ -45,7 +45,6 @@ spring:
     username: postgres
     password: postgres
     driverClassName: org.postgresql.Driver
-    initialization-mode: always
     hikari:
       connection-timeout: 60000
       maximum-pool-size: 20
@@ -56,7 +55,7 @@ spring:
       file-size-threshold: 0
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQL94Dialect
-    defer-datasource-initialization: false
+    defer-datasource-initialization: true
     open-in-view: true
     hibernate:
       ddl-auto: none
