@@ -58,7 +58,7 @@ spring:
     defer-datasource-initialization: true
     open-in-view: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
       default_schema: sample
     properties:
       hibernate:
