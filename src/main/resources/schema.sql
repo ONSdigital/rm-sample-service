@@ -1,7 +1,5 @@
-CREATE SCHEMA sample;
+CREATE SCHEMA IF NOT EXISTS sample;
 
 SET search_path TO sample, public;
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
-
-GRANT USAGE ON SCHEMA sample TO samplesvc;
