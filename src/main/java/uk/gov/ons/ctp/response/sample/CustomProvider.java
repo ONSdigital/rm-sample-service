@@ -39,7 +39,7 @@ class CustomFilter implements SchemaFilter {
 
   @Override
   public boolean includeTable(Table table) {
-    return true;
+    return false;
   }
 
   @Override
