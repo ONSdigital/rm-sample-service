@@ -58,7 +58,7 @@ spring:
     defer-datasource-initialization: true
     open-in-view: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
       default_schema: sample
     properties:
       hibernate:
@@ -69,7 +69,7 @@ spring:
   sql:
     init:
       mode: always
-      continue-on-error: false
+      continue-on-error: true
   liquibase:
     user: postgres
     password: postgres
