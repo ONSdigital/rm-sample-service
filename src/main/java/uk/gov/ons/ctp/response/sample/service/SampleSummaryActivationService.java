@@ -80,7 +80,6 @@ public class SampleSummaryActivationService {
 
     LOG.debug(
         "about to enrich sample summary",
-
         kv("sampleSummaryId", sampleSummaryId),
         kv("surveyId", surveyId),
         kv("collectionExerciseId", collectionExerciseId));
