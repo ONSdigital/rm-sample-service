@@ -13,11 +13,17 @@ logging:
     org.springframework: WARN
     uk.gov.ons.ctp: DEBUG
     io.pivotal.springcloud: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
   profile: DEV
   useJson: false
 
 management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
   security:
     roles: SUPERUSER
     enabled: false
@@ -27,7 +33,7 @@ server:
 
 spring:
   main:
-    # Added as part of upgrade to 2.1 to quiet a an error where the 'restExceptionHandler' bean is defined twice.
+    # Added as part of upgrade to 2.1 to quiet an error where the 'restExceptionHandler' bean is defined twice.
     allow-bean-definition-overriding: true
   output:
     ansi:
@@ -35,17 +41,10 @@ spring:
   application:
     name: ONS SampleService
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://localhost:5432/ras
     username: postgres
     password: postgres
     driverClassName: org.postgresql.Driver
-    continue-on-error: true
-    tomcat:
-      initial-size: 5
-      max-active: 10
-      max-idle: 5
-      min-idle: 3
-    initialization-mode: always
     hikari:
       connection-timeout: 60000
       maximum-pool-size: 20
@@ -56,17 +55,27 @@ spring:
       file-size-threshold: 0
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQL94Dialect
+    defer-datasource-initialization: true
+    open-in-view: true
+    hibernate:
+      ddl-auto: none
+      default_schema: sample
     properties:
       hibernate:
-        ddl-auto: update
-        default_schema: sample
-    open-in-view: true
+        id:
+          new_generator_mappings: false
+  sql:
+    init:
+      mode: always
+      continue-on-error: true
   liquibase:
     user: postgres
     password: postgres
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://localhost:5432/ras
     changeLog: classpath:/database/changelog-master.yml
     liquibase-schema: sample
+    default-schema: sample
+    enabled: false
 
   security:
     user: admin
