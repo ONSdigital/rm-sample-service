@@ -393,14 +393,11 @@ public class SampleSummaryEnrichmentService {
 
   private boolean hasActiveEnrolment(PartyDTO party, UUID surveyId) {
     List<Enrolment> enrolments =
-        party
-            .getAssociations()
-            .stream()
+        party.getAssociations().stream()
             .map(Association::getEnrolments)
             .flatMap(List::stream)
             .collect(Collectors.toList());
-    return enrolments
-        .stream()
+    return enrolments.stream()
         .anyMatch(enrolment -> enrolmentIsEnabledForSurvey(enrolment, surveyId));
   }
 
@@ -425,8 +422,7 @@ public class SampleSummaryEnrichmentService {
 
     // select the one that matches COLLECTION_INSTRUMENT
     SurveyClassifierDTO chosenClassifier =
-        surveyClassifiers
-            .stream()
+        surveyClassifiers.stream()
             .filter(surveyClassifier -> CASE_TYPE_SELECTOR.equals(surveyClassifier.getName()))
             .findAny()
             .orElse(null);
