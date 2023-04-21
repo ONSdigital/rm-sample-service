@@ -49,7 +49,8 @@ public class PartySvcClient {
       maxAttemptsExpression = "#{${retries.maxAttempts}}",
       backoff = @Backoff(delayExpression = "#{${retries.backoff}}"))
   public PartyDTO requestParty(String sampleUnitRef) {
-    log.debug("Retrieving party", kv("sample_unit_ref", sampleUnitRef));
+    System.out.println("!!!" + sampleUnitRef + "!!!");
+    log.debug("Retrieving party {}", kv("sample_unit_ref", sampleUnitRef));
     UriComponents uriComponents =
         restUtility.createUriComponents(
             appConfig.getPartySvc().getRequestPartyPath(), null, sampleUnitRef);
