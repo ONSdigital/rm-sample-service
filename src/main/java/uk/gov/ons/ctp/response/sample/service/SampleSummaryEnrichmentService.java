@@ -282,6 +282,8 @@ public class SampleSummaryEnrichmentService {
   }
 
   private boolean findAndUpdateParty(UUID surveyId, SampleUnit sampleUnit, UUID sampleUnitId) {
+    System.out.println("!!!" + sampleUnit + "!!!");
+    System.out.println("!!!" + sampleUnitId + "!!!");
     PartyDTO party = getParty(sampleUnit.getSampleUnitRef());
     boolean foundParty = (party != null && party.getId() != null);
     if (foundParty) {
