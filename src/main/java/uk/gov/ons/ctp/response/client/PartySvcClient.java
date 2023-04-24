@@ -49,7 +49,6 @@ public class PartySvcClient {
       maxAttemptsExpression = "#{${retries.maxAttempts}}",
       backoff = @Backoff(delayExpression = "#{${retries.backoff}}"))
   public PartyDTO requestParty(String sampleUnitRef) {
-    System.out.println("!!!" + sampleUnitRef + "!!!");
     log.debug("Retrieving party {}", kv("sample_unit_ref", sampleUnitRef));
     UriComponents uriComponents =
         restUtility.createUriComponents(
@@ -66,7 +65,7 @@ public class PartySvcClient {
       backoff = @Backoff(delayExpression = "#{${retries.backoff}}"))
   public void linkSampleSummaryId(String sampleSummaryId, String collectionExerciseId) {
     log.debug(
-        "Linking sample summary to collection exercise",
+        "Linking sample summary to collection exercise {} {}",
         kv("sample_summary_id", sampleSummaryId),
         kv("collection_exercise_id", collectionExerciseId));
     UriComponents uriComponents =
