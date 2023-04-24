@@ -103,7 +103,7 @@ public class CustomObjectMapper {
     businessSampleUnit.setSampleUnitRef(businessSampleUnitDTO.getSampleUnitRef());
     businessSampleUnit.setSampleUnitType(businessSampleUnitDTO.getSampleUnitType());
     businessSampleUnit.setFormType(businessSampleUnitDTO.getFormType());
-//    businessSampleUnit.setSampleUnitId(businessSampleUnit.getSampleUnitId());
+    //    businessSampleUnit.setSampleUnitId(businessSampleUnit.getSampleUnitId());
 
     return businessSampleUnit;
   }
