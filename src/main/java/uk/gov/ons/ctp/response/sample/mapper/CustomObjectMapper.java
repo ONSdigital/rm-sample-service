@@ -84,7 +84,7 @@ public class CustomObjectMapper {
     businessSampleUnit.setBirthdate(businessSampleUnitDTO.getBirthdate());
 
     businessSampleUnit.setEntname1(businessSampleUnit.getEntname1());
-    businessSampleUnit.setEntname3(businessSampleUnitDTO.getEntname2());
+    businessSampleUnit.setEntname2(businessSampleUnitDTO.getEntname2());
     businessSampleUnit.setEntname3(businessSampleUnitDTO.getEntname3());
 
     businessSampleUnit.setRuname1(businessSampleUnitDTO.getRuname1());
@@ -100,10 +100,10 @@ public class CustomObjectMapper {
     businessSampleUnit.setCell_no(businessSampleUnitDTO.getCellNo());
     businessSampleUnit.setCurrency(businessSampleUnitDTO.getCurrency());
 
-    businessSampleUnit.setSampleUnitRef(businessSampleUnitDTO.getSampleUnitType());
+    businessSampleUnit.setSampleUnitRef(businessSampleUnitDTO.getSampleUnitRef());
     businessSampleUnit.setSampleUnitType(businessSampleUnitDTO.getSampleUnitType());
     businessSampleUnit.setFormType(businessSampleUnitDTO.getFormType());
-    businessSampleUnit.setSampleUnitId(businessSampleUnit.getSampleUnitId());
+//    businessSampleUnit.setSampleUnitId(businessSampleUnit.getSampleUnitId());
 
     return businessSampleUnit;
   }
