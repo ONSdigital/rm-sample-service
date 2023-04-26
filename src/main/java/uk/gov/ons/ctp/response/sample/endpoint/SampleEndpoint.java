@@ -1,6 +1,7 @@
 package uk.gov.ons.ctp.response.sample.endpoint;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
+import static uk.gov.ons.ctp.response.sample.mapper.CustomObjectMapper.*;
 
 import com.opencsv.bean.CsvToBean;
 import java.net.URI;
@@ -13,7 +14,6 @@ import javax.validation.Valid;
 import libs.common.error.CTPException;
 import libs.common.error.InvalidRequestException;
 import libs.sample.validation.BusinessSampleUnit;
-import ma.glasnost.orika.MapperFacade;
 import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,12 +46,10 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   private static final ExecutorService EXECUTOR_SERVICE =
       Executors.newFixedThreadPool(NUM_UPLOAD_THREADS);
   private SampleService sampleService;
-  private MapperFacade mapperFacade;
 
   @Autowired
-  public SampleEndpoint(SampleService sampleService, MapperFacade mapperFacade) {
+  public SampleEndpoint(SampleService sampleService) {
     this.sampleService = sampleService;
-    this.mapperFacade = mapperFacade;
   }
 
   /**
@@ -65,8 +63,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     if (CollectionUtils.isEmpty(sampleSummaries)) {
       return ResponseEntity.noContent().build();
     } else {
-      List<SampleSummaryDTO> result =
-          mapperFacade.mapAsList(sampleSummaries, SampleSummaryDTO.class);
+      List<SampleSummaryDTO> result = mapSampleSummariesToListOfDTO(sampleSummaries);
       return ResponseEntity.ok(result);
     }
   }
@@ -87,7 +84,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
           CTPException.Fault.RESOURCE_NOT_FOUND,
           String.format("Sample Summary not found for sampleSummaryId %s", sampleSummaryId));
     }
-    SampleSummaryDTO result = mapperFacade.map(sampleSummary, SampleSummaryDTO.class);
+    SampleSummaryDTO result = mapSampleSummaryDTO(sampleSummary);
 
     return ResponseEntity.ok(result);
   }
@@ -143,7 +140,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
           CTPException.Fault.RESOURCE_NOT_FOUND,
           String.format("Sample Unit not found for sampleUnitId %s", sampleUnitId));
     }
-    SampleUnitDTO result = mapperFacade.map(sampleUnit, SampleUnitDTO.class);
+    SampleUnitDTO result = mapSampleUnitDTO(sampleUnit);
 
     return ResponseEntity.ok(result);
   }
@@ -157,7 +154,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     List<SampleUnit> sampleUnits;
     if (Strings.isEmpty(state)) {
       sampleUnits = sampleService.findSampleUnitsBySampleSummaryAsList(sampleSummaryId);
-      List<SampleUnitDTO> result = mapperFacade.mapAsList(sampleUnits, SampleUnitDTO.class);
+      List<SampleUnitDTO> result = mapSampleUnitsToListOfDTO(sampleUnits);
 
       if (!sampleUnits.isEmpty()) {
         return ResponseEntity.ok(result.toArray(new SampleUnitDTO[] {}));
@@ -181,7 +178,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
             kv("state", state),
             kv("numberOfSamples", sampleUnits.size()));
 
-        List<SampleUnitDTO> result = mapperFacade.mapAsList(sampleUnits, SampleUnitDTO.class);
+        List<SampleUnitDTO> result = mapSampleUnitsToListOfDTO(sampleUnits);
 
         return ResponseEntity.ok(result.toArray(new SampleUnitDTO[] {}));
 
@@ -211,7 +208,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       SampleUnit sampleUnit =
           sampleService.findSampleUnitBySampleSummaryAndSampleUnitRef(
               sampleSummaryId, sampleUnitRef);
-      SampleUnitDTO result = mapperFacade.map(sampleUnit, SampleUnitDTO.class);
+      SampleUnitDTO result = mapSampleUnitDTO(sampleUnit);
       log.debug(
           "found sample unit",
           kv("sampleSummaryId", sampleSummaryId),
@@ -243,8 +240,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     }
     log.debug(
         "create sample unit request received", kv("businessSampleUnitDTO", businessSampleUnitDTO));
-    BusinessSampleUnit businessSampleUnit =
-        mapperFacade.map(businessSampleUnitDTO, BusinessSampleUnit.class);
+    BusinessSampleUnit businessSampleUnit = mapBusinessUnit(businessSampleUnitDTO);
 
     log.debug("business sample constructed", kv("businessSample", businessSampleUnit));
     try {
@@ -253,7 +249,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
           sampleService.createSampleUnit(
               sampleSummaryId, businessSampleUnit, SampleUnitDTO.SampleUnitState.INIT);
       log.debug("sample created");
-      SampleUnitDTO sampleUnitDTO = mapperFacade.map(sampleUnit, SampleUnitDTO.class);
+      SampleUnitDTO sampleUnitDTO = mapSampleUnitDTO(sampleUnit);
       log.debug("created SampleUnitDTO", kv("sampleUnitDTO", sampleUnitDTO));
       return ResponseEntity.created(
               URI.create(String.format("/samples/%s", sampleUnit.getSampleUnitPK())))
@@ -296,7 +292,8 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     if (sampleSummary != null) {
       log.debug("sample summary created", kv("sampleSummaryId", sampleSummary.getId()));
     }
-    SampleSummaryDTO sampleSummaryDTO = mapperFacade.map(sampleSummary, SampleSummaryDTO.class);
+    // sampleSummary could be null do we want to handle this better?
+    SampleSummaryDTO sampleSummaryDTO = mapSampleSummaryDTO(sampleSummary);
 
     return ResponseEntity.created(
             URI.create(String.format("/samplesummary/%s", sampleSummary.getId())))

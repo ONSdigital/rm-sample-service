@@ -48,8 +48,9 @@ public class PubSub {
     }
   }
 
-  /***
-   * Provides subscription name for the sample file dead letter subscriber
+  /**
+   * * Provides subscription name for the sample file dead letter subscriber
+   *
    * @return com.google.pubsub.v1.ProjectSubscriptionName
    */
   public ProjectSubscriptionName getSampleDeadLetterSubscriptionName() {

@@ -16,8 +16,7 @@
 		<springboot.version>2.6.7</springboot.version>
 		<spring.cloud.gcp.version>1.2.8.RELEASE</spring.cloud.gcp.version>
 		<common.version>10.49.4</common.version>
-		<java.version>11</java.version>
-		<orika.version>1.5.4</orika.version>
+		<java.version>17</java.version>
 		<surefire.version>2.20</surefire.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -90,21 +89,13 @@
         https://dev.to/scottshipp/how-to-fix-a-mockito-cannot-mock-this-class-exception-in-a-spring-boot-app-457e -->
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>2.22.0</version>
+            <artifactId>mockito-inline</artifactId>
+            <version>4.6.1</version>
             <scope>test</scope>
         </dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>ma.glasnost.orika</groupId>
-			<artifactId>orika-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>ma.glasnost.orika</groupId>
-			<artifactId>orika-eclipse-tools</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>net.codesup.util</groupId>
@@ -164,7 +155,7 @@
 		<dependency>
 			<groupId>com.vladmihalcea</groupId>
 			<artifactId>hibernate-types-5</artifactId>
-			<version>2.16.2</version>
+			<version>2.17.1</version>
 		</dependency>
 		<!-- END -->
 
@@ -201,19 +192,19 @@
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
-			<version>2.3.1</version>
+			<version>2.4.0-b180830.0359</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.glassfish.jaxb</groupId>
 			<artifactId>jaxb-runtime</artifactId>
-			<version>2.3.3</version>
+			<version>4.0.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-core</artifactId>
-			<version>2.3.0</version>
+			<version>4.0.0</version>
 		</dependency>
 
 		<dependency>
@@ -236,7 +227,7 @@
 		<dependency>
 			<groupId>com.github.tomakehurst</groupId>
 			<artifactId>wiremock</artifactId>
-			<version>2.18.0</version>
+			<version>2.27.2</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -281,7 +272,7 @@
 			<dependency>
 				<groupId>net.codesup.util</groupId>
 				<artifactId>jaxb2-rich-contract-plugin</artifactId>
-				<version>2.0.1</version>
+				<version>2.1.0</version>
 			</dependency>
 
 			<dependency>
@@ -303,9 +294,6 @@
 				<version>${common.version}</version>
 				<scope>test</scope>
 			</dependency>
-
-
-
 		</dependencies>
 
 	</dependencyManagement>
@@ -317,7 +305,7 @@
 			<plugin>
 				<groupId>com.coveo</groupId>
 				<artifactId>fmt-maven-plugin</artifactId>
-				<version>2.10</version>
+				<version>2.9.1</version>
 				<executions>
 					<execution>
 						<goals>
@@ -337,7 +325,7 @@
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
-							<version>1.16.22</version>
+							<version>1.18.24</version>
 						</path>
 					</annotationProcessorPaths>
 				</configuration>
@@ -350,6 +338,11 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>2.18.1</version>
+				<!-- The below argument was added to prevent an error being thrown due to accessing of an unnamed
+               source. This seemed to be the only solution -->
+				<configuration>
+					<argLine>--add-opens java.base/java.util=ALL-UNNAMED</argLine>
+				</configuration>
 				<executions>
 					<execution>
 						<goals>

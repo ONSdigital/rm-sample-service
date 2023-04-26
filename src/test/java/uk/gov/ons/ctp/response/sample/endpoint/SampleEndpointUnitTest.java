@@ -15,11 +15,9 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import libs.common.error.RestExceptionHandler;
 import libs.common.jackson.CustomObjectMapper;
-import ma.glasnost.orika.MapperFacade;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -36,8 +34,6 @@ import uk.gov.ons.ctp.response.sample.service.UnknownSampleSummaryException;
 public class SampleEndpointUnitTest {
 
   @InjectMocks private SampleEndpoint sampleEndpoint;
-
-  @Mock private MapperFacade mapperFacade;
 
   @Mock private SampleService sampleService;
 
@@ -143,7 +139,7 @@ public class SampleEndpointUnitTest {
     sampleSummary.setState(SampleSummaryDTO.SampleState.INIT);
     sampleSummary.setId(UUID.randomUUID());
 
-    when(sampleService.createAndSaveSampleSummary(Matchers.any(SampleSummaryDTO.class)))
+    when(sampleService.createAndSaveSampleSummary(any(SampleSummaryDTO.class)))
         .thenReturn(sampleSummary);
 
     ResultActions actions =
