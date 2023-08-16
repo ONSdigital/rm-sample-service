@@ -213,13 +213,6 @@ public class SampleSvcApplication {
   }
 
   /* PubSub / Spring integration configuration */
-
-  @Bean
-  public PubSubTemplate pubSubTemplate(PubSubPublisherTemplate pubSubPublisherTemplate,
-      PubSubSubscriberTemplate pubSubSubscriberTemplate) {
-    return new PubSubTemplate(pubSubPublisherTemplate, pubSubSubscriberTemplate);
-  }
-
   @Bean(name = "sampleSummaryActivationChannel")
   public MessageChannel sampleSummaryInputMessageChannel() {
     return new PublishSubscribeChannel();
