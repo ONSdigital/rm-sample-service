@@ -4,9 +4,6 @@ import javax.sql.DataSource;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-
-import com.google.cloud.spring.pubsub.core.publisher.PubSubPublisherTemplate;
-import com.google.cloud.spring.pubsub.core.subscriber.PubSubSubscriberTemplate;
 import libs.common.error.RestExceptionHandler;
 import libs.common.jackson.CustomObjectMapper;
 import libs.common.rest.RestUtility;
