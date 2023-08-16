@@ -23,16 +23,10 @@
 	</properties>
 	<dependencies>
 		<!-- Spring Dependencies -->
-<!--		<dependency>-->
-<!--			<groupId>org.springframework.boot</groupId>-->
-<!--			<artifactId>spring-boot-autoconfigure</artifactId>-->
-<!--			<version>3.1.2</version>-->
-<!--		</dependency>-->
-
 		<dependency>
-			<groupId>com.google.cloud</groupId>
+			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-gcp-starter-pubsub</artifactId>
-			<version>4.7.2</version>
+			<version>1.2.8.RELEASE</version>
 		</dependency>
 
 		<dependency>
