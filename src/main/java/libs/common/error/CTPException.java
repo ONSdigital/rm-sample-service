@@ -86,12 +86,16 @@ public class CTPException extends Exception {
     fault = afault;
   }
 
-  /** @return the fault associated with the CTPException. */
+  /**
+   * @return the fault associated with the CTPException.
+   */
   public final Fault getFault() {
     return fault;
   }
 
-  /** @return the timestamp when the CTPException was created. */
+  /**
+   * @return the timestamp when the CTPException was created.
+   */
   public final long getTimestamp() {
     return timestamp;
   }
