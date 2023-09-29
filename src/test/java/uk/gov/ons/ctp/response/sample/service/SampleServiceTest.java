@@ -23,6 +23,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.gov.ons.ctp.response.client.CollectionExerciseSvcClient;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
@@ -54,6 +55,8 @@ public class SampleServiceTest {
   @Mock
   private StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent>
       sampleSvcUnitStateTransitionManager;
+
+  @Mock private CollectionExerciseSvcClient collectionExerciseSvcClient;
 
   @InjectMocks private SampleService sampleService;
 
@@ -132,6 +135,7 @@ public class SampleServiceTest {
   public void activateSampleSummaryTest() throws Exception {
     SampleSummary newSummary = createSampleSummary(1, 1);
     newSummary.setTotalSampleUnits(1);
+    newSummary.setCollectionExerciseId(UUID.randomUUID());
     when(sampleSummaryRepository.findById(any(UUID.class))).thenReturn(Optional.of(newSummary));
     when(sampleUnitRepository.countBySampleSummaryFKAndState(1, SampleUnitState.PERSISTED))
         .thenReturn(1);
