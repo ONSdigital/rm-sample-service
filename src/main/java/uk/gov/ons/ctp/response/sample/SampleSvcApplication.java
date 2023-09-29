@@ -199,7 +199,7 @@ public class SampleSvcApplication {
    */
   @Bean
   @Qualifier("collectionExerciseRestUtility")
-  public RestUtility collectionExerciseRestUtility(){
+  public RestUtility collectionExerciseRestUtility() {
     return new RestUtility(appConfig.getCollectionExerciseSvc().getConnectionConfig());
   }
 

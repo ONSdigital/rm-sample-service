@@ -218,7 +218,7 @@ public class SampleService {
       activateSampleSummaryState(sampleSummary);
       sampleSummaryLoadingStatus.setAreAllSampleUnitsLoaded(true);
       collectionExerciseSvcClient.collectionExerciseSampleReadinessRequest(
-              sampleSummaryId.toString(), sampleSummary.getCollectionExerciseId().toString());
+          sampleSummaryId.toString(), sampleSummary.getCollectionExerciseId().toString());
     } else {
       log.info("Not all sample units have been loaded", kv("sampleSummaryPK", sampleSummaryPK));
       sampleSummaryLoadingStatus.setAreAllSampleUnitsLoaded(false);

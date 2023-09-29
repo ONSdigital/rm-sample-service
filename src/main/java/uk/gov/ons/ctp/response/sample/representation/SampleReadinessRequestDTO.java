@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class SampleReadinessRequestDTO {
-    String sampleSummaryId;
+  String sampleSummaryId;
 }
