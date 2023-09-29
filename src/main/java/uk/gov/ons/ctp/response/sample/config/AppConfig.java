@@ -17,6 +17,7 @@ public class AppConfig {
   private PartySvc partySvc;
   private CollectionInstrumentSvc collectionInstrumentSvc;
   private SurveySvc surveySvc;
+  private CollectionExerciseSvc collectionExerciseSvc;
   private Logging logging;
   private GCP gcp;
 }
