@@ -46,13 +46,14 @@ public class CollectionExerciseSvcClient {
         kv("sample_summary_id", sampleSummaryId));
     UriComponents uriComponents =
         restUtility.createUriComponents(
-            appConfig.getCollectionExerciseSvc().getCollectionExerciseSampleReadinessRequest(),
+            appConfig.getCollectionExerciseSvc().getCollectionExerciseSampleSummaryReadiness(),
             null);
     SampleReadinessRequestDTO sampleReadinessNotificationDTO = new SampleReadinessRequestDTO();
     sampleReadinessNotificationDTO.setSampleSummaryId(sampleSummaryId);
     HttpEntity<SampleReadinessRequestDTO> httpEntity =
         restUtility.createHttpEntity(sampleReadinessNotificationDTO);
     System.out.println(uriComponents);
+    System.out.println(httpEntity);
     restTemplate.exchange(uriComponents.toUri(), HttpMethod.POST, httpEntity, String.class);
   }
 }

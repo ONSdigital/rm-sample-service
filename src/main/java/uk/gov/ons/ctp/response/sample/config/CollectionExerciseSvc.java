@@ -9,5 +9,5 @@ import net.sourceforge.cobertura.CoverageIgnore;
 @Data
 public class CollectionExerciseSvc {
   private RestUtilityConfig connectionConfig;
-  private String collectionExerciseSampleReadinessRequest;
+  private String collectionExerciseSampleSummaryReadiness;
 }
