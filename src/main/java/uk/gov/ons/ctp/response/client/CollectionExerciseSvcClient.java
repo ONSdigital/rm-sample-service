@@ -2,6 +2,7 @@ package uk.gov.ons.ctp.response.client;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
+import java.util.UUID;
 import libs.common.rest.RestUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import org.springframework.web.util.UriComponents;
 import uk.gov.ons.ctp.response.sample.config.AppConfig;
 import uk.gov.ons.ctp.response.sample.representation.SampleReadinessRequestDTO;
 
+/** HTTP RestClient implementation for calls to the Collection Exercise service. */
 @Component
 public class CollectionExerciseSvcClient {
   private static final Logger log = LoggerFactory.getLogger(CollectionExerciseSvcClient.class);
@@ -38,18 +40,18 @@ public class CollectionExerciseSvcClient {
       value = {RestClientException.class},
       maxAttemptsExpression = "#{${retries.maxAttempts}}",
       backoff = @Backoff(delayExpression = "#{${retries.backoff}}"))
-  public void collectionExerciseSampleReadinessRequest(
-      String sampleSummaryId, String collectionExerciseId) {
+  public void collectionExerciseSampleSummaryReadiness(
+      UUID sampleSummaryId, UUID collectionExerciseId) {
     log.debug(
         "Notifying Collection Exercise of sample readiness {}",
         kv("collection_exercise_id", collectionExerciseId));
     UriComponents uriComponents =
         restUtility.createUriComponents(
             appConfig.getCollectionExerciseSvc().getCollectionExerciseSampleReadinessRequest(),
-            null,
-            collectionExerciseId);
+            null);
     SampleReadinessRequestDTO sampleReadinessNotificationDTO = new SampleReadinessRequestDTO();
     sampleReadinessNotificationDTO.setSampleSummaryId(sampleSummaryId);
+    sampleReadinessNotificationDTO.setCollectionExerciseId(collectionExerciseId);
     HttpEntity<SampleReadinessRequestDTO> httpEntity =
         restUtility.createHttpEntity(sampleReadinessNotificationDTO);
     System.out.println(uriComponents);
