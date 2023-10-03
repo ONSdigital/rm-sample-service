@@ -52,8 +52,6 @@ public class CollectionExerciseSvcClient {
     sampleReadinessNotificationDTO.setSampleSummaryId(sampleSummaryId);
     HttpEntity<SampleReadinessRequestDTO> httpEntity =
         restUtility.createHttpEntity(sampleReadinessNotificationDTO);
-    System.out.println(uriComponents);
-    System.out.println(httpEntity);
     restTemplate.exchange(uriComponents.toUri(), HttpMethod.POST, httpEntity, String.class);
   }
 }

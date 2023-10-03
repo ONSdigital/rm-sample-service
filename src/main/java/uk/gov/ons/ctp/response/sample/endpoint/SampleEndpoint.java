@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.ons.ctp.response.client.CollectionExerciseSvcClient;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.representation.*;
@@ -51,6 +52,8 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
   public SampleEndpoint(SampleService sampleService) {
     this.sampleService = sampleService;
   }
+
+  @Autowired private CollectionExerciseSvcClient collectionExerciseSvcClient;
 
   /**
    * GET endpoint for retrieving a list of all existing SampleSummaries
@@ -275,6 +278,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     try {
       SampleSummaryLoadingStatus sampleSummaryLoadingStatus =
           sampleService.sampleSummaryStateCheck(sampleSummaryId);
+      collectionExerciseSvcClient.collectionExerciseSampleSummaryReadiness(sampleSummaryId);
       return ResponseEntity.ok(sampleSummaryLoadingStatus);
     } catch (CTPException e) {
       log.error("unexpected exception", kv("sampleSummaryId", sampleSummaryId), e);

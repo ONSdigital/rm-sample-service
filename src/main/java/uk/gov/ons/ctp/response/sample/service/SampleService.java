@@ -17,7 +17,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.ons.ctp.response.client.CollectionExerciseSvcClient;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleSummary;
 import uk.gov.ons.ctp.response.sample.domain.model.SampleUnit;
 import uk.gov.ons.ctp.response.sample.domain.repository.SampleSummaryRepository;
@@ -46,8 +45,6 @@ public class SampleService {
   @Qualifier("sampleUnitTransitionManager")
   private StateTransitionManager<SampleUnitState, SampleUnitEvent>
       sampleSvcUnitStateTransitionManager;
-
-  @Autowired private CollectionExerciseSvcClient collectionExerciseSvcClient;
 
   public List<SampleSummary> findAllSampleSummaries() {
     return sampleSummaryRepository.findAll();
@@ -217,7 +214,6 @@ public class SampleService {
           kv("sampleSummaryPK", sampleSummaryPK));
       activateSampleSummaryState(sampleSummary);
       sampleSummaryLoadingStatus.setAreAllSampleUnitsLoaded(true);
-      collectionExerciseSvcClient.collectionExerciseSampleSummaryReadiness(sampleSummaryId);
     } else {
       log.info("Not all sample units have been loaded", kv("sampleSummaryPK", sampleSummaryPK));
       sampleSummaryLoadingStatus.setAreAllSampleUnitsLoaded(false);
