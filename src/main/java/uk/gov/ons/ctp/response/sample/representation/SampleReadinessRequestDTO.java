@@ -11,5 +11,4 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class SampleReadinessRequestDTO {
   UUID sampleSummaryId;
-  UUID collectionExerciseId;
 }

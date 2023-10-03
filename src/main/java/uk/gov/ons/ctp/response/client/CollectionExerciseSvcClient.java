@@ -40,18 +40,16 @@ public class CollectionExerciseSvcClient {
       value = {RestClientException.class},
       maxAttemptsExpression = "#{${retries.maxAttempts}}",
       backoff = @Backoff(delayExpression = "#{${retries.backoff}}"))
-  public void collectionExerciseSampleSummaryReadiness(
-      UUID sampleSummaryId, UUID collectionExerciseId) {
+  public void collectionExerciseSampleSummaryReadiness(UUID sampleSummaryId) {
     log.debug(
         "Notifying Collection Exercise of sample readiness {}",
-        kv("collection_exercise_id", collectionExerciseId));
+        kv("sample_summary_id", sampleSummaryId));
     UriComponents uriComponents =
         restUtility.createUriComponents(
             appConfig.getCollectionExerciseSvc().getCollectionExerciseSampleReadinessRequest(),
             null);
     SampleReadinessRequestDTO sampleReadinessNotificationDTO = new SampleReadinessRequestDTO();
     sampleReadinessNotificationDTO.setSampleSummaryId(sampleSummaryId);
-    sampleReadinessNotificationDTO.setCollectionExerciseId(collectionExerciseId);
     HttpEntity<SampleReadinessRequestDTO> httpEntity =
         restUtility.createHttpEntity(sampleReadinessNotificationDTO);
     System.out.println(uriComponents);
