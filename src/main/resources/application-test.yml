@@ -18,6 +18,10 @@ party-svc:
   connection-config:
     port: 38081
 
+collection-exercise-svc:
+  connection-config:
+    port: 38145
+
 gcp:
   project: "test"
   caseNotificationTopic: "test_topic"

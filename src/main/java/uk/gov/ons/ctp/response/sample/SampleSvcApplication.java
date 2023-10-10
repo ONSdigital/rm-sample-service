@@ -193,6 +193,17 @@ public class SampleSvcApplication {
   }
 
   /**
+   * The RestUtility bean for the CollectionExercise service
+   *
+   * @return the RestUtility bean for the CollectionExercise service
+   */
+  @Bean
+  @Qualifier("collectionExerciseRestUtility")
+  public RestUtility collectionExerciseRestUtility() {
+    return new RestUtility(appConfig.getCollectionExerciseSvc().getConnectionConfig());
+  }
+
+  /**
    * The RestUtility bean for the Survey service
    *
    * @return the RestUtility bean for the Survey service
