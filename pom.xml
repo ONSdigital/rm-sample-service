@@ -336,6 +336,7 @@
 						<configuration>
 							<!-- rerun tests because schema isn't create successfully first time -->
 							<rerunFailingTestsCount>2</rerunFailingTestsCount>
+							<classesDirectory>${project.build.outputDirectory}</classesDirectory>
 						</configuration>
 					</execution>
 				</executions>
