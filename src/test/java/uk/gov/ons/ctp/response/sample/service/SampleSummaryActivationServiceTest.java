@@ -30,7 +30,8 @@ public class SampleSummaryActivationServiceTest {
 
   @Test
   public void testActivateSampleSummaryFromPubsub()
-      throws SampleSummaryActivationException, UnknownSampleSummaryException,
+      throws SampleSummaryActivationException,
+          UnknownSampleSummaryException,
           NoSampleUnitsInSampleSummaryException {
 
     SampleSummaryActivationDTO sampleSummaryActivation = new SampleSummaryActivationDTO();
@@ -50,7 +51,8 @@ public class SampleSummaryActivationServiceTest {
 
   @Test(expected = SampleSummaryActivationException.class)
   public void testActivateSampleSummaryFromPubsubCorrectEnrichExceptionThrown()
-      throws UnknownSampleSummaryException, SampleSummaryActivationException,
+      throws UnknownSampleSummaryException,
+          SampleSummaryActivationException,
           NoSampleUnitsInSampleSummaryException {
     SampleSummaryActivationDTO sampleSummaryActivation = new SampleSummaryActivationDTO();
     sampleSummaryActivation.setSampleSummaryId(SAMPLE_SUMMARY_ID);
@@ -99,7 +101,8 @@ public class SampleSummaryActivationServiceTest {
 
   @Test(expected = SampleSummaryActivationException.class)
   public void testActivateSampleSummaryFromPubsubCorrectDistributeExceptionThrown()
-      throws SampleSummaryActivationException, NoSampleUnitsInSampleSummaryException,
+      throws SampleSummaryActivationException,
+          NoSampleUnitsInSampleSummaryException,
           UnknownSampleSummaryException {
     SampleSummaryActivationDTO sampleSummaryActivation = new SampleSummaryActivationDTO();
     sampleSummaryActivation.setSampleSummaryId(SAMPLE_SUMMARY_ID);

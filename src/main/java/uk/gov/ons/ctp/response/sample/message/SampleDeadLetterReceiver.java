@@ -31,6 +31,7 @@ public class SampleDeadLetterReceiver {
   @Qualifier("sampleSummaryTransitionManager")
   private StateTransitionManager<SampleSummaryDTO.SampleState, SampleSummaryDTO.SampleEvent>
       sampleSummaryTransitionManager;
+
   /**
    * To process SampleSummaries from dead letter queue
    *
