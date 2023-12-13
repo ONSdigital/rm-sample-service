@@ -47,7 +47,7 @@ spring:
     driverClassName: org.postgresql.Driver
     hikari:
       connection-timeout: 60000
-      maximum-pool-size: 2
+      maximum-pool-size: 20
   http:
     multipart:
       max-file-size: 50MB

@@ -1,6 +1,10 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:36432/postgres
+    hikari:
+      maximum-pool-size: 2
+    liquibase:
+      maximum-pool-size: 2
   liquibase:
     url: jdbc:postgresql://localhost:36432/postgres
     default-schema: sample
