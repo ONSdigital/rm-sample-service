@@ -245,9 +245,9 @@ public class SampleSummaryEnrichmentService {
     }
 
     Optional<UUID> collectionInstrumentId =
-        formTypeMap.computeIfAbsent(
+        formTypeMap.compute(
             formType,
-            key -> {
+            (key, value) -> {
               UUID ciId = null;
               List<String> classifierTypes = requestSurveyClassifiers(surveyId);
               try {
