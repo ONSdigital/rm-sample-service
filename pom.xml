@@ -17,7 +17,7 @@
 		<spring.cloud.gcp.version>1.2.8.RELEASE</spring.cloud.gcp.version>
 		<common.version>10.49.4</common.version>
 		<java.version>17</java.version>
-		<surefire.version>3.2.2</surefire.version>
+		<surefire.version>3.2.5</surefire.version>
 		<skipSurefire>false</skipSurefire>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
