@@ -1,9 +1,10 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:36432/postgres
+    url: jdbc:postgresql://localhost:15432/postgres?sslmode=disable
+
   liquibase:
-    url: jdbc:postgresql://localhost:36432/postgres
-    default-schema: sample
+    url: jdbc:postgresql://localhost:15432/postgres?sslmode=disable
+    liquibase-schema: sample
 
   cloud:
     gcp:
@@ -24,4 +25,8 @@ collection-exercise-svc:
 
 gcp:
   project: "test"
+  sampleSummaryActivationSubscription: "test_activation_subscription"
+  sampleSummaryActivationStatusTopic: "test_activation_topic"
   caseNotificationTopic: "test_topic"
+  collectionExerciseEndSubscription: "test_collection_exercise_end_sample"
+  sampleSummaryDeadLetterSubscription: "test_dead_letter_subscription"
