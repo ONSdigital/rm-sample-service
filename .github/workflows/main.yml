@@ -163,6 +163,12 @@ jobs:
           docker push "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$IMAGE":${{ env.version }}
           docker push "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$IMAGE":latest
 
+      - name: Publish Charts
+        if: github.ref == 'refs/heads/main'
+        run: |
+          cp $IMAGE-${{ env.HELM_VERSION }}.tgz $IMAGE-latest.tgz
+          gsutil cp $IMAGE-*.tgz gs://$ARTIFACT_BUCKET/$IMAGE/
+
       - name: Publish Release
         if: github.ref == 'refs/heads/main'
         env:
