@@ -14,7 +14,7 @@
 	</scm>
 	<properties>
 		<springboot.version>2.6.7</springboot.version>
-		<spring.cloud.gcp.version>1.2.8.RELEASE</spring.cloud.gcp.version>
+		<spring.cloud.gcp.version>3.7.8</spring.cloud.gcp.version>
 		<common.version>10.49.4</common.version>
 		<java.version>17</java.version>
 		<surefire.version>3.2.5</surefire.version>
@@ -25,15 +25,13 @@
 	<dependencies>
 		<!-- Spring Dependencies -->
 		<dependency>
-			<groupId>org.springframework.cloud</groupId>
+			<groupId>com.google.cloud</groupId>
 			<artifactId>spring-cloud-gcp-starter-pubsub</artifactId>
-			<version>1.2.8.RELEASE</version>
 		</dependency>
 
 		<dependency>
-			<groupId>org.springframework.cloud</groupId>
+			<groupId>com.google.cloud</groupId>
 			<artifactId>spring-cloud-gcp-pubsub</artifactId>
-			<version>1.2.8.RELEASE</version>
 		</dependency>
 
 		<dependency>
@@ -89,7 +87,6 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-crypto</artifactId>
 		</dependency>
-
 
 		<!-- Third Party -->
 		<!-- Added because of mockito errors. It's explained more here
@@ -250,9 +247,15 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-
 			<dependency>
-				<groupId>org.springframework.cloud</groupId>
+				<groupId>com.google.cloud</groupId>
+				<artifactId>libraries-bom</artifactId>
+				<version>26.34.0</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.google.cloud</groupId>
 				<artifactId>spring-cloud-gcp-dependencies</artifactId>
 				<version>${spring.cloud.gcp.version}</version>
 				<type>pom</type>
