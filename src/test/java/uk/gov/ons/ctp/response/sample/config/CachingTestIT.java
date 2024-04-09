@@ -1,10 +1,10 @@
 package uk.gov.ons.ctp.response.sample.config;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
-import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
+import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +16,11 @@ import org.apache.commons.io.IOUtils;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.web.ManagementContextConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +32,7 @@ import uk.gov.ons.ctp.response.client.CollectionInstrumentSvcClient;
 @ManagementContextConfiguration
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@RunWith(MockitoJUnitRunner.class)
 public class CachingTestIT {
 
   @Autowired private CollectionInstrumentSvcClient collectionInstrumentSvcClient;
@@ -39,13 +44,21 @@ public class CachingTestIT {
 
   @Rule public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
-  @ClassRule
-  public static WireMockClassRule wireMockRule =
-      new WireMockClassRule(options().port(18002).bindAddress("localhost"));
+  static WireMockServer wireMockServer = new WireMockServer(18002);
 
   private String searchString = "SURVEY_ID:cb8accda-6118-4d3b-85a3-149e28960c54";
 
-  @org.junit.jupiter.api.Test
+  @BeforeAll
+  public static void startWireMockServer() {
+    wireMockServer.start();
+  }
+
+  @AfterAll
+  public static void stopWireMockServer() {
+    wireMockServer.stop();
+  }
+
+  @Test
   public void testCache() throws Exception {
     StubMapping stubMapping =
         createCollectionInstrumentStub("CachingTestIT.CollectionInstrumentDTO.json");
@@ -91,9 +104,9 @@ public class CachingTestIT {
 
   private StubMapping createCollectionInstrumentStub(String resourceName) throws IOException {
     String json = loadResourceAsString(CachingTestIT.class, resourceName);
+    configureFor("localhost", 18002);
     return stubFor(
-        get(urlMatching(
-                "\\/collection-instrument-api\\/1.0.2\\/collectioninstrument\\?searchString=.*"))
+        get(urlMatching("/collection-instrument-api/1.0.2/collectioninstrument\\?searchString=.*"))
             .willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(json)));
   }
 
