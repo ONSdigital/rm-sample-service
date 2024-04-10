@@ -1,9 +1,9 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres?sslmode=disable
+    url: jdbc:postgresql://localhost:15432/postgres?sslmode=disable
 
   liquibase:
-    url: jdbc:postgresql://localhost:5432/postgres?sslmode=disable
+    url: jdbc:postgresql://localhost:15432/postgres?sslmode=disable
     liquibase-schema: sample
 
   cloud:
@@ -22,10 +22,6 @@ party-svc:
 collection-exercise-svc:
   connection-config:
     port: 38145
-
-collection-instrument-svc:
-  connection-config:
-    port: 18002
 
 gcp:
   project: "test"
