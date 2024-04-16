@@ -23,6 +23,10 @@ collection-exercise-svc:
   connection-config:
     port: 38145
 
+collection-instrument-svc:
+  connection-config:
+    port: 18002
+
 gcp:
   project: "test"
   sampleSummaryActivationSubscription: "test_activation_subscription"
