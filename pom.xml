@@ -14,7 +14,7 @@
 	</scm>
 	<properties>
 		<springboot.version>2.7.18</springboot.version>
-		<spring.cloud.gcp.version>5.6.0</spring.cloud.gcp.version>
+		<spring.cloud.gcp.version>4.8.0</spring.cloud.gcp.version>
 		<common.version>10.49.4</common.version>
 		<java.version>17</java.version>
 		<surefire.version>3.2.5</surefire.version>
