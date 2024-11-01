@@ -6,12 +6,12 @@ import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import jakarta.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.persistence.PersistenceException;
 import libs.common.FixtureHelper;
 import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
