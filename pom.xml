@@ -16,11 +16,12 @@
 		<springboot.version>3.3.3</springboot.version>
 		<spring.cloud.gcp.version>5.6.0</spring.cloud.gcp.version>
 		<common.version>10.49.4</common.version>
-		<java.version>17</java.version>
+		<java.version>21</java.version>
 		<surefire.version>3.2.5</surefire.version>
 		<skipSurefire>false</skipSurefire>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<failsafe.skipITs>false</failsafe.skipITs>
 	</properties>
 	<dependencies>
 		<!-- Spring Dependencies -->
@@ -338,6 +339,7 @@
                source. This seemed to be the only solution -->
 				<configuration>
 					<argLine>--add-opens java.base/java.util=ALL-UNNAMED</argLine>
+					<skipITs>${failsafe.skipITs}</skipITs>
 				</configuration>
 				<executions>
 					<execution>
@@ -447,10 +449,11 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.11.0</version>
+					<version>3.13.0</version>
 					<configuration>
 						<source>${java.version}</source>
 						<target>${java.version}</target>
+						<parameters>true</parameters>
 					</configuration>
 				</plugin>
 				<plugin>
