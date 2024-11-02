@@ -22,6 +22,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<failsafe.skipITs>false</failsafe.skipITs>
+		<exec.skip>false</exec.skip>
 	</properties>
 	<dependencies>
 		<!-- Spring Dependencies -->
@@ -169,11 +170,11 @@
 			<artifactId>commons-csv</artifactId>
 			<version>1.11.0</version>
 		</dependency>
-		<dependency>
-			<groupId>io.hypersistence</groupId>
-			<artifactId>hypersistence-utils-hibernate-55</artifactId>
-			<version>3.8.2</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>io.hypersistence</groupId>-->
+<!--			<artifactId>hypersistence-utils-hibernate-55</artifactId>-->
+<!--			<version>3.8.2</version>-->
+<!--		</dependency>-->
 		<!-- END -->
 
 		<!-- Testing -->
@@ -391,6 +392,9 @@
 				<artifactId>exec-maven-plugin</artifactId>
 				<groupId>org.codehaus.mojo</groupId>
 				<version>3.5.0</version>
+				<configuration>
+					<skip>${exec.skip}</skip>
+				</configuration>
 				<executions>
 					<execution>
 						<id>pre-stop</id>
@@ -497,4 +501,3 @@
 		</resources>
 	</build>
 </project>
-
