@@ -85,7 +85,6 @@ public class SampleSvcApplication {
     liquibase.setDataSource(getDataSource(liquibaseProperties));
     liquibase.setDropFirst(liquibaseProperties.isDropFirst());
     liquibase.setShouldRun(true);
-    // liquibase.setLabels(liquibaseProperties.getLabels());
     liquibase.setChangeLogParameters(liquibaseProperties.getParameters());
     liquibase.setLiquibaseSchema(liquibaseProperties.getLiquibaseSchema());
     liquibase.setDatabaseChangeLogLockTable(liquibaseProperties.getDatabaseChangeLogLockTable());
