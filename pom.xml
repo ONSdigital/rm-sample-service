@@ -340,7 +340,6 @@
                source. This seemed to be the only solution -->
 				<configuration>
 					<argLine>--add-opens java.base/java.util=ALL-UNNAMED</argLine>
-					<skipITs>${failsafe.skipITs}</skipITs>
 				</configuration>
 				<executions>
 					<execution>
@@ -388,9 +387,6 @@
 				<artifactId>exec-maven-plugin</artifactId>
 				<groupId>org.codehaus.mojo</groupId>
 				<version>3.5.0</version>
-				<configuration>
-					<skip>${exec.skip}</skip>
-				</configuration>
 				<executions>
 					<execution>
 						<id>pre-stop</id>
@@ -457,7 +453,6 @@
 					<configuration>
 						<source>${java.version}</source>
 						<target>${java.version}</target>
-						<parameters>true</parameters>
 					</configuration>
 				</plugin>
 				<plugin>
