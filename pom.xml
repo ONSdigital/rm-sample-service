@@ -21,6 +21,8 @@
 		<skipSurefire>false</skipSurefire>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<failsafe.skipITs>false</failsafe.skipITs>
+		<exec.skip>false</exec.skip>
 	</properties>
 	<dependencies>
 		<!-- Spring Dependencies -->
@@ -231,9 +233,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.github.tomakehurst</groupId>
-			<artifactId>wiremock</artifactId>
-			<version>3.0.1</version>
+			<groupId>org.wiremock</groupId>
+			<artifactId>wiremock-standalone</artifactId>
+			<version>3.9.2</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -338,6 +340,7 @@
                source. This seemed to be the only solution -->
 				<configuration>
 					<argLine>--add-opens java.base/java.util=ALL-UNNAMED</argLine>
+					<skipITs>${failsafe.skipITs}</skipITs>
 				</configuration>
 				<executions>
 					<execution>
@@ -384,6 +387,10 @@
 			<plugin>
 				<artifactId>exec-maven-plugin</artifactId>
 				<groupId>org.codehaus.mojo</groupId>
+				<version>3.5.0</version>
+				<configuration>
+					<skip>${exec.skip}</skip>
+				</configuration>
 				<executions>
 					<execution>
 						<id>pre-stop</id>
@@ -450,6 +457,7 @@
 					<configuration>
 						<source>${java.version}</source>
 						<target>${java.version}</target>
+						<parameters>true</parameters>
 					</configuration>
 				</plugin>
 				<plugin>
