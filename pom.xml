@@ -14,10 +14,10 @@
 	</scm>
 	<properties>
 		<springboot.version>3.3.5</springboot.version>
-		<spring.cloud.gcp.version>5.8.0</spring.cloud.gcp.version>
+		<spring.cloud.gcp.version>4.8.0</spring.cloud.gcp.version>
 		<common.version>10.49.4</common.version>
 		<java.version>21</java.version>
-		<surefire.version>3.5.2</surefire.version>
+		<surefire.version>3.2.5</surefire.version>
 		<skipSurefire>false</skipSurefire>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -27,13 +27,11 @@
 		<dependency>
 			<groupId>com.google.cloud</groupId>
 			<artifactId>spring-cloud-gcp-starter-pubsub</artifactId>
-			<version>${spring.cloud.gcp.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.google.cloud</groupId>
 			<artifactId>spring-cloud-gcp-pubsub</artifactId>
-			<version>${spring.cloud.gcp.version}</version>
 		</dependency>
 
 		<dependency>
@@ -96,7 +94,7 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>5.14.2</version>
+			<version>5.13.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -116,12 +114,10 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-annotations</artifactId>
-			<version> 2.18.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
-			<version> 2.18.1</version>
 		</dependency>
 		<dependency>
 			<groupId>net.logstash.logback</groupId>
@@ -136,12 +132,11 @@
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.18.0</version>
+			<version>2.16.1</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
-			<version>4.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.opencsv</groupId>
@@ -151,7 +146,7 @@
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
-			<version>4.30.0</version>
+			<version>4.29.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
@@ -171,7 +166,7 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
-			<version>1.12.0</version>
+			<version>1.11.0</version>
 		</dependency>
 		<!-- END -->
 
@@ -318,7 +313,7 @@
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
-							<version>1.18.36</version>
+							<version>1.18.30</version>
 						</path>
 					</annotationProcessorPaths>
 				</configuration>
@@ -444,7 +439,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.13.0</version>
+					<version>3.11.0</version>
 					<configuration>
 						<source>${java.version}</source>
 						<target>${java.version}</target>
