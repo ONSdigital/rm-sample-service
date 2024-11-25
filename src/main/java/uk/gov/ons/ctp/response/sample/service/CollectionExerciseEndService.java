@@ -2,9 +2,9 @@ package uk.gov.ons.ctp.response.sample.service;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
+import jakarta.transaction.Transactional;
 import java.util.Optional;
 import java.util.UUID;
-import javax.transaction.Transactional;
 import libs.common.error.CTPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
