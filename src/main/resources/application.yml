@@ -176,4 +176,5 @@ gcp:
   sampleSummaryActivationStatusTopic: "test_activation_topic"
   caseNotificationTopic: "test_topic"
   collectionExerciseEndSubscription: "test_collection_exercise_end_sample"
+
   sampleSummaryDeadLetterSubscription: "test-local-dead-letter-sub"
