@@ -82,15 +82,22 @@ public class SampleSummaryDistributionService {
                     kv("sampleUnitId", sampleUnit.getId()));
                 distributeSampleUnit(sampleSummary.getCollectionExerciseId(), sampleUnit);
                 LOG.info(
-                    "preparing to add SampleUnit to List<SampleUnit>",
+                    "saving sample unit",
                     kv("sampleSummaryId", sampleSummaryId),
-                    kv("sampleUnitId", sampleUnit.getId()),
-                    kv("totalMemory", Runtime.getRuntime().totalMemory()),
-                    kv("maxMemory", Runtime.getRuntime().maxMemory()),
-                    kv("freeMemory", Runtime.getRuntime().freeMemory()));
-                distributeSamples.add(sampleUnit);
+                    kv("sampleUnitId", sampleUnit.getId()));
+                sampleUnitRepository.save(sampleUnit);
+                sampleUnitRepository.flush();
+
+                //                LOG.info(
+                //                    "preparing to add SampleUnit to List<SampleUnit>",
+                //                    kv("sampleSummaryId", sampleSummaryId),
+                //                    kv("sampleUnitId", sampleUnit.getId()),
+                //                    kv("totalMemory", Runtime.getRuntime().totalMemory()),
+                //                    kv("maxMemory", Runtime.getRuntime().maxMemory()),
+                //                    kv("freeMemory", Runtime.getRuntime().freeMemory()));
+                // distributeSamples.add(sampleUnit);
                 LOG.info(
-                    "successfully added SampleUnit to List<SampleUnit>",
+                    "successfully saved SampleUnit",
                     kv("sampleSummaryId", sampleSummaryId),
                     kv("sampleUnitId", sampleUnit.getId()),
                     kv("totalMemory", Runtime.getRuntime().totalMemory()),
@@ -113,8 +120,8 @@ public class SampleSummaryDistributionService {
           kv("sampleSummaryId", sampleSummaryId));
       throw new NoSampleUnitsInSampleSummaryException();
     }
-    sampleUnitRepository.saveAll(distributeSamples);
-    sampleUnitRepository.flush();
+    // sampleUnitRepository.saveAll(distributeSamples);
+    // sampleUnitRepository.flush();
     // Nothing currently uses this flag, but in the future we'll clean up old samples once they're
     // no longer needed
     LOG.info(
