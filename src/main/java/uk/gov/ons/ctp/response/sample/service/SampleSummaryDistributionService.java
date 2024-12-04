@@ -82,22 +82,20 @@ public class SampleSummaryDistributionService {
                     kv("sampleUnitId", sampleUnit.getId()));
                 distributeSampleUnit(sampleSummary.getCollectionExerciseId(), sampleUnit);
                 LOG.info(
-                        "preparing to add SampleUnit to List<SampleUnit>",
-                        kv("sampleSummaryId", sampleSummaryId),
-                        kv("sampleUnitId", sampleUnit.getId()),
-                        kv("totalMemory", Runtime.getRuntime().totalMemory()),
-                        kv("maxMemory", Runtime.getRuntime().maxMemory()),
-                        kv("freeMemory", Runtime.getRuntime().freeMemory())
-                );
+                    "preparing to add SampleUnit to List<SampleUnit>",
+                    kv("sampleSummaryId", sampleSummaryId),
+                    kv("sampleUnitId", sampleUnit.getId()),
+                    kv("totalMemory", Runtime.getRuntime().totalMemory()),
+                    kv("maxMemory", Runtime.getRuntime().maxMemory()),
+                    kv("freeMemory", Runtime.getRuntime().freeMemory()));
                 distributeSamples.add(sampleUnit);
                 LOG.info(
-                        "successfully added SampleUnit to List<SampleUnit>",
-                        kv("sampleSummaryId", sampleSummaryId),
-                        kv("sampleUnitId", sampleUnit.getId()),
-                        kv("totalMemory", Runtime.getRuntime().totalMemory()),
-                        kv("maxMemory", Runtime.getRuntime().maxMemory()),
-                        kv("freeMemory", Runtime.getRuntime().freeMemory())
-                );
+                    "successfully added SampleUnit to List<SampleUnit>",
+                    kv("sampleSummaryId", sampleSummaryId),
+                    kv("sampleUnitId", sampleUnit.getId()),
+                    kv("totalMemory", Runtime.getRuntime().totalMemory()),
+                    kv("maxMemory", Runtime.getRuntime().maxMemory()),
+                    kv("freeMemory", Runtime.getRuntime().freeMemory()));
 
               } catch (RuntimeException ex) {
                 LOG.error(
