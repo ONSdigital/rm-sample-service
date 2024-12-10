@@ -2,7 +2,7 @@ services:
 
   postgres:
     container_name: postgres-it
-    image: europe-west2-docker.pkg.dev/ons-ci-rmrasbs/images/postgres
+    image: eu.gcr.io/ons-rasrmbs-management/postgres
     command: postgres -c 'max_connections=1000'
     environment:
       - POSTGRES_USER=postgres
