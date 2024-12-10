@@ -2,7 +2,7 @@ services:
 
   postgres:
     container_name: postgres-it
-    image: eu.gcr.io/ons-rasrmbs-management/postgres
+    image: europe-west2-docker.pkg.dev/ons-ci-rmrasbs/images/postgres
     command: postgres -c 'max_connections=1000'
     environment:
       - POSTGRES_USER=postgres
@@ -13,7 +13,7 @@ services:
 
   party-service:
     container_name: party-service-it
-    image: eu.gcr.io/ons-rasrmbs-management/party
+    image: europe-west2-docker.pkg.dev/ons-ci-rmrasbs/images/party
     external_links:
       - postgres-it
     ports:
@@ -46,7 +46,7 @@ services:
 
   pubsub-emulator:
     container_name: pubsub-emulator-it
-    image: eu.gcr.io/ons-rasrmbs-management/pubsub-emulator
+    image: europe-west2-docker.pkg.dev/ons-ci-rmrasbs/images/pubsub-emulator
     ports:
       - "18681:8681"
     environment:
