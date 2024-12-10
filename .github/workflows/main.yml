@@ -48,6 +48,7 @@ jobs:
           credentials_json: ${{ secrets.GCR_KEY }}
       - name: Setup Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
+      - name: Configure GCR
         run: |
           gcloud auth configure-docker
           gcloud auth configure-docker "$REGISTRY_HOSTNAME"
