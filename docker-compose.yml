@@ -13,7 +13,7 @@ services:
 
   party-service:
     container_name: party-service-it
-    image: eu.gcr.io/ons-rasrmbs-management/party
+    image: europe-west2-docker.pkg.dev/ons-ci-rmrasbs/images/party
     external_links:
       - postgres-it
     ports:
@@ -27,7 +27,7 @@ services:
     container_name: collex-case-it
     external_links:
       - postgres-case-it
-    image: eu.gcr.io/ons-rasrmbs-management/collection-exercise
+    image: europe-west2-docker.pkg.dev/ons-ci-rmrasbs/images/collection-exercise
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-it:5432/postgres?sslmode=disable
       - SPRING_DATASOURCE_USERNAME=postgres
