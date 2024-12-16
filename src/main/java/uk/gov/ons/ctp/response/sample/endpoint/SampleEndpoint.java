@@ -4,13 +4,13 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 import static uk.gov.ons.ctp.response.sample.mapper.CustomObjectMapper.*;
 
 import com.opencsv.bean.CsvToBean;
+import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import javax.validation.Valid;
 import libs.common.error.CTPException;
 import libs.common.error.InvalidRequestException;
 import libs.sample.validation.BusinessSampleUnit;

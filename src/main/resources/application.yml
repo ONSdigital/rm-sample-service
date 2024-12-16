@@ -54,7 +54,7 @@ spring:
       max-request-size: 60MB
       file-size-threshold: 0
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQL94Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     defer-datasource-initialization: true
     open-in-view: true
     hibernate:
@@ -176,3 +176,5 @@ gcp:
   sampleSummaryActivationStatusTopic: "test_activation_topic"
   caseNotificationTopic: "test_topic"
   collectionExerciseEndSubscription: "test_collection_exercise_end_sample"
+
+  sampleSummaryDeadLetterSubscription: "test-local-dead-letter-sub"
