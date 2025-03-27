@@ -1,7 +1,7 @@
 FROM eclipse-temurin:21-jre-alpine
 
 RUN apk update
-RUN addgroup -S appuser && adduser -S appuser -G appgroup && chown -R appuser:appuser
+RUN addgroup -S appuser && adduser -S appuser -G appuser && chown -R appuser:appuser
 USER appuser
 COPY target/samplesvc.jar /opt/samplesvc.jar
 
