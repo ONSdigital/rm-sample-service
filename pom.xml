@@ -263,7 +263,7 @@
 			</dependency>
 
 			<dependency>
-				<groupId>org.testng</groupId>
+				<groupId>org.testing</groupId>
 				<artifactId>testng</artifactId>
 				<version>7.10.2</version>
 				<scope>test</scope>
