@@ -2,7 +2,7 @@ services:
 
   postgres:
     container_name: postgres-it
-    image: eu.gcr.io/ons-rasrmbs-management/postgres
+    image: postgres:14
     command: postgres -c 'max_connections=1000'
     environment:
       - POSTGRES_USER=postgres
@@ -14,8 +14,8 @@ services:
   party-service:
     container_name: party-service-it
     image: europe-west2-docker.pkg.dev/ons-ci-rmrasbs/images/party
-    external_links:
-      - postgres-it
+#    external_links:
+#      - postgres-it
     ports:
       - "38081:8081"
     environment:
@@ -25,8 +25,8 @@ services:
 
   collectionexercise:
     container_name: collex-case-it
-    external_links:
-      - postgres-case-it
+#    external_links:
+#      - postgres-case-it
     image: europe-west2-docker.pkg.dev/ons-ci-rmrasbs/images/collection-exercise
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-it:5432/postgres?sslmode=disable
