@@ -88,13 +88,13 @@ spec:
             timeoutSeconds: 5
           livenessProbe:
             httpGet:
-              path: /actuator/info
+              path: {{ .Values.livenessProbe.httpGet.path }}
               port: {{ .Values.container.port }}
-            initialDelaySeconds: 300
-            periodSeconds: 25
-            failureThreshold: 5
-            successThreshold: 1
-            timeoutSeconds: 8
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
           env:
           - name: DB_HOST
             {{- if .Values.database.managedPostgres }}
