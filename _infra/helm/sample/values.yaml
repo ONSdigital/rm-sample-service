@@ -36,6 +36,9 @@ resources:
       memory: "64Mi"
       cpu: "100m"
 
+jvm:
+   java_options: "-Xms512m -Xmx512m"
+
 autoscaling: false
 scaleAt:
   # These are expressed as a percentage of resources.requests, not resources.limits
