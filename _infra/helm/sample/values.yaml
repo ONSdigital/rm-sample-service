@@ -50,9 +50,9 @@ rollingUpdate:
 livenessProbe:
   httpGet:
     path: /actuator/info
-  initialDelaySeconds: 1
-  periodSeconds: 20
-  failureThreshold: 2
+  initialDelaySeconds: 300
+  periodSeconds: 25
+  failureThreshold: 5
   successThreshold: 1
   timeoutSeconds: 1800
 
