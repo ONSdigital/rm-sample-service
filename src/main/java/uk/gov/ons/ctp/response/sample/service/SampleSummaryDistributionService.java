@@ -43,8 +43,6 @@ public class SampleSummaryDistributionService {
       sampleUnitTransitionManager;
 
   MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
-  MemoryUsage heapMemory = memoryBean.getHeapMemoryUsage();
-  MemoryUsage nonHeapMemory = memoryBean.getNonHeapMemoryUsage();
 
   /**
    * Distributes the sample units to the case service to create cases against each sample unit. This
@@ -60,7 +58,7 @@ public class SampleSummaryDistributionService {
   public void distribute(UUID sampleSummaryId)
       throws NoSampleUnitsInSampleSummaryException, UnknownSampleSummaryException {
     LOG.info("about to distribute sample summary", kv("sampleSummaryId", sampleSummaryId));
-    printMemoryUsage("about to distribute sample summary", heapMemory, nonHeapMemory);
+    printMemoryUsage("about to distribute sample summary", memoryBean);
     // first find the correct sample summary
     SampleSummary sampleSummary =
         sampleSummaryRepository
@@ -68,11 +66,11 @@ public class SampleSummaryDistributionService {
             .orElseThrow(UnknownSampleSummaryException::new);
 
     LOG.info("found sample summary", kv("sampleSummary", sampleSummary.getId()));
-    printMemoryUsage("found sample summary", heapMemory, nonHeapMemory);
+    printMemoryUsage("found sample summary", memoryBean);
     Stream<SampleUnit> sampleUnits = sampleService.findSampleUnitsBySampleSummary(sampleSummaryId);
 
     LOG.info("found sample units for summary", kv("sampleSummaryId", sampleSummaryId));
-    printMemoryUsage("found sample units for summary", heapMemory, nonHeapMemory);
+    printMemoryUsage("found sample units for summary", memoryBean);
     // We need to check that the stream length wasn't 0 - we can't check directly as this would
     // consume the stream
     AtomicInteger i = new AtomicInteger(0);
@@ -88,7 +86,7 @@ public class SampleSummaryDistributionService {
                     "distribute sample unit",
                     kv("sampleSummaryId", sampleSummaryId),
                     kv("sampleUnitId", sampleUnit.getId()));
-                printMemoryUsage("distribute sample unit", heapMemory, nonHeapMemory);
+                printMemoryUsage("distribute sample unit", memoryBean);
                 distributeSampleUnit(sampleSummary.getCollectionExerciseId(), sampleUnit);
                 distributeSamples.add(sampleUnit);
 
@@ -108,20 +106,20 @@ public class SampleSummaryDistributionService {
           kv("sampleSummaryId", sampleSummaryId));
       throw new NoSampleUnitsInSampleSummaryException();
     }
-    printMemoryUsage("sampleUnitRepository.saveAll (before)", heapMemory, nonHeapMemory);
+    printMemoryUsage("sampleUnitRepository.saveAll (before)", memoryBean);
     sampleUnitRepository.saveAll(distributeSamples);
-    printMemoryUsage("sampleUnitRepository.flush() (before)", heapMemory, nonHeapMemory);
+    printMemoryUsage("sampleUnitRepository.flush() (before)", memoryBean);
     sampleUnitRepository.flush();
     // Nothing currently uses this flag, but in the future we'll clean up old samples once they're
     // no longer needed
     LOG.info(
         "Distribution was successful.  Marking sample summary for deletion",
         kv("sampleSummaryId", sampleSummaryId));
-    printMemoryUsage("Marking sample summary for deletion (before)", heapMemory, nonHeapMemory);
+    printMemoryUsage("Marking sample summary for deletion (before)", memoryBean);
     sampleSummary.setMarkForDeletion(true);
-    printMemoryUsage("sampleSummaryRepository.saveAndFlush (before)", heapMemory, nonHeapMemory);
+    printMemoryUsage("sampleSummaryRepository.saveAndFlush (before)", memoryBean);
     sampleSummaryRepository.saveAndFlush(sampleSummary);
-    printMemoryUsage("sampleSummaryRepository.saveAndFlush (after)", heapMemory, nonHeapMemory);
+    printMemoryUsage("sampleSummaryRepository.saveAndFlush (after)", memoryBean);
   }
 
   /**
@@ -133,21 +131,21 @@ public class SampleSummaryDistributionService {
    */
   public void distributeSampleUnit(UUID collectionExerciseId, SampleUnit sampleUnit) {
     SampleUnitParentDTO parent = createSampleUnitParentDTOObject(collectionExerciseId, sampleUnit);
-    printMemoryUsage("sendSampleUnitToCase (before)", heapMemory, nonHeapMemory);
+    printMemoryUsage("sendSampleUnitToCase (before)", memoryBean);
     sampleUnitPublisher.sendSampleUnitToCase(parent);
-    printMemoryUsage("sendSampleUnitToCase (after)", heapMemory, nonHeapMemory);
+    printMemoryUsage("sendSampleUnitToCase (after)", memoryBean);
     try {
       LOG.info(
           "Transitioning state of sampleUnit",
           kv("id", sampleUnit.getId()),
           kv("from", sampleUnit.getState()),
           kv("to", SampleUnitDTO.SampleUnitEvent.DELIVERING));
-      printMemoryUsage("Transitioning state of sampleUnit", heapMemory, nonHeapMemory);
+      printMemoryUsage("Transitioning state of sampleUnit", memoryBean);
       SampleUnitDTO.SampleUnitState newState =
           sampleUnitTransitionManager.transition(
               sampleUnit.getState(), SampleUnitDTO.SampleUnitEvent.DELIVERING);
       sampleUnit.setState(newState);
-      printMemoryUsage("sampleUnitTransitionManager.transition", heapMemory, nonHeapMemory);
+      printMemoryUsage("sampleUnitTransitionManager.transition", memoryBean);
     } catch (CTPException e) {
       LOG.error("Error occurred whilst transitioning state", e);
     }
@@ -174,15 +172,16 @@ public class SampleSummaryDistributionService {
     return parent;
   }
 
-  private static void printMemoryUsage(
-      String location, MemoryUsage heapUsage, MemoryUsage nonHeapMemory) {
+  private static void printMemoryUsage(String location, MemoryMXBean memoryBean) {
+    MemoryUsage heapMemory = memoryBean.getHeapMemoryUsage();
+    MemoryUsage nonHeapMemory = memoryBean.getNonHeapMemoryUsage();
     LOG.info(
         "Memory Usage",
         kv("location", location),
-        kv("heapInit", heapUsage.getInit() / (1024 * 1024) + " MB"),
-        kv("heapUsed", heapUsage.getUsed() / (1024 * 1024) + " MB"),
-        kv("heapCommitted", heapUsage.getCommitted() / (1024 * 1024) + " MB"),
-        kv("heapMax", heapUsage.getMax() / (1024 * 1024) + " MB"),
+        kv("heapInit", heapMemory.getInit() / (1024 * 1024) + " MB"),
+        kv("heapUsed", heapMemory.getUsed() / (1024 * 1024) + " MB"),
+        kv("heapCommitted", heapMemory.getCommitted() / (1024 * 1024) + " MB"),
+        kv("heapMax", heapMemory.getMax() / (1024 * 1024) + " MB"),
         kv("stackInit", nonHeapMemory.getInit() / (1024 * 1024) + " MB"),
         kv("stackUsed", nonHeapMemory.getUsed() / (1024 * 1024) + " MB"),
         kv("stackCommitted", nonHeapMemory.getCommitted() / (1024 * 1024) + " MB"),
