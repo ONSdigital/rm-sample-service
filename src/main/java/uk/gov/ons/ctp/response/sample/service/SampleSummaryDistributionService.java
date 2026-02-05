@@ -23,6 +23,9 @@ import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.message.SampleUnitPublisher;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitParentDTO;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryUsage;
 
 @Service
 public class SampleSummaryDistributionService {
@@ -39,6 +42,10 @@ public class SampleSummaryDistributionService {
   private StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent>
       sampleUnitTransitionManager;
 
+  MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
+  MemoryUsage heapMemory = memoryBean.getHeapMemoryUsage();
+  MemoryUsage nonHeapMemory = memoryBean.getNonHeapMemoryUsage();
+
   /**
    * Distributes the sample units to the case service to create cases against each sample unit. This
    * is done over pubsub.
@@ -53,6 +60,7 @@ public class SampleSummaryDistributionService {
   public void distribute(UUID sampleSummaryId)
       throws NoSampleUnitsInSampleSummaryException, UnknownSampleSummaryException {
     LOG.info("about to distribute sample summary", kv("sampleSummaryId", sampleSummaryId));
+    printMemoryUsage("about to distribute sample summary", heapMemory, nonHeapMemory);
     // first find the correct sample summary
     SampleSummary sampleSummary =
         sampleSummaryRepository
@@ -60,11 +68,11 @@ public class SampleSummaryDistributionService {
             .orElseThrow(UnknownSampleSummaryException::new);
 
     LOG.info("found sample summary", kv("sampleSummary", sampleSummary.getId()));
-
+    printMemoryUsage("found sample summary", heapMemory, nonHeapMemory);
     Stream<SampleUnit> sampleUnits = sampleService.findSampleUnitsBySampleSummary(sampleSummaryId);
 
     LOG.info("found sample units for summary", kv("sampleSummaryId", sampleSummaryId));
-
+    printMemoryUsage("found sample units for summary", heapMemory, nonHeapMemory);
     // We need to check that the stream length wasn't 0 - we can't check directly as this would
     // consume the stream
     AtomicInteger i = new AtomicInteger(0);
@@ -155,4 +163,19 @@ public class SampleSummaryDistributionService {
     parent.setCollectionExerciseId(collectionExerciseId.toString());
     return parent;
   }
+
+  private static void printMemoryUsage(String location, MemoryUsage heapUsage, MemoryUsage nonHeapMemory) {
+    LOG.info("Memory Usage",
+             kv("location", location),
+             kv("heapInit", heapUsage.getInit() / (1024 * 1024) + " MB"),
+             kv("heapUsed", heapUsage.getUsed() / (1024 * 1024) + " MB"),
+             kv("heapCommitted", heapUsage.getCommitted() / (1024 * 1024) + " MB"),
+             kv("heapMax", heapUsage.getMax() / (1024 * 1024) + " MB"),
+             kv("stackInit", nonHeapMemory.getInit() / (1024 * 1024) + " MB"),
+             kv("stackUsed", nonHeapMemory.getUsed() / (1024 * 1024) + " MB"),
+             kv("stackCommitted", nonHeapMemory.getCommitted() / (1024 * 1024) + " MB"),
+             kv("stackMax", nonHeapMemory.getMax() / (1024 * 1024) + " MB")
+        );
+  }
+
 }
