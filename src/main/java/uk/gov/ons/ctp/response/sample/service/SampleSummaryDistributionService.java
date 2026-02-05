@@ -2,6 +2,9 @@ package uk.gov.ons.ctp.response.sample.service;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryUsage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -23,9 +26,6 @@ import uk.gov.ons.ctp.response.sample.domain.repository.SampleUnitRepository;
 import uk.gov.ons.ctp.response.sample.message.SampleUnitPublisher;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitDTO;
 import uk.gov.ons.ctp.response.sample.representation.SampleUnitParentDTO;
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryMXBean;
-import java.lang.management.MemoryUsage;
 
 @Service
 public class SampleSummaryDistributionService {
@@ -164,18 +164,18 @@ public class SampleSummaryDistributionService {
     return parent;
   }
 
-  private static void printMemoryUsage(String location, MemoryUsage heapUsage, MemoryUsage nonHeapMemory) {
-    LOG.info("Memory Usage",
-             kv("location", location),
-             kv("heapInit", heapUsage.getInit() / (1024 * 1024) + " MB"),
-             kv("heapUsed", heapUsage.getUsed() / (1024 * 1024) + " MB"),
-             kv("heapCommitted", heapUsage.getCommitted() / (1024 * 1024) + " MB"),
-             kv("heapMax", heapUsage.getMax() / (1024 * 1024) + " MB"),
-             kv("stackInit", nonHeapMemory.getInit() / (1024 * 1024) + " MB"),
-             kv("stackUsed", nonHeapMemory.getUsed() / (1024 * 1024) + " MB"),
-             kv("stackCommitted", nonHeapMemory.getCommitted() / (1024 * 1024) + " MB"),
-             kv("stackMax", nonHeapMemory.getMax() / (1024 * 1024) + " MB")
-        );
+  private static void printMemoryUsage(
+      String location, MemoryUsage heapUsage, MemoryUsage nonHeapMemory) {
+    LOG.info(
+        "Memory Usage",
+        kv("location", location),
+        kv("heapInit", heapUsage.getInit() / (1024 * 1024) + " MB"),
+        kv("heapUsed", heapUsage.getUsed() / (1024 * 1024) + " MB"),
+        kv("heapCommitted", heapUsage.getCommitted() / (1024 * 1024) + " MB"),
+        kv("heapMax", heapUsage.getMax() / (1024 * 1024) + " MB"),
+        kv("stackInit", nonHeapMemory.getInit() / (1024 * 1024) + " MB"),
+        kv("stackUsed", nonHeapMemory.getUsed() / (1024 * 1024) + " MB"),
+        kv("stackCommitted", nonHeapMemory.getCommitted() / (1024 * 1024) + " MB"),
+        kv("stackMax", nonHeapMemory.getMax() / (1024 * 1024) + " MB"));
   }
-
 }
