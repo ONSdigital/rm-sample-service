@@ -88,6 +88,7 @@ public class SampleSummaryDistributionService {
                     "distribute sample unit",
                     kv("sampleSummaryId", sampleSummaryId),
                     kv("sampleUnitId", sampleUnit.getId()));
+                printMemoryUsage("distribute sample unit", heapMemory, nonHeapMemory);
                 distributeSampleUnit(sampleSummary.getCollectionExerciseId(), sampleUnit);
                 distributeSamples.add(sampleUnit);
 
@@ -107,15 +108,20 @@ public class SampleSummaryDistributionService {
           kv("sampleSummaryId", sampleSummaryId));
       throw new NoSampleUnitsInSampleSummaryException();
     }
+    printMemoryUsage("sampleUnitRepository.saveAll (before)", heapMemory, nonHeapMemory);
     sampleUnitRepository.saveAll(distributeSamples);
+    printMemoryUsage("sampleUnitRepository.flush() (before)", heapMemory, nonHeapMemory);
     sampleUnitRepository.flush();
     // Nothing currently uses this flag, but in the future we'll clean up old samples once they're
     // no longer needed
     LOG.info(
         "Distribution was successful.  Marking sample summary for deletion",
         kv("sampleSummaryId", sampleSummaryId));
+    printMemoryUsage("Marking sample summary for deletion (before)", heapMemory, nonHeapMemory);
     sampleSummary.setMarkForDeletion(true);
+    printMemoryUsage("sampleSummaryRepository.saveAndFlush (before)", heapMemory, nonHeapMemory);
     sampleSummaryRepository.saveAndFlush(sampleSummary);
+    printMemoryUsage("sampleSummaryRepository.saveAndFlush (after)", heapMemory, nonHeapMemory);
   }
 
   /**
@@ -127,17 +133,21 @@ public class SampleSummaryDistributionService {
    */
   public void distributeSampleUnit(UUID collectionExerciseId, SampleUnit sampleUnit) {
     SampleUnitParentDTO parent = createSampleUnitParentDTOObject(collectionExerciseId, sampleUnit);
+    printMemoryUsage("sendSampleUnitToCase (before)", heapMemory, nonHeapMemory);
     sampleUnitPublisher.sendSampleUnitToCase(parent);
+    printMemoryUsage("sendSampleUnitToCase (after)", heapMemory, nonHeapMemory);
     try {
       LOG.info(
           "Transitioning state of sampleUnit",
           kv("id", sampleUnit.getId()),
           kv("from", sampleUnit.getState()),
           kv("to", SampleUnitDTO.SampleUnitEvent.DELIVERING));
+      printMemoryUsage("Transitioning state of sampleUnit", heapMemory, nonHeapMemory);
       SampleUnitDTO.SampleUnitState newState =
           sampleUnitTransitionManager.transition(
               sampleUnit.getState(), SampleUnitDTO.SampleUnitEvent.DELIVERING);
       sampleUnit.setState(newState);
+      printMemoryUsage("sampleUnitTransitionManager.transition", heapMemory, nonHeapMemory);
     } catch (CTPException e) {
       LOG.error("Error occurred whilst transitioning state", e);
     }
