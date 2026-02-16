@@ -2,6 +2,10 @@ package uk.gov.ons.ctp.response.sample.service;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
+import jakarta.persistence.EntityManager;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryUsage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -39,6 +43,10 @@ public class SampleSummaryDistributionService {
   private StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent>
       sampleUnitTransitionManager;
 
+  @Autowired private EntityManager entityManager;
+
+  MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
+
   /**
    * Distributes the sample units to the case service to create cases against each sample unit. This
    * is done over pubsub.
@@ -53,6 +61,7 @@ public class SampleSummaryDistributionService {
   public void distribute(UUID sampleSummaryId)
       throws NoSampleUnitsInSampleSummaryException, UnknownSampleSummaryException {
     LOG.info("about to distribute sample summary", kv("sampleSummaryId", sampleSummaryId));
+    logMemoryUsage("about to distribute sample summary", memoryBean);
     // first find the correct sample summary
     SampleSummary sampleSummary =
         sampleSummaryRepository
@@ -60,11 +69,11 @@ public class SampleSummaryDistributionService {
             .orElseThrow(UnknownSampleSummaryException::new);
 
     LOG.info("found sample summary", kv("sampleSummary", sampleSummary.getId()));
-
+    logMemoryUsage("found sample summary", memoryBean);
     Stream<SampleUnit> sampleUnits = sampleService.findSampleUnitsBySampleSummary(sampleSummaryId);
 
     LOG.info("found sample units for summary", kv("sampleSummaryId", sampleSummaryId));
-
+    logMemoryUsage("found sample units for summary", memoryBean);
     // We need to check that the stream length wasn't 0 - we can't check directly as this would
     // consume the stream
     AtomicInteger i = new AtomicInteger(0);
@@ -80,8 +89,15 @@ public class SampleSummaryDistributionService {
                     "distribute sample unit",
                     kv("sampleSummaryId", sampleSummaryId),
                     kv("sampleUnitId", sampleUnit.getId()));
+                logMemoryUsage("distribute sample unit", memoryBean);
                 distributeSampleUnit(sampleSummary.getCollectionExerciseId(), sampleUnit);
                 distributeSamples.add(sampleUnit);
+
+                int count = i.incrementAndGet();
+                if (count % 1000 == 0) {
+                  entityManager.flush();
+                  entityManager.clear();
+                }
 
               } catch (RuntimeException ex) {
                 LOG.error(
@@ -106,8 +122,11 @@ public class SampleSummaryDistributionService {
     LOG.info(
         "Distribution was successful.  Marking sample summary for deletion",
         kv("sampleSummaryId", sampleSummaryId));
+    logMemoryUsage("Marking sample summary for deletion (before)", memoryBean);
     sampleSummary.setMarkForDeletion(true);
+    logMemoryUsage("sampleSummaryRepository.saveAndFlush (before)", memoryBean);
     sampleSummaryRepository.saveAndFlush(sampleSummary);
+    logMemoryUsage("sampleSummaryRepository.saveAndFlush (after)", memoryBean);
   }
 
   /**
@@ -119,17 +138,21 @@ public class SampleSummaryDistributionService {
    */
   public void distributeSampleUnit(UUID collectionExerciseId, SampleUnit sampleUnit) {
     SampleUnitParentDTO parent = createSampleUnitParentDTOObject(collectionExerciseId, sampleUnit);
+    logMemoryUsage("sendSampleUnitToCase (before)", memoryBean);
     sampleUnitPublisher.sendSampleUnitToCase(parent);
+    logMemoryUsage("sendSampleUnitToCase (after)", memoryBean);
     try {
       LOG.info(
           "Transitioning state of sampleUnit",
           kv("id", sampleUnit.getId()),
           kv("from", sampleUnit.getState()),
           kv("to", SampleUnitDTO.SampleUnitEvent.DELIVERING));
+      logMemoryUsage("Transitioning state of sampleUnit", memoryBean);
       SampleUnitDTO.SampleUnitState newState =
           sampleUnitTransitionManager.transition(
               sampleUnit.getState(), SampleUnitDTO.SampleUnitEvent.DELIVERING);
       sampleUnit.setState(newState);
+      logMemoryUsage("sampleUnitTransitionManager.transition", memoryBean);
     } catch (CTPException e) {
       LOG.error("Error occurred whilst transitioning state", e);
     }
@@ -154,5 +177,28 @@ public class SampleSummaryDistributionService {
     parent.setCollectionInstrumentId(sampleUnit.getCollectionInstrumentId());
     parent.setCollectionExerciseId(collectionExerciseId.toString());
     return parent;
+  }
+
+  /**
+   * A temporary method to log memory usage at various points in the distribution process to try and
+   * identify memory leaks.
+   *
+   * @param location The location in the code where the memory usage is being logged
+   * @param memoryBean Singleton MemoryMXBean to get memory usage information from
+   */
+  private static void logMemoryUsage(String location, MemoryMXBean memoryBean) {
+    MemoryUsage heapMemory = memoryBean.getHeapMemoryUsage();
+    MemoryUsage nonHeapMemory = memoryBean.getNonHeapMemoryUsage();
+    LOG.info(
+        "Memory Usage",
+        kv("location", location),
+        kv("heapInit", heapMemory.getInit() / (1024 * 1024) + " MB"),
+        kv("heapUsed", heapMemory.getUsed() / (1024 * 1024) + " MB"),
+        kv("heapCommitted", heapMemory.getCommitted() / (1024 * 1024) + " MB"),
+        kv("heapMax", heapMemory.getMax() / (1024 * 1024) + " MB"),
+        kv("stackInit", nonHeapMemory.getInit() / (1024 * 1024) + " MB"),
+        kv("stackUsed", nonHeapMemory.getUsed() / (1024 * 1024) + " MB"),
+        kv("stackCommitted", nonHeapMemory.getCommitted() / (1024 * 1024) + " MB"),
+        kv("stackMax", nonHeapMemory.getMax() / (1024 * 1024) + " MB"));
   }
 }
