@@ -244,15 +244,12 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
     log.debug(
         "sampleunits POST request received", kv("businessSampleUnitDTO", businessSampleUnitDTO));
     BusinessSampleUnit businessSampleUnit = mapBusinessUnit(businessSampleUnitDTO);
-
-    log.debug("businessSampleUnit mapped", kv("businessSample", businessSampleUnit));
     try {
       SampleUnit sampleUnit =
           sampleService.createSampleUnit(
               sampleSummaryId, businessSampleUnit, SampleUnitDTO.SampleUnitState.INIT);
       log.debug("sampleUnit created");
       SampleUnitDTO sampleUnitDTO = mapSampleUnitDTO(sampleUnit);
-      log.debug("SampleUnitDTO mapped", kv("sampleUnitDTO", sampleUnitDTO));
       return ResponseEntity.created(
               URI.create(String.format("/samples/%s", sampleUnit.getSampleUnitPK())))
           .contentType(MediaType.APPLICATION_JSON)
