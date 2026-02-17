@@ -8,6 +8,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -79,7 +80,8 @@ public class SampleSummaryDistributionService {
     // consume the stream
     AtomicInteger i = new AtomicInteger(0);
 
-    List<SampleUnit> distributeSamples = new ArrayList<>();
+    // List<SampleUnit> distributeSamples = new ArrayList<>();
+    List<SampleUnit> distributeSamples = Collections.synchronizedList(new ArrayList<>());
     sampleUnits
         .parallel()
         .forEach(
@@ -96,10 +98,10 @@ public class SampleSummaryDistributionService {
 
                 if (i.intValue() % 10 == 0) {
                   LOG.info("!!! FLUSHING AND CLEAR ENTITY MANAGER !!!", kv("count", i.intValue()));
-                  logMemoryUsage("ABOUT TO FLUSH AND CLEAR...", memoryBean);
+                  // logMemoryUsage("ABOUT TO FLUSH AND CLEAR...", memoryBean);
                   entityManager.flush();
                   entityManager.clear();
-                  logMemoryUsage("FLUSH AND CLEAR COMPLETE...", memoryBean);
+                  // logMemoryUsage("FLUSH AND CLEAR COMPLETE...", memoryBean);
                 }
 
               } catch (RuntimeException ex) {
@@ -141,21 +143,21 @@ public class SampleSummaryDistributionService {
    */
   public void distributeSampleUnit(UUID collectionExerciseId, SampleUnit sampleUnit) {
     SampleUnitParentDTO parent = createSampleUnitParentDTOObject(collectionExerciseId, sampleUnit);
-    logMemoryUsage("sendSampleUnitToCase (before)", memoryBean);
+    // logMemoryUsage("sendSampleUnitToCase (before)", memoryBean);
     sampleUnitPublisher.sendSampleUnitToCase(parent);
-    logMemoryUsage("sendSampleUnitToCase (after)", memoryBean);
+    // logMemoryUsage("sendSampleUnitToCase (after)", memoryBean);
     try {
       LOG.info(
           "Transitioning state of sampleUnit",
           kv("id", sampleUnit.getId()),
           kv("from", sampleUnit.getState()),
           kv("to", SampleUnitDTO.SampleUnitEvent.DELIVERING));
-      logMemoryUsage("Transitioning state of sampleUnit", memoryBean);
+      // logMemoryUsage("Transitioning state of sampleUnit", memoryBean);
       SampleUnitDTO.SampleUnitState newState =
           sampleUnitTransitionManager.transition(
               sampleUnit.getState(), SampleUnitDTO.SampleUnitEvent.DELIVERING);
       sampleUnit.setState(newState);
-      logMemoryUsage("sampleUnitTransitionManager.transition", memoryBean);
+      // logMemoryUsage("sampleUnitTransitionManager.transition", memoryBean);
     } catch (CTPException e) {
       LOG.error("Error occurred whilst transitioning state", e);
     }
