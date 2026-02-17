@@ -3,6 +3,8 @@ package uk.gov.ons.ctp.response.sample.service;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import jakarta.persistence.EntityManager;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -10,6 +12,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -44,8 +47,17 @@ public class SampleSummaryDistributionServiceTest {
   @Mock private SampleUnitPublisher sampleUnitPublisher;
   @Mock private SampleService sampleService;
 
+  @Mock private EntityManager entityManager;
+
   // class under test
   @InjectMocks private SampleSummaryDistributionService sampleSummaryDistributionService;
+
+  @Before
+  public void setUp() throws Exception {
+    Field emField = SampleSummaryDistributionService.class.getDeclaredField("entityManager");
+    emField.setAccessible(true);
+    emField.set(sampleSummaryDistributionService, entityManager);
+  }
 
   @Test
   public void testDistribute()
