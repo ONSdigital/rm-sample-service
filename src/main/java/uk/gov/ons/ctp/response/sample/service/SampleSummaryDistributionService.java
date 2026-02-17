@@ -76,7 +76,7 @@ public class SampleSummaryDistributionService {
     LOG.info("found sample units for summary", kv("sampleSummaryId", sampleSummaryId));
     logMemoryUsage("found sample units for summary", memoryBean);
 
-    int batchSize = 10;
+    int batchSize = 1000;
     List<SampleUnit> batch = new ArrayList<>(batchSize);
     AtomicInteger i = new AtomicInteger(0);
 
