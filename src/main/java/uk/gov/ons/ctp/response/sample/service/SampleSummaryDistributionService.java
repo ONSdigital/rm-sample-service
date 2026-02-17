@@ -82,21 +82,39 @@ public class SampleSummaryDistributionService {
 
     sampleUnits.forEach(
         sampleUnit -> {
-          distributeSampleUnit(sampleSummary.getCollectionExerciseId(), sampleUnit);
-          batch.add(sampleUnit);
-          if (batch.size() == batchSize) {
-            sampleUnitRepository.saveAll(batch);
-            entityManager.flush();
-            entityManager.clear();
-            batch.clear();
+          try {
+            distributeSampleUnit(sampleSummary.getCollectionExerciseId(), sampleUnit);
+            batch.add(sampleUnit);
+            if (batch.size() == batchSize) {
+              sampleUnitRepository.saveAll(batch);
+              entityManager.flush();
+              entityManager.clear();
+              batch.clear();
+            }
+            i.getAndIncrement();
+          } catch (RuntimeException ex) {
+            LOG.error(
+                "Failed to distribute sample unit",
+                kv("sampleSummaryId", sampleSummaryId),
+                kv("sampleUnitId", sampleUnit.getId()),
+                ex);
+            throw ex;
           }
-          i.getAndIncrement();
         });
-    // To complete the final batch
-    if (!batch.isEmpty()) {
-      sampleUnitRepository.saveAll(batch);
-      entityManager.flush();
-      entityManager.clear();
+    // To save the final batch
+    try {
+      if (!batch.isEmpty()) {
+        sampleUnitRepository.saveAll(batch);
+        entityManager.flush();
+        entityManager.clear();
+      }
+    } catch (RuntimeException ex) {
+      LOG.error(
+          "Failed to save final batch of sample units following distribution",
+          kv("sampleSummaryId", sampleSummaryId),
+          kv("batchSize", batch.size()),
+          ex);
+      throw ex;
     }
 
     if (i.get() == 0) {
@@ -105,14 +123,10 @@ public class SampleSummaryDistributionService {
           kv("sampleSummaryId", sampleSummaryId));
       throw new NoSampleUnitsInSampleSummaryException();
     }
-    // sampleUnitRepository.saveAll(distributeSamples);
     sampleUnitRepository.flush();
-    // Nothing currently uses this flag, but in the future we'll clean up old samples once they're
-    // no longer needed
     LOG.info(
         "Distribution was successful.  Marking sample summary for deletion",
         kv("sampleSummaryId", sampleSummaryId));
-    logMemoryUsage("Marking sample summary for deletion (before)", memoryBean);
     sampleSummary.setMarkForDeletion(true);
     logMemoryUsage("sampleSummaryRepository.saveAndFlush (before)", memoryBean);
     sampleSummaryRepository.saveAndFlush(sampleSummary);
@@ -128,21 +142,17 @@ public class SampleSummaryDistributionService {
    */
   public void distributeSampleUnit(UUID collectionExerciseId, SampleUnit sampleUnit) {
     SampleUnitParentDTO parent = createSampleUnitParentDTOObject(collectionExerciseId, sampleUnit);
-    // logMemoryUsage("sendSampleUnitToCase (before)", memoryBean);
     sampleUnitPublisher.sendSampleUnitToCase(parent);
-    // logMemoryUsage("sendSampleUnitToCase (after)", memoryBean);
     try {
       LOG.info(
           "Transitioning state of sampleUnit",
           kv("id", sampleUnit.getId()),
           kv("from", sampleUnit.getState()),
           kv("to", SampleUnitDTO.SampleUnitEvent.DELIVERING));
-      // logMemoryUsage("Transitioning state of sampleUnit", memoryBean);
       SampleUnitDTO.SampleUnitState newState =
           sampleUnitTransitionManager.transition(
               sampleUnit.getState(), SampleUnitDTO.SampleUnitEvent.DELIVERING);
       sampleUnit.setState(newState);
-      // logMemoryUsage("sampleUnitTransitionManager.transition", memoryBean);
     } catch (CTPException e) {
       LOG.error("Error occurred whilst transitioning state", e);
     }
@@ -180,7 +190,7 @@ public class SampleSummaryDistributionService {
     MemoryUsage heapMemory = memoryBean.getHeapMemoryUsage();
     MemoryUsage nonHeapMemory = memoryBean.getNonHeapMemoryUsage();
     LOG.info(
-        "Memory Usage",
+        "SampleSummaryDistributionService Memory Usage",
         kv("location", location),
         kv("heapInit", heapMemory.getInit() / (1024 * 1024) + " MB"),
         kv("heapUsed", heapMemory.getUsed() / (1024 * 1024) + " MB"),
