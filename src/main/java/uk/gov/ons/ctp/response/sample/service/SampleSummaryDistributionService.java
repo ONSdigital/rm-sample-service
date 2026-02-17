@@ -8,7 +8,6 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -78,41 +77,65 @@ public class SampleSummaryDistributionService {
     logMemoryUsage("found sample units for summary", memoryBean);
     // We need to check that the stream length wasn't 0 - we can't check directly as this would
     // consume the stream
-    AtomicInteger i = new AtomicInteger(0);
+    // AtomicInteger i = new AtomicInteger(0);
 
     // List<SampleUnit> distributeSamples = new ArrayList<>();
-    List<SampleUnit> distributeSamples = Collections.synchronizedList(new ArrayList<>());
-    sampleUnits
-        .parallel()
-        .forEach(
-            sampleUnit -> {
-              i.getAndIncrement();
-              try {
-                LOG.info(
-                    "distribute sample unit",
-                    kv("sampleSummaryId", sampleSummaryId),
-                    kv("sampleUnitId", sampleUnit.getId()));
-                logMemoryUsage("distribute sample unit", memoryBean);
-                distributeSampleUnit(sampleSummary.getCollectionExerciseId(), sampleUnit);
-                distributeSamples.add(sampleUnit);
+    //    List<SampleUnit> distributeSamples = Collections.synchronizedList(new ArrayList<>());
+    //    sampleUnits
+    //        .parallel()
+    //        .forEach(
+    //            sampleUnit -> {
+    //              i.getAndIncrement();
+    //              try {
+    //                LOG.info(
+    //                    "distribute sample unit",
+    //                    kv("sampleSummaryId", sampleSummaryId),
+    //                    kv("sampleUnitId", sampleUnit.getId()));
+    //                logMemoryUsage("distribute sample unit", memoryBean);
+    //                distributeSampleUnit(sampleSummary.getCollectionExerciseId(), sampleUnit);
+    //                distributeSamples.add(sampleUnit);
+    //
+    //                if (i.intValue() % 10 == 0) {
+    //                  LOG.info("!!! FLUSHING AND CLEAR ENTITY MANAGER !!!", kv("count",
+    // i.intValue()));
+    //                  // logMemoryUsage("ABOUT TO FLUSH AND CLEAR...", memoryBean);
+    //                  entityManager.flush();
+    //                  entityManager.clear();
+    //                  // logMemoryUsage("FLUSH AND CLEAR COMPLETE...", memoryBean);
+    //                }
+    //
+    //              } catch (RuntimeException ex) {
+    //                LOG.error(
+    //                    "Failed to distribute sample unit",
+    //                    kv("sampleSummaryId", sampleSummaryId),
+    //                    kv("sampleUnitId", sampleUnit.getId()),
+    //                    ex);
+    //                throw ex;
+    //              }
+    //            });
 
-                if (i.intValue() % 10 == 0) {
-                  LOG.info("!!! FLUSHING AND CLEAR ENTITY MANAGER !!!", kv("count", i.intValue()));
-                  // logMemoryUsage("ABOUT TO FLUSH AND CLEAR...", memoryBean);
-                  entityManager.flush();
-                  entityManager.clear();
-                  // logMemoryUsage("FLUSH AND CLEAR COMPLETE...", memoryBean);
-                }
+    int batchSize = 10;
+    List<SampleUnit> batch = new ArrayList<>(batchSize);
+    AtomicInteger i = new AtomicInteger(0);
 
-              } catch (RuntimeException ex) {
-                LOG.error(
-                    "Failed to distribute sample unit",
-                    kv("sampleSummaryId", sampleSummaryId),
-                    kv("sampleUnitId", sampleUnit.getId()),
-                    ex);
-                throw ex;
-              }
-            });
+    sampleUnits.forEach(
+        sampleUnit -> {
+          distributeSampleUnit(sampleSummary.getCollectionExerciseId(), sampleUnit);
+          batch.add(sampleUnit);
+          if (batch.size() == batchSize) {
+            sampleUnitRepository.saveAll(batch);
+            entityManager.flush();
+            entityManager.clear();
+            batch.clear();
+          }
+          i.getAndIncrement();
+        });
+    // To complete the final batch
+    if (!batch.isEmpty()) {
+      sampleUnitRepository.saveAll(batch);
+      entityManager.flush();
+      entityManager.clear();
+    }
 
     if (i.get() == 0) {
       LOG.info(
@@ -120,7 +143,7 @@ public class SampleSummaryDistributionService {
           kv("sampleSummaryId", sampleSummaryId));
       throw new NoSampleUnitsInSampleSummaryException();
     }
-    sampleUnitRepository.saveAll(distributeSamples);
+    // sampleUnitRepository.saveAll(distributeSamples);
     sampleUnitRepository.flush();
     // Nothing currently uses this flag, but in the future we'll clean up old samples once they're
     // no longer needed
