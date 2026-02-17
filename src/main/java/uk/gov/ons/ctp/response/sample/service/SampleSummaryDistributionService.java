@@ -75,44 +75,6 @@ public class SampleSummaryDistributionService {
 
     LOG.info("found sample units for summary", kv("sampleSummaryId", sampleSummaryId));
     logMemoryUsage("found sample units for summary", memoryBean);
-    // We need to check that the stream length wasn't 0 - we can't check directly as this would
-    // consume the stream
-    // AtomicInteger i = new AtomicInteger(0);
-
-    // List<SampleUnit> distributeSamples = new ArrayList<>();
-    //    List<SampleUnit> distributeSamples = Collections.synchronizedList(new ArrayList<>());
-    //    sampleUnits
-    //        .parallel()
-    //        .forEach(
-    //            sampleUnit -> {
-    //              i.getAndIncrement();
-    //              try {
-    //                LOG.info(
-    //                    "distribute sample unit",
-    //                    kv("sampleSummaryId", sampleSummaryId),
-    //                    kv("sampleUnitId", sampleUnit.getId()));
-    //                logMemoryUsage("distribute sample unit", memoryBean);
-    //                distributeSampleUnit(sampleSummary.getCollectionExerciseId(), sampleUnit);
-    //                distributeSamples.add(sampleUnit);
-    //
-    //                if (i.intValue() % 10 == 0) {
-    //                  LOG.info("!!! FLUSHING AND CLEAR ENTITY MANAGER !!!", kv("count",
-    // i.intValue()));
-    //                  // logMemoryUsage("ABOUT TO FLUSH AND CLEAR...", memoryBean);
-    //                  entityManager.flush();
-    //                  entityManager.clear();
-    //                  // logMemoryUsage("FLUSH AND CLEAR COMPLETE...", memoryBean);
-    //                }
-    //
-    //              } catch (RuntimeException ex) {
-    //                LOG.error(
-    //                    "Failed to distribute sample unit",
-    //                    kv("sampleSummaryId", sampleSummaryId),
-    //                    kv("sampleUnitId", sampleUnit.getId()),
-    //                    ex);
-    //                throw ex;
-    //              }
-    //            });
 
     int batchSize = 10;
     List<SampleUnit> batch = new ArrayList<>(batchSize);
