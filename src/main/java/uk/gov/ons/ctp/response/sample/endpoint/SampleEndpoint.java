@@ -242,27 +242,26 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       throw new InvalidRequestException("Binding errors for create action: ", bindingResult);
     }
     log.debug(
-        "create sample unit request received", kv("businessSampleUnitDTO", businessSampleUnitDTO));
+        "sampleunits POST request received", kv("businessSampleUnitDTO", businessSampleUnitDTO));
     BusinessSampleUnit businessSampleUnit = mapBusinessUnit(businessSampleUnitDTO);
 
-    log.debug("business sample constructed", kv("businessSample", businessSampleUnit));
+    log.debug("businessSampleUnit mapped", kv("businessSample", businessSampleUnit));
     try {
-      // first create the new sample
       SampleUnit sampleUnit =
           sampleService.createSampleUnit(
               sampleSummaryId, businessSampleUnit, SampleUnitDTO.SampleUnitState.INIT);
-      log.debug("sample created");
+      log.debug("sampleUnit created");
       SampleUnitDTO sampleUnitDTO = mapSampleUnitDTO(sampleUnit);
-      log.debug("created SampleUnitDTO", kv("sampleUnitDTO", sampleUnitDTO));
+      log.debug("SampleUnitDTO mapped", kv("sampleUnitDTO", sampleUnitDTO));
       return ResponseEntity.created(
               URI.create(String.format("/samples/%s", sampleUnit.getSampleUnitPK())))
           .contentType(MediaType.APPLICATION_JSON)
           .body(sampleUnitDTO);
     } catch (IllegalStateException e) {
-      log.warn("duplicate sample", kv("sampleSummaryId", sampleSummaryId), e);
+      log.warn("duplicate sampleUnit", kv("sampleSummaryId", sampleSummaryId), e);
       return ResponseEntity.status(HttpStatus.CONFLICT).build();
     } catch (UnknownSampleSummaryException e) {
-      log.error("unknown sample summary id", kv("sampleSummaryId", sampleSummaryId), e);
+      log.error("unknown sampleSummaryId", kv("sampleSummaryId", sampleSummaryId), e);
       return ResponseEntity.badRequest().build();
     } catch (CTPException | RuntimeException e) {
       log.error("unexpected exception", kv("sampleSummaryId", sampleSummaryId), e);
@@ -284,7 +283,7 @@ public final class SampleEndpoint extends CsvToBean<BusinessSampleUnit> {
       log.error("unexpected exception", kv("sampleSummaryId", sampleSummaryId), e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     } catch (NoSuchElementException e) {
-      log.error("Sample summary not found", kv("sampleSummaryId", sampleSummaryId), e);
+      log.error("sampleSummaryId not found", kv("sampleSummaryId", sampleSummaryId), e);
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
