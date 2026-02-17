@@ -3,6 +3,7 @@ package uk.gov.ons.ctp.response.sample.service;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
@@ -43,7 +44,7 @@ public class SampleSummaryDistributionService {
   private StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent>
       sampleUnitTransitionManager;
 
-  @Autowired private EntityManager entityManager;
+  @PersistenceContext private EntityManager entityManager;
 
   MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
 
