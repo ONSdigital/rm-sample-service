@@ -95,7 +95,7 @@ public class SampleSummaryDistributionService {
                 distributeSamples.add(sampleUnit);
 
                 int count = i.incrementAndGet();
-                if (count % 1000 == 0) {
+                if (count % 10 == 0) {
                   LOG.info("!!! FLUSHING AND CLEAR ENTITY MANAGER !!!", kv("count", count));
                   logMemoryUsage("ABOUT TO FLUSH AND CLEAR...", memoryBean);
                   entityManager.flush();
