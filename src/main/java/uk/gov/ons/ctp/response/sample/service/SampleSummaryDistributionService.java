@@ -90,9 +90,9 @@ public class SampleSummaryDistributionService {
               entityManager.flush();
               entityManager.clear();
               batch.clear();
+              logMemoryUsage("sampleUnit batch processed", memoryBean);
             }
             i.getAndIncrement();
-            logMemoryUsage("sampleUnit batch processed", memoryBean);
           } catch (RuntimeException ex) {
             LOG.error(
                 "Failed to distribute sample unit",
@@ -108,8 +108,8 @@ public class SampleSummaryDistributionService {
         sampleUnitRepository.saveAll(batch);
         entityManager.flush();
         entityManager.clear();
+        logMemoryUsage("remaining final sampleUnit batch processed", memoryBean);
       }
-      logMemoryUsage("remaining final sampleUnit batch processed", memoryBean);
     } catch (RuntimeException ex) {
       LOG.error(
           "Failed to save final batch of sample units following distribution",
