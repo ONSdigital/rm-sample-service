@@ -102,17 +102,17 @@ public class SampleSummaryDistributionService {
             throw ex;
           }
         });
-    // To save the final partial batch
+    // To save the remaining partial batch
     try {
       if (!batch.isEmpty()) {
         sampleUnitRepository.saveAll(batch);
         entityManager.flush();
         entityManager.clear();
-        logMemoryUsage("remaining final sampleUnit batch processed", memoryBean);
+        logMemoryUsage("remaining sampleUnit batch processed", memoryBean);
       }
     } catch (RuntimeException ex) {
       LOG.error(
-          "Failed to save final batch of sample units following distribution",
+          "Failed to save remaining batch of sample units following distribution",
           kv("sampleSummaryId", sampleSummaryId),
           kv("batchSize", batch.size()),
           ex);
