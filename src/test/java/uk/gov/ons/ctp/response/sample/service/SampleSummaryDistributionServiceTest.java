@@ -89,7 +89,7 @@ public class SampleSummaryDistributionServiceTest {
   }
 
   @Test
-  public void testDistributeWithBatchProcessing() throws Exception {
+  public void testDistributeInBatches() throws Exception {
     SampleSummary sampleSummary = new SampleSummary();
     sampleSummary.setId(SAMPLE_SUMMARY_ID);
     sampleSummary.setSampleSummaryPK(Integer.valueOf(1));
