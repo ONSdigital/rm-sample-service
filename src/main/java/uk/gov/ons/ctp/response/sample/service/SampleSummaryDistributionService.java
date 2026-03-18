@@ -9,6 +9,7 @@ import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -114,7 +115,7 @@ public class SampleSummaryDistributionService {
       LOG.error(
           "Failed to save remaining batch of sample units following distribution",
           kv("sampleSummaryId", sampleSummaryId),
-          kv("batchSize", batch.size()),
+          kv("batchSize", Optional.of(batch.size())),
           ex);
       throw ex;
     }
@@ -156,7 +157,7 @@ public class SampleSummaryDistributionService {
               sampleUnit.getState(), SampleUnitDTO.SampleUnitEvent.DELIVERING);
       sampleUnit.setState(newState);
     } catch (CTPException e) {
-      LOG.error("Error occurred whilst transitioning state", e);
+      LOG.error("Error occurred whilst transitioning state of sampleUnit", e);
     }
   }
 

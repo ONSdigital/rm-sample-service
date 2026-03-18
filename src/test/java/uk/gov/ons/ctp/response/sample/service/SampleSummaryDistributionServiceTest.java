@@ -88,6 +88,41 @@ public class SampleSummaryDistributionServiceTest {
     verify(sampleSummaryRepository, times(1)).saveAndFlush(any());
   }
 
+  @Test
+  public void testDistributeWithBatchProcessing() throws Exception {
+    SampleSummary sampleSummary = new SampleSummary();
+    sampleSummary.setId(SAMPLE_SUMMARY_ID);
+    sampleSummary.setSampleSummaryPK(Integer.valueOf(1));
+    sampleSummary.setCollectionExerciseId(UUID.fromString(COLLECTION_EXERCISE_ID));
+
+    List<SampleUnit> samples = new ArrayList<>();
+    // create 1001 sample units, batch size 1000: expect 2 saveAll calls
+    for (int j = 0; j < 1001; j++) {
+      SampleUnit sampleUnit = new SampleUnit();
+      sampleUnit.setId(UUID.randomUUID());
+      sampleUnit.setSampleUnitRef(SAMPLE_UNIT_REF + j);
+      sampleUnit.setSampleUnitType(SAMPLE_UNIT_TYPE);
+      sampleUnit.setPartyId(UUID.fromString(PARTY_ID));
+      samples.add(sampleUnit);
+    }
+    Stream<SampleUnit> sampleStream = samples.stream();
+
+    when(sampleSummaryRepository.findById(SAMPLE_SUMMARY_ID))
+        .thenReturn(Optional.of(sampleSummary));
+    when(sampleService.findSampleUnitsBySampleSummary(SAMPLE_SUMMARY_ID)).thenReturn(sampleStream);
+
+    sampleSummaryDistributionService.distribute(SAMPLE_SUMMARY_ID);
+
+    // 1001 sample units, batch size 1000: expect 2 saveAll calls
+    verify(sampleUnitRepository, times(2)).saveAll(any());
+    verify(entityManager, times(2)).flush();
+    verify(entityManager, times(2)).clear();
+    verify(sampleUnitPublisher, times(1001)).sendSampleUnitToCase(any());
+    verify(sampleUnitStateTransitionManager, times(1001)).transition(any(), any());
+    verify(sampleUnitRepository, times(1)).flush();
+    verify(sampleSummaryRepository, times(1)).saveAndFlush(any());
+  }
+
   @Test(expected = UnknownSampleSummaryException.class)
   public void testDistributeFailsWithUnknownSampleSummaryId()
       throws UnknownSampleSummaryException, NoSampleUnitsInSampleSummaryException {
