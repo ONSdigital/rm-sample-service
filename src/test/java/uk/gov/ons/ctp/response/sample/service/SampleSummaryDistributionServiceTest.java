@@ -64,7 +64,7 @@ public class SampleSummaryDistributionServiceTest {
       throws UnknownSampleSummaryException, NoSampleUnitsInSampleSummaryException, CTPException {
     SampleSummary sampleSummary = new SampleSummary();
     sampleSummary.setId(SAMPLE_SUMMARY_ID);
-    sampleSummary.setSampleSummaryPK(1);
+    sampleSummary.setSampleSummaryPK(Integer.valueOf(1));
     sampleSummary.setCollectionExerciseId(UUID.fromString(COLLECTION_EXERCISE_ID));
 
     SampleUnit sampleUnit = new SampleUnit();
@@ -101,7 +101,7 @@ public class SampleSummaryDistributionServiceTest {
       throws UnknownSampleSummaryException, NoSampleUnitsInSampleSummaryException {
     SampleSummary sampleSummary = new SampleSummary();
     sampleSummary.setId(SAMPLE_SUMMARY_ID);
-    sampleSummary.setSampleSummaryPK(1);
+    sampleSummary.setSampleSummaryPK(Integer.valueOf(1));
     when(sampleSummaryRepository.findById(SAMPLE_SUMMARY_ID))
         .thenReturn(Optional.of(sampleSummary));
     when(sampleService.findSampleUnitsBySampleSummary(SAMPLE_SUMMARY_ID))
@@ -123,11 +123,11 @@ public class SampleSummaryDistributionServiceTest {
         sampleSummaryDistributionService.createSampleUnitParentDTOObject(
             UUID.fromString(COLLECTION_EXERCISE_ID), testSampleUnit);
 
-    assertEquals(output.getId(), SAMPLE_UNIT_ID);
-    assertEquals(output.getSampleUnitType(), SAMPLE_UNIT_TYPE);
-    assertEquals(output.getSampleUnitRef(), SAMPLE_UNIT_REF);
+    assertEquals(SAMPLE_UNIT_ID, output.getId());
+    assertEquals(SAMPLE_UNIT_TYPE, output.getSampleUnitType());
+    assertEquals(SAMPLE_UNIT_REF, output.getSampleUnitRef());
     assertTrue(output.isActiveEnrolment());
     assertEquals(output.getPartyId(), UUID.fromString(PARTY_ID));
-    assertEquals(output.getCollectionExerciseId(), COLLECTION_EXERCISE_ID);
+    assertEquals(COLLECTION_EXERCISE_ID, output.getCollectionExerciseId());
   }
 }
