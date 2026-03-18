@@ -96,8 +96,8 @@ public class SampleSummaryDistributionServiceTest {
     sampleSummary.setCollectionExerciseId(UUID.fromString(COLLECTION_EXERCISE_ID));
 
     List<SampleUnit> samples = new ArrayList<>();
-    // create 1001 sample units, batch size 1000: expect 2 saveAll calls
-    for (int j = 0; j < 1001; j++) {
+    // create 2001 sample units, batch size 1000: expect 3 saveAll calls
+    for (int j = 0; j < 2001; j++) {
       SampleUnit sampleUnit = new SampleUnit();
       sampleUnit.setId(UUID.randomUUID());
       sampleUnit.setSampleUnitRef(SAMPLE_UNIT_REF + j);
@@ -113,12 +113,12 @@ public class SampleSummaryDistributionServiceTest {
 
     sampleSummaryDistributionService.distribute(SAMPLE_SUMMARY_ID);
 
-    // 1001 sample units, batch size 1000: expect 2 saveAll calls
-    verify(sampleUnitRepository, times(2)).saveAll(any());
-    verify(entityManager, times(2)).flush();
-    verify(entityManager, times(2)).clear();
-    verify(sampleUnitPublisher, times(1001)).sendSampleUnitToCase(any());
-    verify(sampleUnitStateTransitionManager, times(1001)).transition(any(), any());
+    // 2001 sample units, batch size 1000: expect 3 saveAll calls
+    verify(sampleUnitRepository, times(3)).saveAll(any());
+    verify(entityManager, times(3)).flush();
+    verify(entityManager, times(3)).clear();
+    verify(sampleUnitPublisher, times(2001)).sendSampleUnitToCase(any());
+    verify(sampleUnitStateTransitionManager, times(2001)).transition(any(), any());
     verify(sampleUnitRepository, times(1)).flush();
     verify(sampleSummaryRepository, times(1)).saveAndFlush(any());
   }
