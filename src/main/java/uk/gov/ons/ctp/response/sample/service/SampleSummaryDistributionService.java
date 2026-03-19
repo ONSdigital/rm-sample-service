@@ -91,7 +91,7 @@ public class SampleSummaryDistributionService {
               entityManager.flush();
               entityManager.clear();
               batch.clear();
-              //logMemoryUsage("sampleUnit batch processed", memoryBean);
+              // logMemoryUsage("sampleUnit batch processed", memoryBean);
             }
             i.getAndIncrement();
           } catch (RuntimeException ex) {
