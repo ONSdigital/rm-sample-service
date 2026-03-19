@@ -71,7 +71,6 @@ public class SampleSummaryDistributionService {
             .orElseThrow(UnknownSampleSummaryException::new);
 
     LOG.info("found sample summary", kv("sampleSummary", sampleSummary.getId()));
-    logMemoryUsage("found sample summary", memoryBean);
     Stream<SampleUnit> sampleUnits = sampleService.findSampleUnitsBySampleSummary(sampleSummaryId);
 
     LOG.info("found sample units for summary", kv("sampleSummaryId", sampleSummaryId));
@@ -91,7 +90,7 @@ public class SampleSummaryDistributionService {
               entityManager.flush();
               entityManager.clear();
               batch.clear();
-              // logMemoryUsage("sampleUnit batch processed", memoryBean);
+              logMemoryUsage("sampleUnit batch processed", memoryBean);
             }
             i.getAndIncrement();
           } catch (RuntimeException ex) {
@@ -131,7 +130,6 @@ public class SampleSummaryDistributionService {
         "Distribution was successful.  Marking sample summary for deletion",
         kv("sampleSummaryId", sampleSummaryId));
     sampleSummary.setMarkForDeletion(true);
-    logMemoryUsage("sampleSummaryRepository.saveAndFlush (before)", memoryBean);
     sampleSummaryRepository.saveAndFlush(sampleSummary);
     logMemoryUsage("sampleSummaryRepository.saveAndFlush (after)", memoryBean);
   }
