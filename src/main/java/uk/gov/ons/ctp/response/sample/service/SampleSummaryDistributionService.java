@@ -2,8 +2,14 @@ package uk.gov.ons.ctp.response.sample.service;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryUsage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -39,6 +45,10 @@ public class SampleSummaryDistributionService {
   private StateTransitionManager<SampleUnitDTO.SampleUnitState, SampleUnitDTO.SampleUnitEvent>
       sampleUnitTransitionManager;
 
+  @PersistenceContext private EntityManager entityManager;
+
+  MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
+
   /**
    * Distributes the sample units to the case service to create cases against each sample unit. This
    * is done over pubsub.
@@ -53,6 +63,7 @@ public class SampleSummaryDistributionService {
   public void distribute(UUID sampleSummaryId)
       throws NoSampleUnitsInSampleSummaryException, UnknownSampleSummaryException {
     LOG.info("about to distribute sample summary", kv("sampleSummaryId", sampleSummaryId));
+    logMemoryUsage("about to distribute sample summary", memoryBean);
     // first find the correct sample summary
     SampleSummary sampleSummary =
         sampleSummaryRepository
@@ -60,38 +71,53 @@ public class SampleSummaryDistributionService {
             .orElseThrow(UnknownSampleSummaryException::new);
 
     LOG.info("found sample summary", kv("sampleSummary", sampleSummary.getId()));
-
     Stream<SampleUnit> sampleUnits = sampleService.findSampleUnitsBySampleSummary(sampleSummaryId);
 
     LOG.info("found sample units for summary", kv("sampleSummaryId", sampleSummaryId));
+    logMemoryUsage("found sample units for summary", memoryBean);
 
-    // We need to check that the stream length wasn't 0 - we can't check directly as this would
-    // consume the stream
+    int batchSize = 1000;
+    List<SampleUnit> batch = new ArrayList<>(batchSize);
     AtomicInteger i = new AtomicInteger(0);
 
-    List<SampleUnit> distributeSamples = new ArrayList<>();
-    sampleUnits
-        .parallel()
-        .forEach(
-            sampleUnit -> {
-              i.getAndIncrement();
-              try {
-                LOG.info(
-                    "distribute sample unit",
-                    kv("sampleSummaryId", sampleSummaryId),
-                    kv("sampleUnitId", sampleUnit.getId()));
-                distributeSampleUnit(sampleSummary.getCollectionExerciseId(), sampleUnit);
-                distributeSamples.add(sampleUnit);
-
-              } catch (RuntimeException ex) {
-                LOG.error(
-                    "Failed to distribute sample unit",
-                    kv("sampleSummaryId", sampleSummaryId),
-                    kv("sampleUnitId", sampleUnit.getId()),
-                    ex);
-                throw ex;
-              }
-            });
+    sampleUnits.forEach(
+        sampleUnit -> {
+          try {
+            distributeSampleUnit(sampleSummary.getCollectionExerciseId(), sampleUnit);
+            batch.add(sampleUnit);
+            if (batch.size() == batchSize) {
+              sampleUnitRepository.saveAll(batch);
+              entityManager.flush();
+              entityManager.clear();
+              batch.clear();
+              logMemoryUsage("sampleUnit batch processed", memoryBean);
+            }
+            i.getAndIncrement();
+          } catch (RuntimeException ex) {
+            LOG.error(
+                "Failed to distribute sample unit",
+                kv("sampleSummaryId", sampleSummaryId),
+                kv("sampleUnitId", sampleUnit.getId()),
+                ex);
+            throw ex;
+          }
+        });
+    // To save the remaining partial batch
+    try {
+      if (!batch.isEmpty()) {
+        sampleUnitRepository.saveAll(batch);
+        entityManager.flush();
+        entityManager.clear();
+        logMemoryUsage("remaining sampleUnit batch processed", memoryBean);
+      }
+    } catch (RuntimeException ex) {
+      LOG.error(
+          "Failed to save remaining batch of sample units following distribution",
+          kv("sampleSummaryId", sampleSummaryId),
+          kv("batchSize", Optional.of(batch.size())),
+          ex);
+      throw ex;
+    }
 
     if (i.get() == 0) {
       LOG.info(
@@ -99,15 +125,13 @@ public class SampleSummaryDistributionService {
           kv("sampleSummaryId", sampleSummaryId));
       throw new NoSampleUnitsInSampleSummaryException();
     }
-    sampleUnitRepository.saveAll(distributeSamples);
     sampleUnitRepository.flush();
-    // Nothing currently uses this flag, but in the future we'll clean up old samples once they're
-    // no longer needed
     LOG.info(
         "Distribution was successful.  Marking sample summary for deletion",
         kv("sampleSummaryId", sampleSummaryId));
     sampleSummary.setMarkForDeletion(true);
     sampleSummaryRepository.saveAndFlush(sampleSummary);
+    logMemoryUsage("sampleSummaryRepository.saveAndFlush (after)", memoryBean);
   }
 
   /**
@@ -131,7 +155,7 @@ public class SampleSummaryDistributionService {
               sampleUnit.getState(), SampleUnitDTO.SampleUnitEvent.DELIVERING);
       sampleUnit.setState(newState);
     } catch (CTPException e) {
-      LOG.error("Error occurred whilst transitioning state", e);
+      LOG.error("Error occurred whilst transitioning state of sampleUnit", e);
     }
   }
 
@@ -154,5 +178,28 @@ public class SampleSummaryDistributionService {
     parent.setCollectionInstrumentId(sampleUnit.getCollectionInstrumentId());
     parent.setCollectionExerciseId(collectionExerciseId.toString());
     return parent;
+  }
+
+  /**
+   * A temporary method to log memory usage at various points in the distribution process to try and
+   * identify memory leaks.
+   *
+   * @param location The location in the code where the memory usage is being logged
+   * @param memoryBean Singleton MemoryMXBean to get memory usage information from
+   */
+  private static void logMemoryUsage(String location, MemoryMXBean memoryBean) {
+    MemoryUsage heapMemory = memoryBean.getHeapMemoryUsage();
+    MemoryUsage nonHeapMemory = memoryBean.getNonHeapMemoryUsage();
+    LOG.info(
+        "SampleSummaryDistributionService Memory Usage",
+        kv("location", location),
+        kv("heapInit", heapMemory.getInit() / (1024 * 1024) + " MB"),
+        kv("heapUsed", heapMemory.getUsed() / (1024 * 1024) + " MB"),
+        kv("heapCommitted", heapMemory.getCommitted() / (1024 * 1024) + " MB"),
+        kv("heapMax", heapMemory.getMax() / (1024 * 1024) + " MB"),
+        kv("stackInit", nonHeapMemory.getInit() / (1024 * 1024) + " MB"),
+        kv("stackUsed", nonHeapMemory.getUsed() / (1024 * 1024) + " MB"),
+        kv("stackCommitted", nonHeapMemory.getCommitted() / (1024 * 1024) + " MB"),
+        kv("stackMax", nonHeapMemory.getMax() / (1024 * 1024) + " MB"));
   }
 }

@@ -3,6 +3,8 @@ package uk.gov.ons.ctp.response.sample.service;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import jakarta.persistence.EntityManager;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -10,6 +12,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 import libs.common.error.CTPException;
 import libs.common.state.StateTransitionManager;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -44,15 +47,24 @@ public class SampleSummaryDistributionServiceTest {
   @Mock private SampleUnitPublisher sampleUnitPublisher;
   @Mock private SampleService sampleService;
 
+  @Mock private EntityManager entityManager;
+
   // class under test
   @InjectMocks private SampleSummaryDistributionService sampleSummaryDistributionService;
+
+  @Before
+  public void setUp() throws Exception {
+    Field emField = SampleSummaryDistributionService.class.getDeclaredField("entityManager");
+    emField.setAccessible(true);
+    emField.set(sampleSummaryDistributionService, entityManager);
+  }
 
   @Test
   public void testDistribute()
       throws UnknownSampleSummaryException, NoSampleUnitsInSampleSummaryException, CTPException {
     SampleSummary sampleSummary = new SampleSummary();
     sampleSummary.setId(SAMPLE_SUMMARY_ID);
-    sampleSummary.setSampleSummaryPK(1);
+    sampleSummary.setSampleSummaryPK(Integer.valueOf(1));
     sampleSummary.setCollectionExerciseId(UUID.fromString(COLLECTION_EXERCISE_ID));
 
     SampleUnit sampleUnit = new SampleUnit();
@@ -76,6 +88,41 @@ public class SampleSummaryDistributionServiceTest {
     verify(sampleSummaryRepository, times(1)).saveAndFlush(any());
   }
 
+  @Test
+  public void testDistributeInBatches() throws Exception {
+    SampleSummary sampleSummary = new SampleSummary();
+    sampleSummary.setId(SAMPLE_SUMMARY_ID);
+    sampleSummary.setSampleSummaryPK(Integer.valueOf(1));
+    sampleSummary.setCollectionExerciseId(UUID.fromString(COLLECTION_EXERCISE_ID));
+
+    List<SampleUnit> samples = new ArrayList<>();
+    // create 2001 sample units, batch size 1000: expect 3 saveAll calls
+    for (int j = 0; j < 2001; j++) {
+      SampleUnit sampleUnit = new SampleUnit();
+      sampleUnit.setId(UUID.randomUUID());
+      sampleUnit.setSampleUnitRef(SAMPLE_UNIT_REF + j);
+      sampleUnit.setSampleUnitType(SAMPLE_UNIT_TYPE);
+      sampleUnit.setPartyId(UUID.fromString(PARTY_ID));
+      samples.add(sampleUnit);
+    }
+    Stream<SampleUnit> sampleStream = samples.stream();
+
+    when(sampleSummaryRepository.findById(SAMPLE_SUMMARY_ID))
+        .thenReturn(Optional.of(sampleSummary));
+    when(sampleService.findSampleUnitsBySampleSummary(SAMPLE_SUMMARY_ID)).thenReturn(sampleStream);
+
+    sampleSummaryDistributionService.distribute(SAMPLE_SUMMARY_ID);
+
+    // 2001 sample units, batch size 1000: expect 3 saveAll calls
+    verify(sampleUnitRepository, times(3)).saveAll(any());
+    verify(entityManager, times(3)).flush();
+    verify(entityManager, times(3)).clear();
+    verify(sampleUnitPublisher, times(2001)).sendSampleUnitToCase(any());
+    verify(sampleUnitStateTransitionManager, times(2001)).transition(any(), any());
+    verify(sampleUnitRepository, times(1)).flush();
+    verify(sampleSummaryRepository, times(1)).saveAndFlush(any());
+  }
+
   @Test(expected = UnknownSampleSummaryException.class)
   public void testDistributeFailsWithUnknownSampleSummaryId()
       throws UnknownSampleSummaryException, NoSampleUnitsInSampleSummaryException {
@@ -89,7 +136,7 @@ public class SampleSummaryDistributionServiceTest {
       throws UnknownSampleSummaryException, NoSampleUnitsInSampleSummaryException {
     SampleSummary sampleSummary = new SampleSummary();
     sampleSummary.setId(SAMPLE_SUMMARY_ID);
-    sampleSummary.setSampleSummaryPK(1);
+    sampleSummary.setSampleSummaryPK(Integer.valueOf(1));
     when(sampleSummaryRepository.findById(SAMPLE_SUMMARY_ID))
         .thenReturn(Optional.of(sampleSummary));
     when(sampleService.findSampleUnitsBySampleSummary(SAMPLE_SUMMARY_ID))
@@ -111,11 +158,11 @@ public class SampleSummaryDistributionServiceTest {
         sampleSummaryDistributionService.createSampleUnitParentDTOObject(
             UUID.fromString(COLLECTION_EXERCISE_ID), testSampleUnit);
 
-    assertEquals(output.getId(), SAMPLE_UNIT_ID);
-    assertEquals(output.getSampleUnitType(), SAMPLE_UNIT_TYPE);
-    assertEquals(output.getSampleUnitRef(), SAMPLE_UNIT_REF);
+    assertEquals(SAMPLE_UNIT_ID, output.getId());
+    assertEquals(SAMPLE_UNIT_TYPE, output.getSampleUnitType());
+    assertEquals(SAMPLE_UNIT_REF, output.getSampleUnitRef());
     assertTrue(output.isActiveEnrolment());
     assertEquals(output.getPartyId(), UUID.fromString(PARTY_ID));
-    assertEquals(output.getCollectionExerciseId(), COLLECTION_EXERCISE_ID);
+    assertEquals(COLLECTION_EXERCISE_ID, output.getCollectionExerciseId());
   }
 }
